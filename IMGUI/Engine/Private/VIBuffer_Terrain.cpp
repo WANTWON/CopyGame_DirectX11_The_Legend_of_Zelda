@@ -179,49 +179,60 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 	memcpy(&TerrainDesc, pArg, sizeof(TERRAINDESC));
 
 
+
+#pragma region VERTEXBUFFER
+
+	m_iNumVertexBuffers = 1;
 	m_iNumVerticesX = TerrainDesc.m_iVerticeNumX;
 	m_iNumVerticesZ = TerrainDesc.m_iVerticeNumZ;
-	ZeroMemory(&m_BufferDesc, sizeof(D3D11_BUFFER_DESC));
 
-	m_iStride = sizeof(VTXNORTEX);
+
 	m_iNumVertices = m_iNumVerticesX * m_iNumVerticesZ;
-	m_iNumVertexBuffers = 1;
-	m_eFormat = DXGI_FORMAT_R32_UINT;
-	m_eTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	m_iStride = sizeof(VTXNORTEX);
 
+	VTXNORTEX*		pVertices = new VTXNORTEX[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXNORTEX) * m_iNumVertices);
 
-	VTXNORTEX*			pVertices = new VTXNORTEX[m_iNumVertices];
 	m_pVerticesPosMxM = new _float3[m_iNumVertices];
+
+
 
 	for (_uint i = 0; i < m_iNumVerticesZ; ++i)
 	{
 		for (_uint j = 0; j < m_iNumVerticesX; ++j)
 		{
-			_uint	iIndex = i * m_iNumVerticesX + j;
+			/* 루프가 하나씩 진행될때마다 1씩증가하는 인덱스를 얻어오기위한.  */
+			_uint		iIndex = i * m_iNumVerticesX + j;
 
-			pVertices[iIndex].vPosition = m_pVerticesPosMxM[iIndex] = _float3(_float(TerrainDesc.m_iPositionX + j), TerrainDesc.m_fHeight, _float(TerrainDesc.m_iPositionZ + i));
-			pVertices[iIndex].vTexture = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
+			pVertices[iIndex].vPosition = m_pVerticesPosMxM[iIndex] = _float3(j, 0.0f, i);
+			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
+			pVertices[iIndex].vTexture = _float2(j / _float(m_iNumVerticesX - 1), i / _float(m_iNumVerticesZ - 1));
 		}
 	}
 
+
+
 #pragma endregion
 
-#pragma region Indices
-	ZeroMemory(&m_BufferDesc, sizeof(D3D11_BUFFER_DESC));
 
-	m_iIndicesByte = sizeof(FACEINDICES32);
+#pragma region INDEXBUFFER
 	m_iNumPrimitive = (m_iNumVerticesX - 1) * (m_iNumVerticesZ - 1) * 2;
+	m_iIndicesByte = sizeof(FACEINDICES32);
 	m_iNumIndicesPerPrimitive = 3;
+	m_eFormat = DXGI_FORMAT_R32_UINT;
+	m_eTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	FACEINDICES32*		pIndices = new FACEINDICES32[m_iNumPrimitive];
+	ZeroMemory(pIndices, sizeof(FACEINDICES32) * m_iNumPrimitive);
 
 
-	FACEINDICES32*			pIndices = new FACEINDICES32[m_iNumPrimitive];
+	_uint			iNumFaces = 0;
 
-	_uint		iNumFaces = 0;
-
-	for (_uint i = 0; i < m_iNumVerticesZ - 1; i++)
+	for (_uint i = 0; i < m_iNumVerticesZ - 1; ++i)
 	{
-		for (_uint j = 0; j < m_iNumVerticesX - 1; j++)
+		for (_uint j = 0; j < m_iNumVerticesX - 1; ++j)
 		{
+			/* 루프가 하나씩 진행될때마다 1씩증가하는 인덱스를 얻어오기위한.  */
 			_uint		iIndex = i * m_iNumVerticesX + j;
 
 			_uint		iIndices[4] = {
@@ -231,46 +242,65 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 				iIndex
 			};
 
+			_vector		vSourDir, vDestDir, vNormal;
+
 			pIndices[iNumFaces]._0 = iIndices[0];
 			pIndices[iNumFaces]._1 = iIndices[1];
 			pIndices[iNumFaces]._2 = iIndices[2];
 
-			_vector		vSourDir, vDestDir, vNormal;
-
+			// 두 점에 대한 벡터 2개를 구한다.
 			vSourDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vPosition);
 			vDestDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition);
+
+			// 외적한다.
 			vNormal = XMVector3Normalize(XMVector3Cross(vSourDir, vDestDir));
 
-			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal, XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal) + vNormal);
-			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal, XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal) + vNormal);
-			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal, XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal) + vNormal);
+			// 외적 결과를 기존 법선 벡터에 더한다.
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal,
+				XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal,
+				XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal,
+				XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal) + vNormal);
+
 			++iNumFaces;
+
+
 
 			pIndices[iNumFaces]._0 = iIndices[0];
 			pIndices[iNumFaces]._1 = iIndices[2];
 			pIndices[iNumFaces]._2 = iIndices[3];
 
+			// 두 점에 대한 벡터 2개를 구한다.
 			vSourDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vPosition);
 			vDestDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition);
+
+			// 외적한다.
 			vNormal = XMVector3Normalize(XMVector3Cross(vSourDir, vDestDir));
 
-			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal, XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal) + vNormal);
-			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal, XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal) + vNormal);
-			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal, XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal) + vNormal);
+			// 외적 결과를 기존 법선 벡터에 더한다.
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal,
+				XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal,
+				XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal,
+				XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal) + vNormal);
+
 			++iNumFaces;
+
 		}
 	}
 
-	for (_uint i = 0; i < m_iNumVertices; ++i)
-		XMStoreFloat3(&pVertices[i].vNormal, XMVector3Normalize(XMLoadFloat3(&pVertices[i].vNormal)));
+
+#pragma endregion
 
 
-
-	/* 정점을 담기 위한 공간을 할당하고, 내가 전달해준 배열의 값들을 멤카피한다. */
-	m_BufferDesc.ByteWidth = m_iStride * m_iNumVertices;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT; /* 정적버퍼를 생성한다. */
+	// 버텍스 ,인덱스 버퍼를 생성한다.
+	ZeroMemory(&m_BufferDesc, sizeof(D3D11_BUFFER_DESC));
+	m_BufferDesc.ByteWidth = m_iNumVertices * m_iStride;
+	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;				// 버퍼를 다이나믹
 	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;	// CPU 접근 가능하게
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = m_iStride;
 
@@ -280,24 +310,23 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 	if (FAILED(__super::Create_VertexBuffer()))
 		return E_FAIL;
 
-	m_BufferDesc.ByteWidth = m_iIndicesByte * m_iNumPrimitive;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT; /* 정적버퍼를 생성한다. */
+	ZeroMemory(&m_BufferDesc, sizeof(D3D11_BUFFER_DESC));
+	m_BufferDesc.ByteWidth = m_iNumPrimitive * m_iIndicesByte;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	m_BufferDesc.CPUAccessFlags = 0;
 	m_BufferDesc.MiscFlags = 0;
-	m_BufferDesc.StructureByteStride = sizeof(_ushort);
+	m_BufferDesc.StructureByteStride = 0;
 
 	ZeroMemory(&m_SubResourceData, sizeof(D3D11_SUBRESOURCE_DATA));
 	m_SubResourceData.pSysMem = pIndices;
 
-	/* 정점을 담기 위한 공간을 할당하고, 내가 전달해준 배열의 값들을 멤카피한다. */
 	if (FAILED(__super::Create_IndexBuffer()))
 		return E_FAIL;
 
+
 	Safe_Delete_Array(pVertices);
 	Safe_Delete_Array(pIndices);
-#pragma endregion
-
 
 	return S_OK;
 }
@@ -312,20 +341,26 @@ _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 
 	_float3			vTempRayDir, vTempRayPos;
 	XMVECTOR		vRayDir, vRayPos;
-	pPicking->Transform_ToLocalSpace(pTransform);
+	pPicking->Compute_LocalRayInfo(&vTempRayDir, &vTempRayPos, pTransform);
 
-	vRayPos = pPicking->Get_RayPos();
-	vRayPos = XMVectorSetW(vRayPos, 1.f);
-	vRayDir = pPicking->Get_RayDir();
+	vRayPos = XMLoadFloat3(&vTempRayPos);
+	vRayDir = XMLoadFloat3(&vTempRayDir);
+
 	vRayDir = XMVector3Normalize(vRayDir);
 
 
-	for (_int i = 0; i < m_iNumVerticesZ; ++i)
+	//// 인덱스 최적화
+	//if (FAILED(Cul_OptiIndex(vRayPos, vRayDir)))
+	//{
+	//	Safe_Release(pPicking);
+	//	return false;
+	//}
+
+
+	for (_int i = 0; i < m_iNumVerticesZ -1 ; ++i)
 	{
-
-		for (_int j = 0; j < m_iNumVerticesX; ++j)
+		for (_int j = 0; j < m_iNumVerticesX- 1; ++j)
 		{
-
 			_uint		iIndex = i * m_iNumVerticesX + j;
 
 			_uint		iIndices[] = {
@@ -340,7 +375,6 @@ _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 
 
 			/* 오른쪽 상단. */
-			_float3	vPickPos;
 			_vector vTemp_1 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[0]]);
 			vTemp_1 = XMVectorSetW(vTemp_1, 1.f);
 			_vector vTemp_2 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[1]]);
@@ -373,11 +407,8 @@ _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 				Safe_Release(pPicking);
 				return true;
 			}
-
 		}
-
 	}
-
 
 	Safe_Release(pPicking);
 	return false;
