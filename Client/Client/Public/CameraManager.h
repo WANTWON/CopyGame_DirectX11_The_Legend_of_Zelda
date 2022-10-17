@@ -1,7 +1,6 @@
 #pragma once
-#include "CameraDynamic.h"
-#include "CameraFPS.h"
-#include "CameraTarget.h"
+#include "Camera_Dynamic.h"
+
 
 BEGIN(Client)
 

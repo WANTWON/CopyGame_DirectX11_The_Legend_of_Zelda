@@ -84,6 +84,9 @@
     <ClInclude Include="..\Public\Camera_Dynamic.h">
       <Filter>96.Camera\Dynamic</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CameraManager.h">
+      <Filter>96.Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -115,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Dynamic.cpp">
       <Filter>96.Camera\Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CameraManager.cpp">
+      <Filter>96.Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -83,7 +83,6 @@ int CCamera_Dynamic::Tick(_float fTimeDelta)
 void CCamera_Dynamic::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
-
 }
 
 HRESULT CCamera_Dynamic::Render()
