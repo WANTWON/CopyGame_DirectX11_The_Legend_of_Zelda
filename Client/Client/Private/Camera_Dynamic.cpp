@@ -60,7 +60,7 @@ int CCamera_Dynamic::Tick(_float fTimeDelta)
 	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
-	_long			MouseMove = 0;
+	/*_long			MouseMove = 0;
 
 	if (MouseMove = pGameInstance->Get_DIMMoveState(DIMM_X))
 	{
@@ -70,7 +70,7 @@ int CCamera_Dynamic::Tick(_float fTimeDelta)
 	if (MouseMove = pGameInstance->Get_DIMMoveState(DIMM_Y))
 	{
 		m_pTransform->Turn(m_pTransform->Get_State(CTransform::STATE_RIGHT), fTimeDelta * MouseMove * 0.1f);
-	}
+	}*/
 
 	Safe_Release(pGameInstance);
 

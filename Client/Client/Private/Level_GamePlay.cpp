@@ -29,8 +29,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	//if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	//	return E_FAIL;	
 
-	//if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
-	//	return E_FAIL;
+	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
+		return E_FAIL;
 
 	
 
@@ -167,7 +167,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_UI"), LEVEL_GAMEPLAY, pLayerTag)))
+	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_UI"), LEVEL_GAMEPLAY, pLayerTag)))
+		//return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, pLayerTag, nullptr)))
 		return E_FAIL;
 
 	Safe_Release(pGameInstance);

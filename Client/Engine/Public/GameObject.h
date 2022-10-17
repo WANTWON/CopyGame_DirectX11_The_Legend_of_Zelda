@@ -29,19 +29,24 @@ public:
 	virtual HRESULT Render();
 
 protected:
-	ID3D11Device* m_pDevice = nullptr; 
-	ID3D11DeviceContext* m_pContext = nullptr;
+	_bool	Get_Dead() { return m_bDead; }
+	_float  Get_CamDistance() { return m_fCamDistance; }
+	void	Set_Dead(_bool bDead) { m_bDead = bDead; }
 
-	float						m_fCamDistance = 0.f;
-
-protected:
-	map<const _tchar*, class CComponent*>				m_Components;
 protected:
 	HRESULT Add_Components(const _tchar* pComponentTag, _uint iLevelIndex, const _tchar* pPrototypeTag, CComponent** ppOut, void* pArg = nullptr);
 	void Compute_CamDistance(_float3 vWorldPos);
 
+protected:
+	ID3D11Device* m_pDevice = nullptr; 
+	ID3D11DeviceContext* m_pContext = nullptr;
 
+	float						m_fCamDistance = 0.f;
+	_bool												m_bDead = false;
+	_float4x4											m_CollisionMatrix;
 
+protected:
+	map<const _tchar*, class CComponent*>				m_Components;
 
 
 public:	

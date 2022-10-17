@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "Base.h"
+#include "UI_Manager.h"
 
 BEGIN(Engine)
 class CRenderer;
@@ -28,7 +29,7 @@ private:
 	ID3D11Device*			m_pDevice = nullptr;
 	ID3D11DeviceContext*	m_pContext = nullptr;
 	CRenderer*				m_pRenderer = nullptr;
-
+	CUI_Manager*			m_pUI_Manager = nullptr;
 #ifdef _DEBUG
 private:
 	_uint					m_iNumRender = 0;

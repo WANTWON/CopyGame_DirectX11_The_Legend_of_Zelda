@@ -2,6 +2,7 @@
 #include "..\Public\BackGround.h"
 
 #include "GameInstance.h"
+#include "UI_Manager.h"
 
 CBackGround::CBackGround(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CGameObject(pDevice, pContext)
@@ -52,6 +53,9 @@ void CBackGround::Late_Tick(_float fTimeDelta)
 
 HRESULT CBackGround::Render()
 {
+	if (!CUI_Manager::Get_Instance()->Get_UI_Open())
+		return S_OK;
+
 	if (nullptr == m_pShaderCom ||
 		nullptr == m_pVIBufferCom)
 		return E_FAIL;
@@ -81,7 +85,7 @@ HRESULT CBackGround::Ready_Components()
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_LOGO, TEXT("Prototype_Component_Texture_BackGround"), (CComponent**)&m_pTextureCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_BackGround_UI"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */

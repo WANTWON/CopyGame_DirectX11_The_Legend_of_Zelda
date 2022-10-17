@@ -4,11 +4,12 @@
 #include "GameInstance.h"
 #include "Level_Loading.h"
 
+
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
+	, m_pUI_Manager(CUI_Manager::Get_Instance())
 {
-	/*D3D11_SAMPLER_DESC*/
-	
+	Safe_AddRef(m_pUI_Manager);
 	Safe_AddRef(m_pGameInstance);
 }
 
@@ -38,6 +39,9 @@ void CMainApp::Tick(_float fTimeDelta)
 {
 	if (nullptr == m_pGameInstance)
 		return;
+
+	if (m_pGameInstance->Key_Up(DIK_I))
+		m_pUI_Manager->Set_UI_Open();
 
 	m_pGameInstance->Tick_Engine(fTimeDelta);
 
@@ -135,7 +139,9 @@ void CMainApp::Free()
 	Safe_Release(m_pContext);
 
 	Safe_Release(m_pGameInstance);
-	
+	Safe_Release(m_pUI_Manager);
+
+	CUI_Manager::Get_Instance()->Destroy_Instance();
 	CGameInstance::Release_Engine();
 }
 

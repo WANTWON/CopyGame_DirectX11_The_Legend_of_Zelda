@@ -179,6 +179,7 @@
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\Public\UI_Manager.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -194,6 +195,7 @@
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\Private\UI_Manager.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
