@@ -66,17 +66,16 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 
 	m_pInput_Device->Update();
 
-
-
 	m_pLevel_Manager->Tick(fTimeDelta);
 	m_pObject_Manager->Tick(fTimeDelta);
 
+	m_pPipeLine->Update();
 	m_pPicking->Tick();
 
 	m_pLevel_Manager->Late_Tick(fTimeDelta);
 	m_pObject_Manager->Late_Tick(fTimeDelta);
 
-	m_pPipeLine->Update();
+
 }
 
 void CGameInstance::Clear(_uint iLevelIndex)

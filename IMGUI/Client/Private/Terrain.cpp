@@ -52,18 +52,30 @@ void CTerrain::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	_float3 m_vMousePickPos;
+	
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (true == m_pVIBufferCom->Picking(m_pTransformCom, &m_vMousePickPos))
+	if (m_pVIBufferCom->Picking(m_pTransformCom, &m_vMousePickPos) == true)
 	{
-		CTerrain_Manager::Get_Instance()->Set_PickingWorldPos(m_vMousePickPos);
+		if (pGameInstance->Mouse_Pressing(DIMK::DIMK_LBUTTON))
+		{
 
+			/*_float fHegith = CMapManager::Get_Instance()->Get_Height();
+			_float fRad = CMapManager::Get_Instance()->Get_Rad();
+			_float fSharp = CMapManager::Get_Instance()->Get_Sharp();*/
+
+			_float fHegith = 0.1f;
+			_float fRad = 0.1f;
+			_float fSharp = 0.1f;
+
+			m_pVIBufferCom->Make_Tick_Up(fHegith, fRad, fSharp, m_vMousePickPos, fTimeDelta);
+
+		}
 	}
 	else
-	{
 		ZeroMemory(&m_vMousePickPos, sizeof(_float3));
-	}
 		
+	RELEASE_INSTANCE(CGameInstance);
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);

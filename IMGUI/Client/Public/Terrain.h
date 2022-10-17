@@ -42,6 +42,7 @@ private:
 	_bool	m_bWireFrame = false;
 	_bool	m_bDebugTerrain = false;
 	_bool	m_bDebugShow = true;
+	_float3 m_vMousePickPos;
 
 public:
 	static CTerrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

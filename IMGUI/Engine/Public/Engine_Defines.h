@@ -11,8 +11,11 @@
 #include <DirectXTK/DDSTextureLoader.h>
 #include <DirectXTK/WICTextureLoader.h>
 #include <DirectXCollision.h>
-#include <typeinfo>
+#include <DirectXTK/ScreenGrab.h>
 
+
+
+#include <typeinfo>
 
 using namespace DirectX;
 

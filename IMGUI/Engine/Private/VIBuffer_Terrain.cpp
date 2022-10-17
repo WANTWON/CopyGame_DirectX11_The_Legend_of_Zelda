@@ -344,9 +344,10 @@ _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 	pPicking->Compute_LocalRayInfo(&vTempRayDir, &vTempRayPos, pTransform);
 
 	vRayPos = XMLoadFloat3(&vTempRayPos);
+	vRayPos = XMVectorSetW(vRayPos, 1.f);
 	vRayDir = XMLoadFloat3(&vTempRayDir);
-
 	vRayDir = XMVector3Normalize(vRayDir);
+
 
 
 	//// 인덱스 최적화
@@ -381,7 +382,7 @@ _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 			vTemp_2 = XMVectorSetW(vTemp_2, 1.f);
 			_vector vTemp_3 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[2]]);
 			vTemp_3 = XMVectorSetW(vTemp_3, 1.f);
-			if (true == TriangleTests::Intersects(vRayPos, vRayDir, vTemp_1, vTemp_2, vTemp_3, fDist))
+			if (true == TriangleTests::Intersects((FXMVECTOR)vRayPos, (FXMVECTOR)vRayDir, (FXMVECTOR)vTemp_1, (GXMVECTOR)vTemp_2, (HXMVECTOR)vTemp_3, fDist))
 			{
 				_vector	vPickPos = vRayPos + vRayDir * fDist;
 
@@ -398,7 +399,7 @@ _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 			vTemp_2 = XMVectorSetW(vTemp_2, 1.f);
 			vTemp_3 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[3]]);
 			vTemp_3 = XMVectorSetW(vTemp_3, 1.f);
-			if (true == TriangleTests::Intersects(vRayPos, vRayDir, vTemp_1, vTemp_2, vTemp_3, fDist))
+			if (true == TriangleTests::Intersects((FXMVECTOR)vRayPos, (FXMVECTOR)vRayDir, (FXMVECTOR)vTemp_1, (GXMVECTOR)vTemp_2, (HXMVECTOR)vTemp_3, fDist))
 			{
 				_vector	vPickPos = vRayPos + vRayDir * fDist;
 
@@ -413,6 +414,66 @@ _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 	Safe_Release(pPicking);
 	return false;
 }
+
+
+
+void CVIBuffer_Terrain::Make_Tick_Up(_float fHeight, _float fRad, _float fSharp, _float3 vPoint, _float fTimeDelta)
+{
+	D3D11_MAPPED_SUBRESOURCE		SubResource;
+
+	m_pContext->Map(m_pVB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+
+	VTXNORTEX* pVertices = (VTXNORTEX*)SubResource.pData;
+
+	for (_int i = 0; i < m_iNumVerticesZ - 1; ++i)
+	{
+
+		for (_int j = 0; j < m_iNumVerticesX - 1; ++j)
+		{
+
+			/* 루프가 하나씩 진행될때마다 1씩증가하는 인덱스를 얻어오기위한.  */
+			_uint		iIndex = i * m_iNumVerticesX + j;
+
+			_float3 vPos = pVertices[iIndex].vPosition;
+
+			_float fH = fHeight;
+			_float fRange = fRad;
+
+			_float3 vTemp1 = vPoint;
+			_float3 vTemp2 = pVertices[iIndex].vPosition;
+			vTemp1.y = vTemp2.y = 0.f;
+
+			_vector fDis = XMLoadFloat3(&vTemp1) - XMLoadFloat3(&vTemp2);
+			_float fLen = XMVectorGetX(XMVector3Length(fDis));
+
+			if (fRange > fLen)
+			{
+
+				_float fAcc = (fRange - fLen) / fRange;
+
+				fAcc = pow(fAcc, (1.f / fSharp));
+
+				_float fTempY = fH * fAcc;
+				if (fH > 0.01f)
+				{
+					if (fTempY > vPos.y)
+						vPos.y = fTempY;
+				}
+				else if (fH < -0.01f)
+					vPos.y += fTempY * fTimeDelta;
+				else
+					vPos.y = 0.f;
+
+			}
+
+			pVertices[iIndex].vPosition = vPos;
+		}
+
+	}
+	m_pContext->Unmap(m_pVB, 0);
+}
+
 
 
 CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, _uint iNumVerticeX, _uint iNumVerticeZ, _float fHeight)

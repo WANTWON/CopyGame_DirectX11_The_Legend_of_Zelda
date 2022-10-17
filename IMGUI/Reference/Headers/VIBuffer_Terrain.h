@@ -29,7 +29,7 @@ public:
 	virtual HRESULT Initialize_Prototype(const _tchar* pHeightMapFilePath);
 	virtual HRESULT Initialize(void* pArg);
 	_bool Picking(class CTransform* pTransform, _float3* pOut);
-
+	void Make_Tick_Up(_float fHeight, _float fRad, _float fSharp, _float3 vPoint, _float fTimeDelta);
 
 private:
 	_uint				m_iNumVerticesX = 0, m_iNumVerticesZ = 0;
