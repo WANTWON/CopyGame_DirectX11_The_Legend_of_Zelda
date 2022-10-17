@@ -36,6 +36,10 @@ public:
 	HRESULT Loading_ForLogoLevel();
 	HRESULT Loading_ForGamePlayLevel();
 
+public:
+	HRESULT Loading_For_ObjectPrototype();
+	HRESULT Loading_For_UITexture();
+
 
 private:
 	LEVEL					m_eNextLevel = LEVEL_END;

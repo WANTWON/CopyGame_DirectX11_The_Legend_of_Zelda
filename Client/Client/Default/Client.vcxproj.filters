@@ -40,11 +40,17 @@
     <Filter Include="95.UI">
       <UniqueIdentifier>{db326884-8e5c-47c6-bd6b-1b276e8834a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="95.UI\00.BackGround">
+    <Filter Include="95.UI\00. ObjUI">
+      <UniqueIdentifier>{c5474d07-5e19-48f3-a029-fbff9831b93d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="95.UI\01. BackGround">
       <UniqueIdentifier>{57566d9b-4982-490a-9436-a60395b8dd99}</UniqueIdentifier>
     </Filter>
-    <Filter Include="95.UI\01. InvenTile">
+    <Filter Include="95.UI\02. InvenTile">
       <UniqueIdentifier>{37acfc00-5104-4b3a-9122-478460e1c85b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="95.UI\03. UIButton">
+      <UniqueIdentifier>{1301e89d-dc8c-4c2b-bb34-ee43c21d52d0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -94,7 +100,16 @@
       <Filter>95.UI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
-      <Filter>95.UI\00.BackGround</Filter>
+      <Filter>95.UI\01. BackGround</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\InvenTile.h">
+      <Filter>95.UI\02. InvenTile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Obj_UI.h">
+      <Filter>95.UI\00. ObjUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UIButton.h">
+      <Filter>95.UI\03. UIButton</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -132,7 +147,16 @@
       <Filter>95.UI</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
-      <Filter>95.UI\00.BackGround</Filter>
+      <Filter>95.UI\01. BackGround</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InvenTile.cpp">
+      <Filter>95.UI\02. InvenTile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Obj_UI.cpp">
+      <Filter>95.UI\00. ObjUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UIButton.cpp">
+      <Filter>95.UI\03. UIButton</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

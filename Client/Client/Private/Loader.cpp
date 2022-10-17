@@ -7,6 +7,7 @@
 #include "Camera_Dynamic.h"
 #include "BackGround.h"
 #include "Terrain.h"
+#include "InvenTile.h"
 //#include "Player.h"
 //#include "Effect.h"
 //#include "Sky.h"
@@ -67,10 +68,10 @@ HRESULT CLoader::Loading_ForLogoLevel()
 
 	/* 텍스쳐 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐 로딩 중."));
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_BackGround_UI"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Inventory.dds"), 1))))
+	if (FAILED(Loading_For_UITexture()))
 		return E_FAIL;
-	
+
+
 	/* 모델 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("모델 로딩 중."));
 	
@@ -78,18 +79,11 @@ HRESULT CLoader::Loading_ForLogoLevel()
 	/* 셰이더 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("셰이더 로딩 중."));
 	
-
-	
-
-	// CShader::Create(m_pDevice, m_pContext, TEXT(""), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements);
-	
-
 	
 
 	/* 객체 원형 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("객체 생성 중."));
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround_UI"),
-		CBackGround::Create(m_pDevice, m_pContext))))
+	if (FAILED(Loading_For_ObjectPrototype()))
 		return E_FAIL;
 	
 
@@ -216,6 +210,44 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 	m_isFinished = true;
 
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_ObjectPrototype()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround_UI"),
+		CBackGround::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_InvenTile_UI"),
+		CInvenTile::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_UITexture()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_BackGround_UI"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/UI/Inventory.dds"), 1))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_InvenTile"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/UI/InvenTile/InvenTile_%d.dds"), 2))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_EquipTile"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/UI/InvenTile/EquipTile_%d.dds"), 2))))
+		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }

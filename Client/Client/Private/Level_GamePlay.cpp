@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 #include "Camera_Dynamic.h"
+#include "InvenTile.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -169,6 +170,33 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 
 	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_UI"), LEVEL_GAMEPLAY, pLayerTag)))
 		//return E_FAIL;
+
+	CInvenTile::INVENDESC InvenDesc;
+	InvenDesc.eTileType = CInvenTile::EQUIP_TILE;
+	InvenDesc.eState = CInvenTile::STATE_EQUIP;
+	InvenDesc.vPosition = _float2(1100, 50);
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_InvenTile_UI"), LEVEL_STATIC, pLayerTag, &InvenDesc)))
+		return E_FAIL;
+
+	InvenDesc.vPosition = _float2(1200, 100);
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_InvenTile_UI"), LEVEL_STATIC, pLayerTag, &InvenDesc)))
+		return E_FAIL;
+
+
+	for (_int i = 0; i < 3; ++i)
+	{
+		for (_int j = 0; j < 4; ++j)
+		{
+			CInvenTile::INVENDESC InvenDesc;
+			InvenDesc.eTileType = CInvenTile::INEVEN_TILE;
+			InvenDesc.eState = CInvenTile::STATE_DEFAULT;
+			InvenDesc.vPosition = _float2(780 + j*110, 260 + i*120);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_InvenTile_UI"), LEVEL_STATIC, pLayerTag, &InvenDesc)))
+				return E_FAIL;
+		}
+	}
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, pLayerTag, nullptr)))
 		return E_FAIL;

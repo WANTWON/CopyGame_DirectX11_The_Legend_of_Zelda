@@ -2,15 +2,15 @@
 #include "..\Public\BackGround.h"
 
 #include "GameInstance.h"
-#include "UI_Manager.h"
+
 
 CBackGround::CBackGround(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	: CGameObject(pDevice, pContext)
+	: CObj_UI(pDevice, pContext)
 {
 }
 
 CBackGround::CBackGround(const CBackGround & rhs)
-	: CGameObject(rhs)
+	: CObj_UI(rhs)
 {
 }
 
@@ -21,16 +21,13 @@ HRESULT CBackGround::Initialize_Prototype()
 
 HRESULT CBackGround::Initialize(void * pArg)
 {
-	if (FAILED(Ready_Components()))
-		return E_FAIL;
-
 	m_fSizeX = g_iWinSizeX;
 	m_fSizeY = g_iWinSizeY;
 	m_fX = g_iWinSizeX >> 1;
 	m_fY = g_iWinSizeY >> 1;	
-
-	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixTranspose(XMMatrixIdentity()));
-	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixTranspose(XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f)));
+	
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -47,25 +44,14 @@ int CBackGround::Tick(_float fTimeDelta)
 
 void CBackGround::Late_Tick(_float fTimeDelta)
 {
-	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
+	__super::Late_Tick(fTimeDelta);
 }
 
 HRESULT CBackGround::Render()
 {
-	if (!CUI_Manager::Get_Instance()->Get_UI_Open())
-		return S_OK;
-
-	if (nullptr == m_pShaderCom ||
-		nullptr == m_pVIBufferCom)
+	if (FAILED(__super::Render()))
 		return E_FAIL;
-
-	if (FAILED(SetUp_ShaderResources()))
-		return E_FAIL;
-
-	m_pShaderCom->Begin();
-
-	m_pVIBufferCom->Render();
+	
 
 	return S_OK;
 }
@@ -143,10 +129,4 @@ CGameObject * CBackGround::Clone(void * pArg)
 void CBackGround::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pTransformCom);
-	Safe_Release(m_pShaderCom);
-	Safe_Release(m_pTextureCom);
-	Safe_Release(m_pVIBufferCom);
-	Safe_Release(m_pRendererCom);
 }
