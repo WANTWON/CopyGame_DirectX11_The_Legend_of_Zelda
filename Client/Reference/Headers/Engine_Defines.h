@@ -51,5 +51,8 @@ using namespace std;
 
 #endif // _DEBUG
 
+#define OBJ_DEAD 1
+#define OBJ_NOEVENT 0
+
 using namespace Engine;
 

@@ -35,6 +35,12 @@ public: /* For.Input_Device */
 	_char Get_DIKState(_uchar eKeyID);
 	_char Get_DIMKeyState(DIMK eMouseKeyID);
 	_long Get_DIMMoveState(DIMM eMouseMoveID);
+	_bool Key_Down(_uchar eKeyID);
+	_bool Key_Up(_uchar eKeyID);
+	_bool Key_Pressing(_uchar eKeyID);
+	_bool Mouse_Down(DIMK eMouseKeyID);
+	_bool Mouse_Up(DIMK eMouseKeyID);
+	_bool Mouse_Pressing(DIMK eMouseKeyID);
 
 public: /* For.Timer_Manager */
 	HRESULT Add_Timer(const _tchar* pTimerTag);
@@ -43,6 +49,10 @@ public: /* For.Timer_Manager */
 
 public: /* For.Level_Manager */
 	HRESULT Open_Level(unsigned int iLevelIndex, class CLevel* pNewLevel);
+	class CLevel* Get_CurrentLevel();
+	_uint Get_CurrentLevelIndex();
+	_uint Get_DestinationLevelIndex();
+	void Set_DestinationLevel(_uint LevelIndex);
 
 public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const _tchar* pPrototypeTag, class CGameObject* pPrototype);

@@ -112,7 +112,7 @@ _char CGameInstance::Get_DIKState(_uchar eKeyID)
 	if (nullptr == m_pInput_Device)
 		return 0;
 
-	return m_pInput_Device->Get_DIKState(eKeyID);	
+	return m_pInput_Device->Get_DIKState(eKeyID);
 }
 
 _char CGameInstance::Get_DIMKeyState(DIMK eMouseKeyID)
@@ -129,6 +129,54 @@ _long CGameInstance::Get_DIMMoveState(DIMM eMouseMoveID)
 		return 0;
 
 	return m_pInput_Device->Get_DIMMoveState(eMouseMoveID);
+}
+
+_bool CGameInstance::Key_Down(_uchar eKeyID)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->Key_Down(eKeyID);
+}
+
+_bool CGameInstance::Key_Up(_uchar eKeyID)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->Key_Up(eKeyID);
+}
+
+_bool CGameInstance::Key_Pressing(_uchar eKeyID)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->Key_Pressing(eKeyID);
+}
+
+_bool CGameInstance::Mouse_Down(DIMK eMouseKeyID)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->Mouse_Down(eMouseKeyID);
+}
+
+_bool CGameInstance::Mouse_Up(DIMK eMouseKeyID)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->Mouse_Up(eMouseKeyID);
+}
+
+_bool CGameInstance::Mouse_Pressing(DIMK eMouseKeyID)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->Mouse_Pressing(eMouseKeyID);
 }
 
 HRESULT CGameInstance::Add_Timer(const _tchar * pTimerTag)
@@ -161,6 +209,38 @@ HRESULT CGameInstance::Open_Level(unsigned int iLevelIndex, CLevel * pNewLevel)
 		return E_FAIL;
 
 	return m_pLevel_Manager->Open_Level(iLevelIndex, pNewLevel);
+}
+
+CLevel * CGameInstance::Get_CurrentLevel()
+{
+	if (nullptr == m_pLevel_Manager)
+		return nullptr;
+
+	return m_pLevel_Manager->Get_CurrentLevel();
+}
+
+_uint CGameInstance::Get_CurrentLevelIndex()
+{
+	if (nullptr == m_pLevel_Manager)
+		return _uint();
+
+	return m_pLevel_Manager->Get_CurrentLevelIndex();
+}
+
+_uint CGameInstance::Get_DestinationLevelIndex()
+{
+	if (nullptr == m_pLevel_Manager)
+		return _uint();
+
+	return m_pLevel_Manager->Get_DestinationLevelIndex();
+}
+
+void CGameInstance::Set_DestinationLevel(_uint LevelIndex)
+{
+	if (nullptr == m_pLevel_Manager)
+		return;
+
+	m_pLevel_Manager->Set_DestinationLevel(LevelIndex);
 }
 
 HRESULT CGameInstance::Add_Prototype(const _tchar * pPrototypeTag, CGameObject * pPrototype)
