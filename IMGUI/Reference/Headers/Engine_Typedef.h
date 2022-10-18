@@ -25,10 +25,12 @@ namespace Engine
 	typedef XMFLOAT4					_float4;
 	typedef XMVECTOR					_vector;
 	typedef FXMVECTOR					_fvector;
+	typedef GXMVECTOR					_gvector;
 
 	typedef XMFLOAT4X4					_float4x4;
 	typedef XMMATRIX					_matrix;
 	typedef FXMMATRIX					_fmatrix;
+	typedef CXMMATRIX					_cmatrix;
 	
 
 }

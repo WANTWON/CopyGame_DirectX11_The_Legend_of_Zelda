@@ -6,8 +6,9 @@
 #include "Object_Manager.h"
 #include "Timer_Manager.h"
 #include "PipeLine.h"
+
 #include "Component_Manager.h"
-#include "Picking.h"
+#include "Light_Manager.h"
 
 BEGIN(Engine)
 
@@ -48,23 +49,37 @@ public: /* For.Timer_Manager */
 
 public: /* For.Level_Manager */
 	HRESULT Open_Level(unsigned int iLevelIndex, class CLevel* pNewLevel);
+	class CLevel* Get_CurrentLevel();
+	_uint Get_CurrentLevelIndex();
+	_uint Get_DestinationLevelIndex();
+	void Set_DestinationLevel(_uint LevelIndex);
 
 public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const _tchar* pPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Add_GameObject(const _tchar* pPrototypeTag, _uint iLevelIndex, const _tchar* pLayerTag, void* pArg = nullptr);
 	class CComponent* Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex = 0);
+	class CGameObject* Get_Object(_uint iLevelIndex, const _tchar * pLayerTag, _uint iIndex = 0);
+	list<CGameObject*>* Get_ObjectList(_uint iSceneID, const _tchar * pLayerTag);
+	void Clear_Layer(_uint iLevelIndex, const _tchar* LayerTag);
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const _tchar* pPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const _tchar* pPrototypeTag, void* pArg = nullptr);
-	
-public: /*For PipeLine*/
-	void Set_Transform(CPipeLine::TRANSFORMSTATE eTransformState, _matrix TransformMatrix);
-	_matrix Get_TransformMatrix(CPipeLine::TRANSFORMSTATE eTransformState);
-	_float4x4 Get_TransformFloat4x4(CPipeLine::TRANSFORMSTATE eTransformState);
-	_float4x4 Get_TransformFloat4x4_TP(CPipeLine::TRANSFORMSTATE eTransformState);
+
+public: /* For.PipeLine */
+	void Set_Transform(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix);
+	_matrix Get_TransformMatrix(CPipeLine::TRANSFORMSTATE  eState);
+	_float4x4 Get_TransformFloat4x4(CPipeLine::TRANSFORMSTATE  eState);
+	_float4x4 Get_TransformFloat4x4_TP(CPipeLine::TRANSFORMSTATE  eState);
 	_float4 Get_CamPosition();
 
+public:
+	const LIGHTDESC* Get_LightDesc(_uint iIndex);
+	HRESULT Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const LIGHTDESC& LightDesc);
+
+
+
+	
 public:
 	static void Release_Engine();
 
@@ -76,7 +91,7 @@ private:
 	CTimer_Manager*					m_pTimer_Manager = nullptr;
 	CComponent_Manager*				m_pComponent_Manager = nullptr;
 	CPipeLine*						m_pPipeLine = nullptr;
-	CPicking*						m_pPicking = nullptr;
+	CLight_Manager*					m_pLight_Manager = nullptr;
 
 public:
 	virtual void Free() override;

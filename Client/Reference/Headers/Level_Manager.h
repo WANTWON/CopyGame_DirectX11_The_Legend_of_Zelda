@@ -9,7 +9,7 @@
 
 BEGIN(Engine)
 
-class CLevel_Manager final : public CBase
+class ENGINE_DLL CLevel_Manager final : public CBase
 {
 	DECLARE_SINGLETON(CLevel_Manager)
 public:

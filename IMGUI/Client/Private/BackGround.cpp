@@ -26,7 +26,7 @@ HRESULT CBackGround::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CBackGround::Tick(_float fTimeDelta)
+int CBackGround::Tick(_float fTimeDelta)
 {
 	/*XMStoreFloat3(&m_vPosition, 
 		XMLoadFloat3(&m_vPosition) + XMLoadFloat3(&m_vDirection));
@@ -49,6 +49,7 @@ void CBackGround::Tick(_float fTimeDelta)
 
 
 	vTmp1 = vTmp1 + vTmp;*/
+	return OBJ_NOEVENT;
 }
 
 void CBackGround::Late_Tick(_float fTimeDelta)

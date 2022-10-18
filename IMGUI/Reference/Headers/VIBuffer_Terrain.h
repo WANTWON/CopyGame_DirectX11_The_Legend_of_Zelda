@@ -8,7 +8,7 @@ class ENGINE_DLL CVIBuffer_Terrain final : public CVIBuffer
 {
 public:
 	typedef struct TerrainTagDesc
-{
+	{
 		_int	m_iPositionX = 0;
 		_int	m_iPositionZ = 0;
 		_int	m_iVerticeNumX = 0;
@@ -17,7 +17,7 @@ public:
 		_bool	m_bShowWireFrame = false;
 		_bool	m_bTestShowTerrain = false;
 
-}TERRAINDESC;
+	}TERRAINDESC;
 
 protected:
 	CVIBuffer_Terrain(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);

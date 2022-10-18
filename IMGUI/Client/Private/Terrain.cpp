@@ -33,7 +33,7 @@ HRESULT CTerrain::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CTerrain::Tick(_float fTimeDelta)
+int CTerrain::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);		
 
@@ -46,6 +46,7 @@ void CTerrain::Tick(_float fTimeDelta)
 		m_bDebugShow = CTerrain_Manager::Get_Instance()->Get_TerrainShow();
 	}
 
+	return S_OK;
 }
 
 void CTerrain::Late_Tick(_float fTimeDelta)
@@ -166,7 +167,7 @@ HRESULT CTerrain::SetUp_ShaderResources()
 
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_WorldFloat4x4_TP(), sizeof(_float4x4))))
+	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))

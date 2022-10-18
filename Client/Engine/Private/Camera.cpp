@@ -31,7 +31,7 @@ HRESULT CCamera::Initialize(void * pArg)
 
 	memcpy(&m_CameraDesc, pArg, sizeof(CAMERADESC));
 
-	m_pTransform->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&m_CameraDesc.vEye));
+	m_pTransform->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_CameraDesc.vEye));
 	m_pTransform->LookAt(XMLoadFloat4(&m_CameraDesc.vAt));
 
 	m_pTransform->Set_TransformDesc(m_CameraDesc.TransformDesc);

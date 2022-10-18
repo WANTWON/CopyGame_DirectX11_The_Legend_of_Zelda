@@ -27,6 +27,8 @@
 	}();
 
 
+
+
 #define BEGIN(NAMESPACE) namespace NAMESPACE {
 
 #define END }

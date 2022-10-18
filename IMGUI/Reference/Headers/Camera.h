@@ -10,8 +10,8 @@ class ENGINE_DLL CCamera abstract : public CGameObject
 public:
 	typedef struct tagCameraDesc
 	{	
-		_float4			vEye;
-		_float4			vAt;
+		_float4				vEye;
+		_float4				vAt;
 
 		_float				fAspect;
 		_float				fFovy;
@@ -29,7 +29,7 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
-	virtual void Tick(_float fTimeDelta);
+	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 
@@ -37,9 +37,10 @@ protected:
 	static _tchar*					m_pTransformTag;
 	class CTransform*				m_pTransform = nullptr;
 	CAMERADESC						m_CameraDesc;
+	class CPipeLine*				m_pPipeLine = nullptr;
 
 protected:
-	HRESULT Bind_OnGraphicDev();
+	HRESULT Bind_OnPipeLine();
 
 
 public:

@@ -35,12 +35,11 @@ protected:
 	D3D11_SUBRESOURCE_DATA		m_SubResourceData;
 
 protected:
-	HRESULT Create_VertexBuffer();
-	HRESULT Create_IndexBuffer();
-
-protected:
 	_float3*		m_pVerticesPosMxM = nullptr;
 
+protected:
+	HRESULT Create_VertexBuffer();
+	HRESULT Create_IndexBuffer();
 
 public:
 	virtual CComponent* Clone(void* pArg = nullptr) = 0;

@@ -21,6 +21,7 @@ public:
 	void Tick(_float fTimeDelta);
 	void Late_Tick(_float fTimeDelta);
 
+public:
 	class CLevel* Get_CurrentLevel() { return m_pCurrentLevel; }
 	_uint Get_CurrentLevelIndex() { return m_iLevelIndex; }
 	_uint Get_DestinationLevelIndex() { return m_iDestinationIndex; }
@@ -30,7 +31,6 @@ private:
 	class CLevel*				m_pCurrentLevel = nullptr;
 	_uint						m_iLevelIndex;
 	_uint						m_iDestinationIndex;
-
 public:
 	virtual void Free() override;
 };

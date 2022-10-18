@@ -36,42 +36,42 @@ HRESULT CTransform::Initialize(void * pArg)
 
 void CTransform::Go_Straight(_float fTimeDelta)
 {
-	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);
 
 	vPosition += XMVector3Normalize(vLook) * m_TransformDesc.fSpeedPerSec * fTimeDelta;
 
-	Set_State(CTransform::STATE_TRANSLATION, vPosition);
+	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
 void CTransform::Go_Backward(_float fTimeDelta)
 {
-	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);
 
 	vPosition -= XMVector3Normalize(vLook) * m_TransformDesc.fSpeedPerSec * fTimeDelta;
 
-	Set_State(CTransform::STATE_TRANSLATION, vPosition);
+	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
 void CTransform::Go_Left(_float fTimeDelta)
 {
-	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector		vRight = Get_State(CTransform::STATE_RIGHT);
 
 	vPosition -= XMVector3Normalize(vRight) * m_TransformDesc.fSpeedPerSec * fTimeDelta;
 
-	Set_State(CTransform::STATE_TRANSLATION, vPosition);
+	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
 void CTransform::Go_Right(_float fTimeDelta)
 {
-	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector		vRight = Get_State(CTransform::STATE_RIGHT);
 
 	vPosition += XMVector3Normalize(vRight) * m_TransformDesc.fSpeedPerSec * fTimeDelta;
 
-	Set_State(CTransform::STATE_TRANSLATION, vPosition);
+	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
@@ -85,7 +85,7 @@ void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
 
 void CTransform::LookAt(_fvector vAt)
 {
-	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 
 	_vector		vLook = vAt - vPosition;
 	_vector		vAxisY = XMVectorSet(0.f, 1.f, 0.f, 0.f);

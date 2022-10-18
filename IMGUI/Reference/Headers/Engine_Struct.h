@@ -2,6 +2,20 @@
 
 namespace Engine
 {
+	/* 빛의 정보를 표현한다. */
+	typedef struct tagLightDesc
+	{
+		enum TYPE { TYPE_DIRECTIONAL, TYPE_POINT, TYPE_END };
+
+		TYPE		eType = TYPE_END;
+		XMFLOAT4	vPosition;
+		float		fRange;
+		XMFLOAT4	vDirection;
+
+		XMFLOAT4	vDiffuse;
+		XMFLOAT4	vAmbient;
+		XMFLOAT4	vSpecular;
+	}LIGHTDESC;
 
 	typedef struct tagLineIndices16
 	{
@@ -48,14 +62,11 @@ namespace Engine
 		static const D3D11_INPUT_ELEMENT_DESC Elements[iNumElements];
 	}VTXNORTEX_DECLARATION;
 
-
 	typedef struct tagVertexCubeTexture
 	{
 		XMFLOAT3		vPosition;
 		XMFLOAT3		vTexture;
 	}VTXCUBETEX;
-
-
 
 	typedef struct tagVertexColor
 	{

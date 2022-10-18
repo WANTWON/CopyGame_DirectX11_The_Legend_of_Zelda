@@ -10,12 +10,8 @@
 
 #include <DirectXTK/DDSTextureLoader.h>
 #include <DirectXTK/WICTextureLoader.h>
-#include <DirectXCollision.h>
 #include <DirectXTK/ScreenGrab.h>
 
-
-
-#include <typeinfo>
 
 using namespace DirectX;
 
@@ -30,6 +26,7 @@ enum DIMM { DIMM_X, DIMM_Y, DIMM_WHEEL, DIMM_END };
 #include <map>
 #include <list>
 #include <algorithm>
+#include <typeinfo.h>
 using namespace std;
 
 
@@ -53,6 +50,9 @@ using namespace std;
 #endif
 
 #endif // _DEBUG
+
+#define OBJ_DEAD 1
+#define OBJ_NOEVENT 0
 
 using namespace Engine;
 
