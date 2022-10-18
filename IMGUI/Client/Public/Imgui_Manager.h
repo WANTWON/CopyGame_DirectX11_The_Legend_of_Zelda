@@ -15,10 +15,12 @@ class CImgui_Manager final : public CBase
 {
 	DECLARE_SINGLETON(CImgui_Manager)
 
+public:
+	enum PICKING_TYPE { PICKING_OBJECT, PICKING_TERRAIN };
+
 private:
 	CImgui_Manager();
 	virtual ~CImgui_Manager() = default;
-
 
 public:
 	HRESULT Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -29,11 +31,9 @@ public:
 public:
 	void Object_Map();
 	void Terrain_Map();
-	void View_Selected_Object_Info();
+	void Set_Terrain_Shape();
 	void ShowSimpleMousePos(bool* p_open);
 	void ShowPickedObjLayOut(bool* p_open);
-
-
 
 private:
 	ID3D11Device* m_pDevice = nullptr;
@@ -45,13 +45,17 @@ private:
 	/* For Terrain Manager */
 	CTerrain_Manager* m_pTerrain_Manager = nullptr;
 	CTerrain_Manager::TERRAINDESC  m_TerrainDesc;
+	CTerrain_Manager::TERRAINSHAPEDESC  m_TerrainShapeDesc;
 	_bool m_bTerrain_Show = true;
-
+	_int m_PickingType = 0;
 	
+
+	/* For Object */
 	OBJID m_eObjID = OBJ_END;
 	_int m_iObjectList = 0;
 
 
+	/* For Picking */
 	_float3 m_vPickedObjPos = _float3(1.f, 1.f, 1.f);
 	_float3 m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
 	_float3 TempPos2 = _float3(0.f, 0.f, 0.f);

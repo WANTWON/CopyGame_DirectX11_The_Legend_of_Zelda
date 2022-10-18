@@ -142,9 +142,14 @@ void CImgui_Manager::ShowGui()
 	{
 		if (ImGui::BeginTabItem("Terrain Tool"))
 		{
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Object"); ImGui::SameLine();
+			ImGui::RadioButton("##Picking for Object", &m_PickingType, PICKING_OBJECT); ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Shaping Terrain"); ImGui::SameLine();
+			ImGui::RadioButton("##Picking for Shaping Terrain", &m_PickingType, PICKING_TERRAIN);
+
 			Terrain_Map();
+			Set_Terrain_Shape();
 			Object_Map();
-			View_Selected_Object_Info();
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Camera Tool"))
@@ -188,34 +193,23 @@ void CImgui_Manager::Terrain_Map()
 	TerrainDesc.m_iVerticeNumX = iNumVertice[0];
 	TerrainDesc.m_iVerticeNumZ = iNumVertice[1];
 
-
-
-	static _int iTerrianX = TerrainDesc.m_iPositionX;
-	iTerrianX = TerrainDesc.m_iPositionX;
 	ImGui::Text("Position X");
 	ImGui::SameLine();
-	ImGui::DragInt("##PositionX", &iTerrianX);
-	TerrainDesc.m_iPositionX = iTerrianX;
+	ImGui::DragInt("##PositionX", &TerrainDesc.m_iPositionX);
 
-	static _int iTerrianZ = TerrainDesc.m_iPositionZ;
-	iTerrianZ = TerrainDesc.m_iPositionZ;
 	ImGui::Text("Position Z");
 	ImGui::SameLine();
-	ImGui::DragInt("##PositionZ", &iTerrianZ);
-	TerrainDesc.m_iPositionZ = iTerrianZ;
+	ImGui::DragInt("##PositionZ", &TerrainDesc.m_iPositionZ);
 
-	static _float fTerrianHeight = TerrainDesc.m_fHeight;
 	ImGui::Text("Position Y");
 	ImGui::SameLine();
-	ImGui::DragFloat("##PositionY", &fTerrianHeight, 1.f, -10, 10);
-	TerrainDesc.m_fHeight = fTerrianHeight;
+	ImGui::DragFloat("##PositionY", &TerrainDesc.m_fHeight, 1.f, -10, 10);
 
 	static _int iOffset = m_pTerrain_Manager->Get_MoveOffset();
 	ImGui::Text("Move Offset");
 	ImGui::SameLine();
 	ImGui::InputInt("##MoveOffset", &iOffset);
 	m_pTerrain_Manager->Set_MoveOffset(iOffset);
-
 
 	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::ImColor(0.f, 0.f, 1.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::ImColor(0.f, 1.f, 0.f));
@@ -242,8 +236,6 @@ void CImgui_Manager::Terrain_Map()
 
 		bCreateTerrain = false;
 	}
-
-
 
 
 }
@@ -338,8 +330,6 @@ void CImgui_Manager::Object_Map()
 	}
 
 
-
-
 	//ImGui::Text("OK");
 	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::ImColor(0.f, 0.f, 1.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::ImColor(0.f, 1.f, 0.f));
@@ -350,22 +340,28 @@ void CImgui_Manager::Object_Map()
 
 }
 
-void CImgui_Manager::View_Selected_Object_Info()
+void CImgui_Manager::Set_Terrain_Shape()
 {
-
 	ImGui::GetIO().NavActive = false;
 	ImGui::GetIO().WantCaptureMouse = true;
 
-	if (!ImGui::CollapsingHeader("View Selected Object Info"))
+	if (!ImGui::CollapsingHeader("Shape Setting (Height, Sharp, Range)"))
 		return;
 
-	const char* ObjectID[] = { "OBJ_BACKGROUND", "OBJ_MONSTER", "OBJ_BLOCK", "OBJ_INTERATIVE", "OBJ_UNINTERATIVE", "OBJ_END" };
-	static int iObjectID = m_eObjID;
-	ImGui::Text("OBJECT_ID : ");
+	ImGui::Text("Height");
 	ImGui::SameLine();
-	ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "%s", ObjectID[iObjectID]);
+	ImGui::DragFloat("##fHeight", &m_TerrainShapeDesc.fHeight);
+
+	ImGui::Text("Radius");
+	ImGui::SameLine();
+	ImGui::DragFloat("##fRadius", &m_TerrainShapeDesc.fRadius);
+
+	ImGui::Text("Sharp");
+	ImGui::SameLine();
+	ImGui::DragFloat("##fSharp", &m_TerrainShapeDesc.fSharp);
 
 
+	m_pTerrain_Manager->Set_TerrainShapeDesc(&m_TerrainShapeDesc);
 
 }
 
