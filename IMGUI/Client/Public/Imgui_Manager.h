@@ -31,6 +31,7 @@ public:
 	void Terrain_Map();
 	void View_Selected_Object_Info();
 	void ShowSimpleMousePos(bool* p_open);
+	void ShowPickedObjLayOut(bool* p_open);
 
 
 
@@ -38,6 +39,7 @@ private:
 	ID3D11Device* m_pDevice = nullptr;
 	ID3D11DeviceContext* m_pContext = nullptr;
 	_bool m_bShowSimpleMousePos = false;
+	_bool m_bShowPickedObject = false;
 
 private:
 	/* For Terrain Manager */
@@ -50,7 +52,8 @@ private:
 	_int m_iObjectList = 0;
 
 
-	_float3 TempPos = _float3(1.f, 1.f, 1.f);
+	_float3 m_vPickedObjPos = _float3(1.f, 1.f, 1.f);
+	_float3 m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
 	_float3 TempPos2 = _float3(0.f, 0.f, 0.f);
 	_float3 TempPos3;
 	_float fDist = 1.f;

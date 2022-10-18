@@ -1,19 +1,10 @@
 #pragma once
 
-#include "Client_Defines.h"
-#include "GameObject.h"
-
-BEGIN(Engine)
-class CShader;
-class CTexture;
-class CRenderer;
-class CTransform;
-class CVIBuffer_Terrain;
-END
+#include "BaseObj.h"
 
 BEGIN(Client)
 
-class CTerrain final : public CGameObject
+class CTerrain final : public CBaseObj
 {
 public:
 	enum TEXTURE { TYPE_DIFFUSE, TYPE_BRUSH, TYPE_FILTER, TYPE_END };
@@ -33,14 +24,6 @@ public:
 	virtual _bool Picking(_float3* PickingPoint);
 	virtual void PickingTrue();
 
-
-private: /* For.Components */
-	CShader*				m_pShaderCom = nullptr;
-	CTexture*				m_pTextureCom[TYPE_END] = { nullptr };
-	CRenderer*				m_pRendererCom = nullptr;
-	CVIBuffer_Terrain*		m_pVIBufferCom = nullptr;
-	CTransform*				m_pTransformCom = nullptr;
-
 private:
 	HRESULT Ready_Components(void* pArg);
 	HRESULT SetUp_ShaderID();
@@ -51,7 +34,6 @@ private:
 	_bool	m_bDebugTerrain = false;
 	_bool	m_bDebugShow = true;
 	_float3 m_vMousePickPos;
-	SHADER_ID m_eShaderID = SHADER_DEFAULT;
 
 public:
 	static CTerrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

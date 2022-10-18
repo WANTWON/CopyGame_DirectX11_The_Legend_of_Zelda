@@ -2,6 +2,8 @@
 #include "..\Public\Imgui_Manager.h"
 #include "imgui.h"
 #include "GameInstance.h"
+#include "PickingMgr.h"
+#include "BaseObj.h"
 
 IMPLEMENT_SINGLETON(CImgui_Manager)
 
@@ -71,7 +73,7 @@ void CImgui_Manager::Tick(_float fTimeDelta)
 
 	ShowGui();
 
-	
+
 
 
 	ImGui::EndFrame();
@@ -120,6 +122,8 @@ void CImgui_Manager::ShowGui()
 		if (ImGui::BeginMenu("Debug"))
 		{
 			ImGui::MenuItem("Show Mouse Pos", NULL, &m_bShowSimpleMousePos);
+			ImGui::Separator();
+			ImGui::MenuItem("Show Picked Object", NULL, &m_bShowPickedObject);
 			ImGui::EndMenu();
 		}
 		ImGui::EndMenuBar();
@@ -157,6 +161,7 @@ void CImgui_Manager::ShowGui()
 	}
 
 	if (m_bShowSimpleMousePos)      ShowSimpleMousePos(&m_bShowSimpleMousePos);
+	if (m_bShowPickedObject)      ShowPickedObjLayOut(&m_bShowPickedObject);
 
 	ImGui::End();
 
@@ -189,20 +194,20 @@ void CImgui_Manager::Terrain_Map()
 	iTerrianX = TerrainDesc.m_iPositionX;
 	ImGui::Text("Position X");
 	ImGui::SameLine();
-	ImGui::Text("%d", iTerrianX);
-
+	ImGui::DragInt("##PositionX", &iTerrianX);
+	TerrainDesc.m_iPositionX = iTerrianX;
 
 	static _int iTerrianZ = TerrainDesc.m_iPositionZ;
 	iTerrianZ = TerrainDesc.m_iPositionZ;
 	ImGui::Text("Position Z");
 	ImGui::SameLine();
-	ImGui::Text("%d", iTerrianZ);
-
+	ImGui::DragInt("##PositionZ", &iTerrianZ);
+	TerrainDesc.m_iPositionZ = iTerrianZ;
 
 	static _float fTerrianHeight = TerrainDesc.m_fHeight;
 	ImGui::Text("Position Y");
 	ImGui::SameLine();
-	ImGui::SliderFloat("##PositionY", &fTerrianHeight, -10, 10);
+	ImGui::DragFloat("##PositionY", &fTerrianHeight, 1.f, -10, 10);
 	TerrainDesc.m_fHeight = fTerrianHeight;
 
 	static _int iOffset = m_pTerrain_Manager->Get_MoveOffset();
@@ -254,12 +259,12 @@ void CImgui_Manager::Object_Map()
 	if (!ImGui::CollapsingHeader("Object_Map"))
 		return;
 
-	static _float Pos[3] = { TempPos.x , TempPos.y, TempPos.z };
+	static _float Pos[3] = { TempPos2.x , TempPos2.y, TempPos2.z };
 	ImGui::Text("set Scale");
 	ImGui::SameLine();
 	ImGui::InputFloat3("##1", Pos);
 
-	static _float Pos2[3] = { TempPos.x , TempPos.y, TempPos.z };
+	static _float Pos2[3] = { TempPos2.x , TempPos2.y, TempPos2.z };
 	ImGui::Text("set Rotation AXIS");
 	ImGui::SameLine();
 	ImGui::InputFloat3("##2", Pos2);
@@ -267,19 +272,19 @@ void CImgui_Manager::Object_Map()
 	//Pos2.y = m_TerrainInfo.vPos.y;
 	//Pos2.z = m_TerrainInfo.vPos.z;
 
-	static _float Pos3[3] = { TempPos.x , TempPos.y };
+	static _float Pos3[3] = { TempPos2.x , TempPos2.y };
 	ImGui::Text("Rotaion Angle / dist");
 	ImGui::SameLine();
 	ImGui::InputFloat2("##3", Pos3);
 
 	//	Pos3.y = 1.f;
 
-	ImGui::Text("vPos X : %f", TempPos.x);
+	ImGui::Text("vPos X : %f", TempPos2.x);
 	ImGui::SameLine();
-	ImGui::Text("vPos Y : %f", TempPos.x);
+	ImGui::Text("vPos Y : %f", TempPos2.x);
 	ImGui::SameLine();
-	ImGui::Text("vPos Z : %f", TempPos.x);
-	ImGui::Text("fAngle : %f", TempPos.x);
+	ImGui::Text("vPos Z : %f", TempPos2.x);
+	ImGui::Text("fAngle : %f", TempPos2.x);
 	ImGui::SameLine();
 	ImGui::Text("Dist : %f", Pos3[1]);
 	ImGui::NewLine();
@@ -347,7 +352,6 @@ void CImgui_Manager::Object_Map()
 
 void CImgui_Manager::View_Selected_Object_Info()
 {
-	_bool ret;
 
 	ImGui::GetIO().NavActive = false;
 	ImGui::GetIO().WantCaptureMouse = true;
@@ -362,64 +366,6 @@ void CImgui_Manager::View_Selected_Object_Info()
 	ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "%s", ObjectID[iObjectID]);
 
 
-	ImGui::Text("OBJECT_TYPE : ");
-	ImGui::SameLine();
-	switch (m_eObjID)
-	{
-	case Client::OBJ_BACKGROUND:
-	{
-		const char* ObjectList[] = { "Terrain1", "Terrain2", "Terrain3", "Terrain4" };
-		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-		break;
-	}
-	case Client::OBJ_MONSTER:
-	{
-		const char* ObjectList[] = { "Pig", "Mpbline", "Spider", "Bearger", "Boarwarrior", "Boss" };
-		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-		break;
-	}
-	case Client::OBJ_BLOCK:
-	{
-		const char* ObjectList[] = { "Block1", "Block2", "Block3" };
-		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-		break;
-	}
-	case Client::OBJ_INTERATIVE:
-	{
-		const char* ObjectList[] = { "Grass", "Tree", "Pot", "Tent", "Food", "Flower" };
-		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-		break;
-	}
-	case Client::OBJ_UNINTERATIVE:
-	{
-		const char* ObjectList[] = { "Wall", "Rock", "Deco1", "Deco2", "Deco3" };
-		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-		break;
-	}
-	case Client::OBJ_END:
-	{
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "NONE");
-		break;
-	}
-	default:
-		break;
-	}
-
-
-	static _float fPosition[3] = { TempPos.x , TempPos.y, TempPos.z };
-	ImGui::Text("Position (");
-	ImGui::SameLine();
-	ImGui::Text("%f, %f , %f )", fPosition);
-
-	static _float fScale[3] = { TempPos.x , TempPos.y, TempPos.z };
-	ImGui::Text("Scale (");
-	ImGui::SameLine();
-	ImGui::Text("%f, %f , %f )", fScale);
 
 }
 
@@ -473,6 +419,181 @@ void CImgui_Manager::ShowSimpleMousePos(bool* p_open)
 			ImGui::EndPopup();
 		}
 	}
+	ImGui::End();
+}
+
+void CImgui_Manager::ShowPickedObjLayOut(bool * p_open)
+{
+	CPickingMgr* pPickingMgr = GET_INSTANCE(CPickingMgr);
+	CGameObject* pPickedObj = pPickingMgr->Get_PickedObj();
+
+
+	ImGui::SetNextWindowSize(ImVec2(200, 300), ImGuiCond_FirstUseEver);
+	if (ImGui::Begin("Picked Object Info", p_open, ImGuiWindowFlags_MenuBar))
+	{
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Close")) *p_open = false;
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
+
+		// Right
+
+		ImGui::BeginGroup();
+		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+
+		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
+		{
+			if (ImGui::BeginTabItem("Description"))
+			{
+
+				const char* ObjectID[] = { "OBJ_BACKGROUND", "OBJ_MONSTER", "OBJ_BLOCK", "OBJ_INTERATIVE", "OBJ_UNINTERATIVE", "OBJ_END" };
+				static int iObjectID = 5;
+				
+				if (pPickedObj != nullptr)
+				{
+					iObjectID = dynamic_cast<CBaseObj*>(pPickedObj)->Get_ObjectID();
+					DirectX::XMStoreFloat3(&m_vPickedObjPos, dynamic_cast<CBaseObj*>(pPickedObj)->Get_Position());
+					m_vPickedObjScale = dynamic_cast<CBaseObj*>(pPickedObj)->Get_Scale();
+
+				}
+				else
+				{
+					iObjectID = 5;
+					m_vPickedObjPos = _float3(0.f, 0.f, 0.f);
+					m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
+				}
+
+				ImGui::Text("OBJECT_ID : ");
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "%s", ObjectID[iObjectID]);
+
+				ImGui::NewLine();
+
+				ImGui::Text("OBJECT_TYPE : ");
+				ImGui::SameLine();
+				switch (m_eObjID)
+				{
+				case Client::OBJ_BACKGROUND:
+				{
+					const char* ObjectList[] = { "Terrain1", "Terrain2", "Terrain3", "Terrain4" };
+					static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
+					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
+					break;
+				}
+				case Client::OBJ_MONSTER:
+				{
+					const char* ObjectList[] = { "Pig", "Mpbline", "Spider", "Bearger", "Boarwarrior", "Boss" };
+					static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
+					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
+					break;
+				}
+				case Client::OBJ_BLOCK:
+				{
+					const char* ObjectList[] = { "Block1", "Block2", "Block3" };
+					static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
+					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
+					break;
+				}
+				case Client::OBJ_INTERATIVE:
+				{
+					const char* ObjectList[] = { "Grass", "Tree", "Pot", "Tent", "Food", "Flower" };
+					static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
+					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
+					break;
+				}
+				case Client::OBJ_UNINTERATIVE:
+				{
+					const char* ObjectList[] = { "Wall", "Rock", "Deco1", "Deco2", "Deco3" };
+					static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
+					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
+					break;
+				}
+				case Client::OBJ_END:
+				{
+					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "NONE");
+					break;
+				}
+				default:
+					break;
+				}
+
+				ImGui::NewLine();
+				ImGui::Text("Position (");
+				ImGui::SameLine();
+				ImGui::Text("%f, %f , %f )", m_vPickedObjPos.x, m_vPickedObjPos.y, m_vPickedObjPos.z);
+
+				ImGui::NewLine();
+				ImGui::Text("Scale (");
+				ImGui::SameLine();
+				ImGui::Text("%f, %f , %f )", m_vPickedObjScale.x, m_vPickedObjScale.y, m_vPickedObjScale.z);
+
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Setting"))
+			{
+				if (pPickedObj != nullptr)
+				{
+					DirectX::XMStoreFloat3(&m_vPickedObjPos, dynamic_cast<CBaseObj*>(pPickedObj)->Get_Position());
+					m_vPickedObjScale = dynamic_cast<CBaseObj*>(pPickedObj)->Get_Scale();
+
+				}
+				else
+				{
+					m_vPickedObjPos = _float3(0.f, 0.f, 0.f);
+					m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
+				}
+
+
+				ImGui::BulletText("Position");
+				ImGui::Text("Position X");
+				ImGui::SameLine();
+				ImGui::DragFloat("##PositionX", &m_vPickedObjPos.x);
+	
+				ImGui::Text("Position Z");
+				ImGui::SameLine();
+				ImGui::DragFloat("##PositionZ", &m_vPickedObjPos.z);
+
+				ImGui::Text("Position Y");
+				ImGui::SameLine();
+				ImGui::DragFloat("##PositionY", &m_vPickedObjPos.y, 1.f, -10, 10);
+
+				ImGui::NewLine();
+
+				ImGui::BulletText("Scale");
+
+				static _float Pos[3] = { m_vPickedObjScale.x, m_vPickedObjScale.y, m_vPickedObjScale.z };
+				ImGui::Text("Scale");
+				ImGui::SameLine();
+				ImGui::InputFloat3("##SettingScale", Pos);
+				m_vPickedObjScale = _float3(Pos[0], Pos[1], Pos[2]);
+
+				if (pPickedObj != nullptr)
+				{
+					_vector vSettingPosition = DirectX::XMLoadFloat3(&m_vPickedObjPos);
+					vSettingPosition = XMVectorSetW(vSettingPosition, 1.f);
+					dynamic_cast<CBaseObj*>(pPickedObj)->Set_State(CTransform::STATE_POSITION, vSettingPosition);
+					dynamic_cast<CBaseObj*>(pPickedObj)->Set_Scale(m_vPickedObjScale);
+
+				}
+
+				ImGui::EndTabItem();
+			}
+			ImGui::EndTabBar();
+		}
+		ImGui::EndChild();
+		if (ImGui::Button("Reset")) {}
+		ImGui::SameLine();
+		if (ImGui::Button("Save")) {}
+		ImGui::EndGroup();
+	}
+
+	RELEASE_INSTANCE(CPickingMgr);
+
 	ImGui::End();
 }
 

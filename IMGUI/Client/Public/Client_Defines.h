@@ -1,5 +1,5 @@
 #pragma once
-
+#pragma warning (disable : 4996)
 namespace Client
 {
 	const unsigned int g_iWinSizeX = 1280;

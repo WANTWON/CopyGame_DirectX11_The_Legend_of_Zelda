@@ -193,7 +193,7 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 		{
 			_uint		iIndex = i * m_iNumVerticesX + j;
 
-			pVertices[iIndex].vPosition = m_pVerticesPosMxM[iIndex] = _float3(TerrainDesc.m_iPositionX + j, TerrainDesc.m_fHeight, TerrainDesc.m_iPositionZ + i);
+			pVertices[iIndex].vPosition = m_pVerticesPosMxM[iIndex] = _float3(j, 0.f,  i);
 			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			pVertices[iIndex].vTexture = _float2(j / _float(m_iNumVerticesX - 1), i / _float(m_iNumVerticesZ - 1));
 		}
@@ -435,6 +435,28 @@ void CVIBuffer_Terrain::Set_Terrain_Shape(_float fHeight, _float fRad, _float fS
 			pVertices[iIndex].vPosition = vPos;
 		}
 
+	}
+	m_pContext->Unmap(m_pVB, 0);
+}
+
+void CVIBuffer_Terrain::Set_Terrain_Buffer(TERRAINDESC TerrainDesc)
+{
+	D3D11_MAPPED_SUBRESOURCE		SubResource;
+
+	m_pContext->Map(m_pVB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXNORTEX* pVertices = (VTXNORTEX*)SubResource.pData;
+
+	for (_uint i = 0; i < TerrainDesc.m_iVerticeNumZ; ++i)
+	{
+		for (_uint j = 0; j < TerrainDesc.m_iVerticeNumX; ++j)
+		{
+			_uint		iIndex = i * m_iNumVerticesX + j;
+
+			pVertices[iIndex].vPosition = m_pVerticesPosMxM[iIndex] = _float3(TerrainDesc.m_iPositionX + j, TerrainDesc.m_fHeight, TerrainDesc.m_iPositionZ + i);
+			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
+			pVertices[iIndex].vTexture = _float2(j / _float(m_iNumVerticesX - 1), i / _float(m_iNumVerticesZ - 1));
+		}
 	}
 	m_pContext->Unmap(m_pVB, 0);
 }

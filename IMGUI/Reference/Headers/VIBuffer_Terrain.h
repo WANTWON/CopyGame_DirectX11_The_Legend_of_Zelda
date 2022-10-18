@@ -30,6 +30,7 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 	virtual _bool Picking(class CTransform* pTransform, _float3* pOut) override;
 	void Set_Terrain_Shape(_float fHeight, _float fRad, _float fSharp, _float3 vPoint, _float fTimeDelta);
+	void Set_Terrain_Buffer(TERRAINDESC TerrainDesc);
 
 private:
 	_uint				m_iNumVerticesX = 0, m_iNumVerticesZ = 0;

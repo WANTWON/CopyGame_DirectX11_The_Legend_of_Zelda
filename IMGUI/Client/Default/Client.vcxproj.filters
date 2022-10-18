@@ -25,9 +25,6 @@
     <Filter Include="01.Levels\02.GamePlay">
       <UniqueIdentifier>{35c5c360-0a21-4524-b3bd-78fd1a809214}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\00.BackGround">
-      <UniqueIdentifier>{57566d9b-4982-490a-9436-a60395b8dd99}</UniqueIdentifier>
-    </Filter>
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{ffd39a2b-4897-4694-bc2f-d9c96bf2d061}</UniqueIdentifier>
     </Filter>
@@ -51,6 +48,12 @@
     </Filter>
     <Filter Include="95.PickingMgr">
       <UniqueIdentifier>{fd6a863a-df98-4d3e-9a16-12f6435747e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\02.BackGround">
+      <UniqueIdentifier>{57566d9b-4982-490a-9436-a60395b8dd99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\00.BaseObj">
+      <UniqueIdentifier>{607cdc99-8a33-4645-bb07-f6980b39b4ed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -88,7 +91,7 @@
       <Filter>01.Levels\01.Logo</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
-      <Filter>02.GameObjects\00.BackGround</Filter>
+      <Filter>02.GameObjects\02.BackGround</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\imconfig.h">
       <Filter>100.IMGUI\Default</Filter>
@@ -132,6 +135,9 @@
     <ClInclude Include="..\Bin\ShaderFiles\Client_Shader_Defines.hpp">
       <Filter>97.ShaderFiles</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BaseObj.h">
+      <Filter>02.GameObjects\00.BaseObj</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -156,7 +162,7 @@
       <Filter>01.Levels\01.Logo</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
-      <Filter>02.GameObjects\00.BackGround</Filter>
+      <Filter>02.GameObjects\02.BackGround</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\imgui.cpp">
       <Filter>100.IMGUI\Default</Filter>
@@ -193,6 +199,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\PickingMgr.cpp">
       <Filter>95.PickingMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BaseObj.cpp">
+      <Filter>02.GameObjects\00.BaseObj</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

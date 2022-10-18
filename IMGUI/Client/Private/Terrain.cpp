@@ -6,12 +6,12 @@
 #include "PickingMgr.h"
 
 CTerrain::CTerrain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject(pDevice, pContext)
+	: CBaseObj(pDevice, pContext)
 {
 }
 
 CTerrain::CTerrain(const CTerrain & rhs)
-	: CGameObject(rhs)
+	: CBaseObj(rhs)
 {
 }
 
@@ -31,8 +31,10 @@ HRESULT CTerrain::Initialize(void* pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	if(!m_bWireFrame)
+	if(!m_bWireFrame && !m_bDebugTerrain)
 		CPickingMgr::Get_Instance()->Add_PickingGroup(this);
+
+	m_eObjectID = OBJ_BACKGROUND;
 
 	return S_OK;
 }
@@ -134,6 +136,7 @@ void CTerrain::PickingTrue()
 HRESULT CTerrain::Ready_Components(void* pArg)
 {
 	CVIBuffer_Terrain::TERRAINDESC TerrainDesc;
+	ZeroMemory(&TerrainDesc, sizeof(CVIBuffer_Terrain::TERRAINDESC));
 	memcpy(&TerrainDesc, pArg, sizeof(CVIBuffer_Terrain::TERRAINDESC));
 	m_bDebugTerrain = TerrainDesc.m_bTestShowTerrain;
 	m_bWireFrame = TerrainDesc.m_bShowWireFrame;
@@ -161,6 +164,9 @@ HRESULT CTerrain::Ready_Components(void* pArg)
 
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
+
+	_vector vInitPosition = XMVectorSet(TerrainDesc.m_iPositionX, TerrainDesc.m_fHeight, TerrainDesc.m_iPositionZ, 1.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vInitPosition);
 
 	return S_OK;
 }
