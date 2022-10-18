@@ -25,7 +25,7 @@ HRESULT CObj_UI::Initialize(void * pArg)
 	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, m_fSizeX);
 	m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_fSizeY);
 
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 1.f));
 
 	return S_OK;
 }

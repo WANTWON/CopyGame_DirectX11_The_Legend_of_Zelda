@@ -11,7 +11,7 @@
 #include <DirectXTK/DDSTextureLoader.h>
 #include <DirectXTK/WICTextureLoader.h>
 #include <DirectXTK/ScreenGrab.h>
-
+#include <DirectXCollision.h>
 
 using namespace DirectX;
 
@@ -55,4 +55,4 @@ using namespace std;
 #define OBJ_NOEVENT 0
 
 using namespace Engine;
-
+using namespace TriangleTests;

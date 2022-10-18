@@ -1,6 +1,6 @@
 ﻿#include "..\Public\VIBuffer_Terrain.h"
 #include "Transform.h"
-//#include "Picking.h"
+#include "Picking.h"
 
 CVIBuffer_Terrain::CVIBuffer_Terrain(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CVIBuffer(pDevice, pContext)
@@ -187,20 +187,17 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 
 	m_pVerticesPosMxM = new _float3[m_iNumVertices];
 
-
-
 	for (_uint i = 0; i < m_iNumVerticesZ; ++i)
 	{
 		for (_uint j = 0; j < m_iNumVerticesX; ++j)
 		{
 			_uint		iIndex = i * m_iNumVerticesX + j;
 
-			pVertices[iIndex].vPosition = m_pVerticesPosMxM[iIndex] = _float3(j, 0.0f, i);
+			pVertices[iIndex].vPosition = m_pVerticesPosMxM[iIndex] = _float3(TerrainDesc.m_iPositionX + j, TerrainDesc.m_fHeight, TerrainDesc.m_iPositionZ + i);
 			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			pVertices[iIndex].vTexture = _float2(j / _float(m_iNumVerticesX - 1), i / _float(m_iNumVerticesZ - 1));
 		}
 	}
-
 
 
 #pragma endregion
@@ -238,14 +235,11 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 			pIndices[iNumFaces]._1 = iIndices[1];
 			pIndices[iNumFaces]._2 = iIndices[2];
 
-			// �� ���� ���� ���� 2���� ���Ѵ�.
 			vSourDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vPosition);
 			vDestDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition);
 
-			// �����Ѵ�.
 			vNormal = XMVector3Normalize(XMVector3Cross(vSourDir, vDestDir));
 
-			// ���� ����� ���� ���� ���Ϳ� ���Ѵ�.
 			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal,
 				XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal) + vNormal);
 			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal,
@@ -256,19 +250,15 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 			++iNumFaces;
 
 
-
 			pIndices[iNumFaces]._0 = iIndices[0];
 			pIndices[iNumFaces]._1 = iIndices[2];
 			pIndices[iNumFaces]._2 = iIndices[3];
 
-			// �� ���� ���� ���� 2���� ���Ѵ�.
 			vSourDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vPosition);
 			vDestDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition);
 
-			// �����Ѵ�.
 			vNormal = XMVector3Normalize(XMVector3Cross(vSourDir, vDestDir));
 
-			// ���� ����� ���� ���� ���Ϳ� ���Ѵ�.
 			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal,
 				XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal) + vNormal);
 			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal,
@@ -284,8 +274,6 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 
 #pragma endregion
 
-
-	// ���ؽ� ,�ε��� ���۸� �����Ѵ�.
 	ZeroMemory(&m_BufferDesc, sizeof(D3D11_BUFFER_DESC));
 	m_BufferDesc.ByteWidth = m_iNumVertices * m_iStride;
 	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;				// ���۸� ���̳���
@@ -324,86 +312,79 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 
 _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 {
-	//CPicking*		pPicking = CPicking::Get_Instance();
-	//Safe_AddRef(pPicking);
+	CPicking*		pPicking = CPicking::Get_Instance();
+	Safe_AddRef(pPicking);
 
-	//_matrix		WorldMatrixInv = pTransform->Get_WorldMatrixInverse();
+	_matrix		WorldMatrixInv = pTransform->Get_WorldMatrixInverse();
 
-	//_float3			vTempRayDir, vTempRayPos;
-	//XMVECTOR		vRayDir, vRayPos;
-	//pPicking->Compute_LocalRayInfo(&vTempRayDir, &vTempRayPos, pTransform);
+	_float3			vTempRayDir, vTempRayPos;
+	XMVECTOR		vRayDir, vRayPos;
+	pPicking->Compute_LocalRayInfo(&vTempRayDir, &vTempRayPos, pTransform);
 
-	//vRayPos = XMLoadFloat3(&vTempRayPos);
-	//vRayPos = XMVectorSetW(vRayPos, 1.f);
-	//vRayDir = XMLoadFloat3(&vTempRayDir);
-	//vRayDir = XMVector3Normalize(vRayDir);
-
-
-	////if (FAILED(Cul_OptiIndex(vRayPos, vRayDir)))
-	////{
-	////	Safe_Release(pPicking);
-	////	return false;
-	////}
+	vRayPos = XMLoadFloat3(&vTempRayPos);
+	vRayPos = XMVectorSetW(vRayPos, 1.f);
+	vRayDir = XMLoadFloat3(&vTempRayDir);
+	vRayDir = XMVector3Normalize(vRayDir);
 
 
-	//for (_int i = 0; i < m_iNumVerticesZ - 1; ++i)
-	//{
-	//	for (_int j = 0; j < m_iNumVerticesX - 1; ++j)
-	//	{
-	//		_uint		iIndex = i * m_iNumVerticesX + j;
+	for (_int i = 0; i < m_iNumVerticesZ - 1; ++i)
+	{
+		for (_int j = 0; j < m_iNumVerticesX - 1; ++j)
+		{
+			_uint		iIndex = i * m_iNumVerticesX + j;
 
-	//		_uint		iIndices[] = {
-	//			iIndex + m_iNumVerticesX,
-	//			iIndex + m_iNumVerticesX + 1,
-	//			iIndex + 1,
-	//			iIndex
-	//		};
+			_uint		iIndices[] = {
+				iIndex + m_iNumVerticesX,
+				iIndex + m_iNumVerticesX + 1,
+				iIndex + 1,
+				iIndex
+			};
 
-	//		_float		fU, fV, fDist;
-	//		_matrix	WorldMatrix = pTransform->Get_WorldMatrix();
+			_float		fU, fV, fDist;
+			_matrix	WorldMatrix = pTransform->Get_WorldMatrix();
 
+		
+			_vector vTemp_1 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[0]]);
+			vTemp_1 = XMVectorSetW(vTemp_1, 1.f);
+			_vector vTemp_2 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[1]]);
+			vTemp_2 = XMVectorSetW(vTemp_2, 1.f);
+			_vector vTemp_3 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[2]]);
+			vTemp_3 = XMVectorSetW(vTemp_3, 1.f);
+			if (true == TriangleTests::Intersects((FXMVECTOR)vRayPos, (FXMVECTOR)vRayDir, (FXMVECTOR)vTemp_1, (GXMVECTOR)vTemp_2, (HXMVECTOR)vTemp_3, fDist))
+			{
+				_vector	vPickPos = vRayPos + vRayDir * fDist;
 
-	//		_vector vTemp_1 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[0]]);
-	//		vTemp_1 = XMVectorSetW(vTemp_1, 1.f);
-	//		_vector vTemp_2 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[1]]);
-	//		vTemp_2 = XMVectorSetW(vTemp_2, 1.f);
-	//		_vector vTemp_3 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[2]]);
-	//		vTemp_3 = XMVectorSetW(vTemp_3, 1.f);
-	//		if (true == TriangleTests::Intersects((FXMVECTOR)vRayPos, (FXMVECTOR)vRayDir, (FXMVECTOR)vTemp_1, (GXMVECTOR)vTemp_2, (HXMVECTOR)vTemp_3, fDist))
-	//		{
-	//			_vector	vPickPos = vRayPos + vRayDir * fDist;
+				XMStoreFloat3(pOut, XMVector3TransformCoord(vPickPos, WorldMatrix));
 
-	//			XMStoreFloat3(pOut, XMVector3TransformCoord(vPickPos, WorldMatrix));
+				Safe_Release(pPicking);
+				return true;
+			}
 
-	//			Safe_Release(pPicking);
-	//			return true;
-	//		}
+			vTemp_1 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[0]]);
+			vTemp_1 = XMVectorSetW(vTemp_1, 1.f);
+			vTemp_2 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[2]]);
+			vTemp_2 = XMVectorSetW(vTemp_2, 1.f);
+			vTemp_3 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[3]]);
+			vTemp_3 = XMVectorSetW(vTemp_3, 1.f);
+			if (true == TriangleTests::Intersects((FXMVECTOR)vRayPos, (FXMVECTOR)vRayDir, (FXMVECTOR)vTemp_1, (GXMVECTOR)vTemp_2, (HXMVECTOR)vTemp_3, fDist))
+			{
+				_vector	vPickPos = vRayPos + vRayDir * fDist;
 
-	//		vTemp_1 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[0]]);
-	//		vTemp_1 = XMVectorSetW(vTemp_1, 1.f);
-	//		vTemp_2 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[2]]);
-	//		vTemp_2 = XMVectorSetW(vTemp_2, 1.f);
-	//		vTemp_3 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[3]]);
-	//		vTemp_3 = XMVectorSetW(vTemp_3, 1.f);
-	//		if (true == TriangleTests::Intersects((FXMVECTOR)vRayPos, (FXMVECTOR)vRayDir, (FXMVECTOR)vTemp_1, (GXMVECTOR)vTemp_2, (HXMVECTOR)vTemp_3, fDist))
-	//		{
-	//			_vector	vPickPos = vRayPos + vRayDir * fDist;
+				XMStoreFloat3(pOut, XMVector3TransformCoord(vPickPos, WorldMatrix));
 
-	//			XMStoreFloat3(pOut, XMVector3TransformCoord(vPickPos, WorldMatrix));
+				Safe_Release(pPicking);
+				return true;
+			}
+		}
+	}
 
-	//			Safe_Release(pPicking);
-	//			return true;
-	//		}
-	//	}
-	//}
-
-	//Safe_Release(pPicking);
+	Safe_Release(pPicking);
 	return false;
 }
 
 
 
-void CVIBuffer_Terrain::Make_Tick_Up(_float fHeight, _float fRad, _float fSharp, _float3 vPoint, _float fTimeDelta)
+void CVIBuffer_Terrain::Set_Terrain_Shape(_float fHeight, _float fRad, _float fSharp, _float3 vPoint, _float fTimeDelta)
 {
 	D3D11_MAPPED_SUBRESOURCE		SubResource;
 
@@ -417,8 +398,6 @@ void CVIBuffer_Terrain::Make_Tick_Up(_float fHeight, _float fRad, _float fSharp,
 
 		for (_int j = 0; j < m_iNumVerticesX - 1; ++j)
 		{
-
-	
 			_uint		iIndex = i * m_iNumVerticesX + j;
 
 			_float3 vPos = pVertices[iIndex].vPosition;

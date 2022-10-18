@@ -76,6 +76,9 @@
     <ClCompile Include="..\private\Light_Manager.cpp">
       <Filter>01.Utility\06.Lights\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Picking.cpp">
+      <Filter>01.Utility\07.Picking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -165,6 +168,9 @@
     <ClInclude Include="..\public\Light_Manager.h">
       <Filter>01.Utility\06.Lights\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Picking.h">
+      <Filter>01.Utility\07.Picking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00.System">
@@ -244,6 +250,9 @@
     </Filter>
     <Filter Include="01.Utility\06.Lights\Manager">
       <UniqueIdentifier>{3826a6b1-d84a-45d4-8a22-89a3c6d2a61b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\07.Picking">
+      <UniqueIdentifier>{362c3d45-6091-41e7-ba96-7fa0cda898f1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

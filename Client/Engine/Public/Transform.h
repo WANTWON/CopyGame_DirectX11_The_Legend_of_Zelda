@@ -31,6 +31,10 @@ public:
 		return XMLoadFloat4x4(&m_WorldMatrix);
 	}
 
+	_matrix Get_WorldMatrixInverse() const {
+		return XMMatrixInverse(nullptr, Get_WorldMatrix());
+	}
+
 	/* 리턴받은 행렬보관해야할 때  */
 	_float4x4 Get_World4x4() const {
 		return m_WorldMatrix;
@@ -38,11 +42,8 @@ public:
 
 	/* 리턴받은 행렬을 셰이더에 던지기위해.  */
 	_float4x4 Get_World4x4_TP() const {
-
 		_float4x4	TransposeMatrix;
-
 		XMStoreFloat4x4(&TransposeMatrix, XMMatrixTranspose(Get_WorldMatrix()));
-
 		return TransposeMatrix;
 	
 	}

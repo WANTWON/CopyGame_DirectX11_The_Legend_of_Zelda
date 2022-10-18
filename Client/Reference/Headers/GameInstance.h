@@ -9,6 +9,7 @@
 
 #include "Component_Manager.h"
 #include "Light_Manager.h"
+#include "Picking.h"
 
 BEGIN(Engine)
 
@@ -59,7 +60,7 @@ public: /* For.Object_Manager */
 	HRESULT Add_GameObject(const _tchar* pPrototypeTag, _uint iLevelIndex, const _tchar* pLayerTag, void* pArg = nullptr);
 	class CComponent* Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex = 0);
 	class CGameObject* Get_Object(_uint iLevelIndex, const _tchar * pLayerTag, _uint iIndex = 0);
-	list<CGameObject*>* Get_ObjectList(_uint iSceneID, const _tchar * pLayerTag);
+	list<class CGameObject*>* Get_ObjectList(_uint iSceneID, const _tchar * pLayerTag);
 	void Clear_Layer(_uint iLevelIndex, const _tchar* LayerTag);
 
 public: /* For.Component_Manager */
@@ -92,6 +93,7 @@ private:
 	CComponent_Manager*				m_pComponent_Manager = nullptr;
 	CPipeLine*						m_pPipeLine = nullptr;
 	CLight_Manager*					m_pLight_Manager = nullptr;
+	CPicking*						m_pPicking = nullptr;
 
 public:
 	virtual void Free() override;
