@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "PipeLine.h"
 #include "Terrain_Manager.h"
+#include "PickingMgr.h"
 
 CTerrain::CTerrain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject(pDevice, pContext)
@@ -30,6 +31,9 @@ HRESULT CTerrain::Initialize(void* pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
+	if(!m_bWireFrame)
+		CPickingMgr::Get_Instance()->Add_PickingGroup(this);
+
 	return S_OK;
 }
 
@@ -53,35 +57,11 @@ void CTerrain::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (m_pVIBufferCom->Picking(m_pTransformCom, &m_vMousePickPos) == true)
-	{
-		CTerrain_Manager::Get_Instance()->Set_PickingWorldPos(m_vMousePickPos);
-
-		if (pGameInstance->Mouse_Pressing(DIMK::DIMK_LBUTTON))
-		{
-
-			/*_float fHegith = CMapManager::Get_Instance()->Get_Height();
-			_float fRad = CMapManager::Get_Instance()->Get_Rad();
-			_float fSharp = CMapManager::Get_Instance()->Get_Sharp();*/
-
-			_float fHegith = 1.f;
-			_float fRad = 1.f;
-			_float fSharp = 1.f;
-
-			m_pVIBufferCom->Set_Terrain_Shape(fHegith, fRad, fSharp, m_vMousePickPos, fTimeDelta);
-
-		}
-	}
-	//else
-	//	ZeroMemory(&m_vMousePickPos, sizeof(_float3));
-		
-	RELEASE_INSTANCE(CGameInstance);
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+
+	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 }
 
 HRESULT CTerrain::Render()
@@ -93,53 +73,77 @@ HRESULT CTerrain::Render()
 		nullptr == m_pVIBufferCom)
 		return E_FAIL;
 
-	ID3D11RasterizerState* pWireFrame;
-	ID3D11RasterizerState* pFillFrame;
 
-	D3D11_RASTERIZER_DESC WireDesc;
-
-	ZeroMemory(&WireDesc, sizeof(D3D11_RASTERIZER_DESC));
-	WireDesc.FillMode = D3D11_FILL_WIREFRAME;
-	WireDesc.CullMode = D3D11_CULL_NONE;
-	m_pDevice->CreateRasterizerState(&WireDesc, &pWireFrame);
-	WireDesc.FillMode = D3D11_FILL_SOLID;
-	WireDesc.CullMode = D3D11_CULL_BACK;
-	m_pDevice->CreateRasterizerState(&WireDesc, &pFillFrame);
-	
-
-	if (m_bDebugTerrain)
- 		m_bWireFrame = CTerrain_Manager::Get_Instance()->Get_TerrainDesc().m_bShowWireFrame;
-
-	if(m_bWireFrame)
-		m_pContext->RSSetState(pWireFrame);
+	if (FAILED(SetUp_ShaderID()))
+		return E_FAIL;
 
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-	m_pShaderCom->Begin(m_bWireFrame);
+	m_pShaderCom->Begin(m_eShaderID);
+
 	m_pVIBufferCom->Render();
-	m_pContext->RSSetState(pFillFrame);
-
-
-	Safe_Release(pWireFrame);
-	Safe_Release(pFillFrame);
 
 	return S_OK;
+}
+
+_bool CTerrain::Picking(_float3 * PickingPoint)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (m_pVIBufferCom->Picking(m_pTransformCom, &m_vMousePickPos) == true)
+	{
+		CTerrain_Manager::Get_Instance()->Set_PickingWorldPos(m_vMousePickPos);
+		RELEASE_INSTANCE(CGameInstance);
+		return true;
+	}
+	else
+	{
+		ZeroMemory(&m_vMousePickPos, sizeof(_float3));
+	}
+		
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return false;
+}
+
+void CTerrain::PickingTrue()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Mouse_Up(DIMK::DIMK_LBUTTON))
+	{
+		if (m_bPicked)
+			CPickingMgr::Get_Instance()->Set_PickedObj(nullptr);
+		else
+			CPickingMgr::Get_Instance()->Set_PickedObj(this);
+		/*_float fHegith = CMapManager::Get_Instance()->Get_Height();
+		_float fRad = CMapManager::Get_Instance()->Get_Rad();
+		_float fSharp = CMapManager::Get_Instance()->Get_Sharp();*/
+
+		_float fHegith = 1.f;
+		_float fRad = 1.f;
+		_float fSharp = 1.f;
+
+		//m_pVIBufferCom->Set_Terrain_Shape(fHegith, fRad, fSharp, m_vMousePickPos, 1.f);
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CTerrain::Ready_Components(void* pArg)
 {
 	CVIBuffer_Terrain::TERRAINDESC TerrainDesc;
 	memcpy(&TerrainDesc, pArg, sizeof(CVIBuffer_Terrain::TERRAINDESC));
-	m_bWireFrame = TerrainDesc.m_bShowWireFrame;
 	m_bDebugTerrain = TerrainDesc.m_bTestShowTerrain;
+	m_bWireFrame = TerrainDesc.m_bShowWireFrame;
 
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Terrain"), (CComponent**)&m_pTextureCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Terrain"), (CComponent**)&m_pTextureCom[TYPE_DIFFUSE])))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */
@@ -161,6 +165,27 @@ HRESULT CTerrain::Ready_Components(void* pArg)
 	return S_OK;
 }
 
+HRESULT CTerrain::SetUp_ShaderID()
+{
+
+	if (m_bDebugTerrain)
+	{
+		if (CTerrain_Manager::Get_Instance()->Get_TerrainDesc().m_bShowWireFrame)
+			m_eShaderID = SHADER_WIREFRAME;
+		else
+			m_eShaderID = SHADER_DEFAULT;
+	}
+
+	if(m_bWireFrame)
+		m_eShaderID = SHADER_WIREFRAME;
+	else if (m_bPicked)
+		m_eShaderID = SHADER_PICKED;
+	else
+		m_eShaderID = SHADER_DEFAULT;
+
+	return S_OK;
+}
+
 HRESULT CTerrain::SetUp_ShaderResources()
 {
 
@@ -178,7 +203,7 @@ HRESULT CTerrain::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(0))))
+	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom[TYPE_DIFFUSE]->Get_SRV(0))))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -220,5 +245,7 @@ void CTerrain::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pRendererCom);
-	Safe_Release(m_pTextureCom);
+
+	for (_uint i = 0; i < TYPE_END; ++i)
+		Safe_Release(m_pTextureCom[i]);
 }

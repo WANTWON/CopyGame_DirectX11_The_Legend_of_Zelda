@@ -4,6 +4,7 @@
 #include "GameInstance.h"
 #include "Camera_Dynamic.h"
 #include "Terrain_Manager.h"
+#include "PickingMgr.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -39,6 +40,7 @@ void CLevel_GamePlay::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);	
 
+	CPickingMgr::Get_Instance()->Picking();
 }
 
 void CLevel_GamePlay::Late_Tick(_float fTimeDelta)

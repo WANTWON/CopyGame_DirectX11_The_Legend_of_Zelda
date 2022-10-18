@@ -28,7 +28,7 @@ public:
 	virtual HRESULT Initialize_Prototype(_uint iNumVerticeX, _uint iNumVerticeZ, _float fHeight);
 	virtual HRESULT Initialize_Prototype(const _tchar* pHeightMapFilePath);
 	virtual HRESULT Initialize(void* pArg);
-	_bool Picking(class CTransform* pTransform, _float3* pOut);
+	virtual _bool Picking(class CTransform* pTransform, _float3* pOut) override;
 	void Set_Terrain_Shape(_float fHeight, _float fRad, _float fSharp, _float3 vPoint, _float fTimeDelta);
 
 private:

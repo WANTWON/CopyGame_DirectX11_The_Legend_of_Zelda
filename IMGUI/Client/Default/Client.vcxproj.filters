@@ -49,6 +49,9 @@
     <Filter Include="03.ToolManager">
       <UniqueIdentifier>{8c7bfb45-d25d-4688-bf8b-87e09439cf78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="95.PickingMgr">
+      <UniqueIdentifier>{fd6a863a-df98-4d3e-9a16-12f6435747e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -123,6 +126,12 @@
     <ClInclude Include="..\Public\Terrain_Manager.h">
       <Filter>03.ToolManager</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PickingMgr.h">
+      <Filter>95.PickingMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Bin\ShaderFiles\Client_Shader_Defines.hpp">
+      <Filter>97.ShaderFiles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -182,6 +191,9 @@
     <ClCompile Include="..\Private\Terrain_Manager.cpp">
       <Filter>03.ToolManager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\PickingMgr.cpp">
+      <Filter>95.PickingMgr</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -197,10 +209,10 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl">
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

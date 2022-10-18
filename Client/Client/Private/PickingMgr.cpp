@@ -1,4 +1,4 @@
-癤�#include "PickingMgr.h"
+#include "PickingMgr.h"
 #include "GameInstance.h"
 #include "Transform.h"
 #include "GameObject.h"
@@ -36,23 +36,6 @@ void CPickingMgr::Out_PickingGroup(CGameObject * pGameObject)
 	}
 }
 
-void CPickingMgr::Set_PickedObj(CGameObject * pGameObject)
-{
-	if (pGameObject == nullptr)
-	{
-		m_pPickedObj->Set_Picked(false);
-		m_pPickedObj = nullptr;
-		return;
-	}
-		
-	m_pPickedObj = pGameObject;
-
-	for (auto& pGameObject : m_GameObjects)
-		pGameObject->Set_Picked(false);
-
-	m_pPickedObj->Set_Picked(true);
-}
-
 _bool CPickingMgr::Picking()
 {
 	if (m_bMouseInUI)
@@ -71,7 +54,7 @@ _bool CPickingMgr::Picking()
 		}
 	}
 
-	if (!vecPicked.empty()) 
+	if (!vecPicked.empty()) //가장 z값이 작은 것을 구한다.
 	{
 		vecPicked.sort([](CGameObject* pSour, CGameObject* pDest)
 		{
@@ -81,6 +64,7 @@ _bool CPickingMgr::Picking()
 		vecPicked.front()->PickingTrue();
 		return true;
 	}
+
 	return false;
 }
 
@@ -88,5 +72,6 @@ _bool CPickingMgr::Picking()
 
 void CPickingMgr::Free()
 {
+
 	m_GameObjects.clear();
 }

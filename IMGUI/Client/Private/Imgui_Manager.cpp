@@ -3,8 +3,6 @@
 #include "imgui.h"
 #include "GameInstance.h"
 
-
-
 IMPLEMENT_SINGLETON(CImgui_Manager)
 
 CImgui_Manager::CImgui_Manager()

@@ -88,44 +88,6 @@ void CPicking::Transform_ToLocalSpace(class CTransform * pTransform)
 
 }
 
-_bool CPicking::Intersect_InWorldSpace(_vector vPointA, _vector vPointB, _vector vPointC, _float3* pOut)
-{
-	_float		fU, fV, fDist;
-
-	_vector vRayPos = XMLoadFloat3(&m_vRayPos);
-	_vector vRayDir = XMLoadFloat3(&m_vRayDir);
-
-
-	if (true == TriangleTests::Intersects(vRayPos, vRayDir, vPointA, vPointB, vPointC, fDist))
-	{
-		_vector	vPickPos = vRayPos + vRayDir * fDist;
-		XMStoreFloat3(pOut, vPickPos);
-
-		return true;
-	}
-
-	return false;
-}
-
-_bool CPicking::Intersect_InLocalSpace(_vector vPointA, _vector vPointB, _vector vPointC, _float3* pOut)
-{
-	_float		fU, fV, fDist;
-
-	_fvector vLocalRayPos = XMLoadFloat3(&m_vRayPos_Local);
-	XMVectorSetW(vLocalRayPos, 1.f);
-	_fvector vLocalRayDir = XMLoadFloat3(&m_vRayDir_Local);
-	XMVector3Normalize(vLocalRayDir);
-
-	if (true == TriangleTests::Intersects(vLocalRayPos, vLocalRayDir, vPointA, vPointB, vPointC, fDist))
-	{
-		_vector	vPickPos = vLocalRayPos + vLocalRayDir * fDist;
-		XMStoreFloat3(pOut, vPickPos);
-	
-		return true;
-	}
-
-	return false;
-}
 
 void CPicking::Compute_LocalRayInfo(_float3 * pRayDir, _float3 * pRayPos, CTransform * pTransform)
 {

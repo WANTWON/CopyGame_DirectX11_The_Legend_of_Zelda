@@ -13,6 +13,9 @@
 #include <DirectXTK/ScreenGrab.h>
 #include <DirectXCollision.h>
 
+#include <directXTK/SpriteFont.h>
+#include <directXTK/SpriteBatch.h>
+
 using namespace DirectX;
 
 

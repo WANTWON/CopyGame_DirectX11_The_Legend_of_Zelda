@@ -1,5 +1,6 @@
 #include "..\Public\GameObject.h"
 #include "GameInstance.h"
+#include "PipeLine.h"
 
 CGameObject::CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice), m_pContext(pContext)
@@ -63,17 +64,21 @@ HRESULT CGameObject::Add_Components(const _tchar * pComponentTag, _uint iLevelIn
 	return S_OK;
 }
 
-void CGameObject::Compute_CamDistance(_float3 vWorldPos)
+void CGameObject::Compute_CamDistance(_vector vWorldPos)
 {
 	_float4x4			ViewMatrix;
 
-	//m_pGraphic_Device->GetTransform(D3DTS_VIEW, &ViewMatrix);
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	//D3DXMatrixInverse(&ViewMatrix, nullptr, &ViewMatrix);
+	_matrix vViewMatrixInv = pGameInstance->Get_TransformMatrix(CPipeLine::D3DTS_VIEW);
+	vViewMatrixInv = XMMatrixInverse(nullptr, vViewMatrixInv);
 
-	//_float3		vCamPosition = *(_float3*)&ViewMatrix.m[3][0];
+	_vector vCamPosition = vViewMatrixInv.r[3];
 
-	//m_fCamDistance = D3DXVec3Length(&(vCamPosition - vWorldPos));
+	m_fCamDistance = XMVectorGetX(XMVector3Length(vCamPosition - vWorldPos));
+	
+	RELEASE_INSTANCE(CGameInstance);
+
 }
 
 CComponent * CGameObject::Find_Component(const _tchar * pComponentTag)

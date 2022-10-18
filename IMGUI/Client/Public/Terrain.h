@@ -15,6 +15,8 @@ BEGIN(Client)
 
 class CTerrain final : public CGameObject
 {
+public:
+	enum TEXTURE { TYPE_DIFFUSE, TYPE_BRUSH, TYPE_FILTER, TYPE_END };
 private:
 	CTerrain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CTerrain(const CTerrain& rhs);
@@ -27,15 +29,21 @@ public:
 	virtual void Late_Tick(_float fTimeDelta)override;
 	virtual HRESULT Render() override;
 
+public:
+	virtual _bool Picking(_float3* PickingPoint);
+	virtual void PickingTrue();
+
+
 private: /* For.Components */
 	CShader*				m_pShaderCom = nullptr;
-	CTexture*				m_pTextureCom = nullptr;
+	CTexture*				m_pTextureCom[TYPE_END] = { nullptr };
 	CRenderer*				m_pRendererCom = nullptr;
 	CVIBuffer_Terrain*		m_pVIBufferCom = nullptr;
 	CTransform*				m_pTransformCom = nullptr;
 
 private:
 	HRESULT Ready_Components(void* pArg);
+	HRESULT SetUp_ShaderID();
 	HRESULT SetUp_ShaderResources();
 
 private:
@@ -43,6 +51,7 @@ private:
 	_bool	m_bDebugTerrain = false;
 	_bool	m_bDebugShow = true;
 	_float3 m_vMousePickPos;
+	SHADER_ID m_eShaderID = SHADER_DEFAULT;
 
 public:
 	static CTerrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

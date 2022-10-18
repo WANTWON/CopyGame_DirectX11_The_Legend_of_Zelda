@@ -15,8 +15,6 @@ public:
 	HRESULT Initialize(HWND hWnd, _uint iWinCX, _uint iWinCY, ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
 	void Tick(); 
 	void Transform_ToLocalSpace(class CTransform * pTransform);
-	_bool Intersect_InWorldSpace(_vector vPointA, _vector vPointB, _vector vPointC, _float3* pOut);
-	_bool Intersect_InLocalSpace(_vector vPointA, _vector vPointB, _vector vPointC, _float3* pOut);
 	void Compute_LocalRayInfo(_float3 * pRayDir, _float3 * pRayPos, CTransform * pTransform);
 
 public:
