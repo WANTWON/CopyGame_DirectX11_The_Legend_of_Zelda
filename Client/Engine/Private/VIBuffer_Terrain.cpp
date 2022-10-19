@@ -390,10 +390,10 @@ void CVIBuffer_Terrain::Set_Terrain_Shape(_float fHeight, _float fRad, _float fS
 	D3D11_MAPPED_SUBRESOURCE		IndiceSubResouce;
 
 	m_pContext->Map(m_pVB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
-	m_pContext->Map(m_pIB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &IndiceSubResouce);
-
+	//m_pContext->Map(m_pIB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &IndiceSubResouce);
 
 	VTXNORTEX* pVertices = (VTXNORTEX*)SubResource.pData;
+//	FACEINDICES32*		pIndices = (FACEINDICES32*)IndiceSubResouce.pData;
 
 	for (_int i = 0; i < m_iNumVerticesZ - 1; ++i)
 	{
@@ -439,8 +439,66 @@ void CVIBuffer_Terrain::Set_Terrain_Shape(_float fHeight, _float fRad, _float fS
 
 	}
 
-	m_pContext->Unmap(m_pIB, 0);
+	//_uint			iNumFaces = 0;
+
+	//for (_uint i = 0; i < m_iNumVerticesZ - 1; ++i)
+	//{
+	//	for (_uint j = 0; j < m_iNumVerticesX - 1; ++j)
+	//	{
+	//		_uint		iIndex = i * m_iNumVerticesX + j;
+
+	//		_uint		iIndices[4] = {
+	//			iIndex + m_iNumVerticesX,
+	//			iIndex + m_iNumVerticesX + 1,
+	//			iIndex + 1,
+	//			iIndex
+	//		};
+
+	//		_vector		vSourDir, vDestDir, vNormal;
+
+	//		pIndices[iNumFaces]._0 = iIndices[0];
+	//		pIndices[iNumFaces]._1 = iIndices[1];
+	//		pIndices[iNumFaces]._2 = iIndices[2];
+
+	//		vSourDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vPosition);
+	//		vDestDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition);
+
+	//		vNormal = XMVector3Normalize(XMVector3Cross(vSourDir, vDestDir));
+
+	//		XMStoreFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal,
+	//			XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal) + vNormal);
+	//		XMStoreFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal,
+	//			XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal) + vNormal);
+	//		XMStoreFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal,
+	//			XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal) + vNormal);
+
+	//		++iNumFaces;
+
+
+	//		pIndices[iNumFaces]._0 = iIndices[0];
+	//		pIndices[iNumFaces]._1 = iIndices[2];
+	//		pIndices[iNumFaces]._2 = iIndices[3];
+
+	//		vSourDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vPosition);
+	//		vDestDir = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition);
+
+	//		vNormal = XMVector3Normalize(XMVector3Cross(vSourDir, vDestDir));
+
+	//		XMStoreFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal,
+	//			XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal) + vNormal);
+	//		XMStoreFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal,
+	//			XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal) + vNormal);
+	//		XMStoreFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal,
+	//			XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal) + vNormal);
+
+	//		++iNumFaces;
+
+	//	}
+	//}
+
+
 	m_pContext->Unmap(m_pVB, 0);
+	//m_pContext->Unmap(m_pIB, 0);
 
 }
 
