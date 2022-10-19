@@ -11,11 +11,9 @@ public:
 	{
 		_int	m_iPositionX = 0;
 		_int	m_iPositionZ = 0;
-		_int	m_iVerticeNumX = 0;
-		_int	m_iVerticeNumZ = 0;
+		_int	m_iVerticeNumX = 10;
+		_int	m_iVerticeNumZ = 10;
 		_float  m_fHeight = 0;
-		_bool	m_bShowWireFrame = false;
-		_bool	m_bTestShowTerrain = false;
 
 	}TERRAINDESC;
 

@@ -71,16 +71,16 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 
 	CTerrain_Manager::TERRAINDESC TerrainDesc;
 	TerrainDesc = CTerrain_Manager::Get_Instance()->Get_TerrainDesc();
-	TerrainDesc.m_iVerticeNumX = 50;
-	TerrainDesc.m_iVerticeNumZ = 50;
-	TerrainDesc.m_bTestShowTerrain = false;
+	TerrainDesc.TerrainDesc.m_iVerticeNumX = 50;
+	TerrainDesc.TerrainDesc.m_iVerticeNumZ = 50;
+	TerrainDesc.m_eDebugTerrain = CTerrain_Manager::DEBUG_WIRE;
 	TerrainDesc.m_bShowWireFrame = true;
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, &TerrainDesc)))
 		return E_FAIL;
 
 	TerrainDesc = CTerrain_Manager::Get_Instance()->Get_TerrainDesc();
-	TerrainDesc.m_bTestShowTerrain = true;
+	TerrainDesc.m_eDebugTerrain = CTerrain_Manager::DEBUG_SOILD;
 	CTerrain_Manager::Get_Instance()->Set_TerrainDesc(&TerrainDesc);
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, &TerrainDesc)))

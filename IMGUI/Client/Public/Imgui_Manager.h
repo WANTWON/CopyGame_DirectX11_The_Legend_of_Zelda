@@ -29,6 +29,9 @@ public:
 	void ShowGui();
 
 public:
+	PICKING_TYPE Get_PickingType() {return (PICKING_TYPE)m_PickingType;}
+
+public:
 	void Object_Map();
 	void Terrain_Map();
 	void Set_Terrain_Shape();

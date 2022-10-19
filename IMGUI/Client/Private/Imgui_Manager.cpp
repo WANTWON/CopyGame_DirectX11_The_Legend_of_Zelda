@@ -49,16 +49,16 @@ void CImgui_Manager::Tick(_float fTimeDelta)
 	CTerrain_Manager::TERRAINDESC TerrainDesc = m_pTerrain_Manager->Get_TerrainDesc();
 
 	if (pGameInstance->Key_Up(DIK_LEFT))
-		TerrainDesc.m_iPositionX -= m_pTerrain_Manager->Get_MoveOffset();
+		TerrainDesc.TerrainDesc.m_iPositionX -= m_pTerrain_Manager->Get_MoveOffset();
 
 	if (pGameInstance->Key_Up(DIK_RIGHT))
-		TerrainDesc.m_iPositionX += m_pTerrain_Manager->Get_MoveOffset();
+		TerrainDesc.TerrainDesc.m_iPositionX += m_pTerrain_Manager->Get_MoveOffset();
 
 	if (pGameInstance->Key_Up(DIK_UP))
-		TerrainDesc.m_iPositionZ += m_pTerrain_Manager->Get_MoveOffset();
+		TerrainDesc.TerrainDesc.m_iPositionZ += m_pTerrain_Manager->Get_MoveOffset();
 
 	if (pGameInstance->Key_Up(DIK_DOWN))
-		TerrainDesc.m_iPositionZ -= m_pTerrain_Manager->Get_MoveOffset();
+		TerrainDesc.TerrainDesc.m_iPositionZ -= m_pTerrain_Manager->Get_MoveOffset();
 
 	if (pGameInstance->Key_Up(DIK_SPACE))
 	{
@@ -186,24 +186,24 @@ void CImgui_Manager::Terrain_Map()
 
 	CTerrain_Manager::TERRAINDESC TerrainDesc = m_pTerrain_Manager->Get_TerrainDesc();
 
-	static _int iNumVertice[2] = { TerrainDesc.m_iVerticeNumX, TerrainDesc.m_iVerticeNumZ };
+	static _int iNumVertice[2] = { TerrainDesc.TerrainDesc.m_iVerticeNumX, TerrainDesc.TerrainDesc.m_iVerticeNumZ };
 	ImGui::Text("NumVerticeX / NumVerticeZ");
 	ImGui::SameLine(0, 10);
 	ImGui::InputInt2("##1", iNumVertice, 10);
-	TerrainDesc.m_iVerticeNumX = iNumVertice[0];
-	TerrainDesc.m_iVerticeNumZ = iNumVertice[1];
+	TerrainDesc.TerrainDesc.m_iVerticeNumX = iNumVertice[0];
+	TerrainDesc.TerrainDesc.m_iVerticeNumZ = iNumVertice[1];
 
 	ImGui::Text("Position X");
 	ImGui::SameLine();
-	ImGui::DragInt("##PositionX", &TerrainDesc.m_iPositionX);
+	ImGui::DragInt("##PositionX", &TerrainDesc.TerrainDesc.m_iPositionX);
 
 	ImGui::Text("Position Z");
 	ImGui::SameLine();
-	ImGui::DragInt("##PositionZ", &TerrainDesc.m_iPositionZ);
+	ImGui::DragInt("##PositionZ", &TerrainDesc.TerrainDesc.m_iPositionZ);
 
 	ImGui::Text("Position Y");
 	ImGui::SameLine();
-	ImGui::DragFloat("##PositionY", &TerrainDesc.m_fHeight, 1.f, -10, 10);
+	ImGui::DragFloat("##PositionY", &TerrainDesc.TerrainDesc.m_fHeight, 1.f, -10, 10);
 
 	static _int iOffset = m_pTerrain_Manager->Get_MoveOffset();
 	ImGui::Text("Move Offset");

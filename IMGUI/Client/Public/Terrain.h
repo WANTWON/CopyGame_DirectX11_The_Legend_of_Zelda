@@ -7,6 +7,7 @@ BEGIN(Client)
 class CTerrain final : public CBaseObj
 {
 public:
+	enum TERRAIN_DEBUG_TYPE { DEBUG_SOILD, DEBUG_WIRE, DEBUG_NONE };
 	enum TEXTURE { TYPE_DIFFUSE, TYPE_BRUSH, TYPE_FILTER, TYPE_END };
 private:
 	CTerrain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -25,15 +26,17 @@ public:
 	virtual void PickingTrue();
 
 private:
-	HRESULT Ready_Components(void* pArg);
-	HRESULT SetUp_ShaderID();
-	HRESULT SetUp_ShaderResources();
+	virtual HRESULT Ready_Components(void* pArg)override;
+	virtual HRESULT SetUp_ShaderID()override;
+	virtual HRESULT SetUp_ShaderResources()override;
+	void Set_Terrain_Shape();
+	void Set_Picked();
+
 
 private:
 	_bool	m_bWireFrame = false;
-	_bool	m_bDebugTerrain = false;
 	_bool	m_bDebugShow = true;
-	_float3 m_vMousePickPos;
+	TERRAIN_DEBUG_TYPE m_eDebugtype = DEBUG_NONE;
 
 public:
 	static CTerrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

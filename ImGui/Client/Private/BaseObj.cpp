@@ -44,6 +44,8 @@ HRESULT CBaseObj::Render()
 	return S_OK;
 }
 
+
+
 _vector CBaseObj::Get_Position()
 {
 	if (m_pTransformCom == nullptr)

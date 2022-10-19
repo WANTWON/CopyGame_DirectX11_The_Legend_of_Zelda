@@ -61,7 +61,7 @@ protected:
 	SHADER_ID m_eShaderID = SHADER_DEFAULT;
 	OBJID  m_eObjectID = OBJ_END;
 	_float3 m_vScale = _float3(1.f,1.f,1.f);
-
+	_float3 m_vMousePickPos;
 public:
 	virtual void Free() override;
 };

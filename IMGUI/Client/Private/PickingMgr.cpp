@@ -40,7 +40,8 @@ void CPickingMgr::Set_PickedObj(CGameObject * pGameObject)
 {
 	if (pGameObject == nullptr)
 	{
-		m_pPickedObj->Set_Picked(false);
+		if(m_pPickedObj != nullptr)	
+			m_pPickedObj->Set_Picked(false);
 		m_pPickedObj = nullptr;
 		return;
 	}

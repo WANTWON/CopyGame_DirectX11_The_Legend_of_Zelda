@@ -16,7 +16,7 @@ HRESULT CTerrain_Manager::Create_Terrain(LEVEL eLevel, const _tchar* pLayerTag)
 	Safe_AddRef(pGameInstance);
 
 	TERRAINDESC TerrainDesc = m_TerrainDesc;
-	TerrainDesc.m_bTestShowTerrain = false;
+	TerrainDesc.m_eDebugTerrain = DEBUG_NONE;
 
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), eLevel, pLayerTag, &TerrainDesc)))

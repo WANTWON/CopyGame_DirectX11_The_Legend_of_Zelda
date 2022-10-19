@@ -1,6 +1,7 @@
 #pragma once
 #include "Base.h"
 #include "Client_Defines.h"
+#include "VIBuffer_Terrain.h"
 
 BEGIN(Client)
 
@@ -9,15 +10,14 @@ class CTerrain_Manager final : public CBase
 	DECLARE_SINGLETON(CTerrain_Manager)
 
 public:
+	enum TERRAIN_DEBUG_TYPE { DEBUG_SOILD, DEBUG_WIRE, DEBUG_NONE };
+
 	typedef struct TerrainTagDesc
 	{
-		_int	m_iPositionX = 0;
-		_int	m_iPositionZ = 0;
-		_int	m_iVerticeNumX = 10;
-		_int	m_iVerticeNumZ = 10;
-		_float  m_fHeight = 0;
+		CVIBuffer_Terrain::TERRAINDESC TerrainDesc;
+
 		_bool	m_bShowWireFrame = false;
-		_bool	m_bTestShowTerrain = false;
+		TERRAIN_DEBUG_TYPE	m_eDebugTerrain = DEBUG_NONE;
 
 	}TERRAINDESC;
 
