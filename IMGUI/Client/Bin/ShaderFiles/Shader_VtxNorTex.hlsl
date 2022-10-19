@@ -104,8 +104,6 @@ VS_OUT VS_MAIN_POINT(VS_IN In)
 
 	Out.fShade = max(dot(normalize(vLightDir) * -1.f, normalize(vWorldNormal)), 0.f) * fAtt;
 
-
-	
 	vector		vReflect = reflect(normalize(vLightDir), normalize(vWorldNormal));
 	vector		vLook = vWorldPos - g_vCamPosition;
 
@@ -186,7 +184,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	//vector		vMtrlDiffuse = vSourDiffuse * vFilter + vDestDiffuse * (1.f - vFilter);
 	//vector		vDiffuse = vMtrlDiffuse + vBrush;
 	
-	Out.vColor = (vSourDiffuse) * saturate(In.fShade + g_vLightAmbient * g_vMtrlAmbient)
+	Out.vColor = (g_vLightDiffuse*vSourDiffuse) * saturate(In.fShade + g_vLightAmbient * g_vMtrlAmbient)
 		+ (g_vLightSpecular * g_vMtrlSpecular) * In.fSpecular;
 
 	return Out;
@@ -196,9 +194,10 @@ PS_OUT PS_DEFAULT(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
-	vector		vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV * 30);
+	vector		vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV);
 
-	Out.vColor = vSourDiffuse;
+	Out.vColor = (g_vLightDiffuse*vSourDiffuse) * saturate(In.fShade + g_vLightAmbient * g_vMtrlAmbient)
+		+ (g_vLightSpecular * g_vMtrlSpecular) * In.fSpecular;
 
 	return Out;
 }
@@ -218,9 +217,10 @@ PS_OUT PS_PICKED(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
-	vector		vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV * 30.f);
+	vector		vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV);
 
-	Out.vColor = vSourDiffuse;
+	Out.vColor = (g_vLightDiffuse*vSourDiffuse) * saturate(In.fShade + g_vLightAmbient * g_vMtrlAmbient)
+		+ (g_vLightSpecular * g_vMtrlSpecular) * In.fSpecular;
 	Out.vColor.rgb += 0.1f;
 
 	return Out;

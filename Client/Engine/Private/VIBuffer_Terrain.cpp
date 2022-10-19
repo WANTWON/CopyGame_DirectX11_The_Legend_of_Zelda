@@ -387,8 +387,10 @@ _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 void CVIBuffer_Terrain::Set_Terrain_Shape(_float fHeight, _float fRad, _float fSharp, _float3 vPoint, _float fTimeDelta)
 {
 	D3D11_MAPPED_SUBRESOURCE		SubResource;
+	D3D11_MAPPED_SUBRESOURCE		IndiceSubResouce;
 
 	m_pContext->Map(m_pVB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+	m_pContext->Map(m_pIB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &IndiceSubResouce);
 
 
 	VTXNORTEX* pVertices = (VTXNORTEX*)SubResource.pData;
@@ -436,7 +438,10 @@ void CVIBuffer_Terrain::Set_Terrain_Shape(_float fHeight, _float fRad, _float fS
 		}
 
 	}
+
+	m_pContext->Unmap(m_pIB, 0);
 	m_pContext->Unmap(m_pVB, 0);
+
 }
 
 void CVIBuffer_Terrain::Set_Terrain_Buffer(TERRAINDESC TerrainDesc)

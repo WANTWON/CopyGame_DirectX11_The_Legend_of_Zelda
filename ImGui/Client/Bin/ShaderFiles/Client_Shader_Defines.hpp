@@ -18,7 +18,7 @@ sampler PointSampler = sampler_state
 RasterizerState RS_Default
 {
 	FillMode = solid;
-	CullMode = back;
+	CullMode = None;
 	FrontCounterClockwise = false;
 };
 

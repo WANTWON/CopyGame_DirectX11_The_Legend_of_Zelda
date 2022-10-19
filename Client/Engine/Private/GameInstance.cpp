@@ -356,12 +356,12 @@ HRESULT CGameInstance::Add_Fonts(ID3D11Device * pDevice, ID3D11DeviceContext * p
 	return m_pFont_Manager->Add_Fonts(pDevice, pContext, pFontTag, pFontFilePath);	
 }
 
-HRESULT CGameInstance::Render_Font(const _tchar * pFontTag, const _tchar * pText, _fvector vPos, _fvector vColor)
+HRESULT CGameInstance::Render_Font(const _tchar * pFontTag, const _tchar * pText, _fvector vPos, _fvector vColor, _float fScale)
 {
 	if (nullptr == m_pFont_Manager)
 		return E_FAIL;
 
-	return m_pFont_Manager->Render_Font(pFontTag, pText, vPos, vColor);
+	return m_pFont_Manager->Render_Font(pFontTag, pText, vPos, vColor, fScale);
 }
 
 void CGameInstance::Release_Engine()
