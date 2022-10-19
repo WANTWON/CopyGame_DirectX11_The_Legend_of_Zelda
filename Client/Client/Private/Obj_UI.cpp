@@ -22,10 +22,10 @@ HRESULT CObj_UI::Initialize(void * pArg)
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixTranspose(XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f)));
 
 
-	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, m_fSizeX);
-	m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_fSizeY);
+	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, m_fSize.x);
+	m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_fSize.y);
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fPosition.x - g_iWinSizeX * 0.5f, -m_fPosition.y + g_iWinSizeY * 0.5f, 0.f, 1.f));
 
 	return S_OK;
 }
@@ -40,6 +40,7 @@ void CObj_UI::Late_Tick(_float fTimeDelta)
 {
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
+
 }
 
 HRESULT CObj_UI::Render()
@@ -51,10 +52,14 @@ HRESULT CObj_UI::Render()
 		nullptr == m_pVIBufferCom)
 		return E_FAIL;
 
+
+	if (FAILED(SetUp_ShaderID()))
+		return E_FAIL;
+
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-	m_pShaderCom->Begin();
+	m_pShaderCom->Begin(m_eShaderID);
 
 	m_pVIBufferCom->Render();
 
@@ -68,7 +73,9 @@ void CObj_UI::Free()
 
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pShaderCom);
+
 	Safe_Release(m_pTextureCom);
+
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pRendererCom);
 }

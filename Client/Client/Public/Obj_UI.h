@@ -31,21 +31,26 @@ public:
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 
+public:
+	_float2 Get_Position() { return m_fPosition; }
+	
 protected:
 	CShader*				m_pShaderCom = nullptr;
-	CTexture*				m_pTextureCom = nullptr;
+	CTexture*				m_pTextureCom =  nullptr ;
 	CRenderer*				m_pRendererCom = nullptr;
 	CTransform*				m_pTransformCom = nullptr;
 	CVIBuffer_Rect*			m_pVIBufferCom = nullptr;
 
 protected:
-	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
+	_float2					m_fPosition, m_fSize;
 	_float4x4				m_ViewMatrix, m_ProjMatrix;
+	SHADER_ID				m_eShaderID = SHADER_ALPHATEST;
+	
 
-
-private:
+protected:
 	virtual HRESULT Ready_Components() = 0;
 	virtual HRESULT SetUp_ShaderResources() = 0; /* 셰이더 전역변수에 값을 전달한다. */
+	virtual HRESULT SetUp_ShaderID() { return S_OK; };
 
 
 public:

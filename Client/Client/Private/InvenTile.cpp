@@ -11,6 +11,7 @@ CInvenTile::CInvenTile(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 
 CInvenTile::CInvenTile(const CInvenTile & rhs)
 	: CObj_UI(rhs)
+	, m_InvenDesc(rhs.m_InvenDesc)
 {
 }
 
@@ -27,20 +28,25 @@ HRESULT CInvenTile::Initialize(void * pArg)
 	switch (m_InvenDesc.eTileType)
 	{
 	case INEVEN_TILE:
-		m_fSizeX = 110;
-		m_fSizeY = 110;
+		m_fSize.x = 110;
+		m_fSize.y = 110;
 		break;
 	case EQUIP_TILE:
-		m_fSizeX = 100;
-		m_fSizeY = 100;
+		m_fSize.x = 100;
+		m_fSize.y = 100;
 		break;
 	}
 
-	m_fX = m_InvenDesc.vPosition.x;
-	m_fY = m_InvenDesc.vPosition.y;
+	m_fPosition.x = m_InvenDesc.vPosition.x;
+	m_fPosition.y = m_InvenDesc.vPosition.y;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
+	m_eShaderID = SHADER_ALPHABLEND;
+
+	if (m_InvenDesc.eTileType == INEVEN_TILE)
+		CUI_Manager::Get_Instance()->Add_InvenGroup(this);
 
 	return S_OK;
 }
@@ -59,6 +65,8 @@ void CInvenTile::Late_Tick(_float fTimeDelta)
 
 HRESULT CInvenTile::Render()
 {
+	//__super::Render();
+
 	if (!CUI_Manager::Get_Instance()->Get_UI_Open() && m_InvenDesc.eTileType != EQUIP_TILE)
 		return E_FAIL;
 		
@@ -66,10 +74,14 @@ HRESULT CInvenTile::Render()
 		nullptr == m_pVIBufferCom)
 		return E_FAIL;
 
+	if (FAILED(SetUp_ShaderID()))
+		return E_FAIL;
+
+
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-	m_pShaderCom->Begin();
+	m_pShaderCom->Begin(m_eShaderID);
 
 	m_pVIBufferCom->Render();
 
@@ -88,7 +100,7 @@ HRESULT CInvenTile::Ready_Components()
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxTex"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_UI"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	switch (m_InvenDesc.eTileType)
@@ -138,6 +150,16 @@ HRESULT CInvenTile::SetUp_ShaderResources()
 	return S_OK;
 }
 
+HRESULT CInvenTile::SetUp_ShaderID()
+{
+	if (m_bSelected)
+		m_eShaderID = SHADER_PICKED;
+	else
+		m_eShaderID = SHADER_ALPHABLEND;
+
+	return S_OK;
+}
+
 CInvenTile * CInvenTile::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CInvenTile*	pInstance = new CInvenTile(pDevice, pContext);
@@ -161,6 +183,9 @@ CGameObject * CInvenTile::Clone(void * pArg)
 		ERR_MSG(TEXT("Failed to Cloned : CInvenTile"));
 		Safe_Release(pInstance);
 	}
+
+	
+
 
 	return pInstance;
 }

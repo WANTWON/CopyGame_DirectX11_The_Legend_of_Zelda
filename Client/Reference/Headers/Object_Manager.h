@@ -15,6 +15,10 @@ private:
 
 public:
 	class CComponent* Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex = 0);
+	class CGameObject* Find_Objects(_uint iLevelIndex, const _tchar* pLayerTag, _uint iIndex = 0);
+	list<CGameObject*>* Get_ObjectList(_uint iSceneID, const _tchar * pLayerTag);
+	void Clear(_uint iLevelIndex);
+	void Clear_Layer(_uint iLevelIndex, const _tchar* LayerTag);
 
 public:
 	HRESULT Reserve_Container(_uint iNumLevels);
@@ -22,7 +26,6 @@ public:
 	HRESULT Add_GameObject(const _tchar* pPrototypeTag, _uint iLevelIndex, const _tchar* pLayerTag, void* pArg = nullptr);
 	void Tick(_float fTimeDelta);
 	void Late_Tick(_float fTimeDelta);
-	void Clear(_uint iLevelIndex);
 
 
 private:

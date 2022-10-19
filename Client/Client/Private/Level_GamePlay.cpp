@@ -4,6 +4,8 @@
 #include "GameInstance.h"
 #include "Camera_Dynamic.h"
 #include "InvenTile.h"
+#include "UIButton.h"
+#include "UI_Manager.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -165,23 +167,42 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _tchar * pLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 {
-	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
-	Safe_AddRef(pGameInstance);
+	CGameInstance*			pGameInstance = GET_INSTANCE(CGameInstance);
 
 	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_UI"), LEVEL_GAMEPLAY, pLayerTag)))
 		//return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, pLayerTag, nullptr)))
+		return E_FAIL;
+
 
 	CInvenTile::INVENDESC InvenDesc;
 	InvenDesc.eTileType = CInvenTile::EQUIP_TILE;
 	InvenDesc.eState = CInvenTile::STATE_EQUIP;
 	InvenDesc.vPosition = _float2(1100, 50);
 
+	CUIButton::BUTTONDESC ButtonDesc;
+	ButtonDesc.eButtonType = CUIButton::BTN_FIX;
+	ButtonDesc.eColor = CUIButton::BTN_BLACK;
+	ButtonDesc.eState = CUIButton::BTN_X;
+	ButtonDesc.vPosition = _float2(InvenDesc.vPosition.x - 20, InvenDesc.vPosition.y + 20);
+
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_InvenTile_UI"), LEVEL_STATIC, pLayerTag, &InvenDesc)))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, pLayerTag, &ButtonDesc)))
+		return E_FAIL;
+
 	InvenDesc.vPosition = _float2(1200, 100);
+	ButtonDesc.eState = CUIButton::BTN_Y;
+	ButtonDesc.vPosition = _float2(InvenDesc.vPosition.x - 20, InvenDesc.vPosition.y + 20);
+
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_InvenTile_UI"), LEVEL_STATIC, pLayerTag, &InvenDesc)))
 		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, pLayerTag, &ButtonDesc)))
+		return E_FAIL;
+	
 
 
 	for (_int i = 0; i < 3; ++i)
@@ -198,10 +219,20 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 		}
 	}
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, pLayerTag, nullptr)))
+	
+	ButtonDesc.eButtonType = CUIButton::BTN_INVEN;
+	ButtonDesc.eColor = CUIButton::BTN_GREEN;
+	ButtonDesc.eState = CUIButton::BTN_X;
+	ButtonDesc.vPosition = _float2(780 - 30, 260 + 30);
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, pLayerTag, &ButtonDesc)))
 		return E_FAIL;
 
-	Safe_Release(pGameInstance);
+	ButtonDesc.eState = CUIButton::BTN_Y;
+	ButtonDesc.vPosition = _float2(890 - 30, 260 + 30);
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, pLayerTag, &ButtonDesc)))
+		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }

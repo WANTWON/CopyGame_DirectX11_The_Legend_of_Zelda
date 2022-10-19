@@ -7,7 +7,7 @@ class CInvenTile final : public CObj_UI
 {
 public:
 	enum TILE_TYPE { INEVEN_TILE, EQUIP_TILE };
-	enum TILE_STATE { STATE_DEFAULT, STATE_EQUIP, STATE_SELECTED };
+	enum TILE_STATE { STATE_DEFAULT, STATE_EQUIP };
 
 	typedef struct InvenTiletag
 	{
@@ -30,12 +30,18 @@ public:
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 
+public:
+	void Set_SelectTile(_bool type) { m_bSelected = type; }
+	void Set_TileState(TILE_STATE eState) {m_InvenDesc.eState = eState;}
+
 private:
 	virtual HRESULT Ready_Components() override;
 	virtual HRESULT SetUp_ShaderResources()override;  /* 셰이더 전역변수에 값을 전달한다. */
+	virtual HRESULT SetUp_ShaderID() override;
 
 private:
 	INVENDESC  m_InvenDesc;
+	_bool m_bSelected = false;
 
 public:
 	static CInvenTile* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

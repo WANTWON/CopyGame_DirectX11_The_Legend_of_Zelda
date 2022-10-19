@@ -49,14 +49,8 @@ HRESULT CTerrain::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-	if (GetKeyState('1') < 0)
-	{
-		m_pShaderCom->Begin(2);
-	}
-	else
-	{
-		m_pShaderCom->Begin(0);
-	}
+	
+	m_pShaderCom->Begin(0);
 
 
 

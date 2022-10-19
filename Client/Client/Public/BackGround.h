@@ -21,7 +21,7 @@ public:
 private:
 	virtual HRESULT Ready_Components() override;
 	virtual HRESULT SetUp_ShaderResources()override; /* 셰이더 전역변수에 값을 전달한다. */
-
+	virtual HRESULT SetUp_ShaderID() override;
 
 public:
 	static CBackGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

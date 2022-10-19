@@ -43,6 +43,9 @@ void CMainApp::Tick(_float fTimeDelta)
 	if (m_pGameInstance->Key_Up(DIK_I))
 		m_pUI_Manager->Set_UI_Open();
 
+	if (m_pUI_Manager->Get_UI_Open())
+		m_pUI_Manager->Tick();
+
 	m_pGameInstance->Tick_Engine(fTimeDelta);
 
 #ifdef _DEBUG
@@ -111,7 +114,10 @@ HRESULT CMainApp::Ready_Prototype_Component()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxTex.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements))))
 		return E_FAIL;
 
-
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_UI"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_UI.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements))))
+		return E_FAIL;
+	
 
 	Safe_AddRef(m_pRenderer);
 

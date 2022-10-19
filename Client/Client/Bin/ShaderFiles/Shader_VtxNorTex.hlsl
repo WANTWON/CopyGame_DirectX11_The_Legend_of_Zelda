@@ -1,4 +1,6 @@
 
+#include "Client_Shader_Defines.hpp"
+
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 vector			g_vCamPosition;
@@ -27,22 +29,6 @@ float			g_fBrushRange = 2.f;
 
 texture2D		g_FilterTexture;
 
-
-sampler LinearSampler = sampler_state
-{	
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = wrap;
-	AddressV = wrap;
-};
-
-sampler PointSampler = sampler_state
-{
-	Filter = MIN_MAG_MIP_POINT;
-	AddressU = wrap;
-	AddressV = wrap;
-};
-
-
 struct VS_IN
 {
 	float3		vPosition : POSITION;
@@ -57,7 +43,7 @@ struct VS_OUT
 	float		fShade : COLOR0;
 	float		fSpecular : COLOR1;
 	float2		vTexUV : TEXCOORD0;
-	float4		vWorldPos : TEXCOORD1;	
+	float4		vWorldPos : TEXCOORD1;
 };
 
 VS_OUT VS_MAIN_DIRECTIONAL(VS_IN In)
@@ -74,7 +60,7 @@ VS_OUT VS_MAIN_DIRECTIONAL(VS_IN In)
 
 	vector		vWorldNormal = mul(vector(In.vNormal, 0.f), g_WorldMatrix);
 
-	Out.fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(vWorldNormal)), 0.f) ;
+	Out.fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(vWorldNormal)), 0.f);
 
 
 	vector		vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
@@ -118,8 +104,6 @@ VS_OUT VS_MAIN_POINT(VS_IN In)
 
 	Out.fShade = max(dot(normalize(vLightDir) * -1.f, normalize(vWorldNormal)), 0.f) * fAtt;
 
-
-	
 	vector		vReflect = reflect(normalize(vLightDir), normalize(vWorldNormal));
 	vector		vLook = vWorldPos - g_vCamPosition;
 
@@ -133,7 +117,7 @@ VS_OUT VS_MAIN_POINT(VS_IN In)
 struct VS_OUT_PHONG
 {
 	float4		vPosition : SV_POSITION;
-	float4		vNormal : NORMAL;	
+	float4		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
 	float4		vWorldPos : TEXCOORD1;
 };
@@ -181,30 +165,67 @@ PS_OUT PS_MAIN(PS_IN In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	vector		vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV * 30.f);
-	vector		vDestDiffuse = g_DiffuseTexture[1].Sample(LinearSampler, In.vTexUV * 30.f);
-	vector		vFilter = g_FilterTexture.Sample(PointSampler, In.vTexUV);
+	//vector		vDestDiffuse = g_DiffuseTexture[1].Sample(LinearSampler, In.vTexUV * 30.f);
+	//vector		vFilter = g_FilterTexture.Sample(PointSampler, In.vTexUV);
 
-	vector		vBrush = vector(0.f, 0.f, 0.f, 0.f);
+	/*vector		vBrush = vector(0.f, 0.f, 0.f, 0.f);
 
-	if (g_vBrushPos.x - g_fBrushRange < In.vWorldPos.x && In.vWorldPos.x < g_vBrushPos.x + g_fBrushRange && 
-		g_vBrushPos.z - g_fBrushRange < In.vWorldPos.z && In.vWorldPos.z < g_vBrushPos.z + g_fBrushRange)
+	if (g_vBrushPos.x - g_fBrushRange < In.vWorldPos.x && In.vWorldPos.x < g_vBrushPos.x + g_fBrushRange &&
+	g_vBrushPos.z - g_fBrushRange < In.vWorldPos.z && In.vWorldPos.z < g_vBrushPos.z + g_fBrushRange)
 	{
-		float2		fNewUV;
+	float2		fNewUV;
 
-		fNewUV.x = (In.vWorldPos.x - (g_vBrushPos.x - g_fBrushRange)) / (2.f * g_fBrushRange);
-		fNewUV.y = ((g_vBrushPos.z + g_fBrushRange) - In.vWorldPos.z) / (2.f * g_fBrushRange);
+	fNewUV.x = (In.vWorldPos.x - (g_vBrushPos.x - g_fBrushRange)) / (2.f * g_fBrushRange);
+	fNewUV.y = ((g_vBrushPos.z + g_fBrushRange) - In.vWorldPos.z) / (2.f * g_fBrushRange);
 
-		vBrush = g_BrushTexture.Sample(LinearSampler, fNewUV);
-	}
+	vBrush = g_BrushTexture.Sample(LinearSampler, fNewUV);
+	}*/
 
-	vector		vMtrlDiffuse = vSourDiffuse * vFilter + vDestDiffuse * (1.f - vFilter);
-	vector		vDiffuse = vMtrlDiffuse + vBrush;
-	
-	Out.vColor = (g_vLightDiffuse * vDiffuse) * saturate(In.fShade + g_vLightAmbient * g_vMtrlAmbient)
+	//vector		vMtrlDiffuse = vSourDiffuse * vFilter + vDestDiffuse * (1.f - vFilter);
+	//vector		vDiffuse = vMtrlDiffuse + vBrush;
+
+	Out.vColor = (g_vLightDiffuse*vSourDiffuse) * saturate(In.fShade + g_vLightAmbient * g_vMtrlAmbient)
 		+ (g_vLightSpecular * g_vMtrlSpecular) * In.fSpecular;
 
 	return Out;
 }
+
+PS_OUT PS_DEFAULT(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	vector		vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV);
+
+	Out.vColor = (g_vLightDiffuse*vSourDiffuse) * saturate(In.fShade + g_vLightAmbient * g_vMtrlAmbient)
+		+ (g_vLightSpecular * g_vMtrlSpecular) * In.fSpecular;
+
+	return Out;
+}
+
+
+PS_OUT PS_WIRE(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = 1.f;
+
+	return Out;
+}
+
+
+PS_OUT PS_PICKED(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	vector		vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV);
+
+	Out.vColor = (g_vLightDiffuse*vSourDiffuse) * saturate(In.fShade + g_vLightAmbient * g_vMtrlAmbient)
+		+ (g_vLightSpecular * g_vMtrlSpecular) * In.fSpecular;
+	Out.vColor.rgb += 0.1f;
+
+	return Out;
+}
+
 
 struct PS_IN_PHONG
 {
@@ -233,25 +254,58 @@ PS_OUT PS_MAIN_PHONG(PS_IN_PHONG In)
 }
 
 
-
 technique11 DefaultTechnique
 {
-	pass Directional
+	pass Default
 	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
 		VertexShader = compile vs_5_0 VS_MAIN_DIRECTIONAL();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_MAIN();
+		PixelShader = compile ps_5_0 PS_DEFAULT();
+	}
+
+	pass WireFrame
+	{
+		SetRasterizerState(RS_Wireframe);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DIRECTIONAL();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_WIRE();
+	}
+
+	pass Picked
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN_DIRECTIONAL();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_PICKED();
 	}
 
 	pass Point
 	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
 		VertexShader = compile vs_5_0 VS_MAIN_POINT();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_MAIN();
+		PixelShader = compile ps_5_0 PS_DEFAULT();
 	}
 
 	pass Phong
 	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
 		VertexShader = compile vs_5_0 VS_MAIN_PHONG();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_PHONG();

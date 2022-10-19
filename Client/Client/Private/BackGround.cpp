@@ -21,25 +21,24 @@ HRESULT CBackGround::Initialize_Prototype()
 
 HRESULT CBackGround::Initialize(void * pArg)
 {
-	m_fSizeX = g_iWinSizeX;
-	m_fSizeY = g_iWinSizeY;
-	m_fX = g_iWinSizeX >> 1;
-	m_fY = g_iWinSizeY >> 1;	
+	m_fSize.x = g_iWinSizeX;
+	m_fSize.y = g_iWinSizeY;
+	m_fPosition.x = g_iWinSizeX >> 1;
+	m_fPosition.y = g_iWinSizeY >> 1;
 	
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
+	m_eShaderID = SHADER_ALPHABLEND;
 
 	return S_OK;
 }
 
 int CBackGround::Tick(_float fTimeDelta)
 {
-	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, m_fSizeX);
-	m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_fSizeY);
+	
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 1.f));
-
-	return OBJ_NOEVENT;
+	return S_OK;
 }
 
 void CBackGround::Late_Tick(_float fTimeDelta)
@@ -67,7 +66,7 @@ HRESULT CBackGround::Ready_Components()
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxTex"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_UI"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Texture */
@@ -96,6 +95,11 @@ HRESULT CBackGround::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(0))))
 		return E_FAIL;
 
+	return S_OK;
+}
+
+HRESULT CBackGround::SetUp_ShaderID()
+{
 	return S_OK;
 }
 
