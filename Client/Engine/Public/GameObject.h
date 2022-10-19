@@ -2,8 +2,6 @@
 
 #include "Base.h"
 
-/* 게임객체들의 부모가되는 클래스다. */
-
 BEGIN(Engine)
 
 class ENGINE_DLL CGameObject abstract : public CBase
@@ -40,10 +38,10 @@ public:
 protected:
 	HRESULT Add_Components(const _tchar* pComponentTag, _uint iLevelIndex, const _tchar* pPrototypeTag, CComponent** ppOut, void* pArg = nullptr);
 	void Compute_CamDistance(_vector vWorldPos);
-	
+
 
 protected:
-	ID3D11Device* m_pDevice = nullptr; 
+	ID3D11Device* m_pDevice = nullptr;
 	ID3D11DeviceContext* m_pContext = nullptr;
 	map<const _tchar*, class CComponent*>				m_Components;
 
@@ -53,7 +51,7 @@ protected:
 	_float4x4											m_CollisionMatrix;
 	_bool												m_bPicked = false;
 
-public:	
+public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;
 };

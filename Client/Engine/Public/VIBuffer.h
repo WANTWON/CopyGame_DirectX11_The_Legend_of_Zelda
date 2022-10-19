@@ -4,7 +4,7 @@
 
 BEGIN(Engine)
 
-class ENGINE_DLL CVIBuffer abstract : public CComponent 
+class ENGINE_DLL CVIBuffer abstract : public CComponent
 {
 protected:
 	CVIBuffer(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
@@ -31,7 +31,7 @@ protected:
 	_uint						m_iNumIndicesPerPrimitive = 0;
 	DXGI_FORMAT					m_eFormat;
 	D3D11_PRIMITIVE_TOPOLOGY	m_eTopology;
-	
+
 
 protected:
 	D3D11_BUFFER_DESC			m_BufferDesc;

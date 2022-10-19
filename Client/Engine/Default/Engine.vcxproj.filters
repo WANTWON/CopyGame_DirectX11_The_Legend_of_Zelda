@@ -76,8 +76,20 @@
     <ClCompile Include="..\private\Light_Manager.cpp">
       <Filter>01.Utility\06.Lights\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Font_Manager.cpp">
+      <Filter>01.Utility\07.Fonts\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CustomFont.cpp">
+      <Filter>01.Utility\07.Fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Model.cpp">
+      <Filter>01.Utility\03.Components\06.Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MeshContainer.cpp">
+      <Filter>01.Utility\03.Components\06.Model\MeshContainer</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Picking.cpp">
-      <Filter>01.Utility\07.Picking</Filter>
+      <Filter>01.Utility\08.Picking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -168,8 +180,20 @@
     <ClInclude Include="..\public\Light_Manager.h">
       <Filter>01.Utility\06.Lights\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Font_Manager.h">
+      <Filter>01.Utility\07.Fonts\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CustomFont.h">
+      <Filter>01.Utility\07.Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Model.h">
+      <Filter>01.Utility\03.Components\06.Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MeshContainer.h">
+      <Filter>01.Utility\03.Components\06.Model\MeshContainer</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Picking.h">
-      <Filter>01.Utility\07.Picking</Filter>
+      <Filter>01.Utility\08.Picking</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -251,8 +275,20 @@
     <Filter Include="01.Utility\06.Lights\Manager">
       <UniqueIdentifier>{3826a6b1-d84a-45d4-8a22-89a3c6d2a61b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\07.Picking">
-      <UniqueIdentifier>{362c3d45-6091-41e7-ba96-7fa0cda898f1}</UniqueIdentifier>
+    <Filter Include="01.Utility\07.Fonts">
+      <UniqueIdentifier>{50b3415b-4464-4ac8-9edd-be3ff5ab06e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\07.Fonts\Manager">
+      <UniqueIdentifier>{eda1bc04-8f96-4f67-996e-728aefbb4382}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\06.Model">
+      <UniqueIdentifier>{bed460e4-d3ed-45cb-ae1e-e146ba3321d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\06.Model\MeshContainer">
+      <UniqueIdentifier>{975b48a2-5306-4158-a73e-270f6e05634d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\08.Picking">
+      <UniqueIdentifier>{92c881bf-b3e3-4613-978e-2fdec9a0b47d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

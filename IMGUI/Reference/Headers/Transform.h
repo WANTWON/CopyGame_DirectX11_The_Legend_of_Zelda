@@ -42,8 +42,11 @@ public:
 
 	/* 리턴받은 행렬을 셰이더에 던지기위해.  */
 	_float4x4 Get_World4x4_TP() const {
+
 		_float4x4	TransposeMatrix;
+
 		XMStoreFloat4x4(&TransposeMatrix, XMMatrixTranspose(Get_WorldMatrix()));
+
 		return TransposeMatrix;
 	
 	}

@@ -121,7 +121,7 @@ CComponent * CTransform::Clone(void * pArg)
 		ERR_MSG(TEXT("Failed to Cloned : CTransform"));
 		Safe_Release(pInstance);
 	}
-
+		
 	return pInstance;
 }
 

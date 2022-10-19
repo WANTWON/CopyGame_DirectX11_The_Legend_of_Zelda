@@ -9,6 +9,7 @@
 
 #include "Component_Manager.h"
 #include "Light_Manager.h"
+#include "Font_Manager.h"
 #include "Picking.h"
 
 BEGIN(Engine)
@@ -59,9 +60,6 @@ public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const _tchar* pPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Add_GameObject(const _tchar* pPrototypeTag, _uint iLevelIndex, const _tchar* pLayerTag, void* pArg = nullptr);
 	class CComponent* Get_Component(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex = 0);
-	class CGameObject* Get_Object(_uint iLevelIndex, const _tchar * pLayerTag, _uint iIndex = 0);
-	list<class CGameObject*>* Get_ObjectList(_uint iSceneID, const _tchar * pLayerTag);
-	void Clear_Layer(_uint iLevelIndex, const _tchar* LayerTag);
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const _tchar* pPrototypeTag, class CComponent* pPrototype);
@@ -74,13 +72,15 @@ public: /* For.PipeLine */
 	_float4x4 Get_TransformFloat4x4_TP(CPipeLine::TRANSFORMSTATE  eState);
 	_float4 Get_CamPosition();
 
-public:
+public: /* For.Light_Manager */
 	const LIGHTDESC* Get_LightDesc(_uint iIndex);
 	HRESULT Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const LIGHTDESC& LightDesc);
 
+public: /* For.Font_Manager */
+	HRESULT Add_Fonts(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontTag, const _tchar* pFontFilePath);
+	HRESULT Render_Font(const _tchar* pFontTag, const _tchar* pText, _fvector vPos, _fvector vColor);
 
 
-	
 public:
 	static void Release_Engine();
 
@@ -93,8 +93,8 @@ private:
 	CComponent_Manager*				m_pComponent_Manager = nullptr;
 	CPipeLine*						m_pPipeLine = nullptr;
 	CLight_Manager*					m_pLight_Manager = nullptr;
+	CFont_Manager*					m_pFont_Manager = nullptr;
 	CPicking*						m_pPicking = nullptr;
-
 public:
 	virtual void Free() override;
 };

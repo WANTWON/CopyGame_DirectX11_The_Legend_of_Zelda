@@ -5,14 +5,14 @@
 CGameObject::CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice), m_pContext(pContext)
 {
-	Safe_AddRef(m_pDevice); 
+	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pContext);
 }
 
 CGameObject::CGameObject(const CGameObject & rhs)
 	: m_pDevice(rhs.m_pDevice), m_pContext(rhs.m_pContext)
 {
-	Safe_AddRef(m_pDevice); 
+	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pContext);
 }
 
@@ -76,7 +76,7 @@ void CGameObject::Compute_CamDistance(_vector vWorldPos)
 	_vector vCamPosition = vViewMatrixInv.r[3];
 
 	m_fCamDistance = XMVectorGetX(XMVector3Length(vCamPosition - vWorldPos));
-	
+
 	RELEASE_INSTANCE(CGameInstance);
 
 }
@@ -87,14 +87,14 @@ CComponent * CGameObject::Find_Component(const _tchar * pComponentTag)
 	if (iter == m_Components.end())
 		return nullptr;
 
-	return iter->second;	
+	return iter->second;
 }
 
 void CGameObject::Free()
 {
-	for (auto& Pair : m_Components)	
+	for (auto& Pair : m_Components)
 		Safe_Release(Pair.second);
-	m_Components.clear();	
+	m_Components.clear();
 
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);

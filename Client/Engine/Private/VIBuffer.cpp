@@ -17,7 +17,8 @@ CVIBuffer::CVIBuffer(const CVIBuffer & rhs)
 	, m_iNumIndicesPerPrimitive(rhs.m_iNumIndicesPerPrimitive)
 	, m_eFormat(rhs.m_eFormat)
 	, m_eTopology(rhs.m_eTopology)
-{	
+	, m_pVerticesPosMxM(rhs.m_pVerticesPosMxM)
+{
 	Safe_AddRef(m_pVB);
 	Safe_AddRef(m_pIB);
 }
@@ -35,7 +36,7 @@ HRESULT CVIBuffer::Initialize(void * pArg)
 HRESULT CVIBuffer::Render()
 {
 	ID3D11Buffer*		pBuffer[] = {
-		m_pVB, 		
+		m_pVB,
 	};
 
 	_uint				iStrides[] = {
@@ -43,13 +44,12 @@ HRESULT CVIBuffer::Render()
 	};
 
 	_uint				iOffsets[] = {
-		0, 
+		0,
 	};
 
 	m_pContext->IASetVertexBuffers(0, m_iNumVertexBuffers, pBuffer, iStrides, iOffsets);
 	m_pContext->IASetIndexBuffer(m_pIB, m_eFormat, 0);
 	m_pContext->IASetPrimitiveTopology(m_eTopology);
-	// m_pContext->IASetInputLayout();
 
 	m_pContext->DrawIndexed(m_iNumIndicesPerPrimitive * m_iNumPrimitive, 0, 0);
 
@@ -58,11 +58,10 @@ HRESULT CVIBuffer::Render()
 
 HRESULT CVIBuffer::Create_VertexBuffer()
 {
-	/* 메모리 공간을 할당한다.(Vertices) */
 	return m_pDevice->CreateBuffer(&m_BufferDesc, &m_SubResourceData, &m_pVB);
 }
 
-HRESULT CVIBuffer::Create_IndexBuffer()	
+HRESULT CVIBuffer::Create_IndexBuffer()
 {
 	return m_pDevice->CreateBuffer(&m_BufferDesc, &m_SubResourceData, &m_pIB);
 }

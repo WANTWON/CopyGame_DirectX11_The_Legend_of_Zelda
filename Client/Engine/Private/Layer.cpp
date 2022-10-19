@@ -15,19 +15,6 @@ CComponent * CLayer::Get_Component(const _tchar * pComponentTag, _uint iIndex)
 	return (*iter)->Find_Component(pComponentTag);	
 }
 
-CGameObject * CLayer::Get_Object(_uint iIndex)
-{
-	if (m_GameObjects.size() <= iIndex)
-		return nullptr;
-
-	auto	iter = m_GameObjects.begin();
-
-	for (size_t i = 0; i < iIndex; ++i)
-		++iter;
-
-	return *iter;
-}
-
 HRESULT CLayer::Initialize()
 {
 	return S_OK;
@@ -48,13 +35,7 @@ void CLayer::Tick(_float fTimeDelta)
 	for (auto& pGameObject : m_GameObjects)
 	{
 		if (nullptr != pGameObject)
-		{
-			int iEvent = pGameObject->Tick(fTimeDelta);
-			if (iEvent == OBJ_DEAD)
-			{
-				Safe_Release(pGameObject);
-			}
-		}
+			pGameObject->Tick(fTimeDelta);
 	}
 }
 

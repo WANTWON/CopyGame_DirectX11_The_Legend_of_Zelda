@@ -11,9 +11,11 @@ CGameInstance::CGameInstance()
 	, m_pComponent_Manager(CComponent_Manager::Get_Instance())	
 	, m_pPipeLine(CPipeLine::Get_Instance())
 	, m_pLight_Manager(CLight_Manager::Get_Instance())
+	, m_pFont_Manager(CFont_Manager::Get_Instance())
 	, m_pPicking(CPicking::Get_Instance())
 {	
 	Safe_AddRef(m_pPicking);
+	Safe_AddRef(m_pFont_Manager);
 	Safe_AddRef(m_pLight_Manager);
 	Safe_AddRef(m_pPipeLine);
 	Safe_AddRef(m_pComponent_Manager);
@@ -39,7 +41,7 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, cons
 	if (FAILED(m_pInput_Device->Initialize(hInst, GraphicDesc.hWnd)))
 		return E_FAIL;
 
-	/* 피킹 초기화 */
+	/* 픽킹 초기화한다 */
 	if (FAILED(m_pPicking->Initialize(GraphicDesc.hWnd, GraphicDesc.iWinSizeX, GraphicDesc.iWinSizeY, *ppDevice, *ppContext)))
 		return E_FAIL;
 
@@ -274,31 +276,6 @@ CComponent * CGameInstance::Get_Component(_uint iLevelIndex, const _tchar * pLay
 	return m_pObject_Manager->Get_Component(iLevelIndex, pLayerTag, pComponentTag, iIndex);
 }
 
-
-CGameObject * CGameInstance::Get_Object(_uint iLevelIndex, const _tchar * pLayerTag, _uint iIndex)
-{
-	if (nullptr == m_pObject_Manager)
-		return nullptr;
-
-	return m_pObject_Manager->Find_Objects(iLevelIndex, pLayerTag, iIndex);
-}
-
-list<CGameObject*>* CGameInstance::Get_ObjectList(_uint iSceneID, const _tchar * pLayerTag)
-{
-	if (nullptr == m_pObject_Manager)
-		return nullptr;
-
-	return m_pObject_Manager->Get_ObjectList(iSceneID, pLayerTag);
-}
-
-void CGameInstance::Clear_Layer(_uint iLevelIndex, const _tchar * LayerTag)
-{
-	if (nullptr == m_pObject_Manager)
-		return;
-
-	m_pObject_Manager->Clear_Layer(iLevelIndex, LayerTag);
-}
-
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const _tchar * pPrototypeTag, CComponent * pPrototype)
 {
 	if (nullptr == m_pComponent_Manager)
@@ -371,6 +348,22 @@ HRESULT CGameInstance::Add_Light(ID3D11Device * pDevice, ID3D11DeviceContext * p
 	return m_pLight_Manager->Add_Light(pDevice, pContext, LightDesc);	
 }
 
+HRESULT CGameInstance::Add_Fonts(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const _tchar * pFontTag, const _tchar * pFontFilePath)
+{
+	if (nullptr == m_pFont_Manager)
+		return E_FAIL;
+
+	return m_pFont_Manager->Add_Fonts(pDevice, pContext, pFontTag, pFontFilePath);	
+}
+
+HRESULT CGameInstance::Render_Font(const _tchar * pFontTag, const _tchar * pText, _fvector vPos, _fvector vColor)
+{
+	if (nullptr == m_pFont_Manager)
+		return E_FAIL;
+
+	return m_pFont_Manager->Render_Font(pFontTag, pText, vPos, vColor);
+}
+
 void CGameInstance::Release_Engine()
 {
 	CGameInstance::Get_Instance()->Destroy_Instance();
@@ -389,6 +382,8 @@ void CGameInstance::Release_Engine()
 
 	CInput_Device::Get_Instance()->Destroy_Instance();
 
+	CFont_Manager::Get_Instance()->Destroy_Instance();
+
 	CPicking::Get_Instance()->Destroy_Instance();
 
 	CGraphic_Device::Get_Instance()->Destroy_Instance();
@@ -397,6 +392,7 @@ void CGameInstance::Release_Engine()
 void CGameInstance::Free()
 {	
 	Safe_Release(m_pPicking);
+	Safe_Release(m_pFont_Manager);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPipeLine);
 	Safe_Release(m_pComponent_Manager);

@@ -1,4 +1,4 @@
-﻿#include "..\Public\VIBuffer_Terrain.h"
+#include "..\Public\VIBuffer_Terrain.h"
 #include "Transform.h"
 #include "Picking.h"
 
@@ -126,7 +126,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath
 
 
 	m_BufferDesc.ByteWidth = m_iStride * m_iNumVertices;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT; 
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	m_BufferDesc.CPUAccessFlags = 0;
 	m_BufferDesc.MiscFlags = 0;
@@ -193,7 +193,7 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 		{
 			_uint		iIndex = i * m_iNumVerticesX + j;
 
-			pVertices[iIndex].vPosition = m_pVerticesPosMxM[iIndex] = _float3(j, 0.f,  i);
+			pVertices[iIndex].vPosition = m_pVerticesPosMxM[iIndex] = _float3(j, 0.f, i);
 			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			pVertices[iIndex].vTexture = _float2(j / _float(m_iNumVerticesX - 1), i / _float(m_iNumVerticesZ - 1));
 		}
@@ -276,9 +276,9 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 
 	ZeroMemory(&m_BufferDesc, sizeof(D3D11_BUFFER_DESC));
 	m_BufferDesc.ByteWidth = m_iNumVertices * m_iStride;
-	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;				// ���۸� ���̳���
+	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;				
 	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;	// CPU ���� �����ϰ�
+	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;	
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = m_iStride;
 
@@ -343,7 +343,7 @@ _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 			_float		fU, fV, fDist;
 			_matrix	WorldMatrix = pTransform->Get_WorldMatrix();
 
-		
+
 			_vector vTemp_1 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[0]]);
 			vTemp_1 = XMVectorSetW(vTemp_1, 1.f);
 			_vector vTemp_2 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[1]]);
