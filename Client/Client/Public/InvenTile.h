@@ -3,6 +3,7 @@
 
 BEGIN(Client)
 
+class CInvenItem;
 class CInvenTile final : public CObj_UI
 {
 public:
@@ -40,6 +41,7 @@ private:
 	virtual HRESULT SetUp_ShaderID() override;
 
 private:
+	class CInvenItem* m_pItem = nullptr;
 	INVENDESC  m_InvenDesc;
 	_bool m_bSelected = false;
 

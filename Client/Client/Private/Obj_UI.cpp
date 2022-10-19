@@ -45,13 +45,10 @@ void CObj_UI::Late_Tick(_float fTimeDelta)
 
 HRESULT CObj_UI::Render()
 {
-	if (!CUI_Manager::Get_Instance()->Get_UI_Open())
-		return S_OK;
 
 	if (nullptr == m_pShaderCom ||
 		nullptr == m_pVIBufferCom)
 		return E_FAIL;
-
 
 	if (FAILED(SetUp_ShaderID()))
 		return E_FAIL;

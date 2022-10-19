@@ -49,7 +49,10 @@
     <Filter Include="95.UI\02. InvenTile">
       <UniqueIdentifier>{37acfc00-5104-4b3a-9122-478460e1c85b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="95.UI\03. UIButton">
+    <Filter Include="95.UI\03. InvenItem">
+      <UniqueIdentifier>{98a8fba2-465d-43fd-9bba-0ccc270e4b67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="95.UI\04. UIButton">
       <UniqueIdentifier>{1301e89d-dc8c-4c2b-bb34-ee43c21d52d0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -109,10 +112,13 @@
       <Filter>95.UI\00. ObjUI</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UIButton.h">
-      <Filter>95.UI\03. UIButton</Filter>
+      <Filter>95.UI\04. UIButton</Filter>
     </ClInclude>
     <ClInclude Include="..\Bin\ShaderFiles\Client_Shader_Defines.hpp">
       <Filter>97.ShaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\InvenItem.h">
+      <Filter>95.UI\03. InvenItem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -159,7 +165,10 @@
       <Filter>95.UI\00. ObjUI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UIButton.cpp">
-      <Filter>95.UI\03. UIButton</Filter>
+      <Filter>95.UI\04. UIButton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InvenItem.cpp">
+      <Filter>95.UI\03. InvenItem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

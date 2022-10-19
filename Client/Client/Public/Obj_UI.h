@@ -33,6 +33,7 @@ public:
 
 public:
 	_float2 Get_Position() { return m_fPosition; }
+	_float2 Get_Scale() { return m_fSize; }
 	
 protected:
 	CShader*				m_pShaderCom = nullptr;

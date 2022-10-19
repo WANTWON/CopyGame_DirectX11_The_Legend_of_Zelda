@@ -2,7 +2,7 @@
 #include "..\Public\InvenTile.h"
 
 #include "GameInstance.h"
-
+#include "InvenItem.h"
 
 CInvenTile::CInvenTile(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CObj_UI(pDevice, pContext)
@@ -25,20 +25,9 @@ HRESULT CInvenTile::Initialize(void * pArg)
 	if (pArg != nullptr)
 		memcpy(&m_InvenDesc, pArg, sizeof(INVENDESC));
 
-	switch (m_InvenDesc.eTileType)
-	{
-	case INEVEN_TILE:
-		m_fSize.x = 110;
-		m_fSize.y = 110;
-		break;
-	case EQUIP_TILE:
-		m_fSize.x = 100;
-		m_fSize.y = 100;
-		break;
-	}
-
-	m_fPosition.x = m_InvenDesc.vPosition.x;
-	m_fPosition.y = m_InvenDesc.vPosition.y;
+	m_fSize.x = 110;
+	m_fSize.y = 110;
+	m_fPosition = m_InvenDesc.vPosition;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -47,6 +36,16 @@ HRESULT CInvenTile::Initialize(void * pArg)
 
 	if (m_InvenDesc.eTileType == INEVEN_TILE)
 		CUI_Manager::Get_Instance()->Add_InvenGroup(this);
+
+	CInvenItem::ITEMDESC ItemDesc;
+	ItemDesc.eItemType = CInvenItem::ITEM_USABLE;
+	ItemDesc.eItemUsage = CInvenItem::USAGE_END;
+	ItemDesc.vPosition = m_fPosition;
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_UI"), &ItemDesc)))
+		return E_FAIL;
+
+	
 
 	return S_OK;
 }
@@ -60,31 +59,19 @@ int CInvenTile::Tick(_float fTimeDelta)
 
 void CInvenTile::Late_Tick(_float fTimeDelta)
 {
-	__super::Late_Tick(fTimeDelta);
+	if (nullptr != m_pRendererCom)
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+
+	//__super::Late_Tick(fTimeDelta);
 }
 
 HRESULT CInvenTile::Render()
 {
-	//__super::Render();
 
 	if (!CUI_Manager::Get_Instance()->Get_UI_Open() && m_InvenDesc.eTileType != EQUIP_TILE)
 		return E_FAIL;
 		
-	if (nullptr == m_pShaderCom ||
-		nullptr == m_pVIBufferCom)
-		return E_FAIL;
-
-	if (FAILED(SetUp_ShaderID()))
-		return E_FAIL;
-
-
-	if (FAILED(SetUp_ShaderResources()))
-		return E_FAIL;
-
-	m_pShaderCom->Begin(m_eShaderID);
-
-	m_pVIBufferCom->Render();
-
+	__super::Render();
 
 	return S_OK;
 }

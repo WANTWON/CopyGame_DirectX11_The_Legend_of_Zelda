@@ -9,6 +9,7 @@
 #include "Terrain.h"
 #include "InvenTile.h"
 #include "UIButton.h"
+#include "InvenItem.h"
 
 //#include "Player.h"
 //#include "Effect.h"
@@ -232,6 +233,10 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 		CUIButton::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CInvenItem"),
+		CInvenItem::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
@@ -261,6 +266,14 @@ HRESULT CLoader::Loading_For_UITexture()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/UI/Button/BtnY_%02d.png"), 3))))
 		return E_FAIL;
 	
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_EquipItem"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/UI/Item/EqItem_%d.png"), 5))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UsableItem"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/UI/Item/Item_%d.png"), 7))))
+		return E_FAIL;
+
 
 	RELEASE_INSTANCE(CGameInstance);
 

@@ -3,9 +3,10 @@
 
 #include "GameInstance.h"
 #include "Camera_Dynamic.h"
+#include "UI_Manager.h"
 #include "InvenTile.h"
 #include "UIButton.h"
-#include "UI_Manager.h"
+#include "InvenItem.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -208,7 +209,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	for (_int i = 0; i < 3; ++i)
 	{
 		for (_int j = 0; j < 4; ++j)
-		{
+		{			
+
 			CInvenTile::INVENDESC InvenDesc;
 			InvenDesc.eTileType = CInvenTile::INEVEN_TILE;
 			InvenDesc.eState = CInvenTile::STATE_DEFAULT;
@@ -231,6 +233,17 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	ButtonDesc.vPosition = _float2(890 - 30, 260 + 30);
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, pLayerTag, &ButtonDesc)))
 		return E_FAIL;
+
+
+	CInvenItem::ITEMDESC ItemDesc;
+	ItemDesc.eItemType = CInvenItem::ITEM_USABLE;
+	ItemDesc.eItemUsage = CInvenItem::USAGE_END;
+	ItemDesc.vPosition = _float2(500, 600);
+
+	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_UIItem"), &ItemDesc)))
+		//return E_FAIL;
+
+
 
 	RELEASE_INSTANCE(CGameInstance);
 

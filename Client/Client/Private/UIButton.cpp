@@ -48,7 +48,10 @@ int CUIButton::Tick(_float fTimeDelta)
 
 void CUIButton::Late_Tick(_float fTimeDelta)
 {
-	__super::Late_Tick(fTimeDelta);
+	//__super::Late_Tick(fTimeDelta);
+
+	if (nullptr != m_pRendererCom)
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
 
 	if (m_ButtonDesc.eButtonType == BTN_INVEN)
 	{
@@ -74,17 +77,7 @@ HRESULT CUIButton::Render()
 	if (m_ButtonDesc.eButtonType == BTN_INVEN && nullptr == CUI_Manager::Get_Instance()->Get_EquipItem((CUI_Manager::EQUIP_BT)m_ButtonDesc.eState))
 		return E_FAIL;	
 
-	if (nullptr == m_pShaderCom ||
-		nullptr == m_pVIBufferCom)
-		return E_FAIL;
-
-	if (FAILED(SetUp_ShaderResources()))
-		return E_FAIL;
-
-	m_pShaderCom->Begin();
-
-	m_pVIBufferCom->Render();
-
+	__super::Render();
 
 	return S_OK;
 }

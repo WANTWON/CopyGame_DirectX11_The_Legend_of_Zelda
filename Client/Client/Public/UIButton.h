@@ -1,4 +1,4 @@
-
+#pragma once
 #include "Obj_UI.h"
 
 BEGIN(Client)

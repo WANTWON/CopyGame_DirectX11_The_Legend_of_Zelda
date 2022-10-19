@@ -1,31 +1,33 @@
 #include "stdafx.h"
-#include "..\Public\BackGround.h"
-
+#include "InvenItem.h"
 #include "GameInstance.h"
 
 
-CBackGround::CBackGround(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CInvenItem::CInvenItem(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CObj_UI(pDevice, pContext)
 {
 }
 
-CBackGround::CBackGround(const CBackGround & rhs)
+CInvenItem::CInvenItem(const CInvenItem & rhs)
 	: CObj_UI(rhs)
 {
 }
 
-HRESULT CBackGround::Initialize_Prototype()
+HRESULT CInvenItem::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CBackGround::Initialize(void * pArg)
+HRESULT CInvenItem::Initialize(void * pArg)
 {
-	m_fSize.x = g_iWinSizeX;
-	m_fSize.y = g_iWinSizeY;
-	m_fPosition.x = g_iWinSizeX >> 1;
-	m_fPosition.y = g_iWinSizeY >> 1;
-	
+	if (pArg != nullptr)
+		memcpy(&m_ItemDesc, pArg, sizeof(ITEMDESC));
+
+
+	m_fSize.x = 110;
+	m_fSize.y = 110;
+	m_fPosition = m_ItemDesc.vPosition;
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -34,32 +36,33 @@ HRESULT CBackGround::Initialize(void * pArg)
 	return S_OK;
 }
 
-int CBackGround::Tick(_float fTimeDelta)
+int CInvenItem::Tick(_float fTimeDelta)
 {
-	
-	return S_OK;
+	__super::Tick(fTimeDelta);
+
+	return OBJ_NOEVENT;
 }
 
-void CBackGround::Late_Tick(_float fTimeDelta)
+void CInvenItem::Late_Tick(_float fTimeDelta)
 {
 	//__super::Late_Tick(fTimeDelta);
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
+
 }
 
-HRESULT CBackGround::Render()
+HRESULT CInvenItem::Render()
 {
-	if (!CUI_Manager::Get_Instance()->Get_UI_Open())
-		return E_FAIL;
+	//if (!CUI_Manager::Get_Instance()->Get_UI_Open())
+		//return E_FAIL;
 
-	if (FAILED(__super::Render()))
-		return E_FAIL;
-	
+	__super::Render();
+
 	return S_OK;
 }
 
-HRESULT CBackGround::Ready_Components()
+HRESULT CInvenItem::Ready_Components()
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))
@@ -73,9 +76,19 @@ HRESULT CBackGround::Ready_Components()
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_UI"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_Texture */
-	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_BackGround_UI"), (CComponent**)&m_pTextureCom)))
-		return E_FAIL;
+	switch (m_ItemDesc.eItemType)
+	{
+	case ITEM_EQUIP:
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_EquipItem"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case ITEM_USABLE:
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_UsableItem"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	}
 
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
@@ -84,7 +97,7 @@ HRESULT CBackGround::Ready_Components()
 	return S_OK;
 }
 
-HRESULT CBackGround::SetUp_ShaderResources()
+HRESULT CInvenItem::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -96,24 +109,20 @@ HRESULT CBackGround::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(0))))
+	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(2))))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CBackGround::SetUp_ShaderID()
-{
-	return S_OK;
-}
 
-CBackGround * CBackGround::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CInvenItem * CInvenItem::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CBackGround*	pInstance = new CBackGround(pDevice, pContext);
+	CInvenItem*	pInstance = new CInvenItem(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		ERR_MSG(TEXT("Failed to Created : CBackGround"));
+		ERR_MSG(TEXT("Failed to Created : CInvenItem"));
 		Safe_Release(pInstance);
 	}
 
@@ -121,20 +130,20 @@ CBackGround * CBackGround::Create(ID3D11Device * pDevice, ID3D11DeviceContext * 
 }
 
 
-CGameObject * CBackGround::Clone(void * pArg)
+CGameObject * CInvenItem::Clone(void * pArg)
 {
-	CBackGround*	pInstance = new CBackGround(*this);
+	CInvenItem*	pInstance = new CInvenItem(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		ERR_MSG(TEXT("Failed to Cloned : CBackGround"));
+		ERR_MSG(TEXT("Failed to Cloned : CInvenItem"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CBackGround::Free()
+void CInvenItem::Free()
 {
 	__super::Free();
 }
