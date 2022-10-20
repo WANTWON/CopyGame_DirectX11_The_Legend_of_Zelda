@@ -5,19 +5,15 @@
 
 BEGIN(Engine)
 class CShader;
-class CTexture;
 class CRenderer;
 class CTransform;
-class CVIBuffer_Terrain;
+
 END
 
 BEGIN(Client)
 
 class CBaseObj abstract : public CGameObject
 {
-public:
-	enum TEXTURE { TYPE_DIFFUSE, TYPE_BRUSH, TYPE_FILTER, TYPE_END };
-
 protected:
 	CBaseObj(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CBaseObj(const CBaseObj& rhs);
@@ -46,15 +42,13 @@ public:
 
 protected: /* For.Components */
 	CShader*				m_pShaderCom = nullptr;
-	CTexture*				m_pTextureCom[TYPE_END] = { nullptr };
 	CRenderer*				m_pRendererCom = nullptr;
-	CVIBuffer_Terrain*		m_pVIBufferCom = nullptr;
 	CTransform*				m_pTransformCom = nullptr;
 
 
 protected:
 	virtual HRESULT Ready_Components(void* pArg) = 0;
-	virtual HRESULT SetUp_ShaderID() = 0;
+	virtual HRESULT SetUp_ShaderID() { return S_OK; };
 	virtual HRESULT SetUp_ShaderResources() = 0;
 
 protected:

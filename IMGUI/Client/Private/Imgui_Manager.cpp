@@ -562,7 +562,11 @@ void CImgui_Manager::ShowPickedObjLayOut(bool * p_open)
 
 				ImGui::BulletText("Scale");
 
-				static _float Pos[3] = { m_vPickedObjScale.x, m_vPickedObjScale.y, m_vPickedObjScale.z };
+				static _float Pos[3] = { m_vPickedObjScale.x, m_vPickedObjScale.y,  m_vPickedObjScale.z };
+				Pos[0] = m_vPickedObjScale.x;
+				Pos[1] = m_vPickedObjScale.y;
+				Pos[2] = m_vPickedObjScale.z;
+
 				ImGui::Text("Scale");
 				ImGui::SameLine();
 				ImGui::InputFloat3("##SettingScale", Pos);

@@ -26,7 +26,9 @@ public:
 	HRESULT SetUp_Material(class CShader* pShader, const char* pConstantName, _uint iMeshIndex, aiTextureType eType);
 	HRESULT Render(class CShader* pShader, _uint iMeshIndex, _uint iPassIndex = 0);
 
-	
+public:
+	_bool Picking(class CTransform * pTransform, _float3 * pOut = nullptr);
+
 
 private:
 	const aiScene*				m_pAIScene = nullptr;

@@ -55,6 +55,9 @@
     <Filter Include="02.GameObjects\00.BaseObj">
       <UniqueIdentifier>{607cdc99-8a33-4645-bb07-f6980b39b4ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\03.NonAnimModel">
+      <UniqueIdentifier>{387253f7-5aef-465a-8434-d5f4024f1ee5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -138,6 +141,9 @@
     <ClInclude Include="..\Public\BaseObj.h">
       <Filter>02.GameObjects\00.BaseObj</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\NonAnim.h">
+      <Filter>02.GameObjects\03.NonAnimModel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -203,6 +209,9 @@
     <ClCompile Include="..\Private\BaseObj.cpp">
       <Filter>02.GameObjects\00.BaseObj</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\NonAnim.cpp">
+      <Filter>02.GameObjects\03.NonAnimModel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -222,6 +231,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

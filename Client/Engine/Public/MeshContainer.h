@@ -16,10 +16,12 @@ public:
 	_uint Get_MaterialIndex() const {
 		return m_iMaterialIndex;
 	}
+	_bool Picking(class CTransform * pTransform, _float3 * pOut = nullptr);
 
 public:
 	virtual HRESULT Initialize_Prototype(const aiMesh* pAIMesh, _fmatrix PivotMatrix);
 	virtual HRESULT Initialize(void* pArg);
+
 
 private:
 	const aiMesh*				m_pAIMesh = nullptr;

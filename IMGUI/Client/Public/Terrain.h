@@ -2,6 +2,13 @@
 
 #include "BaseObj.h"
 
+BEGIN(Engine)
+class CVIBuffer_Terrain;
+class CTexture;
+
+END
+
+
 BEGIN(Client)
 
 class CTerrain final : public CBaseObj
@@ -34,6 +41,9 @@ private:
 
 
 private:
+	CTexture*				m_pTextureCom[TYPE_END] = { nullptr };
+	CVIBuffer_Terrain*		m_pVIBufferCom = nullptr;
+
 	_bool	m_bWireFrame = false;
 	_bool	m_bDebugShow = true;
 	TERRAIN_DEBUG_TYPE m_eDebugtype = DEBUG_NONE;

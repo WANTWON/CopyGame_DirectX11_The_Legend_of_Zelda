@@ -7,7 +7,7 @@
 #include "Camera_Dynamic.h"
 #include "BackGround.h"
 #include "Terrain.h"
-//#include "Player.h"
+#include "NonAnim.h"
 //#include "Effect.h"
 //#include "Sky.h"
 //#include "UI.h"
@@ -137,6 +137,19 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	/* ¸ðµ¨ ·Îµù Áß. */
 	lstrcpy(m_szLoadingText, TEXT("¸ðµ¨ ·Îµù Áß."));
 
+	_matrix			PivotMatrix = XMMatrixIdentity();
+
+	/*For.Prototype_Component_Model_Fiona*/
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_ForkLift*/
+	PivotMatrix = XMMatrixScaling(0.11f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_ForkLift"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/ForkLift/ForkLift.fbx", PivotMatrix))))
+		return E_FAIL;
 	
 
 	///*For.Prototype_Component_VIBuffer_Cube */
@@ -148,10 +161,10 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	/* ¼ÎÀÌ´õ ·Îµù Áß. */
 	lstrcpy(m_szLoadingText, TEXT("¼ÎÀÌ´õ ·Îµù Áß."));
 
-	///* For.Prototype_Component_Shader_Cube */
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_Cube"), 
-	//	CShader::Create(m_pGraphic_Device, TEXT("../Bin/Shaderfiles/Shader_Cube.hlsl")))))
-	//	return E_FAIL;
+	/* For.Prototype_Component_Shader_VtxModel */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/Shaderfiles/Shader_VtxModel.hlsl"), VTXMODEL_DECLARATION::Elements, VTXMODEL_DECLARATION::iNumElements))))
+		return E_FAIL;
 
 	/* °´Ã¼ »ý¼º Áß. */
 	lstrcpy(m_szLoadingText, TEXT("°´Ã¼ »ý¼º Áß."));
@@ -166,10 +179,10 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	//	CSky::Create(m_pGraphic_Device))))
 	//	return E_FAIL;
 
-	///*For.Prototype_GameObject_Player*/
-	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
-	//	CPlayer::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
+	/*For.Prototype_GameObject_Player*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
+		CNonAnim::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	/*For.Prototype_GameObject_Terrain*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
