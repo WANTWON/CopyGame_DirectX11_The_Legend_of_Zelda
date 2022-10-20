@@ -5,11 +5,14 @@
 #include "PickingMgr.h"
 #include "BaseObj.h"
 
+
 IMPLEMENT_SINGLETON(CImgui_Manager)
 
 CImgui_Manager::CImgui_Manager()
 	: m_pTerrain_Manager(CTerrain_Manager::Get_Instance())
+	, m_pModel_Manager(CModelManager::Get_Instance())
 {
+	Safe_AddRef(m_pModel_Manager);
 	Safe_AddRef(m_pTerrain_Manager);
 }
 
@@ -124,6 +127,8 @@ void CImgui_Manager::ShowGui()
 			ImGui::MenuItem("Show Mouse Pos", NULL, &m_bShowSimpleMousePos);
 			ImGui::Separator();
 			ImGui::MenuItem("Show Picked Object", NULL, &m_bShowPickedObject);
+			ImGui::Separator();
+			ImGui::MenuItem("Show Model List", NULL, &m_bShowModelList);
 			ImGui::EndMenu();
 		}
 		ImGui::EndMenuBar();
@@ -167,7 +172,7 @@ void CImgui_Manager::ShowGui()
 
 	if (m_bShowSimpleMousePos)      ShowSimpleMousePos(&m_bShowSimpleMousePos);
 	if (m_bShowPickedObject)      ShowPickedObjLayOut(&m_bShowPickedObject);
-
+	if (m_bShowModelList)		ShowModelList(&m_bShowModelList);
 	ImGui::End();
 
 }
@@ -597,6 +602,87 @@ void CImgui_Manager::ShowPickedObjLayOut(bool * p_open)
 	ImGui::End();
 }
 
+void CImgui_Manager::ShowModelList(bool * p_open)
+{
+	ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
+	if (ImGui::Begin("Show Model List", p_open, ImGuiWindowFlags_MenuBar))
+	{
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Close")) *p_open = false;
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
+
+		vector<const _tchar*> LayerTags = m_pModel_Manager->Get_LayerTags();
+
+		// Left
+		static int selected = 0;
+		{
+			ImGui::BeginChild("left pane", ImVec2(200, 0), true);
+
+			int i = 0;
+			for (auto& iter : LayerTags)
+			{
+				char label[128];
+				char szLayertag[MAX_PATH] = "";
+				WideCharToMultiByte(CP_ACP, 0, iter, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
+				sprintf(label, szLayertag);
+				if (ImGui::Selectable(label, selected == i))
+					selected = i;
+				i++;
+			}
+			ImGui::EndChild();
+		}
+		ImGui::SameLine();
+
+		// Right
+		{
+			ImGui::BeginGroup();
+			ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+			char szLayertag[MAX_PATH] = "";
+			WideCharToMultiByte(CP_ACP, 0, LayerTags[selected], MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
+			ImGui::Text(szLayertag);
+			ImGui::Separator();
+			if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
+			{
+				if (ImGui::BeginTabItem("ObjectList"))
+				{
+					ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("Details"))
+				{
+					ImGui::Text("ID: 0123456789");
+					ImGui::EndTabItem();
+				}
+				ImGui::EndTabBar();
+			}
+			ImGui::EndChild();
+			if (ImGui::Button("Add_Model")) Create_Model(LayerTags[selected]);
+			ImGui::SameLine();
+			if (ImGui::Button("Revert")) {}
+			ImGui::SameLine();
+			if (ImGui::Button("Save")) {}
+			ImGui::EndGroup();
+		}
+	}
+	ImGui::End();
+}
+
+void CImgui_Manager::Create_Model(const _tchar* pPrototypeTag)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
+	m_pModel_Manager->Create_Model_Clone(iLevel, pPrototypeTag, TEXT("Layer_Player"));
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 void CImgui_Manager::Free()
 {
 	ImGui_ImplDX11_Shutdown();
@@ -607,6 +693,7 @@ void CImgui_Manager::Free()
 	//::DestroyWindow(hwnd);
 	//::UnregisterClass(wc.lpszClassName, wc.hInstance);
 
+	Safe_Release(m_pModel_Manager);
 	Safe_Release(m_pTerrain_Manager);
 	CTerrain_Manager::Get_Instance()->Destroy_Instance();
 

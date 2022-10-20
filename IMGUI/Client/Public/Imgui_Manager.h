@@ -5,6 +5,7 @@
 
 #include "Level_Manager.h"
 #include "Terrain_Manager.h"
+#include "ModelManager.h"
 
 BEGIN(Engine)
 END
@@ -37,12 +38,17 @@ public:
 	void Set_Terrain_Shape();
 	void ShowSimpleMousePos(bool* p_open);
 	void ShowPickedObjLayOut(bool* p_open);
+	void ShowModelList(bool* p_open);
+
+public:
+	void Create_Model(const _tchar* pPrototypeTag);
 
 private:
 	ID3D11Device* m_pDevice = nullptr;
 	ID3D11DeviceContext* m_pContext = nullptr;
 	_bool m_bShowSimpleMousePos = false;
 	_bool m_bShowPickedObject = false;
+	_bool m_bShowModelList = false;
 
 private:
 	/* For Terrain Manager */
@@ -54,6 +60,7 @@ private:
 	
 
 	/* For Object */
+	CModelManager* m_pModel_Manager = nullptr;
 	OBJID m_eObjID = OBJ_END;
 	_int m_iObjectList = 0;
 

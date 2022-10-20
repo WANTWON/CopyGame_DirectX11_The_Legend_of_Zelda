@@ -5,6 +5,7 @@
 #include "Level_Loading.h"
 #include "Imgui_Manager.h"
 #include "PickingMgr.h"
+#include "ModelManager.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
@@ -163,6 +164,7 @@ void CMainApp::Free()
 
 	Safe_Release(m_pGameInstance);
 	
+	CModelManager::Get_Instance()->Destroy_Instance();
 	CPickingMgr::Get_Instance()->Destroy_Instance();
 	CImgui_Manager::Get_Instance()->Destroy_Instance();
 	CGameInstance::Release_Engine();

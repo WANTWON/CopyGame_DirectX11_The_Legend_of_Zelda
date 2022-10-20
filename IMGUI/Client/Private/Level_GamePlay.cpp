@@ -44,12 +44,14 @@ void CLevel_GamePlay::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);	
 
-	CPickingMgr::Get_Instance()->Picking();
+	
 }
 
 void CLevel_GamePlay::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
+
+	CPickingMgr::Get_Instance()->Picking();
 
 	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
 }

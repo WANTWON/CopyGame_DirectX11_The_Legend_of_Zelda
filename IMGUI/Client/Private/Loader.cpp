@@ -105,11 +105,8 @@ HRESULT CLoader::Loading_ForLogoLevel()
 
 HRESULT CLoader::Loading_ForGamePlayLevel()
 {
-	CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
-	if (nullptr == pGameInstance)
-		return E_FAIL;
-
-	Safe_AddRef(pGameInstance);
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+	CModelManager*		pModelManager = GET_INSTANCE(CModelManager);
 
 	/* 텍스쳐 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐 로딩 중."));
@@ -140,21 +137,21 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 	_matrix			PivotMatrix = XMMatrixIdentity();
 
-	/*For.Prototype_Component_Model_Fiona*/
-	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx", PivotMatrix))))
-		return E_FAIL;
+	///*For.Prototype_Component_Model_Fiona*/
+	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx", PivotMatrix))))
+	//	return E_FAIL;
 
-	/*For.Prototype_Component_Model_ForkLift*/
-	PivotMatrix = XMMatrixScaling(0.11f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_ForkLift"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/ForkLift/ForkLift.fbx", PivotMatrix))))
-		return E_FAIL;
+	///*For.Prototype_Component_Model_ForkLift*/
+	//PivotMatrix = XMMatrixScaling(0.11f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_ForkLift"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/ForkLift/ForkLift.fbx", PivotMatrix))))
+	//	return E_FAIL;
 
 	/*For.Prototype_Component_Model_Field05*/
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	if (CModelManager::Get_Instance()->Create_Model_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Field05_%c"),
+	if (pModelManager->Create_Model_Prototype(LEVEL_GAMEPLAY, TEXT("Model_Field05%c"),
 		m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Meshes/Test/Field_05%c.fbx"), PivotMatrix, 16))
 		return E_FAIL;
 
@@ -210,7 +207,8 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 
-	Safe_Release(pGameInstance);
+	RELEASE_INSTANCE(CModelManager);
+	RELEASE_INSTANCE(CGameInstance);
 
 	m_isFinished = true;
 

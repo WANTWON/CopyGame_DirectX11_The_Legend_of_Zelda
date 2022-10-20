@@ -21,20 +21,24 @@ HRESULT CNonAnim::Initialize_Prototype()
 
 HRESULT CNonAnim::Initialize(void * pArg)
 {
-	memcpy(&m_ModelDesc, pArg, sizeof(NONANIMDESC));
+	if(pArg != nullptr)
+		memcpy(&m_ModelDesc, pArg, sizeof(NONANIMDESC));
 
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	CPickingMgr::Get_Instance()->Add_PickingGroup(this);
+	//CPickingMgr::Get_Instance()->Add_PickingGroup(this);
 
 	m_eObjectID = OBJ_BLOCK;
 
-
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat3(&m_ModelDesc.vPosition));
-	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, m_ModelDesc.vScale.x);
-	m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_ModelDesc.vScale.y);
-	m_pTransformCom->Set_Scale(CTransform::STATE_LOOK, m_ModelDesc.vScale.z);
+	/*if (pArg != nullptr)
+	{
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat3(&m_ModelDesc.vPosition));
+		m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, m_ModelDesc.vScale.x);
+		m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_ModelDesc.vScale.y);
+		m_pTransformCom->Set_Scale(CTransform::STATE_LOOK, m_ModelDesc.vScale.z);
+	}*/
+	
 
 
 	return S_OK;
@@ -69,7 +73,7 @@ HRESULT CNonAnim::Render()
 
 	_uint		iNumMeshes = m_pModelCom->Get_NumMeshContainers();
 
-	for (_uint i = 0; i < iNumMeshes; ++i)
+	for (_uint i = 0; i < iNumMeshes - 1; ++i)
 	{
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
 			return E_FAIL;
@@ -149,7 +153,7 @@ HRESULT CNonAnim::Ready_Components(void* pArg)
 	/* For.Com_Model*/
 	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, m_ModelDesc.pModeltag, (CComponent**)&m_pModelCom)))
 		return E_FAIL;
-
+	
 	return S_OK;
 }
 
