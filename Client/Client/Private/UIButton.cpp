@@ -51,7 +51,7 @@ void CUIButton::Late_Tick(_float fTimeDelta)
 	//__super::Late_Tick(fTimeDelta);
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 
 	if (m_ButtonDesc.eButtonType == BTN_INVEN)
 	{

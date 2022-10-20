@@ -99,7 +99,7 @@ HRESULT CRenderer::Render_AlphaBlend()
 
 HRESULT CRenderer::Render_UI()
 {
-	for (auto& pGameObject : m_GameObjects[RENDER_UI])
+	for (auto& pGameObject : m_GameObjects[RENDER_UI_BACK])
 	{
 		if (nullptr != pGameObject)
 		{
@@ -108,7 +108,19 @@ HRESULT CRenderer::Render_UI()
 		}
 	}
 
-	m_GameObjects[RENDER_UI].clear();
+	m_GameObjects[RENDER_UI_BACK].clear();
+
+
+	for (auto& pGameObject : m_GameObjects[RENDER_UI_FRONT])
+	{
+		if (nullptr != pGameObject)
+		{
+			pGameObject->Render();
+			Safe_Release(pGameObject);
+		}
+	}
+
+	m_GameObjects[RENDER_UI_FRONT].clear();
 	return S_OK;
 }
 

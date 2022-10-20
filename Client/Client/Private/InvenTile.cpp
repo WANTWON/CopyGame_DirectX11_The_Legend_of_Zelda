@@ -42,10 +42,19 @@ HRESULT CInvenTile::Initialize(void * pArg)
 	ItemDesc.eItemUsage = CInvenItem::USAGE_END;
 	ItemDesc.vPosition = m_fPosition;
 
-	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_UI"), &ItemDesc)))
+	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_InvenItem"), &ItemDesc)))
 		return E_FAIL;
 
-	
+	list<CGameObject*>* pItemList =  CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_InvenItem"));
+	m_pItem = dynamic_cast<CInvenItem*>(pItemList->back()); 
+	_uint iTextureNum = pItemList->size() - 2;
+	if (iTextureNum >= 6)
+		iTextureNum = 0;
+
+	if (m_InvenDesc.eTileType == EQUIP_TILE)
+		dynamic_cast<CInvenItem*>(m_pItem)->Set_TextureNum(0);
+	else
+		dynamic_cast<CInvenItem*>(m_pItem)->Set_TextureNum(iTextureNum);
 
 	return S_OK;
 }
@@ -59,21 +68,60 @@ int CInvenTile::Tick(_float fTimeDelta)
 
 void CInvenTile::Late_Tick(_float fTimeDelta)
 {
-	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+	__super::Late_Tick(fTimeDelta);
 
-	//__super::Late_Tick(fTimeDelta);
+	if (!CUI_Manager::Get_Instance()->Get_UI_Open() && m_InvenDesc.eTileType != EQUIP_TILE)
+		dynamic_cast<CInvenItem*>(m_pItem)->Set_bShow(false);
+	else
+		dynamic_cast<CInvenItem*>(m_pItem)->Set_bShow(true);
+
+
+	CObj_UI* pItemObj = nullptr;
+
+	if (m_InvenDesc.eTileType == EQUIP_TILE)
+	{
+		switch (m_InvenDesc.eEquipKey)
+		{
+		case EQUIP_X:
+			pItemObj = CUI_Manager::Get_Instance()->Get_EquipItem(CUI_Manager::EQUIP_X);
+			break;
+		case EQUIP_Y:
+			pItemObj = CUI_Manager::Get_Instance()->Get_EquipItem(CUI_Manager::EQUIP_Y);
+			break;
+		}
+		if (pItemObj == nullptr)
+			return;
+
+		_uint itextureNum = dynamic_cast<CInvenTile*>(pItemObj)->Get_TextureNum();
+		dynamic_cast<CInvenItem*>(m_pItem)->Set_TextureNum(itextureNum);
+	}
+
 }
 
 HRESULT CInvenTile::Render()
 {
-
 	if (!CUI_Manager::Get_Instance()->Get_UI_Open() && m_InvenDesc.eTileType != EQUIP_TILE)
 		return E_FAIL;
 		
 	__super::Render();
 
 	return S_OK;
+}
+
+void CInvenTile::Set_TextureNum(_uint iNum)
+{
+	if (m_pItem == nullptr)
+		return;
+
+	return m_pItem->Set_TextureNum(iNum);
+}
+
+_uint CInvenTile::Get_TextureNum()
+{
+	if (m_pItem == nullptr)
+		return 0;
+
+	return m_pItem->Get_TextureNum();
 }
 
 HRESULT CInvenTile::Ready_Components()

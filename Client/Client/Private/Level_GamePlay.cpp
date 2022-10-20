@@ -180,6 +180,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	CInvenTile::INVENDESC InvenDesc;
 	InvenDesc.eTileType = CInvenTile::EQUIP_TILE;
 	InvenDesc.eState = CInvenTile::STATE_EQUIP;
+	InvenDesc.eEquipKey = CInvenTile::EQUIP_X;
 	InvenDesc.vPosition = _float2(1100, 50);
 
 	CUIButton::BUTTONDESC ButtonDesc;
@@ -195,6 +196,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 		return E_FAIL;
 
 	InvenDesc.vPosition = _float2(1200, 100);
+	InvenDesc.eEquipKey = CInvenTile::EQUIP_Y;
 	ButtonDesc.eState = CUIButton::BTN_Y;
 	ButtonDesc.vPosition = _float2(InvenDesc.vPosition.x - 20, InvenDesc.vPosition.y + 20);
 
@@ -214,6 +216,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 			CInvenTile::INVENDESC InvenDesc;
 			InvenDesc.eTileType = CInvenTile::INEVEN_TILE;
 			InvenDesc.eState = CInvenTile::STATE_DEFAULT;
+			InvenDesc.eEquipKey = CInvenTile::EQUIP_NONE;
 			InvenDesc.vPosition = _float2(780 + j*110, 260 + i*120);
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_InvenTile_UI"), LEVEL_STATIC, pLayerTag, &InvenDesc)))

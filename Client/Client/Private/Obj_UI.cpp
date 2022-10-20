@@ -39,7 +39,7 @@ int CObj_UI::Tick(_float fTimeDelta)
 void CObj_UI::Late_Tick(_float fTimeDelta)
 {
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_BACK, this);
 
 }
 

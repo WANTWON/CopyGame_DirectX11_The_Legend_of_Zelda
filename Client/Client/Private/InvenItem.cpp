@@ -24,8 +24,8 @@ HRESULT CInvenItem::Initialize(void * pArg)
 		memcpy(&m_ItemDesc, pArg, sizeof(ITEMDESC));
 
 
-	m_fSize.x = 110;
-	m_fSize.y = 110;
+	m_fSize.x = 100;
+	m_fSize.y = 100;
 	m_fPosition = m_ItemDesc.vPosition;
 
 	if (FAILED(__super::Initialize(pArg)))
@@ -48,14 +48,13 @@ void CInvenItem::Late_Tick(_float fTimeDelta)
 	//__super::Late_Tick(fTimeDelta);
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
-
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 }
 
 HRESULT CInvenItem::Render()
 {
-	//if (!CUI_Manager::Get_Instance()->Get_UI_Open())
-		//return E_FAIL;
+	if (!m_bShow)
+		return E_FAIL;
 
 	__super::Render();
 
@@ -109,7 +108,7 @@ HRESULT CInvenItem::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(2))))
+	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_iTextureNum))))
 		return E_FAIL;
 
 	return S_OK;

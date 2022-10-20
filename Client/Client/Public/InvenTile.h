@@ -8,11 +8,13 @@ class CInvenTile final : public CObj_UI
 {
 public:
 	enum TILE_TYPE { INEVEN_TILE, EQUIP_TILE };
+	enum EQUIP_KEY { EQUIP_X, EQUIP_Y, EQUIP_NONE };
 	enum TILE_STATE { STATE_DEFAULT, STATE_EQUIP };
 
 	typedef struct InvenTiletag
 	{
 		TILE_TYPE eTileType = INEVEN_TILE;
+		EQUIP_KEY eEquipKey = EQUIP_NONE;
 		TILE_STATE eState = STATE_DEFAULT;
 		_float2 vPosition = _float2(0.f, 0.f);
 
@@ -34,6 +36,8 @@ public:
 public:
 	void Set_SelectTile(_bool type) { m_bSelected = type; }
 	void Set_TileState(TILE_STATE eState) {m_InvenDesc.eState = eState;}
+	void Set_TextureNum(_uint iNum);
+	_uint Get_TextureNum();
 
 private:
 	virtual HRESULT Ready_Components() override;
