@@ -188,6 +188,7 @@
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\MainApp.h" />
+    <ClInclude Include="..\Public\ModelManager.h" />
     <ClInclude Include="..\Public\NonAnim.h" />
     <ClInclude Include="..\Public\PickingMgr.h" />
     <ClInclude Include="..\Public\Terrain.h" />
@@ -214,6 +215,7 @@
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
+    <ClCompile Include="..\Private\ModelManager.cpp" />
     <ClCompile Include="..\Private\NonAnim.cpp" />
     <ClCompile Include="..\Private\PickingMgr.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />

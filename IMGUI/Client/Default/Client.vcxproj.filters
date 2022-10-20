@@ -58,6 +58,12 @@
     <Filter Include="02.GameObjects\03.NonAnimModel">
       <UniqueIdentifier>{387253f7-5aef-465a-8434-d5f4024f1ee5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.ToolManager\Terrain_Manager">
+      <UniqueIdentifier>{02e7e0a7-9dd9-4440-9803-cc258d7f2b85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.ToolManager\NonAnim_Manager">
+      <UniqueIdentifier>{0694f4ed-81c0-46ee-a50f-aac9d496b329}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -129,9 +135,6 @@
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>02.GameObjects\01.Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Terrain_Manager.h">
-      <Filter>03.ToolManager</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\PickingMgr.h">
       <Filter>95.PickingMgr</Filter>
     </ClInclude>
@@ -143,6 +146,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\NonAnim.h">
       <Filter>02.GameObjects\03.NonAnimModel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Terrain_Manager.h">
+      <Filter>03.ToolManager\Terrain_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ModelManager.h">
+      <Filter>03.ToolManager\NonAnim_Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -200,9 +209,6 @@
     <ClCompile Include="..\Private\Camera_Dynamic.cpp">
       <Filter>96.Camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Terrain_Manager.cpp">
-      <Filter>03.ToolManager</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\PickingMgr.cpp">
       <Filter>95.PickingMgr</Filter>
     </ClCompile>
@@ -211,6 +217,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\NonAnim.cpp">
       <Filter>02.GameObjects\03.NonAnimModel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Terrain_Manager.cpp">
+      <Filter>03.ToolManager\Terrain_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ModelManager.cpp">
+      <Filter>03.ToolManager\NonAnim_Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

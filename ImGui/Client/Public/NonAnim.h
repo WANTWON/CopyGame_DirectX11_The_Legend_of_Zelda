@@ -12,6 +12,15 @@ BEGIN(Client)
 
 class CNonAnim final : public CBaseObj
 {
+public:
+	typedef struct NonAnimModelTag
+	{
+		const _tchar* pModeltag = TEXT("");
+		_float3 vPosition = _float3(0.f, 0.f, 0.f);
+		_float3 vScale = _float3(1.f, 1.f, 1.f);
+
+	}NONANIMDESC;
+
 private:
 	CNonAnim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CNonAnim(const CNonAnim& rhs);
@@ -31,6 +40,8 @@ public:
 
 private:
 	CModel*					m_pModelCom = nullptr;
+	NONANIMDESC				m_ModelDesc;
+
 
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;

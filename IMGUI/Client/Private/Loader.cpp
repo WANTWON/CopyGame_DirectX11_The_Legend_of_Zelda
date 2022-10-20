@@ -8,6 +8,7 @@
 #include "BackGround.h"
 #include "Terrain.h"
 #include "NonAnim.h"
+#include "ModelManager.h"
 //#include "Effect.h"
 //#include "Sky.h"
 //#include "UI.h"
@@ -150,7 +151,13 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_ForkLift"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/ForkLift/ForkLift.fbx", PivotMatrix))))
 		return E_FAIL;
-	
+
+	/*For.Prototype_Component_Model_Field05*/
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (CModelManager::Get_Instance()->Create_Model_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Field05_%c"),
+		m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Meshes/Test/Field_05%c.fbx"), PivotMatrix, 16))
+		return E_FAIL;
+
 
 	///*For.Prototype_Component_VIBuffer_Cube */
 	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"),
