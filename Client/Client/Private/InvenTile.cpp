@@ -32,7 +32,7 @@ HRESULT CInvenTile::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_eShaderID = SHADER_ALPHABLEND;
+	m_eShaderID = UI_ALPHABLEND;
 
 	if (m_InvenDesc.eTileType == INEVEN_TILE)
 		CUI_Manager::Get_Instance()->Add_InvenGroup(this);
@@ -188,9 +188,9 @@ HRESULT CInvenTile::SetUp_ShaderResources()
 HRESULT CInvenTile::SetUp_ShaderID()
 {
 	if (m_bSelected)
-		m_eShaderID = SHADER_PICKED;
+		m_eShaderID = UI_PICKED;
 	else
-		m_eShaderID = SHADER_ALPHABLEND;
+		m_eShaderID = UI_ALPHABLEND;
 
 	return S_OK;
 }

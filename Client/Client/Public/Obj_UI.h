@@ -34,6 +34,8 @@ public:
 public:
 	_float2 Get_Position() { return m_fPosition; }
 	_float2 Get_Scale() { return m_fSize; }
+	void Set_Position(_float2 fPostion) { m_fPosition = fPostion; };
+	void Set_Scale(_float2 fScale) {m_fSize = fScale;};
 	
 protected:
 	CShader*				m_pShaderCom = nullptr;
@@ -45,7 +47,7 @@ protected:
 protected:
 	_float2					m_fPosition, m_fSize;
 	_float4x4				m_ViewMatrix, m_ProjMatrix;
-	SHADER_ID				m_eShaderID = SHADER_ALPHATEST;
+	SHADERUI_ID				m_eShaderID = UI_ALPHATEST;
 	
 
 protected:

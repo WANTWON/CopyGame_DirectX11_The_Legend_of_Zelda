@@ -32,7 +32,11 @@ HRESULT CObj_UI::Initialize(void * pArg)
 
 int CObj_UI::Tick(_float fTimeDelta)
 {
-	
+	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, m_fSize.x);
+	m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_fSize.y);
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fPosition.x - g_iWinSizeX * 0.5f, -m_fPosition.y + g_iWinSizeY * 0.5f, 0.f, 1.f));
+
 	return OBJ_NOEVENT;
 }
 

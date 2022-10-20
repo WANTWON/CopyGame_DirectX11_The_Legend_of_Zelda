@@ -40,9 +40,6 @@
     <Filter Include="95.UI">
       <UniqueIdentifier>{db326884-8e5c-47c6-bd6b-1b276e8834a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="95.UI\00. ObjUI">
-      <UniqueIdentifier>{c5474d07-5e19-48f3-a029-fbff9831b93d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="95.UI\01. BackGround">
       <UniqueIdentifier>{57566d9b-4982-490a-9436-a60395b8dd99}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,15 @@
     </Filter>
     <Filter Include="95.UI\04. UIButton">
       <UniqueIdentifier>{1301e89d-dc8c-4c2b-bb34-ee43c21d52d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="95.UI\00. ObjUI%28Base%29">
+      <UniqueIdentifier>{c5474d07-5e19-48f3-a029-fbff9831b93d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\00.BaseObj">
+      <UniqueIdentifier>{3c7378a6-3e37-486a-b9ee-fc1f1825002c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\02.Player">
+      <UniqueIdentifier>{2a2f6828-11ef-4b28-a218-49dc0b8693d6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -109,7 +115,7 @@
       <Filter>95.UI\02. InvenTile</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Obj_UI.h">
-      <Filter>95.UI\00. ObjUI</Filter>
+      <Filter>95.UI\00. ObjUI%28Base%29</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UIButton.h">
       <Filter>95.UI\04. UIButton</Filter>
@@ -119,6 +125,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\InvenItem.h">
       <Filter>95.UI\03. InvenItem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BaseObj.h">
+      <Filter>02.GameObjects\00.BaseObj</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player.h">
+      <Filter>02.GameObjects\02.Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -162,13 +174,19 @@
       <Filter>95.UI\02. InvenTile</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Obj_UI.cpp">
-      <Filter>95.UI\00. ObjUI</Filter>
+      <Filter>95.UI\00. ObjUI%28Base%29</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UIButton.cpp">
       <Filter>95.UI\04. UIButton</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\InvenItem.cpp">
       <Filter>95.UI\03. InvenItem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BaseObj.cpp">
+      <Filter>02.GameObjects\00.BaseObj</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player.cpp">
+      <Filter>02.GameObjects\02.Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -192,6 +210,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_UI.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

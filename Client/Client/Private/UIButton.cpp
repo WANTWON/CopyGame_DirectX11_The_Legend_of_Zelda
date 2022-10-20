@@ -34,7 +34,7 @@ HRESULT CUIButton::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_eShaderID = SHADER_ALPHABLEND;
+	m_eShaderID = UI_ALPHABLEND;
 
 	return S_OK;
 }

@@ -1,15 +1,11 @@
 #pragma once
 
-#include "Client_Defines.h"
-#include "GameObject.h"
+#include "BaseObj.h"
 
 
 BEGIN(Engine)
 
-class CShader;
 class CTexture;
-class CRenderer;
-class CTransform;
 class CVIBuffer_Terrain;
 
 END
@@ -17,7 +13,7 @@ END
 
 BEGIN(Client)
 
-class CTerrain final : public CGameObject
+class CTerrain final : public CBaseObj
 {
 public:
 	enum TEXTURE { TYPE_DIFFUSE, TYPE_BRUSH, TYPE_FILTER, TYPE_END };
@@ -35,10 +31,7 @@ public:
 	virtual HRESULT Render();
 
 private:
-	CShader*				m_pShaderCom = nullptr;
 	CTexture*				m_pTextureCom[TYPE_END] = { nullptr };
-	CRenderer*				m_pRendererCom = nullptr;
-	CTransform*				m_pTransformCom = nullptr;
 	CVIBuffer_Terrain*		m_pVIBufferCom = nullptr;
 
 	ID3D11ShaderResourceView*			m_pFilterTexture = nullptr;
@@ -47,10 +40,9 @@ private:
 
 
 private:
-	HRESULT Ready_Components();
-	HRESULT SetUp_ShaderResources(); /* 셰이더 전역변수에 값을 전달한다. */
-	HRESULT Create_FilterTexture();
-
+	virtual HRESULT Ready_Components(void* pArg);
+	virtual HRESULT SetUp_ShaderResources(); /* 셰이더 전역변수에 값을 전달한다. */
+	virtual HRESULT Create_FilterTexture();
 
 public:
 	static CTerrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
