@@ -27,17 +27,19 @@ HRESULT CNonAnim::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	//CPickingMgr::Get_Instance()->Add_PickingGroup(this);
+	CPickingMgr::Get_Instance()->Add_PickingGroup(this);
 
 	m_eObjectID = OBJ_BLOCK;
 
-	/*if (pArg != nullptr)
+	if (pArg != nullptr)
 	{
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat3(&m_ModelDesc.vPosition));
+		_vector vPosition = XMLoadFloat3(&m_ModelDesc.vPosition);
+		vPosition = XMVectorSetW(vPosition, 1.f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 		m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, m_ModelDesc.vScale.x);
 		m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_ModelDesc.vScale.y);
 		m_pTransformCom->Set_Scale(CTransform::STATE_LOOK, m_ModelDesc.vScale.z);
-	}*/
+	}
 	
 
 
