@@ -40,8 +40,10 @@ public:
 	void ShowPickedObjLayOut(bool* p_open);
 	void ShowModelList(bool* p_open);
 
+
 public:
-	void Create_Model(const _tchar* pPrototypeTag);
+	void Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag);
+	void Read_Objects_Name( _tchar* cFolderPath);
 
 private:
 	ID3D11Device* m_pDevice = nullptr;
@@ -49,6 +51,8 @@ private:
 	_bool m_bShowSimpleMousePos = false;
 	_bool m_bShowPickedObject = false;
 	_bool m_bShowModelList = false;
+	_bool m_bShow_app_style_editor = false;
+	_bool m_bFilePath = false;
 
 private:
 	/* For Terrain Manager */

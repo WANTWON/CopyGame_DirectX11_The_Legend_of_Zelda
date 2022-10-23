@@ -13,6 +13,7 @@ namespace Client
 }
 
 #include <process.h>
+#include <commdlg.h>
 
 // Client_Defines.h
 
@@ -20,3 +21,4 @@ extern HWND			g_hWnd;
 extern HINSTANCE	g_hInst;
 
 using namespace Client;
+using namespace std;

@@ -150,10 +150,10 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	//	return E_FAIL;
 
 	/*For.Prototype_Component_Model_Field05*/
-	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	/*PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (pModelManager->Create_Model_Prototype(LEVEL_GAMEPLAY, TEXT("Model_Field05%c"),
 		m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Meshes/Test/Field_05%c.fbx"), PivotMatrix, 16))
-		return E_FAIL;
+		return E_FAIL;*/
 
 
 	///*For.Prototype_Component_VIBuffer_Cube */
@@ -184,7 +184,7 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	//	return E_FAIL;
 
 	/*For.Prototype_GameObject_Player*/
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NonAnim"),
 		CNonAnim::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 

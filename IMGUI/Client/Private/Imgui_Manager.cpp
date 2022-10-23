@@ -8,6 +8,49 @@
 
 IMPLEMENT_SINGLETON(CImgui_Manager)
 
+typedef basic_string<TCHAR> tstring;
+
+TCHAR* StringToTCHAR(string& s)
+{
+	tstring tstr;
+	const char* all = s.c_str();
+	int len = 1 + strlen(all);
+	wchar_t* t = new wchar_t[len];
+	if (NULL == t) throw std::bad_alloc();
+	mbstowcs(t, all, len);
+	return (TCHAR*)t;
+}
+
+string TCHARToString(const TCHAR* ptsz)
+{
+	int len = wcslen((wchar_t*)ptsz);
+	char* psz = new char[2 * len + 1];
+	wcstombs(psz, (wchar_t*)ptsz, 2 * len + 1);
+	std::string s = psz;
+	delete[] psz;
+	return s;
+}
+
+string ToString(wstring value)
+{
+	string temp;
+	temp.assign(value.begin(), value.end());
+	return temp;
+}
+
+vector<string> SplitPath(string path, char sep) {
+	vector<string> out;
+	stringstream stream(path);
+	string temp;
+
+	while (getline(stream, temp, sep)) {
+		out.push_back(temp);
+	}
+
+	return out;
+}
+
+
 CImgui_Manager::CImgui_Manager()
 	: m_pTerrain_Manager(CTerrain_Manager::Get_Instance())
 	, m_pModel_Manager(CModelManager::Get_Instance())
@@ -29,17 +72,24 @@ HRESULT CImgui_Manager::Initialize(ID3D11Device * pDevice, ID3D11DeviceContext *
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
+	
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsLight();
+	ImGui::StyleColorsBlue();
+	//io.FontDefault = io.Fonts->AddFontFromFileTTF("../../Resources/Fonts/Quicksand-Medium.ttf", 16.0f);
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(g_hWnd);
 	ImGui_ImplDX11_Init(m_pDevice, m_pContext);
 
+
+	_tchar Path[MAX_PATH] = L"../Bin/Resources/Meshes/";
+	Read_Objects_Name(Path);
 	return S_OK;
 }
+
 
 void CImgui_Manager::Tick(_float fTimeDelta)
 {
@@ -131,6 +181,11 @@ void CImgui_Manager::ShowGui()
 			ImGui::MenuItem("Show Model List", NULL, &m_bShowModelList);
 			ImGui::EndMenu();
 		}
+		if (ImGui::BeginMenu("Tools"))
+		{
+			ImGui::MenuItem("Style Editor", NULL, &m_bShow_app_style_editor);
+			ImGui::EndMenu();
+		}
 		ImGui::EndMenuBar();
 	}
 
@@ -173,6 +228,13 @@ void CImgui_Manager::ShowGui()
 	if (m_bShowSimpleMousePos)      ShowSimpleMousePos(&m_bShowSimpleMousePos);
 	if (m_bShowPickedObject)      ShowPickedObjLayOut(&m_bShowPickedObject);
 	if (m_bShowModelList)		ShowModelList(&m_bShowModelList);
+	if (m_bShow_app_style_editor)
+	{
+		ImGui::Begin("Dear ImGui Style Editor", &m_bShow_app_style_editor);
+		ImGui::ShowStyleEditor();
+		ImGui::End();
+	}
+
 	ImGui::End();
 
 }
@@ -604,6 +666,7 @@ void CImgui_Manager::ShowPickedObjLayOut(bool * p_open)
 
 void CImgui_Manager::ShowModelList(bool * p_open)
 {
+
 	ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
 	if (ImGui::Begin("Show Model List", p_open, ImGuiWindowFlags_MenuBar))
 	{
@@ -612,6 +675,7 @@ void CImgui_Manager::ShowModelList(bool * p_open)
 			if (ImGui::BeginMenu("File"))
 			{
 				if (ImGui::MenuItem("Close")) *p_open = false;
+				if (ImGui::MenuItem("Set_File_Path")) m_bFilePath = !m_bFilePath;
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
@@ -625,15 +689,21 @@ void CImgui_Manager::ShowModelList(bool * p_open)
 			ImGui::BeginChild("left pane", ImVec2(200, 0), true);
 
 			int i = 0;
-			for (auto& iter : LayerTags)
+
+			if (LayerTags.size() != 0)
 			{
-				char label[128];
-				char szLayertag[MAX_PATH] = "";
-				WideCharToMultiByte(CP_ACP, 0, iter, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
-				sprintf(label, szLayertag);
-				if (ImGui::Selectable(label, selected == i))
-					selected = i;
-				i++;
+				for (auto& iter : LayerTags)
+				{
+					if (iter == nullptr)
+						continue;
+					char label[128];
+					char szLayertag[MAX_PATH] = "";
+					WideCharToMultiByte(CP_ACP, 0, iter, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
+					sprintf(label, szLayertag);
+					if (ImGui::Selectable(label, selected == i))
+						selected = i;
+					i++;
+				}
 			}
 			ImGui::EndChild();
 		}
@@ -644,7 +714,8 @@ void CImgui_Manager::ShowModelList(bool * p_open)
 			ImGui::BeginGroup();
 			ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 			char szLayertag[MAX_PATH] = "";
-			WideCharToMultiByte(CP_ACP, 0, LayerTags[selected], MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
+			if(LayerTags.size() != 0)
+				WideCharToMultiByte(CP_ACP, 0, LayerTags[selected], MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
 			ImGui::Text(szLayertag);
 			ImGui::Separator();
 			if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
@@ -662,7 +733,7 @@ void CImgui_Manager::ShowModelList(bool * p_open)
 				ImGui::EndTabBar();
 			}
 			ImGui::EndChild();
-			if (ImGui::Button("Add_Model")) Create_Model(LayerTags[selected]);
+			if (ImGui::Button("Add_Model")) Create_Model(LayerTags[selected], TEXT(""));
 			ImGui::SameLine();
 			if (ImGui::Button("Revert")) {}
 			ImGui::SameLine();
@@ -670,15 +741,131 @@ void CImgui_Manager::ShowModelList(bool * p_open)
 			ImGui::EndGroup();
 		}
 	}
+
+	if (m_bFilePath)
+	{
+		
+		OPENFILENAME OFN;
+		TCHAR filePathName[300] = L"";
+		TCHAR lpstrFile[300] = L"";
+		static TCHAR filter[] = L"모든 파일\0*.*\0텍스트 파일\0*.txt\0fbx 파일\0*.fbx";
+
+		memset(&OFN, 0, sizeof(OPENFILENAME));
+		OFN.lStructSize = sizeof(OPENFILENAME);
+		OFN.hwndOwner = g_hWnd;
+		OFN.lpstrFilter = filter;
+		OFN.lpstrFile = lpstrFile;
+		OFN.nMaxFile = 300;
+		OFN.lpstrInitialDir = L".";
+
+		if (GetOpenFileName(&OFN) != 0) {
+			wsprintf(filePathName, L"%s 파일을 열겠습니까?", OFN.lpstrFile);
+			MessageBox(g_hWnd, filePathName, L"열기 선택", MB_OK);
+
+			string StringPath = ToString(OFN.lpstrFile);
+
+			_tchar*     szFullPath = new _tchar[MAX_PATH]; // = TEXT("");
+			_tchar		szDrive[MAX_PATH] = TEXT("");
+			_tchar		szDir[MAX_PATH] = TEXT("");
+			_tchar		szFileName[MAX_PATH] = TEXT("");
+			_tchar		szExt[MAX_PATH] = TEXT("");
+
+			szFullPath = StringToTCHAR(StringPath);
+		
+			/* 경로를 분해한다. */
+			_wsplitpath_s(szFullPath, szDrive, _MAX_DRIVE, szDir, _MAX_DIR, szFileName, _MAX_FNAME, szExt, MAX_PATH);
+			string DirPath = TCHARToString(szDir);
+			vector<string> Splitpaths;
+			Splitpaths = SplitPath(DirPath, '\\');
+
+			string FullRelativePath = "..";
+			int iIndex = 0;
+			auto ret = find(Splitpaths.begin(), Splitpaths.end(), "Bin");
+			if (ret != Splitpaths.end())
+			{
+				iIndex = ret - Splitpaths.begin();
+
+				for (_uint i = iIndex; i < Splitpaths.size(); ++i)
+				{
+					FullRelativePath += "/" + Splitpaths[i];
+				}
+			}
+
+			int a = 0;
+		}
+		m_bFilePath = false;
+	}
+
 	ImGui::End();
 }
 
-void CImgui_Manager::Create_Model(const _tchar* pPrototypeTag)
+void CImgui_Manager::Read_Objects_Name(_tchar* cFolderPath)
+{
+	_tchar ObjectFilePath[MAX_PATH] = TEXT("");
+	_tchar filePath[MAX_PATH] = TEXT("");
+	wcscpy_s(filePath, MAX_PATH, cFolderPath); // Backup Path used for Sub-folders
+	wcscat_s(cFolderPath, MAX_PATH, TEXT("*"));
+
+	WIN32_FIND_DATA fileData;
+
+	HANDLE hDir = FindFirstFile(cFolderPath, &fileData);
+
+	/* No files found */
+	if (hDir == INVALID_HANDLE_VALUE)
+	{
+		FindClose(hDir);
+		return;
+	}
+		
+	do {
+		if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) // Directory
+		{
+			if (lstrcmp(fileData.cFileName, TEXT(".")) == 0 || lstrcmp(fileData.cFileName, TEXT("..")) == 0)
+				continue;
+	
+			_tchar subFilePath[MAX_PATH] = TEXT("");
+			wcscpy_s(subFilePath, MAX_PATH, filePath);
+			wcscat_s(subFilePath, MAX_PATH, fileData.cFileName);
+			wcscat_s(subFilePath, MAX_PATH, TEXT("/"));
+
+			wcscpy_s(ObjectFilePath, MAX_PATH, TEXT("")); // Backup Path used for Sub-folders
+			wcscpy_s(ObjectFilePath, MAX_PATH, subFilePath); // Backup Path used for Sub-folders
+			// Recursive Function Call
+			Read_Objects_Name(subFilePath);
+		}
+		else // File
+		{
+			_tchar szFileExt[MAX_PATH];
+
+			_wsplitpath_s(fileData.cFileName, nullptr, 0, nullptr, 0, nullptr, 0, szFileExt, MAX_PATH);
+
+			if (!wcscmp(szFileExt, TEXT(".fbx")))
+			{
+				wcscpy_s(ObjectFilePath, MAX_PATH, TEXT("")); // Backup Path used for Sub-folders
+				wcscpy_s(ObjectFilePath, MAX_PATH, filePath); // Backup Path used for Sub-folders
+				wcscat_s(ObjectFilePath, MAX_PATH, fileData.cFileName);
+
+				wstring wsFileName(fileData.cFileName);
+				string sFileName(wsFileName.begin(), wsFileName.end());
+
+				const _tchar* FileName = StringToTCHAR(sFileName);
+
+				m_pModel_Manager->Add_FileName(FileName, ObjectFilePath);
+				delete(FileName);
+			}
+		}
+	} while (FindNextFile(hDir, &fileData));
+
+	FindClose(hDir);
+}
+
+void CImgui_Manager::Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	_matrix			PivotMatrix = XMMatrixIdentity();
 	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
-	m_pModel_Manager->Create_Model_Clone(iLevel, pPrototypeTag, TEXT("Layer_Player"));
+	m_pModel_Manager->Create_Model(iLevel, pPrototypeTag, pLayerTag, m_pDevice, m_pContext, CModel::TYPE_NONANIM, PivotMatrix);
 
 	RELEASE_INSTANCE(CGameInstance);
 }
