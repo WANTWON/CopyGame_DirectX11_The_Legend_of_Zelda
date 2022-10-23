@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "Model.h"
 #include "NonAnim.h"
+#include "GameObject.h"
 
 
 IMPLEMENT_SINGLETON(CModelManager)
@@ -10,6 +11,8 @@ IMPLEMENT_SINGLETON(CModelManager)
 CModelManager::CModelManager()
 {
 	m_LayerTags.reserve(0);
+	m_CreatedModel.reserve(0);
+	
 }
 
 
@@ -67,6 +70,12 @@ void CModelManager::Add_FileName(const _tchar * Layertag, const _tchar * FileNam
 	m_LayerTags.push_back(szLayerTag);
 }
 
+void CModelManager::Set_AllPickedFalse()
+{
+	for (auto& pGameObject : m_CreatedModel)
+		dynamic_cast<CGameObject*>(pGameObject)->Set_Picked(false);
+}
+
 const _tchar * CModelManager::Find_ModelTag(const _tchar * ModelTag)
 {
 	auto	iter = find_if(m_ModelTags.begin(), m_ModelTags.end(), CTag_Finder(ModelTag));
@@ -88,4 +97,6 @@ void CModelManager::Free()
 	for (auto& iter : m_LayerTags)
 		Safe_Delete(iter);
 	m_LayerTags.clear();
+
+	m_CreatedModel.clear();
 }

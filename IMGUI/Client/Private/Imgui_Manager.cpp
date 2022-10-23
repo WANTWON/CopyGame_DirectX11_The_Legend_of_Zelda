@@ -4,6 +4,7 @@
 #include "GameInstance.h"
 #include "PickingMgr.h"
 #include "BaseObj.h"
+#include "NonAnim.h"
 
 
 IMPLEMENT_SINGLETON(CImgui_Manager)
@@ -72,7 +73,7 @@ HRESULT CImgui_Manager::Initialize(ID3D11Device * pDevice, ID3D11DeviceContext *
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-	
+
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -83,6 +84,8 @@ HRESULT CImgui_Manager::Initialize(ID3D11Device * pDevice, ID3D11DeviceContext *
 	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(g_hWnd);
 	ImGui_ImplDX11_Init(m_pDevice, m_pContext);
+
+	
 
 
 	_tchar Path[MAX_PATH] = L"../Bin/Resources/Meshes/";
@@ -150,26 +153,17 @@ void CImgui_Manager::ShowGui()
 	ImGui::Begin(u8"Editor", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar
 		| ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-
-	//SettingMenu();
 	//메뉴바
 	if (ImGui::BeginMenuBar())
 	{
 		// 메뉴
 		if (ImGui::BeginMenu("File"))
 		{
-
 			if (ImGui::MenuItem("save"))
-			{
 				int a = 0;
-			}
-
 			ImGui::Separator();
 			if (ImGui::MenuItem("open"))
-			{
 				int a = 0;
-			}
-
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Debug"))
@@ -177,8 +171,6 @@ void CImgui_Manager::ShowGui()
 			ImGui::MenuItem("Show Mouse Pos", NULL, &m_bShowSimpleMousePos);
 			ImGui::Separator();
 			ImGui::MenuItem("Show Picked Object", NULL, &m_bShowPickedObject);
-			ImGui::Separator();
-			ImGui::MenuItem("Show Model List", NULL, &m_bShowModelList);
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Tools"))
@@ -191,23 +183,22 @@ void CImgui_Manager::ShowGui()
 
 
 	const char* Level[] = { "Level_GamePlay", "Level_Boss" };
-	static int iCurrentLevel = 0;
+	static int iCurrentLevel = (int)m_iCurrentLevel;
 	ImGui::Combo("##0", &iCurrentLevel, Level, IM_ARRAYSIZE(Level));
-
+	m_iCurrentLevel = (LEVEL)iCurrentLevel;
 	ImGui::NewLine();
-
 
 	ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
 	if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
 	{
 		if (ImGui::BeginTabItem("Terrain Tool"))
 		{
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Object"); ImGui::SameLine();
-			ImGui::RadioButton("##Picking for Object", &m_PickingType, PICKING_OBJECT); ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Moving Terrain"); ImGui::SameLine();
+			ImGui::RadioButton("##Picking for Moving Terrain", &m_PickingType, PICKING_OBJECT); ImGui::SameLine();
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Shaping Terrain"); ImGui::SameLine();
 			ImGui::RadioButton("##Picking for Shaping Terrain", &m_PickingType, PICKING_TERRAIN);
 
-			Terrain_Map();
+			Set_Terrain_Map();
 			Set_Terrain_Shape();
 			Object_Map();
 			ImGui::EndTabItem();
@@ -217,17 +208,32 @@ void CImgui_Manager::ShowGui()
 			ImGui::Text("This is the Camera Tool tab!\nblah blah blah blah blah");
 			ImGui::EndTabItem();
 		}
-		if (ImGui::BeginTabItem("Tool,,Tool"))
+		if (ImGui::BeginTabItem("Model Tool"))
 		{
-			ImGui::Text("This is the Tool,,Tool Tool tab!\nblah blah blah blah blah");
+			if (ImGui::BeginTabBar("ModelsTabs", ImGuiTabBarFlags_None))
+			{
+				if (ImGui::BeginTabItem("Show Model List"))
+				{
+					Show_ModelList();
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("Show Current Model List"))
+				{
+					Show_CurrentModelList();
+					ImGui::EndTabItem();
+				}
+				ImGui::EndTabBar();
+			}
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
 	}
 
+
+
 	if (m_bShowSimpleMousePos)      ShowSimpleMousePos(&m_bShowSimpleMousePos);
-	if (m_bShowPickedObject)      ShowPickedObjLayOut(&m_bShowPickedObject);
-	if (m_bShowModelList)		ShowModelList(&m_bShowModelList);
+	if (m_bShowPickedObject)		ShowPickedObjLayOut(&m_bShowPickedObject);
+	if (m_bFilePath)				Set_File_Path_Dialog();
 	if (m_bShow_app_style_editor)
 	{
 		ImGui::Begin("Dear ImGui Style Editor", &m_bShow_app_style_editor);
@@ -240,7 +246,7 @@ void CImgui_Manager::ShowGui()
 }
 
 
-void CImgui_Manager::Terrain_Map()
+void CImgui_Manager::Set_Terrain_Map()
 {
 
 	_bool bCreateTerrain;
@@ -248,8 +254,7 @@ void CImgui_Manager::Terrain_Map()
 	ImGui::GetIO().NavActive = false;
 	ImGui::GetIO().WantCaptureMouse = true;
 
-	if (!ImGui::CollapsingHeader("Terrain_Map"))
-		return;
+	ImGui::CollapsingHeader("Terrain_Map");
 
 	CTerrain_Manager::TERRAINDESC TerrainDesc = m_pTerrain_Manager->Get_TerrainDesc();
 
@@ -278,9 +283,9 @@ void CImgui_Manager::Terrain_Map()
 	ImGui::InputInt("##MoveOffset", &iOffset);
 	m_pTerrain_Manager->Set_MoveOffset(iOffset);
 
-	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::ImColor(0.f, 0.f, 1.f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::ImColor(0.f, 1.f, 0.f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::ImColor(1.f, 0.f, 0.f));
+	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::ImColor(0.3f, 0.5f, 0.7f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::ImColor(0.2f, 0.5f, 0.8f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::ImColor(0.2f, 0.2f, 0.5f));
 	bCreateTerrain = ImGui::Button("Create Terrain");
 	ImGui::PopStyleColor(3);
 
@@ -412,8 +417,7 @@ void CImgui_Manager::Set_Terrain_Shape()
 	ImGui::GetIO().NavActive = false;
 	ImGui::GetIO().WantCaptureMouse = true;
 
-	if (!ImGui::CollapsingHeader("Shape Setting (Height, Sharp, Range)"))
-		return;
+	ImGui::CollapsingHeader("Shape Setting (Height, Sharp, Range)");
 
 	ImGui::Text("Height");
 	ImGui::SameLine();
@@ -494,18 +498,6 @@ void CImgui_Manager::ShowPickedObjLayOut(bool * p_open)
 	ImGui::SetNextWindowSize(ImVec2(200, 300), ImGuiCond_FirstUseEver);
 	if (ImGui::Begin("Picked Object Info", p_open, ImGuiWindowFlags_MenuBar))
 	{
-		if (ImGui::BeginMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				if (ImGui::MenuItem("Close")) *p_open = false;
-				ImGui::EndMenu();
-			}
-			ImGui::EndMenuBar();
-		}
-
-		// Right
-
 		ImGui::BeginGroup();
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 
@@ -514,9 +506,10 @@ void CImgui_Manager::ShowPickedObjLayOut(bool * p_open)
 			if (ImGui::BeginTabItem("Description"))
 			{
 
+				ImGui::BulletText("ObjectInfo");
 				const char* ObjectID[] = { "OBJ_BACKGROUND", "OBJ_MONSTER", "OBJ_BLOCK", "OBJ_INTERATIVE", "OBJ_UNINTERATIVE", "OBJ_END" };
 				static int iObjectID = 5;
-				
+
 				if (pPickedObj != nullptr)
 				{
 					iObjectID = dynamic_cast<CBaseObj*>(pPickedObj)->Get_ObjectID();
@@ -534,8 +527,6 @@ void CImgui_Manager::ShowPickedObjLayOut(bool * p_open)
 				ImGui::Text("OBJECT_ID : ");
 				ImGui::SameLine();
 				ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "%s", ObjectID[iObjectID]);
-
-				ImGui::NewLine();
 
 				ImGui::Text("OBJECT_TYPE : ");
 				ImGui::SameLine();
@@ -586,37 +577,11 @@ void CImgui_Manager::ShowPickedObjLayOut(bool * p_open)
 				}
 
 				ImGui::NewLine();
-				ImGui::Text("Position (");
-				ImGui::SameLine();
-				ImGui::Text("%f, %f , %f )", m_vPickedObjPos.x, m_vPickedObjPos.y, m_vPickedObjPos.z);
-
-				ImGui::NewLine();
-				ImGui::Text("Scale (");
-				ImGui::SameLine();
-				ImGui::Text("%f, %f , %f )", m_vPickedObjScale.x, m_vPickedObjScale.y, m_vPickedObjScale.z);
-
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Setting"))
-			{
-				if (pPickedObj != nullptr)
-				{
-					DirectX::XMStoreFloat3(&m_vPickedObjPos, dynamic_cast<CBaseObj*>(pPickedObj)->Get_Position());
-					m_vPickedObjScale = dynamic_cast<CBaseObj*>(pPickedObj)->Get_Scale();
-
-				}
-				else
-				{
-					m_vPickedObjPos = _float3(0.f, 0.f, 0.f);
-					m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
-				}
-
-
 				ImGui::BulletText("Position");
 				ImGui::Text("Position X");
 				ImGui::SameLine();
 				ImGui::DragFloat("##PositionX", &m_vPickedObjPos.x);
-	
+
 				ImGui::Text("Position Z");
 				ImGui::SameLine();
 				ImGui::DragFloat("##PositionZ", &m_vPickedObjPos.z);
@@ -664,87 +629,11 @@ void CImgui_Manager::ShowPickedObjLayOut(bool * p_open)
 	ImGui::End();
 }
 
-void CImgui_Manager::ShowModelList(bool * p_open)
+void CImgui_Manager::Set_File_Path_Dialog()
 {
-
-	ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
-	if (ImGui::Begin("Show Model List", p_open, ImGuiWindowFlags_MenuBar))
-	{
-		if (ImGui::BeginMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				if (ImGui::MenuItem("Close")) *p_open = false;
-				if (ImGui::MenuItem("Set_File_Path")) m_bFilePath = !m_bFilePath;
-				ImGui::EndMenu();
-			}
-			ImGui::EndMenuBar();
-		}
-
-		vector<const _tchar*> LayerTags = m_pModel_Manager->Get_LayerTags();
-
-		// Left
-		static int selected = 0;
-		{
-			ImGui::BeginChild("left pane", ImVec2(200, 0), true);
-
-			int i = 0;
-
-			if (LayerTags.size() != 0)
-			{
-				for (auto& iter : LayerTags)
-				{
-					if (iter == nullptr)
-						continue;
-					char label[128];
-					char szLayertag[MAX_PATH] = "";
-					WideCharToMultiByte(CP_ACP, 0, iter, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
-					sprintf(label, szLayertag);
-					if (ImGui::Selectable(label, selected == i))
-						selected = i;
-					i++;
-				}
-			}
-			ImGui::EndChild();
-		}
-		ImGui::SameLine();
-
-		// Right
-		{
-			ImGui::BeginGroup();
-			ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-			char szLayertag[MAX_PATH] = "";
-			if(LayerTags.size() != 0)
-				WideCharToMultiByte(CP_ACP, 0, LayerTags[selected], MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
-			ImGui::Text(szLayertag);
-			ImGui::Separator();
-			if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
-			{
-				if (ImGui::BeginTabItem("ObjectList"))
-				{
-					ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Details"))
-				{
-					ImGui::Text("ID: 0123456789");
-					ImGui::EndTabItem();
-				}
-				ImGui::EndTabBar();
-			}
-			ImGui::EndChild();
-			if (ImGui::Button("Add_Model")) Create_Model(LayerTags[selected], TEXT(""));
-			ImGui::SameLine();
-			if (ImGui::Button("Revert")) {}
-			ImGui::SameLine();
-			if (ImGui::Button("Save")) {}
-			ImGui::EndGroup();
-		}
-	}
-
 	if (m_bFilePath)
 	{
-		
+
 		OPENFILENAME OFN;
 		TCHAR filePathName[300] = L"";
 		TCHAR lpstrFile[300] = L"";
@@ -771,7 +660,7 @@ void CImgui_Manager::ShowModelList(bool * p_open)
 			_tchar		szExt[MAX_PATH] = TEXT("");
 
 			szFullPath = StringToTCHAR(StringPath);
-		
+
 			/* 경로를 분해한다. */
 			_wsplitpath_s(szFullPath, szDrive, _MAX_DRIVE, szDir, _MAX_DIR, szFileName, _MAX_FNAME, szExt, MAX_PATH);
 			string DirPath = TCHARToString(szDir);
@@ -795,8 +684,152 @@ void CImgui_Manager::ShowModelList(bool * p_open)
 		}
 		m_bFilePath = false;
 	}
+}
 
-	ImGui::End();
+void CImgui_Manager::Show_ModelList()
+{
+
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Set_File_Path")) m_bFilePath = !m_bFilePath;
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
+
+	vector<const _tchar*> LayerTags = m_pModel_Manager->Get_LayerTags();
+
+	// Left
+	static int selected = 0;
+	{
+		ImGui::BeginChild("left pane", ImVec2(150, 0), true);
+
+		int i = 0;
+
+		if (LayerTags.size() != 0)
+		{
+			for (auto& iter : LayerTags)
+			{
+				if (iter == nullptr)
+					continue;
+				char label[128];
+				char szLayertag[MAX_PATH] = "";
+				WideCharToMultiByte(CP_ACP, 0, iter, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
+				sprintf(label, szLayertag);
+				if (ImGui::Selectable(label, selected == i))
+					selected = i;
+				i++;
+			}
+		}
+		ImGui::EndChild();
+	}
+	ImGui::SameLine();
+
+	// Right
+	{
+		ImGui::BeginGroup();
+		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+		char szLayertag[MAX_PATH] = "";
+		if (LayerTags.size() != 0)
+			WideCharToMultiByte(CP_ACP, 0, LayerTags[selected], MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
+		ImGui::Text(szLayertag);
+		ImGui::Separator();
+		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
+		{
+			//if (ImGui::BeginTabItem("ObjectList"))
+				if (ImGui::BeginTabItem("pig won hye yeon"))
+			{
+				ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Details"))
+			{
+				ImGui::Text("pig won hye yeon");
+				//ImGui::Text("ID: 0123456789");
+				ImGui::EndTabItem();
+			}
+			ImGui::EndTabBar();
+		}
+		ImGui::EndChild();
+		if (ImGui::Button("Add_Model")) Create_Model(LayerTags[selected], TEXT(""));
+		ImGui::SameLine();
+		if (ImGui::Button("Revert")) {}
+		ImGui::SameLine();
+		if (ImGui::Button("Save")) {}
+		ImGui::EndGroup();
+	}
+}
+
+void CImgui_Manager::Show_CurrentModelList()
+{
+	vector<class CNonAnim*> vecCreatedModel = m_pModel_Manager->Get_CreatedModel();
+
+	// Left
+	static int selected = 0;
+	{
+		ImGui::BeginChild("Object List", ImVec2(150, 0), true);
+
+		int i = 0;
+
+		if (vecCreatedModel.size() != 0)
+		{
+			for (auto& iter : vecCreatedModel)
+			{
+				if (iter == nullptr)
+					continue;
+
+				char label[128];
+				char szLayertag[MAX_PATH] = "";
+
+				string  ModelTag = TCHARToString(iter->Get_Modeltag());
+				ModelTag = ModelTag + to_string(i);
+				_tchar* RealModelTag = StringToTCHAR(ModelTag);
+				WideCharToMultiByte(CP_ACP, 0, RealModelTag, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
+				sprintf(label, szLayertag);
+				if (ImGui::Selectable(label, selected == i))
+				{
+					selected = i;
+					vecCreatedModel[i]->Set_Picked();
+				}
+					
+				i++;
+			}
+		}
+		ImGui::EndChild();
+	}
+	ImGui::SameLine();
+
+	// Right
+	{
+		ImGui::BeginGroup();
+		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+		char szLayertag[MAX_PATH] = "";
+		if (vecCreatedModel.size() != 0)
+			WideCharToMultiByte(CP_ACP, 0, vecCreatedModel[selected]->Get_Modeltag(), MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
+		ImGui::Text(szLayertag);
+		ImGui::Separator();
+		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
+		{
+			if (ImGui::BeginTabItem("ObjectList"))
+			{
+				ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Details"))
+			{
+				ImGui::Text("ID: 0123456789");
+				ImGui::EndTabItem();
+			}
+			ImGui::EndTabBar();
+		}
+		ImGui::EndChild();
+		if (ImGui::Button("Revert")) {}
+		ImGui::SameLine();
+		if (ImGui::Button("Save")) {}
+		ImGui::EndGroup();
+	}
 }
 
 void CImgui_Manager::Read_Objects_Name(_tchar* cFolderPath)
@@ -816,13 +849,13 @@ void CImgui_Manager::Read_Objects_Name(_tchar* cFolderPath)
 		FindClose(hDir);
 		return;
 	}
-		
+
 	do {
 		if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) // Directory
 		{
 			if (lstrcmp(fileData.cFileName, TEXT(".")) == 0 || lstrcmp(fileData.cFileName, TEXT("..")) == 0)
 				continue;
-	
+
 			_tchar subFilePath[MAX_PATH] = TEXT("");
 			wcscpy_s(subFilePath, MAX_PATH, filePath);
 			wcscat_s(subFilePath, MAX_PATH, fileData.cFileName);

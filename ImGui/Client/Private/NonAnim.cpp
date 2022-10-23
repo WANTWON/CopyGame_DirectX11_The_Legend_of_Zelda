@@ -27,7 +27,7 @@ HRESULT CNonAnim::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	CPickingMgr::Get_Instance()->Add_PickingGroup(this);
+	//CPickingMgr::Get_Instance()->Add_PickingGroup(this);
 
 	m_eObjectID = OBJ_BLOCK;
 
@@ -42,6 +42,7 @@ HRESULT CNonAnim::Initialize(void * pArg)
 	}
 	
 
+	CModelManager::Get_Instance()->Add_CreatedModel(this);
 
 	return S_OK;
 }
@@ -75,7 +76,7 @@ HRESULT CNonAnim::Render()
 
 	_uint		iNumMeshes = m_pModelCom->Get_NumMeshContainers();
 
-	for (_uint i = 0; i < iNumMeshes - 1; ++i)
+	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
 			return E_FAIL;
@@ -130,9 +131,16 @@ void CNonAnim::Set_Picked()
 	if (pGameInstance->Mouse_Up(DIMK::DIMK_LBUTTON))
 	{
 		if (m_bPicked)
+		{
+			CModelManager::Get_Instance()->Set_AllPickedFalse();
 			CPickingMgr::Get_Instance()->Set_PickedObj(nullptr);
+		}	
 		else
+		{
+			CModelManager::Get_Instance()->Set_AllPickedFalse();
 			CPickingMgr::Get_Instance()->Set_PickedObj(this);
+		}
+			
 	}
 
 	RELEASE_INSTANCE(CGameInstance);

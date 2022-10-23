@@ -37,6 +37,7 @@ public:
 	virtual _bool Picking(_float3* PickingPoint);
 	virtual void PickingTrue();
 	void Set_Picked();
+	const _tchar* Get_Modeltag() {return m_ModelDesc.pModeltag;}
 
 private:
 	CModel*					m_pModelCom = nullptr;
