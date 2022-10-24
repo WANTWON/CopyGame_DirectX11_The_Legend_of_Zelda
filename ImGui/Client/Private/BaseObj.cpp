@@ -31,6 +31,10 @@ int CBaseObj::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
+	if (m_bDead)
+		return OBJ_DEAD;
+
+
 	return OBJ_NOEVENT;
 }
 

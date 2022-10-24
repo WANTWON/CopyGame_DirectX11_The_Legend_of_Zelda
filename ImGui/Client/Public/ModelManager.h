@@ -2,9 +2,9 @@
 #include "Base.h"
 #include "Client_Defines.h"
 #include "Model.h"
+#include "NonAnim.h"
 
 BEGIN(Client)
-class CNonAnim;
 class CModelManager final : public CBase
 {
 	DECLARE_SINGLETON(CModelManager)
@@ -19,21 +19,24 @@ public:
 
 public:
 	vector<const _tchar*> Get_LayerTags() { return m_LayerTags;}
-	vector<class CNonAnim*> Get_CreatedModel() { return m_CreatedModel; }
+	const vector<class CNonAnim*> Get_CreatedModel() const { return m_CreatedModel; }
 
 
 	void Add_FileName(const _tchar* Layertag, const _tchar* FileName);
 	void Add_CreatedModel( class CNonAnim* pNonAnimModel) { m_CreatedModel.push_back(pNonAnimModel); }
 	void Set_AllPickedFalse();
+	void Set_InitModelDesc(CNonAnim::NONANIMDESC ModelDesc) { memcpy(&m_InitModelDesc, &ModelDesc, sizeof(CNonAnim::NONANIMDESC)); }
+	void Out_CreatedModel(CNonAnim* pGameObject);
 
 private:
 	const _tchar* Find_ModelTag(const _tchar* ModelTag);
-
+	
 
 private:
-	map<const _tchar*, const _tchar*>  m_ModelTags;
-	vector<const _tchar*> m_LayerTags;
+	map<const _tchar*, const _tchar*>  m_ModelTags;  //Prototype Tag & Path
+	vector<const _tchar*> m_LayerTags; //Prototype Tag ¸¸ ¸ð¾ÆµÐ°Å  
 	vector<class CNonAnim*> m_CreatedModel;
+	CNonAnim::NONANIMDESC  m_InitModelDesc;
 
 public:
 	void Free() override;

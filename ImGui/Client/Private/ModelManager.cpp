@@ -2,7 +2,6 @@
 #include "..\Public\ModelManager.h"
 #include "GameInstance.h"
 #include "Model.h"
-#include "NonAnim.h"
 #include "GameObject.h"
 
 
@@ -41,9 +40,9 @@ HRESULT CModelManager::Create_Model(LEVEL eLevel, const _tchar* pModelTag, const
 	Create_Model_Prototype(eLevel, pModelTag, pDevice, pContext, eModelType, PivotMatrix);
 
 	CNonAnim::NONANIMDESC  NonAnimDesc;
+	memcpy(&NonAnimDesc, &m_InitModelDesc, sizeof(CNonAnim::NONANIMDESC));
 	NonAnimDesc.pModeltag = pModelTag;
-	NonAnimDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	NonAnimDesc.vScale = _float3(1.f, 1.f, 1.f);
+
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), eLevel, pLayerTag, &NonAnimDesc)))
 		return E_FAIL;
 
@@ -84,6 +83,18 @@ const _tchar * CModelManager::Find_ModelTag(const _tchar * ModelTag)
 		return nullptr;
 
 	return iter->second;
+}
+
+void CModelManager::Out_CreatedModel(CNonAnim * pGameObject)
+{
+	auto& iter = m_CreatedModel.begin();
+	while (iter != m_CreatedModel.end())
+	{
+		if (*iter == pGameObject)
+			iter = m_CreatedModel.erase(iter);
+		else
+			++iter;
+	}
 }
 
 void CModelManager::Free()

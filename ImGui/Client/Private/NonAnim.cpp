@@ -36,9 +36,10 @@ HRESULT CNonAnim::Initialize(void * pArg)
 		_vector vPosition = XMLoadFloat3(&m_ModelDesc.vPosition);
 		vPosition = XMVectorSetW(vPosition, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-		m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, m_ModelDesc.vScale.x);
-		m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_ModelDesc.vScale.y);
-		m_pTransformCom->Set_Scale(CTransform::STATE_LOOK, m_ModelDesc.vScale.z);
+		Set_Scale(m_ModelDesc.vScale);
+
+		if(m_ModelDesc.m_fAngle != 0)
+			m_pTransformCom->Turn(XMLoadFloat3(&m_ModelDesc.vRotation), m_ModelDesc.m_fAngle);
 	}
 	
 
@@ -49,6 +50,8 @@ HRESULT CNonAnim::Initialize(void * pArg)
 
 int CNonAnim::Tick(_float fTimeDelta)
 {
+	if (__super::Tick(fTimeDelta))
+		return OBJ_DEAD;
 
 	return OBJ_NOEVENT;
 }

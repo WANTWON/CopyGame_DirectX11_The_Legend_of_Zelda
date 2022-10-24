@@ -6,6 +6,7 @@
 #include "Level_Manager.h"
 #include "Terrain_Manager.h"
 #include "ModelManager.h"
+#include "NonAnim.h"
 
 BEGIN(Engine)
 class CGameObject;
@@ -36,23 +37,25 @@ public:
 	/* For Debug*/
 	void ShowSimpleMousePos(bool* p_open);
 	void ShowPickedObjLayOut(bool* p_open);
+	void ShowPickedObj();
+	void Show_PopupBox();
 
 	/* For Terrain Tool */
-	void Object_Map();
 	void Set_Terrain_Map();
 	void Set_Terrain_Shape();
 
 	/* For Model Tool */
+	void Set_Object_Map();
 	void Set_File_Path_Dialog();
 	void Show_ModelList();
 	void Show_CurrentModelList();
+	void BrowseForFolder();
 
 
 public:
 	void Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag);
 	void Read_Objects_Name( _tchar* cFolderPath);
-
-
+	
 private:
 	ID3D11Device* m_pDevice = nullptr;
 	ID3D11DeviceContext* m_pContext = nullptr;
@@ -60,6 +63,8 @@ private:
 	_bool m_bShowPickedObject = false;
 	_bool m_bShow_app_style_editor = false;
 	_bool m_bFilePath = false;
+	_bool m_bSave = false;
+	_bool m_bLoad = false;
 
 private:
 	/* For Terrain Manager */
@@ -72,16 +77,22 @@ private:
 
 	/* For Object */
 	CModelManager* m_pModel_Manager = nullptr;
+	vector<const _tchar*> m_LayerTags;
+	CNonAnim::NONANIMDESC  m_InitDesc;
+	_int m_iSelected = 0;
+
+
 	OBJID m_eObjID = OBJ_END;
 	_int m_iObjectList = 0;
+	_float m_fDist = 1.f;
 
 
 	/* For Picking */
 	_float3 m_vPickedObjPos = _float3(1.f, 1.f, 1.f);
 	_float3 m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
-	_float3 TempPos2 = _float3(0.f, 0.f, 0.f);
-	_float3 TempPos3;
-	_float fDist = 1.f;
+	
+
+	
 	LEVEL m_iCurrentLevel = LEVEL_GAMEPLAY;
 public:
 	virtual void Free() override;

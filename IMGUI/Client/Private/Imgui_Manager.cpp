@@ -1,11 +1,15 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "..\Public\Imgui_Manager.h"
 #include "imgui.h"
 #include "GameInstance.h"
 #include "PickingMgr.h"
 #include "BaseObj.h"
-#include "NonAnim.h"
 
+#include <windows.h>
+#include <string.h>
+
+//This is needed for virtually everything in BrowseFolder.
+#include <shlobj.h>   
 
 IMPLEMENT_SINGLETON(CImgui_Manager)
 
@@ -51,7 +55,6 @@ vector<string> SplitPath(string path, char sep) {
 	return out;
 }
 
-
 CImgui_Manager::CImgui_Manager()
 	: m_pTerrain_Manager(CTerrain_Manager::Get_Instance())
 	, m_pModel_Manager(CModelManager::Get_Instance())
@@ -63,6 +66,7 @@ CImgui_Manager::CImgui_Manager()
 
 HRESULT CImgui_Manager::Initialize(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
+	m_LayerTags.reserve(0);
 
 	m_pDevice = pDevice;
 	m_pContext = pContext;
@@ -153,17 +157,17 @@ void CImgui_Manager::ShowGui()
 	ImGui::Begin(u8"Editor", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar
 		| ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-	//�޴���
+	//메뉴바
 	if (ImGui::BeginMenuBar())
 	{
-		// �޴�
+		// 메뉴
 		if (ImGui::BeginMenu("File"))
 		{
 			if (ImGui::MenuItem("save"))
-				int a = 0;
+				m_bSave = true;
 			ImGui::Separator();
 			if (ImGui::MenuItem("open"))
-				int a = 0;
+				m_bLoad = true;
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Debug"))
@@ -200,12 +204,6 @@ void CImgui_Manager::ShowGui()
 
 			Set_Terrain_Map();
 			Set_Terrain_Shape();
-			Object_Map();
-			ImGui::EndTabItem();
-		}
-		if (ImGui::BeginTabItem("Camera Tool"))
-		{
-			ImGui::Text("This is the Camera Tool tab!\nblah blah blah blah blah");
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Model Tool"))
@@ -226,11 +224,16 @@ void CImgui_Manager::ShowGui()
 			}
 			ImGui::EndTabItem();
 		}
+		if (ImGui::BeginTabItem("Camera Tool"))
+		{
+			ImGui::Text("This is the Camera Tool tab!\nblah blah blah blah blah");
+			ImGui::EndTabItem();
+		}
 		ImGui::EndTabBar();
 	}
 
 
-
+	if (m_bSave || m_bLoad)					BrowseForFolder();
 	if (m_bShowSimpleMousePos)      ShowSimpleMousePos(&m_bShowSimpleMousePos);
 	if (m_bShowPickedObject)		ShowPickedObjLayOut(&m_bShowPickedObject);
 	if (m_bFilePath)				Set_File_Path_Dialog();
@@ -243,6 +246,110 @@ void CImgui_Manager::ShowGui()
 
 	ImGui::End();
 
+}
+
+void CImgui_Manager::BrowseForFolder()
+{
+	if (m_bSave)
+	{
+		OPENFILENAME OFN;
+		TCHAR filePathName[300] = L"";
+		TCHAR lpstrFile[300] = L"";
+		static TCHAR filter[] = L"데이터 파일\0*.dat\0텍스트 파일\0*.txt";
+
+		memset(&OFN, 0, sizeof(OPENFILENAME));
+		OFN.lStructSize = sizeof(OPENFILENAME);
+		OFN.hwndOwner = g_hWnd;
+		OFN.lpstrFilter = filter;
+		OFN.lpstrFile = lpstrFile;
+		OFN.nMaxFile = 300;
+		OFN.lpstrInitialDir = L".";
+		OFN.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
+		
+		if (GetSaveFileName(&OFN))
+		{
+			//ERR_MSG(TEXT("save-as  '%s'\n"), ofn.lpstrFile); //경로// 파일이름.확장자
+			//ERR_MSG(TEXT("filename '%s'\n"), ofn.lpstrFile + ofn.nFileOffset); 
+
+			HANDLE hFile = 0;
+			_ulong dwByte = 0;
+			CNonAnim::NONANIMDESC  ModelDesc;
+			_uint iNum = 0;
+
+			list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, TEXT("Layer_Model"));
+			if (nullptr == plistClone)
+				return;
+
+			iNum = plistClone->size();
+
+			hFile = CreateFile(OFN.lpstrFile, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);;
+			if (0 == hFile)
+				return;
+
+			/* 첫줄은 object 리스트의 size 받아서 갯수만큼 for문 돌리게 하려고 저장해놓음*/
+			WriteFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+			for (auto& iter : *plistClone)
+			{
+				ModelDesc = dynamic_cast<CNonAnim*>(iter)->Get_ModelDesc();
+				int a = 0;
+				WriteFile(hFile, &ModelDesc, sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+				
+			}
+
+			CloseHandle(hFile);
+		}
+
+		m_bSave = false;
+	}
+	else if (m_bLoad)
+	{
+		OPENFILENAME OFN;
+		TCHAR filePathName[300] = L"";
+		TCHAR lpstrFile[300] = L"";
+		static TCHAR filter[] = L"데이터 파일\0*.dat\0텍스트 파일\0*.txt";
+
+		memset(&OFN, 0, sizeof(OPENFILENAME));
+		OFN.lStructSize = sizeof(OPENFILENAME);
+		OFN.hwndOwner = g_hWnd;
+		OFN.lpstrFilter = filter;
+		OFN.lpstrFile = lpstrFile;
+		OFN.nMaxFile = 300;
+		OFN.lpstrInitialDir = L".";
+
+		if (GetOpenFileName(&OFN) != 0) {
+			wsprintf(filePathName, L"%s 파일을 열겠습니까?", OFN.lpstrFile);
+			MessageBox(g_hWnd, filePathName, L"열기 선택", MB_OK);
+		
+			//ERR_MSG(TEXT("save-as  '%s'\n"), ofn.lpstrFile); //경로// 파일이름.확장자
+			//ERR_MSG(TEXT("filename '%s'\n"), ofn.lpstrFile + ofn.nFileOffset); 
+
+			HANDLE hFile = 0;
+			_ulong dwByte = 0;
+			CNonAnim::NONANIMDESC  ModelDesc;
+			_uint iNum = 0;
+			LEVEL iLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
+			_matrix			PivotMatrix = XMMatrixIdentity();
+
+			hFile = CreateFile(OFN.lpstrFile, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+			if (0 == hFile)
+				return;
+
+			/* 타일의 개수 받아오기 */
+			ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+			for (_uint i = 0; i < iNum; ++i)
+			{
+				ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+				m_pModel_Manager->Set_InitModelDesc(ModelDesc);
+				m_pModel_Manager->Create_Model(iLevel, ModelDesc.pModeltag, TEXT("Layer_Model"), m_pDevice, m_pContext, CModel::TYPE_NONANIM, PivotMatrix);
+			}
+
+			CloseHandle(hFile);
+		}
+
+		m_bLoad = false;
+	}
 }
 
 
@@ -313,45 +420,37 @@ void CImgui_Manager::Set_Terrain_Map()
 }
 
 
-void CImgui_Manager::Object_Map()
+void CImgui_Manager::Set_Object_Map()
 {
-	_bool ret;
+	ImGui::NewLine(); 
+	ImGui::BulletText("Transform Setting");
 
-	ImGui::GetIO().NavActive = false;
-	ImGui::GetIO().WantCaptureMouse = true;
-
-	if (!ImGui::CollapsingHeader("Object_Map"))
-		return;
-
-	static _float Pos[3] = { TempPos2.x , TempPos2.y, TempPos2.z };
-	ImGui::Text("set Scale");
+	static _float Position[3] = { m_InitDesc.vPosition.x , m_InitDesc.vPosition.y, m_InitDesc.vPosition.z };
+	ImGui::Text("Position");
 	ImGui::SameLine();
-	ImGui::InputFloat3("##1", Pos);
-
-	static _float Pos2[3] = { TempPos2.x , TempPos2.y, TempPos2.z };
-	ImGui::Text("set Rotation AXIS");
+	ImGui::InputFloat3("##1", Position);
+	m_InitDesc.vPosition = _float3(Position[0], Position[1], Position[2]);
+	
+	static _float Scale[3] = { m_InitDesc.vScale.x , m_InitDesc.vScale.y, m_InitDesc.vScale.z };
+	ImGui::Text("Scale");
 	ImGui::SameLine();
-	ImGui::InputFloat3("##2", Pos2);
-	//Pos2.x = m_TerrainInfo.vPos.x;
-	//Pos2.y = m_TerrainInfo.vPos.y;
-	//Pos2.z = m_TerrainInfo.vPos.z;
+	ImGui::InputFloat3("##Scale", Scale);
+	m_InitDesc.vScale = _float3(Scale[0], Scale[1], Scale[2]);
+	
+	static _float Rotation[3] = { m_InitDesc.vRotation.x , m_InitDesc.vRotation.y, m_InitDesc.vRotation.z };
+	ImGui::Text("Rotation axis");
+	ImGui::SameLine();
+	ImGui::InputFloat3("##2", Rotation);
+	m_InitDesc.vRotation = _float3( Rotation[0], Rotation[1], Rotation[2]);
 
-	static _float Pos3[3] = { TempPos2.x , TempPos2.y };
+	
+	static _float Offset[2] = { m_InitDesc.m_fAngle , m_fDist };
 	ImGui::Text("Rotaion Angle / dist");
 	ImGui::SameLine();
-	ImGui::InputFloat2("##3", Pos3);
+	ImGui::InputFloat2("##3", Offset);
+	m_InitDesc.m_fAngle = Offset[0];
+	m_fDist = Offset[1];
 
-	//	Pos3.y = 1.f;
-
-	ImGui::Text("vPos X : %f", TempPos2.x);
-	ImGui::SameLine();
-	ImGui::Text("vPos Y : %f", TempPos2.x);
-	ImGui::SameLine();
-	ImGui::Text("vPos Z : %f", TempPos2.x);
-	ImGui::Text("fAngle : %f", TempPos2.x);
-	ImGui::SameLine();
-	ImGui::Text("Dist : %f", Pos3[1]);
-	ImGui::NewLine();
 
 	const char* ObjectID[] = { "OBJ_BACKGROUND", "OBJ_MONSTER", "OBJ_BLOCK", "OBJ_INTERATIVE", "OBJ_UNINTERATIVE", "OBJ_END" };
 	static int iObjectID = 5;
@@ -400,15 +499,6 @@ void CImgui_Manager::Object_Map()
 	default:
 		break;
 	}
-
-
-	//ImGui::Text("OK");
-	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::ImColor(0.f, 0.f, 1.f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::ImColor(0.f, 1.f, 0.f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::ImColor(1.f, 0.f, 0.f));
-	ret = ImGui::Button("Create_Object");
-	ImGui::PopStyleColor(3);
-	ImGui::NewLine();
 
 }
 
@@ -629,15 +719,253 @@ void CImgui_Manager::ShowPickedObjLayOut(bool * p_open)
 	ImGui::End();
 }
 
+void CImgui_Manager::ShowPickedObj()
+{
+	CPickingMgr* pPickingMgr = GET_INSTANCE(CPickingMgr);
+	CGameObject* pPickedObj = pPickingMgr->Get_PickedObj();
+
+
+	ImGui::BulletText("ObjectInfo");
+	const char* ObjectID[] = { "OBJ_BACKGROUND", "OBJ_MONSTER", "OBJ_BLOCK", "OBJ_INTERATIVE", "OBJ_UNINTERATIVE", "OBJ_END" };
+	static int iObjectID = 5;
+
+	if (pPickedObj != nullptr)
+	{
+		iObjectID = dynamic_cast<CBaseObj*>(pPickedObj)->Get_ObjectID();
+		DirectX::XMStoreFloat3(&m_vPickedObjPos, dynamic_cast<CBaseObj*>(pPickedObj)->Get_Position());
+		m_vPickedObjScale = dynamic_cast<CBaseObj*>(pPickedObj)->Get_Scale();
+
+	}
+	else
+	{
+		iObjectID = 5;
+		m_vPickedObjPos = _float3(0.f, 0.f, 0.f);
+		m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
+	}
+
+	ImGui::Text("OBJECT_ID : ");
+	ImGui::SameLine();
+	ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "%s", ObjectID[iObjectID]);
+
+	ImGui::Text("OBJECT_TYPE : ");
+	ImGui::SameLine();
+	switch (m_eObjID)
+	{
+	case Client::OBJ_BACKGROUND:
+	{
+		const char* ObjectList[] = { "Terrain1", "Terrain2", "Terrain3", "Terrain4" };
+		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
+		break;
+	}
+	case Client::OBJ_MONSTER:
+	{
+		const char* ObjectList[] = { "Pig", "Mpbline", "Spider", "Bearger", "Boarwarrior", "Boss" };
+		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
+		break;
+	}
+	case Client::OBJ_BLOCK:
+	{
+		const char* ObjectList[] = { "Block1", "Block2", "Block3" };
+		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
+		break;
+	}
+	case Client::OBJ_INTERATIVE:
+	{
+		const char* ObjectList[] = { "Grass", "Tree", "Pot", "Tent", "Food", "Flower" };
+		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
+		break;
+	}
+	case Client::OBJ_UNINTERATIVE:
+	{
+		const char* ObjectList[] = { "Wall", "Rock", "Deco1", "Deco2", "Deco3" };
+		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
+		break;
+	}
+	case Client::OBJ_END:
+	{
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "NONE");
+		break;
+	}
+	default:
+		break;
+	}
+
+	ImGui::NewLine();
+	ImGui::BulletText("Position");
+	ImGui::Text("Position X");
+	ImGui::SameLine();
+	ImGui::DragFloat("##PositionX", &m_vPickedObjPos.x);
+
+	ImGui::Text("Position Z");
+	ImGui::SameLine();
+	ImGui::DragFloat("##PositionZ", &m_vPickedObjPos.z);
+
+	ImGui::Text("Position Y");
+	ImGui::SameLine();
+	ImGui::DragFloat("##PositionY", &m_vPickedObjPos.y, 1.f, -10, 10);
+
+	ImGui::NewLine();
+
+	ImGui::BulletText("Scale");
+
+	static _float Pos[3] = { m_vPickedObjScale.x, m_vPickedObjScale.y,  m_vPickedObjScale.z };
+	Pos[0] = m_vPickedObjScale.x;
+	Pos[1] = m_vPickedObjScale.y;
+	Pos[2] = m_vPickedObjScale.z;
+
+	ImGui::Text("Scale");
+	ImGui::SameLine();
+	ImGui::InputFloat3("##SettingScale", Pos);
+	m_vPickedObjScale = _float3(Pos[0], Pos[1], Pos[2]);
+
+	if (pPickedObj != nullptr)
+	{
+		_vector vSettingPosition = DirectX::XMLoadFloat3(&m_vPickedObjPos);
+		vSettingPosition = XMVectorSetW(vSettingPosition, 1.f);
+		dynamic_cast<CBaseObj*>(pPickedObj)->Set_State(CTransform::STATE_POSITION, vSettingPosition);
+		dynamic_cast<CBaseObj*>(pPickedObj)->Set_Scale(m_vPickedObjScale);
+
+	}
+
+	if (ImGui::Button("Delete Object")) 
+	{ 
+		ImGui::OpenPopup("Delete Object?"); 	
+	}
+	Show_PopupBox();
+	RELEASE_INSTANCE(CPickingMgr);
+}
+
+void CImgui_Manager::Show_PopupBox()
+{
+	// Always center this window when appearing
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	bool unused_open = true;
+
+	if (ImGui::BeginPopupModal("Delete Object?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		CPickingMgr* pPickingMgr = GET_INSTANCE(CPickingMgr);
+		CGameObject* pPickedObj = pPickingMgr->Get_PickedObj();
+		CNonAnim* pNonAnim = dynamic_cast<CNonAnim*>(pPickedObj);
+		ImGui::Text("Are yoou Sure Delete This Object?\n\n");
+		ImGui::Separator();
+
+		char ModelTagName[MAX_PATH];
+		WideCharToMultiByte(CP_ACP, 0, pNonAnim->Get_Modeltag(), MAX_PATH, ModelTagName, MAX_PATH, NULL, NULL);
+		
+		ImGui::Text("Object Name : ");  ImGui::SameLine(); ImGui::Text(ModelTagName);
+
+		if (ImGui::Button("OK", ImVec2(120, 0))) 
+		{ 
+			m_iSelected = 0;
+			pPickingMgr->Set_PickedObj(nullptr);
+			pPickedObj->Set_Dead(true);
+			m_pModel_Manager->Out_CreatedModel(pNonAnim);
+			ImGui::CloseCurrentPopup(); 
+			
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::EndPopup();
+
+		RELEASE_INSTANCE(CPickingMgr);
+	}
+
+
+	if (ImGui::BeginPopupModal("Delete Layer Tag?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("All those LayerTag files will be deleted.\nThis operation cannot be undone!\n\n");
+		ImGui::Separator();
+
+		static int unused_i = 0;
+		ImGui::Combo("Combo", &unused_i, "Layer1\0Layer2\0");
+
+		static bool dont_ask_me_next_time = false;
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+		ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+		ImGui::PopStyleVar();
+
+		if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+		ImGui::EndPopup();
+	}
+
+
+	if (ImGui::BeginPopupModal("Add Layer Tag", NULL, ImGuiWindowFlags_MenuBar))
+	{
+		static char LayerBuffer[MAX_PATH] = "";
+		
+		ImGui::Text("Enter Layer Tag");
+		ImGui::InputText("Layer Tag", LayerBuffer, MAX_PATH);
+		
+		if (ImGui::Button("Add Layer Tag"))
+		{
+			bool bFailed = false;
+			TCHAR* szUniCode = new _tchar[MAX_PATH];
+			_tccpy(szUniCode, TEXT(""));
+			MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, LayerBuffer, strlen(LayerBuffer), szUniCode, MAX_PATH);
+
+			if (m_LayerTags.size() != 0)
+			{
+				for (auto& iter : m_LayerTags)
+				{
+					if (!_tcscmp(TEXT(""), szUniCode) || !_tcscmp(iter, szUniCode))
+					{
+						bFailed = true;
+						ImGui::OpenPopup("Failed");
+						delete(szUniCode);
+					}
+
+				}
+			}
+			if (!bFailed)
+			{
+				m_LayerTags.push_back(szUniCode);
+				ImGui::OpenPopup("Succese");
+			}
+
+		}
+
+		if (ImGui::BeginPopupModal("Failed", &unused_open))
+		{
+			ImGui::Text("Failed Add Layer Tag");
+			if (ImGui::Button("Close"))
+				ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+		}
+		if (ImGui::BeginPopupModal("Succese", &unused_open))
+		{
+			ImGui::Text("Succese");
+			if (ImGui::Button("Close"))
+				ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+		}
+
+
+		ImGui::SameLine();
+		if (ImGui::Button("Close"))  ImGui::CloseCurrentPopup();
+		ImGui::EndPopup();
+	}
+
+}
+
 void CImgui_Manager::Set_File_Path_Dialog()
 {
+
 	if (m_bFilePath)
 	{
-
 		OPENFILENAME OFN;
 		TCHAR filePathName[300] = L"";
 		TCHAR lpstrFile[300] = L"";
-		static TCHAR filter[] = L"��� ����\0*.*\0�ؽ�Ʈ ����\0*.txt\0fbx ����\0*.fbx";
+		static TCHAR filter[] = L"모든 파일\0*.*\0텍스트 파일\0*.txt\0fbx 파일\0*.fbx";
 
 		memset(&OFN, 0, sizeof(OPENFILENAME));
 		OFN.lStructSize = sizeof(OPENFILENAME);
@@ -648,8 +976,8 @@ void CImgui_Manager::Set_File_Path_Dialog()
 		OFN.lpstrInitialDir = L".";
 
 		if (GetOpenFileName(&OFN) != 0) {
-			wsprintf(filePathName, L"%s ������ ���ڽ��ϱ�?", OFN.lpstrFile);
-			MessageBox(g_hWnd, filePathName, L"���� ����", MB_OK);
+			wsprintf(filePathName, L"%s 파일을 열겠습니까?", OFN.lpstrFile);
+			MessageBox(g_hWnd, filePathName, L"열기 선택", MB_OK);
 
 			string StringPath = ToString(OFN.lpstrFile);
 
@@ -661,7 +989,7 @@ void CImgui_Manager::Set_File_Path_Dialog()
 
 			szFullPath = StringToTCHAR(StringPath);
 
-			/* ��θ� �����Ѵ�. */
+			/* 경로를 분해한다. */
 			_wsplitpath_s(szFullPath, szDrive, _MAX_DRIVE, szDir, _MAX_DIR, szFileName, _MAX_FNAME, szExt, MAX_PATH);
 			string DirPath = TCHARToString(szDir);
 			vector<string> Splitpaths;
@@ -701,7 +1029,7 @@ void CImgui_Manager::Show_ModelList()
 
 	vector<const _tchar*> LayerTags = m_pModel_Manager->Get_LayerTags();
 
-	// Left
+	// ------------------------ Left-----------------------------------
 	static int selected = 0;
 	{
 		ImGui::BeginChild("left pane", ImVec2(150, 0), true);
@@ -727,33 +1055,41 @@ void CImgui_Manager::Show_ModelList()
 	}
 	ImGui::SameLine();
 
-	// Right
+	// ------------------------ Right -----------------------------------
 	{
 		ImGui::BeginGroup();
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 		char szLayertag[MAX_PATH] = "";
 		if (LayerTags.size() != 0)
 			WideCharToMultiByte(CP_ACP, 0, LayerTags[selected], MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
-		ImGui::Text(szLayertag);
+		ImGui::Text("Selected :"); ImGui::SameLine();  ImGui::Text(szLayertag);
 		ImGui::Separator();
 		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
 		{
-			//if (ImGui::BeginTabItem("ObjectList"))
-				if (ImGui::BeginTabItem("pig won hye yeon"))
+				if (ImGui::BeginTabItem("Setting"))
 			{
-				ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
+				ImGui::BulletText("Layer Setting");
+				char* items[] = { "Layer_Map", "Layer_Model", "Layer_Interactive" };
+				static int item_current = 0;
+				ImGui::Combo("Layer_List", &item_current, items, IM_ARRAYSIZE(items));
+
+				if (ImGui::Button("Delete Layer Tag"))
+					ImGui::OpenPopup("Delete Layer Tag?");
+				ImGui::SameLine();
+				if (ImGui::Button("Add New Layer Tag"))
+					ImGui::OpenPopup("Add Layer Tag");
+
+				Show_PopupBox();
+			
 				ImGui::EndTabItem();
 			}
-			if (ImGui::BeginTabItem("Details"))
-			{
-				ImGui::Text("pig won hye yeon");
-				//ImGui::Text("ID: 0123456789");
-				ImGui::EndTabItem();
-			}
+
+				Set_Object_Map();
+
 			ImGui::EndTabBar();
 		}
 		ImGui::EndChild();
-		if (ImGui::Button("Add_Model")) Create_Model(LayerTags[selected], TEXT(""));
+		if (ImGui::Button("Add_Model")) Create_Model(LayerTags[selected], TEXT("Layer_Model"));
 		ImGui::SameLine();
 		if (ImGui::Button("Revert")) {}
 		ImGui::SameLine();
@@ -767,7 +1103,6 @@ void CImgui_Manager::Show_CurrentModelList()
 	vector<class CNonAnim*> vecCreatedModel = m_pModel_Manager->Get_CreatedModel();
 
 	// Left
-	static int selected = 0;
 	{
 		ImGui::BeginChild("Object List", ImVec2(150, 0), true);
 
@@ -788,9 +1123,10 @@ void CImgui_Manager::Show_CurrentModelList()
 				_tchar* RealModelTag = StringToTCHAR(ModelTag);
 				WideCharToMultiByte(CP_ACP, 0, RealModelTag, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
 				sprintf(label, szLayertag);
-				if (ImGui::Selectable(label, selected == i))
+				delete(RealModelTag);
+				if (ImGui::Selectable(label, m_iSelected == i))
 				{
-					selected = i;
+					m_iSelected = i;
 					vecCreatedModel[i]->Set_Picked();
 				}
 					
@@ -807,14 +1143,14 @@ void CImgui_Manager::Show_CurrentModelList()
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 		char szLayertag[MAX_PATH] = "";
 		if (vecCreatedModel.size() != 0)
-			WideCharToMultiByte(CP_ACP, 0, vecCreatedModel[selected]->Get_Modeltag(), MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
+			WideCharToMultiByte(CP_ACP, 0, vecCreatedModel[m_iSelected]->Get_Modeltag(), MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
 		ImGui::Text(szLayertag);
 		ImGui::Separator();
 		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
 		{
-			if (ImGui::BeginTabItem("ObjectList"))
+			if (ImGui::BeginTabItem("LayerList"))
 			{
-				ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
+				ShowPickedObj();
 				ImGui::EndTabItem();
 			}
 			if (ImGui::BeginTabItem("Details"))
@@ -896,6 +1232,8 @@ void CImgui_Manager::Create_Model(const _tchar* pPrototypeTag, const _tchar* pLa
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	m_pModel_Manager->Set_InitModelDesc(m_InitDesc);
+
 	_matrix			PivotMatrix = XMMatrixIdentity();
 	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
 	m_pModel_Manager->Create_Model(iLevel, pPrototypeTag, pLayerTag, m_pDevice, m_pContext, CModel::TYPE_NONANIM, PivotMatrix);
@@ -909,6 +1247,11 @@ void CImgui_Manager::Free()
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
+
+	for (auto& iter : m_LayerTags)
+		Safe_Delete(iter);
+	m_LayerTags.clear();
+
 	//CleanupDeviceD3D();
 	//::DestroyWindow(hwnd);
 	//::UnregisterClass(wc.lpszClassName, wc.hInstance);
@@ -916,6 +1259,7 @@ void CImgui_Manager::Free()
 	Safe_Release(m_pModel_Manager);
 	Safe_Release(m_pTerrain_Manager);
 	CTerrain_Manager::Get_Instance()->Destroy_Instance();
+	CModelManager::Get_Instance()->Destroy_Instance();
 
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);

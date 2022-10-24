@@ -18,6 +18,8 @@ public:
 		const _tchar* pModeltag = TEXT("");
 		_float3 vPosition = _float3(0.f, 0.f, 0.f);
 		_float3 vScale = _float3(1.f, 1.f, 1.f);
+		_float3 vRotation = _float3(0.f, 0.f, 0.f);
+		_float m_fAngle = 0.f;
 
 	}NONANIMDESC;
 
@@ -37,7 +39,8 @@ public:
 	virtual _bool Picking(_float3* PickingPoint);
 	virtual void PickingTrue();
 	void Set_Picked();
-	const _tchar* Get_Modeltag() {return m_ModelDesc.pModeltag;}
+	const _tchar* Get_Modeltag() { return m_ModelDesc.pModeltag; }
+	const NONANIMDESC Get_ModelDesc() {return m_ModelDesc;}
 
 private:
 	CModel*					m_pModelCom = nullptr;
