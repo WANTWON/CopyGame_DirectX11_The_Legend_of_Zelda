@@ -92,7 +92,7 @@ HRESULT CImgui_Manager::Initialize(ID3D11Device * pDevice, ID3D11DeviceContext *
 	
 
 
-	_tchar Path[MAX_PATH] = L"../Bin/Resources/Meshes/";
+	_tchar Path[MAX_PATH] = L"../../../Bin/Resources/Meshes/";
 	Read_Objects_Name(Path);
 	return S_OK;
 }
