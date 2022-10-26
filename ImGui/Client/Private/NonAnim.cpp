@@ -164,7 +164,9 @@ HRESULT CNonAnim::Ready_Components(void* pArg)
 		return E_FAIL;
 
 	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, m_ModelDesc.pModeltag, (CComponent**)&m_pModelCom)))
+	_tchar			szModeltag[MAX_PATH] = TEXT("");
+	MultiByteToWideChar(CP_ACP, 0, m_ModelDesc.pModeltag, strlen(m_ModelDesc.pModeltag), szModeltag, MAX_PATH);
+	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, szModeltag, (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 	
 	return S_OK;
@@ -225,7 +227,7 @@ CGameObject * CNonAnim::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		ERR_MSG(TEXT("Failed to Cloned : CPlayer"));
+		ERR_MSG(TEXT("Failed to Cloned : CNonAnim"));
 		Safe_Release(pInstance);
 	}
 

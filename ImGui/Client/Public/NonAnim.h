@@ -15,7 +15,7 @@ class CNonAnim final : public CBaseObj
 public:
 	typedef struct NonAnimModelTag
 	{
-		const _tchar* pModeltag = TEXT("");
+		char pModeltag[MAX_PATH] = "";
 		_float3 vPosition = _float3(0.f, 0.f, 0.f);
 		_float3 vScale = _float3(1.f, 1.f, 1.f);
 		_float3 vRotation = _float3(0.f, 0.f, 0.f);
@@ -39,7 +39,7 @@ public:
 	virtual _bool Picking(_float3* PickingPoint);
 	virtual void PickingTrue();
 	void Set_Picked();
-	const _tchar* Get_Modeltag() { return m_ModelDesc.pModeltag; }
+	const char* Get_Modeltag() { return m_ModelDesc.pModeltag; }
 	const NONANIMDESC Get_ModelDesc() {return m_ModelDesc;}
 
 private:

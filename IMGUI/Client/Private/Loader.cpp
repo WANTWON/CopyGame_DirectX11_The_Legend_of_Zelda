@@ -137,10 +137,25 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 	_matrix			PivotMatrix = XMMatrixIdentity();
 
-	///*For.Prototype_Component_Model_Fiona*/
+	/*For.Prototype_Component_Model_Fiona*/
 	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx", PivotMatrix))))
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Fiona/Fiona.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	///*For.Prototype_Component_Model_Fiona*/
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Field_05A.fbx"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Test/Field_05A.fbx", PivotMatrix))))
+	//	return E_FAIL;
+
+	///*For.Prototype_Component_Model_Fiona*/
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Field_05B.fbx"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Test/Field_05B.fbx", PivotMatrix))))
+	//	return E_FAIL;
+
+	///*For.Prototype_Component_Model_Fiona*/
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Field_05C.fbx"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Test/Field_05C.fbx", PivotMatrix))))
 	//	return E_FAIL;
 
 	///*For.Prototype_Component_Model_ForkLift*/

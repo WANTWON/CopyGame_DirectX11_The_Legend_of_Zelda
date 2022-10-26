@@ -307,7 +307,12 @@ HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const _tchar * pPrototyp
 	if (nullptr == m_pComponent_Manager)
 		return E_FAIL;
 
-	return m_pComponent_Manager->Add_Prototype(iLevelIndex, pPrototypeTag, pPrototype);	
+	if (FAILED(m_pComponent_Manager->Add_Prototype(iLevelIndex, pPrototypeTag, pPrototype)))
+	{
+		Safe_Release(pPrototype);
+		return E_FAIL;
+	}
+	return S_OK;
 }
 
 CComponent * CGameInstance::Clone_Component(_uint iLevelIndex, const _tchar * pPrototypeTag, void * pArg)

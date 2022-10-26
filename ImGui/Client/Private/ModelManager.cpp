@@ -21,13 +21,22 @@ HRESULT CModelManager::Create_Model_Prototype(LEVEL eLevel, const _tchar * pMode
 
 	const _tchar* pModelFilePath = Find_ModelTag(pModelTag);
 	if (pModelFilePath == nullptr)
+	{
+		RELEASE_INSTANCE(CGameInstance);
 		return E_FAIL;
+	}
+		
 
 	char szLayertag[MAX_PATH] = "";
 	WideCharToMultiByte(CP_ACP, 0, pModelFilePath, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
 
+
 	if (FAILED(pGameInstance->Add_Prototype(eLevel, pModelTag, CModel::Create(pDevice, pContext, eModelType, szLayertag, PivotMatrix))))
+	{
+		RELEASE_INSTANCE(CGameInstance);
 		return E_FAIL;
+	}
+		
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
@@ -41,10 +50,16 @@ HRESULT CModelManager::Create_Model(LEVEL eLevel, const _tchar* pModelTag, const
 
 	CNonAnim::NONANIMDESC  NonAnimDesc;
 	memcpy(&NonAnimDesc, &m_InitModelDesc, sizeof(CNonAnim::NONANIMDESC));
-	NonAnimDesc.pModeltag = pModelTag;
+	char cModelTag[MAX_PATH] = "";
+	WideCharToMultiByte(CP_ACP, 0, pModelTag, MAX_PATH, cModelTag, MAX_PATH, NULL, NULL);
+	strcpy(NonAnimDesc.pModeltag , cModelTag);
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), eLevel, pLayerTag, &NonAnimDesc)))
+	{
+		RELEASE_INSTANCE(CGameInstance);
 		return E_FAIL;
+	}
+		
 
 	RELEASE_INSTANCE(CGameInstance);
 

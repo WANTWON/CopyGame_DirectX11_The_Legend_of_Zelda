@@ -79,6 +79,7 @@ private:
 	CModelManager* m_pModel_Manager = nullptr;
 	vector<string> m_stLayerTags;
 	vector<const _tchar*> m_LayerTags;
+	vector<const _tchar*> m_ModelTags;
 	CNonAnim::NONANIMDESC  m_InitDesc;
 	_int m_iSelected = 0;
 

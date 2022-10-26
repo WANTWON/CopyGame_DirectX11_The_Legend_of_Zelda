@@ -268,7 +268,7 @@ void CImgui_Manager::BrowseForFolder()
 		OFN.nMaxFile = 300;
 		OFN.lpstrInitialDir = L".";
 		OFN.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
-		
+
 		if (GetSaveFileName(&OFN))
 		{
 			//ERR_MSG(TEXT("save-as  '%s'\n"), ofn.lpstrFile); //경로// 파일이름.확장자
@@ -279,9 +279,13 @@ void CImgui_Manager::BrowseForFolder()
 			CNonAnim::NONANIMDESC  ModelDesc;
 			_uint iNum = 0;
 
-			list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, TEXT("Layer_Model"));
+			list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, TEXT("Layer Map"));
 			if (nullptr == plistClone)
+			{
+				m_bSave = false;
 				return;
+			}
+				
 
 			iNum = plistClone->size();
 
@@ -295,9 +299,8 @@ void CImgui_Manager::BrowseForFolder()
 			for (auto& iter : *plistClone)
 			{
 				ModelDesc = dynamic_cast<CNonAnim*>(iter)->Get_ModelDesc();
-				int a = 0;
 				WriteFile(hFile, &ModelDesc, sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
-				
+
 			}
 
 			CloseHandle(hFile);
@@ -323,7 +326,7 @@ void CImgui_Manager::BrowseForFolder()
 		if (GetOpenFileName(&OFN) != 0) {
 			wsprintf(filePathName, L"%s 파일을 열겠습니까?", OFN.lpstrFile);
 			MessageBox(g_hWnd, filePathName, L"열기 선택", MB_OK);
-		
+
 			//ERR_MSG(TEXT("save-as  '%s'\n"), ofn.lpstrFile); //경로// 파일이름.확장자
 			//ERR_MSG(TEXT("filename '%s'\n"), ofn.lpstrFile + ofn.nFileOffset); 
 
@@ -345,7 +348,11 @@ void CImgui_Manager::BrowseForFolder()
 			{
 				ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
 				m_pModel_Manager->Set_InitModelDesc(ModelDesc);
-				m_pModel_Manager->Create_Model(iLevel, ModelDesc.pModeltag, TEXT("Layer_Model"), m_pDevice, m_pContext, CModel::TYPE_NONANIM, PivotMatrix);
+				//_tchar*			szModeltag = new _tchar[MAX_PATH];
+				_tchar			szModeltag[MAX_PATH] = TEXT("");
+				//m_ModelTags.push_back(szModeltag);
+				MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, strlen(ModelDesc.pModeltag), szModeltag, MAX_PATH);
+				m_pModel_Manager->Create_Model(iLevel, szModeltag, TEXT("Layer_Model"), m_pDevice, m_pContext, CModel::TYPE_NONANIM, PivotMatrix);
 			}
 
 			CloseHandle(hFile);
@@ -857,11 +864,8 @@ void CImgui_Manager::Show_PopupBox()
 		CNonAnim* pNonAnim = dynamic_cast<CNonAnim*>(pPickedObj);
 		ImGui::Text("Are yoou Sure Delete This Object?\n\n");
 		ImGui::Separator();
-
-		char ModelTagName[MAX_PATH];
-		WideCharToMultiByte(CP_ACP, 0, pNonAnim->Get_Modeltag(), MAX_PATH, ModelTagName, MAX_PATH, NULL, NULL);
 		
-		ImGui::Text("Object Name : ");  ImGui::SameLine(); ImGui::Text(ModelTagName);
+		ImGui::Text("Object Name : ");  ImGui::SameLine(); ImGui::Text(pNonAnim->Get_Modeltag());
 
 		if (ImGui::Button("OK", ImVec2(120, 0))) 
 		{ 
@@ -1130,7 +1134,7 @@ void CImgui_Manager::Show_CurrentModelList()
 				char label[128];
 				char szLayertag[MAX_PATH] = "";
 
-				string  ModelTag = TCHARToString(iter->Get_Modeltag());
+				string  ModelTag = iter->Get_Modeltag();
 				ModelTag = ModelTag + to_string(i);
 				_tchar* RealModelTag = StringToTCHAR(ModelTag);
 				WideCharToMultiByte(CP_ACP, 0, RealModelTag, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
@@ -1155,7 +1159,7 @@ void CImgui_Manager::Show_CurrentModelList()
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 		char szLayertag[MAX_PATH] = "";
 		if (vecCreatedModel.size() != 0)
-			WideCharToMultiByte(CP_ACP, 0, vecCreatedModel[m_iSelected]->Get_Modeltag(), MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
+			strcpy_s(szLayertag, MAX_PATH, vecCreatedModel[m_iSelected]->Get_Modeltag());
 		ImGui::Text(szLayertag);
 		ImGui::Separator();
 		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
@@ -1263,6 +1267,11 @@ void CImgui_Manager::Free()
 	for (auto& iter : m_LayerTags)
 		Safe_Delete(iter);
 	m_LayerTags.clear();
+
+	/*for (auto& iter : m_ModelTags)
+		Safe_Delete(iter);
+	m_ModelTags.clear();*/
+
 	m_stLayerTags.clear();
 	//CleanupDeviceD3D();
 	//::DestroyWindow(hwnd);
