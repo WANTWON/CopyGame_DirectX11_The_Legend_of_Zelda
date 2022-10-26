@@ -4,10 +4,8 @@
 #include "GameInstance.h"
 #include "PickingMgr.h"
 #include "BaseObj.h"
-
 #include <windows.h>
 #include <string.h>
-
 //This is needed for virtually everything in BrowseFolder.
 #include <shlobj.h>   
 
@@ -69,7 +67,7 @@ CImgui_Manager::CImgui_Manager()
 
 HRESULT CImgui_Manager::Initialize(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	m_LayerTags.reserve(0);
+	m_TempLayerTags.reserve(0);
 
 	m_pDevice = pDevice;
 	m_pContext = pContext;
@@ -81,22 +79,14 @@ HRESULT CImgui_Manager::Initialize(ID3D11Device * pDevice, ID3D11DeviceContext *
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
 
-
 	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
-	//ImGui::StyleColorsLight();
 	ImGui::StyleColorsBlue();
 	//io.FontDefault = io.Fonts->AddFontFromFileTTF("../../Resources/Fonts/Quicksand-Medium.ttf", 16.0f);
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(g_hWnd);
 	ImGui_ImplDX11_Init(m_pDevice, m_pContext);
-
-	
-
-
-	_tchar Path[MAX_PATH] = L"../../../Bin/Resources/Meshes/";
-	Read_Objects_Name(Path);
+	Read_Objects_Name(m_pFilePath);
 	return S_OK;
 }
 
@@ -106,9 +96,9 @@ void CImgui_Manager::Tick(_float fTimeDelta)
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-
-
+	
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	m_iCurrentLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
 	CTerrain_Manager::TERRAINDESC TerrainDesc = m_pTerrain_Manager->Get_TerrainDesc();
 
 	if (pGameInstance->Key_Up(DIK_LEFT))
@@ -125,20 +115,14 @@ void CImgui_Manager::Tick(_float fTimeDelta)
 
 	if (pGameInstance->Key_Up(DIK_SPACE))
 	{
-		LEVEL pLevelIndex = (LEVEL)CLevel_Manager::Get_Instance()->Get_CurrentLevelIndex();
-
-		if (FAILED(m_pTerrain_Manager->Create_Terrain(pLevelIndex, TEXT("Layer_Terrain"))))
+		if (FAILED(m_pTerrain_Manager->Create_Terrain(m_iCurrentLevel, TEXT("Layer_Terrain"))))
 			return;
 	}
 
 	m_pTerrain_Manager->Set_TerrainDesc(&TerrainDesc);
 	RELEASE_INSTANCE(CGameInstance);
 
-	ShowGui();
-
-
-
-
+	Show_GuiTick();
 	ImGui::EndFrame();
 
 }
@@ -146,16 +130,11 @@ void CImgui_Manager::Tick(_float fTimeDelta)
 void CImgui_Manager::Render()
 {
 	// Rendering
-
-
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-
-
 }
 
-void CImgui_Manager::ShowGui()
+void CImgui_Manager::Show_GuiTick()
 {
 	ImGui::Begin(u8"Editor", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar
 		| ImGuiWindowFlags_AlwaysVerticalScrollbar);
@@ -187,7 +166,6 @@ void CImgui_Manager::ShowGui()
 		}
 		ImGui::EndMenuBar();
 	}
-
 
 	const char* Level[] = { "Level_GamePlay", "Level_Boss" };
 	static int iCurrentLevel = (int)m_iCurrentLevel;
@@ -236,17 +214,11 @@ void CImgui_Manager::ShowGui()
 	}
 
 
-	if (m_bSave || m_bLoad)					BrowseForFolder();
+	if (m_bSave || m_bLoad)			BrowseForFolder();
 	if (m_bShowSimpleMousePos)      ShowSimpleMousePos(&m_bShowSimpleMousePos);
 	if (m_bShowPickedObject)		ShowPickedObjLayOut(&m_bShowPickedObject);
 	if (m_bFilePath)				Set_File_Path_Dialog();
-	if (m_bShow_app_style_editor)
-	{
-		ImGui::Begin("Dear ImGui Style Editor", &m_bShow_app_style_editor);
-		ImGui::ShowStyleEditor();
-		ImGui::End();
-	}
-
+	if (m_bShow_app_style_editor)  { ImGui::Begin("Dear ImGui Style Editor", &m_bShow_app_style_editor); ImGui::ShowStyleEditor(); ImGui::End(); }
 	ImGui::End();
 
 }
@@ -348,9 +320,7 @@ void CImgui_Manager::BrowseForFolder()
 			{
 				ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
 				m_pModel_Manager->Set_InitModelDesc(ModelDesc);
-				//_tchar*			szModeltag = new _tchar[MAX_PATH];
 				_tchar			szModeltag[MAX_PATH] = TEXT("");
-				//m_ModelTags.push_back(szModeltag);
 				MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, strlen(ModelDesc.pModeltag), szModeltag, MAX_PATH);
 				m_pModel_Manager->Create_Model(iLevel, szModeltag, TEXT("Layer_Model"), m_pDevice, m_pContext, CModel::TYPE_NONANIM, PivotMatrix);
 			}
@@ -362,50 +332,119 @@ void CImgui_Manager::BrowseForFolder()
 	}
 }
 
+void CImgui_Manager::Set_FilePath()
+{
+	//모델들이 있는 폴더 경로를 설정하면, 그 폴더 안에 있는 fbx 모델들을 읽는다.
+	ImGui::BulletText("Setting FilePath");
+	static char FilePath[MAX_PATH] = "";
+	WideCharToMultiByte(CP_ACP, 0, m_pFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
+	ImGui::InputText("##FilePath", FilePath, MAX_PATH);
+	MultiByteToWideChar(CP_ACP, 0, FilePath, MAX_PATH, m_pFilePath, MAX_PATH);
+	ImGui::SameLine();
+	if (ImGui::Button("ChangePath"))
+	{
+		m_pModel_Manager->Clear_Layer();
+		Read_Objects_Name(m_pFilePath);
+	}
+}
+
+void CImgui_Manager::Set_LayerTag()
+{
+	//Layer tag를 만들거나, 삭제한다. 
+	ImGui::BulletText("Layer Setting");
+
+	if (ImGui::BeginCombo("Layer List", m_stLayerTags[m_iSeletecLayerNum].c_str()))
+	{
+		for (int i = 0; i < m_stLayerTags.size(); i++)
+		{
+			if (ImGui::Selectable(m_stLayerTags[i].c_str(), m_iSeletecLayerNum == i))
+				m_iSeletecLayerNum = i;
+		}
+		ImGui::EndCombo();
+	}
+	if (ImGui::Button("Delete Layer Tag"))
+		ImGui::OpenPopup("Delete Layer Tag?"); ImGui::SameLine();
+
+	if (ImGui::Button("Add New Layer Tag"))
+		ImGui::OpenPopup("Add Layer Tag");
+
+	Show_PopupBox();
+}
+
+void CImgui_Manager::Set_Macro()
+{
+	vector<const _tchar*> ModelTags = m_pModel_Manager->Get_LayerTags();
+	ImGui::NewLine();
+	ImGui::BulletText("Macro Setting");
+	ImGui::Text("fbx size : "); ImGui::SameLine(); ImGui::Text("%d", ModelTags.size());
+
+	static int LoopOption[2]{ 0 };
+	static float fDistance[3]{ 0.f };
+	static float fPosition[3]{ 0.f };
+	ImGui::Text("Col & Row :"); ImGui::SameLine(); ImGui::InputInt2("##Col & Row", LoopOption);
+	ImGui::Text("DistanceXYZ :"); ImGui::SameLine(); ImGui::InputFloat3("##DistanceXYZ", fDistance);
+	ImGui::Text("PositionXYZ :"); ImGui::SameLine(); ImGui::InputFloat3("##PositionXYZ", fPosition);
+	
+	if (ImGui::Button("Create Macro"))
+	{
+		for (int i = 0; i < LoopOption[0]; ++i)
+		{
+			for (int j = 0; j < LoopOption[1]; ++j)
+			{
+				_int iIndex = i*LoopOption[1] + j;
+
+				m_InitDesc.vPosition = _float3(fPosition[0] + j*fDistance[0], fPosition[1], fPosition[2] + i*fDistance[2]);
+				_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+				Create_Model(ModelTags[iIndex], LayerTag);
+				m_TempLayerTags.push_back(LayerTag);			
+			}
+			int a = 0;
+		}
+		int a = 0;
+	}
+
+	int a = 0;
+
+}
+
 
 void CImgui_Manager::Set_Terrain_Map()
 {
-
 	_bool bCreateTerrain;
 
 	ImGui::GetIO().NavActive = false;
 	ImGui::GetIO().WantCaptureMouse = true;
-
 	ImGui::CollapsingHeader("Terrain_Map");
 
 	CTerrain_Manager::TERRAINDESC TerrainDesc = m_pTerrain_Manager->Get_TerrainDesc();
 
 	static _int iNumVertice[2] = { TerrainDesc.TerrainDesc.m_iVerticeNumX, TerrainDesc.TerrainDesc.m_iVerticeNumZ };
-	ImGui::Text("NumVerticeX / NumVerticeZ");
-	ImGui::SameLine(0, 10);
+	ImGui::Text("NumX / NumZ"); ImGui::SameLine(0, 10);
 	ImGui::InputInt2("##1", iNumVertice, 10);
 	TerrainDesc.TerrainDesc.m_iVerticeNumX = iNumVertice[0];
 	TerrainDesc.TerrainDesc.m_iVerticeNumZ = iNumVertice[1];
 
-	ImGui::Text("Position X");
-	ImGui::SameLine();
+	ImGui::Text("Position X"); ImGui::SameLine();
 	ImGui::DragInt("##PositionX", &TerrainDesc.TerrainDesc.m_iPositionX);
 
-	ImGui::Text("Position Z");
-	ImGui::SameLine();
+	ImGui::Text("Position Z"); ImGui::SameLine();
 	ImGui::DragInt("##PositionZ", &TerrainDesc.TerrainDesc.m_iPositionZ);
 
-	ImGui::Text("Position Y");
-	ImGui::SameLine();
+	ImGui::Text("Position Y"); ImGui::SameLine();
 	ImGui::DragFloat("##PositionY", &TerrainDesc.TerrainDesc.m_fHeight, 1.f, -10, 10);
 
 	static _int iOffset = m_pTerrain_Manager->Get_MoveOffset();
-	ImGui::Text("Move Offset");
-	ImGui::SameLine();
+	ImGui::Text("Move Offset"); ImGui::SameLine();
 	ImGui::InputInt("##MoveOffset", &iOffset);
 	m_pTerrain_Manager->Set_MoveOffset(iOffset);
 
-	ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::ImColor(0.3f, 0.5f, 0.7f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::ImColor(0.2f, 0.5f, 0.8f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::ImColor(0.2f, 0.2f, 0.5f));
-	bCreateTerrain = ImGui::Button("Create Terrain");
-	ImGui::PopStyleColor(3);
-
+	if (ImGui::Button("Create Terrain"))
+	{
+		LEVEL pLevelIndex = (LEVEL)CLevel_Manager::Get_Instance()->Get_CurrentLevelIndex();
+		if (FAILED(m_pTerrain_Manager->Create_Terrain(pLevelIndex, TEXT("Layer_Terrain"))))
+			return;
+	}
+	
 	ImGui::SameLine();
 	ImGui::Checkbox("WireFrame", &TerrainDesc.m_bShowWireFrame);
 	m_pTerrain_Manager->Set_bWireFrame(TerrainDesc.m_bShowWireFrame);
@@ -416,17 +455,6 @@ void CImgui_Manager::Set_Terrain_Map()
 
 	m_pTerrain_Manager->Set_TerrainDesc(&TerrainDesc);
 
-	if (bCreateTerrain)
-	{
-		LEVEL pLevelIndex = (LEVEL)CLevel_Manager::Get_Instance()->Get_CurrentLevelIndex();
-
-		if (FAILED(m_pTerrain_Manager->Create_Terrain(pLevelIndex, TEXT("Layer_Terrain"))))
-			return;
-
-		bCreateTerrain = false;
-	}
-
-
 }
 
 
@@ -436,27 +464,22 @@ void CImgui_Manager::Set_Object_Map()
 	ImGui::BulletText("Transform Setting");
 
 	static _float Position[3] = { m_InitDesc.vPosition.x , m_InitDesc.vPosition.y, m_InitDesc.vPosition.z };
-	ImGui::Text("Position");
-	ImGui::SameLine();
+	ImGui::Text("Position"); ImGui::SameLine();
 	ImGui::InputFloat3("##1", Position);
 	m_InitDesc.vPosition = _float3(Position[0], Position[1], Position[2]);
 	
 	static _float Scale[3] = { m_InitDesc.vScale.x , m_InitDesc.vScale.y, m_InitDesc.vScale.z };
-	ImGui::Text("Scale");
-	ImGui::SameLine();
+	ImGui::Text("Scale"); ImGui::SameLine();
 	ImGui::InputFloat3("##Scale", Scale);
 	m_InitDesc.vScale = _float3(Scale[0], Scale[1], Scale[2]);
 	
 	static _float Rotation[3] = { m_InitDesc.vRotation.x , m_InitDesc.vRotation.y, m_InitDesc.vRotation.z };
-	ImGui::Text("Rotation axis");
-	ImGui::SameLine();
+	ImGui::Text("Rotation axis"); ImGui::SameLine();
 	ImGui::InputFloat3("##2", Rotation);
 	m_InitDesc.vRotation = _float3( Rotation[0], Rotation[1], Rotation[2]);
 
-	
 	static _float Offset[2] = { m_InitDesc.m_fAngle , m_fDist };
-	ImGui::Text("Rotaion Angle / dist");
-	ImGui::SameLine();
+	ImGui::Text("Rotaion Angle / dist"); ImGui::SameLine();
 	ImGui::InputFloat2("##3", Offset);
 	m_InitDesc.m_fAngle = Offset[0];
 	m_fDist = Offset[1];
@@ -470,7 +493,6 @@ void CImgui_Manager::Set_Object_Map()
 
 	switch (m_eObjID)
 	{
-
 	case Client::OBJ_BACKGROUND:
 	{
 		const char* ObjectList[] = { "Terrain1", "Terrain2", "Terrain3", "Terrain4" };
@@ -869,7 +891,7 @@ void CImgui_Manager::Show_PopupBox()
 
 		if (ImGui::Button("OK", ImVec2(120, 0))) 
 		{ 
-			m_iSelected = 0;
+			m_iCreatedSelected = 0;
 			pPickingMgr->Set_PickedObj(nullptr);
 			pPickedObj->Set_Dead(true);
 			m_pModel_Manager->Out_CreatedModel(pNonAnim);
@@ -1061,7 +1083,7 @@ void CImgui_Manager::Show_ModelList()
 
 	// ------------------------ Right -----------------------------------
 	{
-		static int SeletecLayerNum = 0;
+		
 		ImGui::BeginGroup();
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 		char szLayertag[MAX_PATH] = "";
@@ -1073,43 +1095,33 @@ void CImgui_Manager::Show_ModelList()
 		{
 			if (ImGui::BeginTabItem("Setting"))
 			{
-				ImGui::BulletText("Layer Setting");
+				Set_FilePath();
+				ImGui::NewLine();
+				Set_LayerTag();
+				Set_Object_Map();
+				ImGui::EndTabItem();
 
-				if (ImGui::BeginCombo("Layer List", m_stLayerTags[SeletecLayerNum].c_str()))
+				if (ImGui::Button("Add_Model"))
 				{
-					for (int i = 0; i < m_stLayerTags.size(); i++)
-					{
-						if (ImGui::Selectable(m_stLayerTags[i].c_str(), SeletecLayerNum == i))
-							SeletecLayerNum = i;
-					}
-					ImGui::EndCombo();
+					_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+					Create_Model(ModelTags[selected], LayerTag);
+					m_TempLayerTags.push_back(LayerTag);
 				}
-				if (ImGui::Button("Delete Layer Tag"))
-					ImGui::OpenPopup("Delete Layer Tag?");
 				ImGui::SameLine();
-				if (ImGui::Button("Add New Layer Tag"))
-					ImGui::OpenPopup("Add Layer Tag");
-
-				Show_PopupBox();
-
+				if (ImGui::Button("Revert")) {}
+			}
+			if (ImGui::BeginTabItem("Macro"))
+			{
+				Set_FilePath();
+				ImGui::NewLine();
+				Set_LayerTag();
+				Set_Macro();
 				ImGui::EndTabItem();
 			}
-
-			Set_Object_Map();
-
 			ImGui::EndTabBar();
 		}
+		
 		ImGui::EndChild();
-		if (ImGui::Button("Add_Model"))
-		{
-			_tchar* LayerTag = StringToTCHAR(m_stLayerTags[SeletecLayerNum]);
-			Create_Model(ModelTags[selected], LayerTag);
-			m_LayerTags.push_back(LayerTag);
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Revert")) {}
-		ImGui::SameLine();
-		if (ImGui::Button("Save")) {}
 		ImGui::EndGroup();
 	}
 }
@@ -1140,9 +1152,9 @@ void CImgui_Manager::Show_CurrentModelList()
 				WideCharToMultiByte(CP_ACP, 0, RealModelTag, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
 				sprintf(label, szLayertag);
 				delete(RealModelTag);
-				if (ImGui::Selectable(label, m_iSelected == i))
+				if (ImGui::Selectable(label, m_iCreatedSelected == i))
 				{
-					m_iSelected = i;
+					m_iCreatedSelected = i;
 					vecCreatedModel[i]->Set_Picked();
 				}
 					
@@ -1159,7 +1171,7 @@ void CImgui_Manager::Show_CurrentModelList()
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 		char szLayertag[MAX_PATH] = "";
 		if (vecCreatedModel.size() != 0)
-			strcpy_s(szLayertag, MAX_PATH, vecCreatedModel[m_iSelected]->Get_Modeltag());
+			strcpy_s(szLayertag, MAX_PATH, vecCreatedModel[m_iCreatedSelected]->Get_Modeltag());
 		ImGui::Text(szLayertag);
 		ImGui::Separator();
 		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
@@ -1263,14 +1275,10 @@ void CImgui_Manager::Free()
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-
-	for (auto& iter : m_LayerTags)
+	for (auto& iter : m_TempLayerTags)
 		Safe_Delete(iter);
-	m_LayerTags.clear();
+	m_TempLayerTags.clear();
 
-	/*for (auto& iter : m_ModelTags)
-		Safe_Delete(iter);
-	m_ModelTags.clear();*/
 
 	m_stLayerTags.clear();
 	//CleanupDeviceD3D();

@@ -62,6 +62,9 @@ void CNonAnim::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+	XMStoreFloat3(&m_ModelDesc.vPosition, Get_Position());
+	m_ModelDesc.vScale = Get_Scale();
 }
 
 HRESULT CNonAnim::Render()

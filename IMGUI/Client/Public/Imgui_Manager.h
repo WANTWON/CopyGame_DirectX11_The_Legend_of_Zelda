@@ -28,7 +28,7 @@ public:
 	HRESULT Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	void Tick(_float fTimeDelta);
 	void Render();
-	void ShowGui();
+	void Show_GuiTick();
 
 public:
 	PICKING_TYPE Get_PickingType() {return (PICKING_TYPE)m_PickingType;}
@@ -50,6 +50,10 @@ public:
 	void Show_ModelList();
 	void Show_CurrentModelList();
 	void BrowseForFolder();
+	void Set_FilePath();
+	void Set_LayerTag();
+	void Set_Macro();
+	void Set_ObjectID();
 
 
 public:
@@ -65,7 +69,7 @@ private:
 	_bool m_bFilePath = false;
 	_bool m_bSave = false;
 	_bool m_bLoad = false;
-
+	LEVEL m_iCurrentLevel = LEVEL_GAMEPLAY;
 private:
 	/* For Terrain Manager */
 	CTerrain_Manager* m_pTerrain_Manager = nullptr;
@@ -76,13 +80,13 @@ private:
 	
 
 	/* For Object */
+	_tchar m_pFilePath[MAX_PATH] = L"../../../Bin/Resources/Meshes/";
 	CModelManager* m_pModel_Manager = nullptr;
 	vector<string> m_stLayerTags;
-	vector<const _tchar*> m_LayerTags;
-	vector<const _tchar*> m_ModelTags;
+	vector<const _tchar*> m_TempLayerTags;
 	CNonAnim::NONANIMDESC  m_InitDesc;
-	_int m_iSelected = 0;
-
+	_int m_iCreatedSelected = 0;
+	_int m_iSeletecLayerNum = 0;
 
 	OBJID m_eObjID = OBJ_END;
 	_int m_iObjectList = 0;
@@ -95,7 +99,7 @@ private:
 	
 
 	
-	LEVEL m_iCurrentLevel = LEVEL_GAMEPLAY;
+
 public:
 	virtual void Free() override;
 };

@@ -79,7 +79,6 @@ void CModelManager::Add_FileName(const _tchar * Layertag, const _tchar * FileNam
 	_tcscpy(szLayerTag, Layertag);
 	_tcscpy(szFullPath, FileName);
 
-
 	m_ModelTags.emplace(szLayerTag, szFullPath);
 	m_LayerTags.push_back(szLayerTag);
 }
@@ -110,6 +109,19 @@ void CModelManager::Out_CreatedModel(CNonAnim * pGameObject)
 		else
 			++iter;
 	}
+}
+
+void CModelManager::Clear_Layer()
+{
+
+	for (auto& iter : m_ModelTags)
+		Safe_Delete(iter.second);
+	m_ModelTags.clear();
+
+	for (auto& iter : m_LayerTags)
+		Safe_Delete(iter);
+	m_LayerTags.clear();
+
 }
 
 void CModelManager::Free()

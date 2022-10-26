@@ -27,6 +27,7 @@ public:
 	void Set_AllPickedFalse();
 	void Set_InitModelDesc(CNonAnim::NONANIMDESC ModelDesc) { memcpy(&m_InitModelDesc, &ModelDesc, sizeof(CNonAnim::NONANIMDESC)); }
 	void Out_CreatedModel(CNonAnim* pGameObject);
+	void Clear_Layer();
 
 private:
 	const _tchar* Find_ModelTag(const _tchar* ModelTag);
