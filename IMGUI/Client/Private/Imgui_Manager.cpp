@@ -61,6 +61,9 @@ CImgui_Manager::CImgui_Manager()
 {
 	Safe_AddRef(m_pModel_Manager);
 	Safe_AddRef(m_pTerrain_Manager);
+
+	char* LayerTag = "Layer Map";
+	m_stLayerTags.push_back(LayerTag);
 }
 
 
@@ -902,33 +905,30 @@ void CImgui_Manager::Show_PopupBox()
 	if (ImGui::BeginPopupModal("Add Layer Tag", NULL, ImGuiWindowFlags_MenuBar))
 	{
 		static char LayerBuffer[MAX_PATH] = "";
-		
+
 		ImGui::Text("Enter Layer Tag");
 		ImGui::InputText("Layer Tag", LayerBuffer, MAX_PATH);
-		
+
 		if (ImGui::Button("Add Layer Tag"))
 		{
 			bool bFailed = false;
-			TCHAR* szUniCode = new _tchar[MAX_PATH];
-			_tccpy(szUniCode, TEXT(""));
-			MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, LayerBuffer, strlen(LayerBuffer), szUniCode, MAX_PATH);
 
-			if (m_LayerTags.size() != 0)
+			if (m_stLayerTags.size() != 0)
 			{
-				for (auto& iter : m_LayerTags)
+				for (auto& iter : m_stLayerTags)
 				{
-					if (!_tcscmp(TEXT(""), szUniCode) || !_tcscmp(iter, szUniCode))
+					if (!strcmp("", LayerBuffer) || !strcmp(iter.c_str(), LayerBuffer))
 					{
 						bFailed = true;
 						ImGui::OpenPopup("Failed");
-						delete(szUniCode);
 					}
 
 				}
 			}
 			if (!bFailed)
 			{
-				m_LayerTags.push_back(szUniCode);
+				string NewLayer = LayerBuffer;
+				m_stLayerTags.push_back(NewLayer);
 				ImGui::OpenPopup("Succese");
 			}
 
@@ -1027,7 +1027,7 @@ void CImgui_Manager::Show_ModelList()
 		ImGui::EndMenuBar();
 	}
 
-	vector<const _tchar*> LayerTags = m_pModel_Manager->Get_LayerTags();
+	vector<const _tchar*> ModelTags = m_pModel_Manager->Get_LayerTags();
 
 	// ------------------------ Left-----------------------------------
 	static int selected = 0;
@@ -1036,9 +1036,9 @@ void CImgui_Manager::Show_ModelList()
 
 		int i = 0;
 
-		if (LayerTags.size() != 0)
+		if (ModelTags.size() != 0)
 		{
-			for (auto& iter : LayerTags)
+			for (auto& iter : ModelTags)
 			{
 				if (iter == nullptr)
 					continue;
@@ -1057,22 +1057,29 @@ void CImgui_Manager::Show_ModelList()
 
 	// ------------------------ Right -----------------------------------
 	{
+		static int SeletecLayerNum = 0;
 		ImGui::BeginGroup();
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 		char szLayertag[MAX_PATH] = "";
-		if (LayerTags.size() != 0)
-			WideCharToMultiByte(CP_ACP, 0, LayerTags[selected], MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
+		if (ModelTags.size() != 0)
+			WideCharToMultiByte(CP_ACP, 0, ModelTags[selected], MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
 		ImGui::Text("Selected :"); ImGui::SameLine();  ImGui::Text(szLayertag);
 		ImGui::Separator();
 		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
 		{
-				if (ImGui::BeginTabItem("Setting"))
+			if (ImGui::BeginTabItem("Setting"))
 			{
 				ImGui::BulletText("Layer Setting");
-				char* items[] = { "Layer_Map", "Layer_Model", "Layer_Interactive" };
-				static int item_current = 0;
-				ImGui::Combo("Layer_List", &item_current, items, IM_ARRAYSIZE(items));
 
+				if (ImGui::BeginCombo("Layer List", m_stLayerTags[SeletecLayerNum].c_str()))
+				{
+					for (int i = 0; i < m_stLayerTags.size(); i++)
+					{
+						if (ImGui::Selectable(m_stLayerTags[i].c_str(), SeletecLayerNum == i))
+							SeletecLayerNum = i;
+					}
+					ImGui::EndCombo();
+				}
 				if (ImGui::Button("Delete Layer Tag"))
 					ImGui::OpenPopup("Delete Layer Tag?");
 				ImGui::SameLine();
@@ -1080,16 +1087,21 @@ void CImgui_Manager::Show_ModelList()
 					ImGui::OpenPopup("Add Layer Tag");
 
 				Show_PopupBox();
-			
+
 				ImGui::EndTabItem();
 			}
 
-				Set_Object_Map();
+			Set_Object_Map();
 
 			ImGui::EndTabBar();
 		}
 		ImGui::EndChild();
-		if (ImGui::Button("Add_Model")) Create_Model(LayerTags[selected], TEXT("Layer_Model"));
+		if (ImGui::Button("Add_Model"))
+		{
+			_tchar* LayerTag = StringToTCHAR(m_stLayerTags[SeletecLayerNum]);
+			Create_Model(ModelTags[selected], LayerTag);
+			m_LayerTags.push_back(LayerTag);
+		}
 		ImGui::SameLine();
 		if (ImGui::Button("Revert")) {}
 		ImGui::SameLine();
@@ -1251,7 +1263,7 @@ void CImgui_Manager::Free()
 	for (auto& iter : m_LayerTags)
 		Safe_Delete(iter);
 	m_LayerTags.clear();
-
+	m_stLayerTags.clear();
 	//CleanupDeviceD3D();
 	//::DestroyWindow(hwnd);
 	//::UnregisterClass(wc.lpszClassName, wc.hInstance);
