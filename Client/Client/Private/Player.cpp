@@ -23,13 +23,17 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-
 	return S_OK;
 }
 
 int CPlayer::Tick(_float fTimeDelta)
 {
+	Key_Input(fTimeDelta);
+	
+	m_pModelCom->Set_CurrentAnimIndex(m_iAnimNum);
+	m_pModelCom->Play_Animation(fTimeDelta);
 
+	
 	return OBJ_NOEVENT;
 }
 
@@ -62,6 +66,69 @@ HRESULT CPlayer::Render()
 	return S_OK;
 }
 
+void CPlayer::Key_Input(_float fTimeDelta)
+{
+	CGameInstance* pGameInstacne = GET_INSTANCE(CGameInstance);
+
+	if (pGameInstacne->Key_Pressing(DIK_LEFT))
+	{
+		m_eDir[DIR_X] = -1.f;
+		Change_Direction();
+		m_pTransformCom->Go_Straight(fTimeDelta);
+	}
+	else if (pGameInstacne->Key_Pressing(DIK_RIGHT))
+	{
+		m_eDir[DIR_X] = 1.f;
+		Change_Direction();
+		m_pTransformCom->Go_Straight(fTimeDelta);
+	}
+	else
+		m_eDir[DIR_X] = 0.f;
+
+
+
+
+	if (pGameInstacne->Key_Pressing(DIK_DOWN))
+	{
+		m_eDir[DIR_Z] = -1.f;
+		Change_Direction();
+		m_pTransformCom->Go_Straight(fTimeDelta);
+	}
+	else if (pGameInstacne->Key_Pressing(DIK_UP))
+	{
+		m_eDir[DIR_Z] = 1.f;
+		Change_Direction();
+		m_pTransformCom->Go_Straight(fTimeDelta);
+	}
+	else
+		m_eDir[DIR_Z] = 0.f;
+
+
+
+
+	if (m_eDir[DIR_X] == 0 && m_eDir[DIR_Z] == 0)
+	{
+		m_iAnimNum = IDLE;
+	}
+	else if (m_eDir[DIR_X] == 0 || m_eDir[DIR_Z] == 0)
+	{
+		CTransform::TRANSFORMDESC pTransformDesc = m_pTransformCom->Get_TransformDesc();
+		pTransformDesc.fSpeedPerSec = 5.f;
+		m_pTransformCom->Set_TransformDesc(pTransformDesc);
+		m_iAnimNum = RUN;
+	}
+	else
+	{
+		CTransform::TRANSFORMDESC pTransformDesc = m_pTransformCom->Get_TransformDesc();
+		pTransformDesc.fSpeedPerSec = 2.5f;
+		m_pTransformCom->Set_TransformDesc(pTransformDesc);
+		m_iAnimNum = RUN;
+	}
+		
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 HRESULT CPlayer::Ready_Components(void* pArg)
 {
 	/* For.Com_Renderer */
@@ -69,11 +136,16 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 		return E_FAIL;
 
 	/* For.Com_Transform */
-	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom)))
+	CTransform::TRANSFORMDESC		TransformDesc;
+	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
+
+	TransformDesc.fSpeedPerSec = 5.f;
+	TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Model*/

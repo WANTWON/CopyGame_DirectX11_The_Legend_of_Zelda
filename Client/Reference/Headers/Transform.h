@@ -22,51 +22,24 @@ private:
 	virtual ~CTransform() = default;
 
 public:
-	_vector Get_State(STATE eState) const {
-		return XMLoadFloat4((_float4*)&m_WorldMatrix.m[eState][0]);
-	}	
-
-	/* 리턴받은 행렬을 이용해 연산을 해야할 때. */
-	_matrix Get_WorldMatrix() const {
-		return XMLoadFloat4x4(&m_WorldMatrix);
-	}
-
-	_matrix Get_WorldMatrixInverse() const {
-		return XMMatrixInverse(nullptr, Get_WorldMatrix());
-	}
-
-	/* 리턴받은 행렬보관해야할 때  */
-	_float4x4 Get_World4x4() const {
-		return m_WorldMatrix;
-	}
-
-	/* 리턴받은 행렬을 셰이더에 던지기위해.  */
+	_vector Get_State(STATE eState) const { return XMLoadFloat4((_float4*)&m_WorldMatrix.m[eState][0]);}	
+	_matrix Get_WorldMatrix() const { return XMLoadFloat4x4(&m_WorldMatrix); }
+	_matrix Get_WorldMatrixInverse() const { return XMMatrixInverse(nullptr, Get_WorldMatrix()); }
+	_float4x4 Get_World4x4() const { return m_WorldMatrix; }
 	_float4x4 Get_World4x4_TP() const {
-
 		_float4x4	TransposeMatrix;
-
 		XMStoreFloat4x4(&TransposeMatrix, XMMatrixTranspose(Get_WorldMatrix()));
+		return TransposeMatrix; }
+	_float Get_Scale(STATE eState) { return XMVectorGetX(XMVector3Length(XMLoadFloat4x4(&m_WorldMatrix).r[eState])); }
+	TRANSFORMDESC Get_TransformDesc() { return m_TransformDesc;  }
 
-		return TransposeMatrix;
-	
-	}
-
-
-	_float Get_Scale(STATE eState) {
-		return XMVectorGetX(XMVector3Length(XMLoadFloat4x4(&m_WorldMatrix).r[eState]));
-	}
-	
 	void Set_State(STATE eState, _fvector vState) {
 		_matrix		WorldMatrix = XMLoadFloat4x4(&m_WorldMatrix);
 		WorldMatrix.r[eState] = vState;
 		XMStoreFloat4x4(&m_WorldMatrix, WorldMatrix);	
 	}
-
-
 	void Set_Scale(STATE eState, _float fScale);
-	void Set_TransformDesc(const TRANSFORMDESC& TransformDesc ) {
-		m_TransformDesc = TransformDesc;
-	}
+	void Set_TransformDesc(const TRANSFORMDESC& TransformDesc ) {m_TransformDesc = TransformDesc; }
 
 
 public:
@@ -82,6 +55,7 @@ public:
 public:
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void LookAt(_fvector vAt);
+	void Change_Direction(_float UpDown, _float RightLeft);
 
 private:			
 	_float4x4				m_WorldMatrix;

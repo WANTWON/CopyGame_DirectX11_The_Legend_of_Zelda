@@ -13,6 +13,8 @@ BEGIN(Client)
 
 class CBaseObj abstract : public CGameObject
 {
+public:
+	enum DIRINPUT {DIR_X,DIR_Z, POS_END};
 
 protected:
 	CBaseObj(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -29,6 +31,7 @@ public:
 public:
 	virtual _bool Picking(_float3* PickingPoint) { return false; };
 	virtual void PickingTrue() {};
+	void Change_Direction();
 
 public:
 	OBJID Get_ObjectID() { return m_eObjectID; }
@@ -50,10 +53,12 @@ protected:
 	virtual HRESULT SetUp_ShaderResources() = 0;
 
 protected:
-	SHADER_ID m_eShaderID = SHADER_DEFAULT;
-	OBJID  m_eObjectID = OBJ_END;
-	_float3 m_vScale = _float3(1.f,1.f,1.f);
-	_float3 m_vMousePickPos;
+	SHADER_ID		m_eShaderID = SHADER_DEFAULT;
+	OBJID			m_eObjectID = OBJ_END;
+	_float3			m_vScale = _float3(1.f,1.f,1.f);
+	_float3			m_vMousePickPos;
+	_float				m_eDir[POS_END] = { 0 };
+	_float				m_ePreDir[POS_END] = { 0 };
 
 
 public:

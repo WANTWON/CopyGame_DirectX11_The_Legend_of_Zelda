@@ -31,6 +31,11 @@ HRESULT CTransform::Initialize_Prototype()
 
 HRESULT CTransform::Initialize(void * pArg)
 {
+	if (pArg != nullptr)
+	{
+		memcpy(&m_TransformDesc, pArg, sizeof(TRANSFORMDESC));
+	}
+
 	return S_OK;
 }
 
@@ -96,6 +101,25 @@ void CTransform::LookAt(_fvector vAt)
 	Set_State(STATE_RIGHT, XMVector3Normalize(vRight) * Get_Scale(CTransform::STATE_RIGHT));
 	Set_State(STATE_UP, XMVector3Normalize(vUp) * Get_Scale(CTransform::STATE_UP));
 	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * Get_Scale(CTransform::STATE_LOOK));
+}
+
+void CTransform::Change_Direction(_float UpDown, _float RightLeft)
+{
+	if (UpDown == 0 && RightLeft == 0)
+		return;
+
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	_vector		vLook = vPosition +  XMVectorSet(RightLeft, 0.f, UpDown, 0.f) - vPosition;
+	
+	_vector		vAxisY = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+	_vector		vRight = XMVector3Cross(vAxisY, vLook);
+	_vector		vUp = XMVector3Cross(vLook, vRight);
+
+	Set_State(STATE_RIGHT, XMVector3Normalize(vRight) * Get_Scale(CTransform::STATE_RIGHT));
+	Set_State(STATE_UP, XMVector3Normalize(vUp) * Get_Scale(CTransform::STATE_UP));
+	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * Get_Scale(CTransform::STATE_LOOK));
+
 }
 
 CTransform * CTransform::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

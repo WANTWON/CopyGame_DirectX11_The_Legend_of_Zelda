@@ -44,6 +44,16 @@ HRESULT CBaseObj::Render()
 	return S_OK;
 }
 
+void CBaseObj::Change_Direction()
+{
+	if (m_eDir[DIR_X] != m_ePreDir[DIR_X] || m_eDir[DIR_Z] != m_ePreDir[DIR_Z])
+	{
+		m_pTransformCom->Change_Direction(m_eDir[DIR_Z], m_eDir[DIR_X]);
+		m_ePreDir[DIR_X] = m_eDir[DIR_X];
+		m_ePreDir[DIR_Z] = m_eDir[DIR_Z];
+	}
+}
+
 
 
 _vector CBaseObj::Get_Position()
