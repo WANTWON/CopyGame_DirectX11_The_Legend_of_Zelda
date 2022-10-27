@@ -17,7 +17,7 @@ TCHAR* StringToTCHAR(string& s)
 {
 	tstring tstr;
 	const char* all = s.c_str();
-	int len = 1 + strlen(all);
+	int len = 1 + (int)strlen(all);
 	wchar_t* t = new wchar_t[len];
 	if (NULL == t) throw std::bad_alloc();
 	mbstowcs(t, all, len);
@@ -26,7 +26,7 @@ TCHAR* StringToTCHAR(string& s)
 
 string TCHARToString(const TCHAR* ptsz)
 {
-	int len = wcslen((wchar_t*)ptsz);
+	int len = (int)wcslen((wchar_t*)ptsz);
 	char* psz = new char[2 * len + 1];
 	wcstombs(psz, (wchar_t*)ptsz, 2 * len + 1);
 	std::string s = psz;
@@ -259,7 +259,7 @@ void CImgui_Manager::BrowseForFolder()
 			}
 				
 
-			iNum = plistClone->size();
+			iNum = (_int)plistClone->size();
 
 			hFile = CreateFile(OFN.lpstrFile, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);;
 			if (0 == hFile)
@@ -321,7 +321,7 @@ void CImgui_Manager::BrowseForFolder()
 				ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
 				m_pModel_Manager->Set_InitModelDesc(ModelDesc);
 				_tchar			szModeltag[MAX_PATH] = TEXT("");
-				MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, strlen(ModelDesc.pModeltag), szModeltag, MAX_PATH);
+				MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, (_int)strlen(ModelDesc.pModeltag), szModeltag, MAX_PATH);
 				m_pModel_Manager->Create_Model(iLevel, szModeltag, TEXT("Layer_Model"), m_pDevice, m_pContext, CModel::TYPE_NONANIM, PivotMatrix);
 			}
 
@@ -410,8 +410,6 @@ void CImgui_Manager::Set_Macro()
 
 void CImgui_Manager::Set_Terrain_Map()
 {
-	_bool bCreateTerrain;
-
 	ImGui::GetIO().NavActive = false;
 	ImGui::GetIO().WantCaptureMouse = true;
 	ImGui::CollapsingHeader("Terrain_Map");
@@ -1026,7 +1024,7 @@ void CImgui_Manager::Set_File_Path_Dialog()
 			auto ret = find(Splitpaths.begin(), Splitpaths.end(), "Bin");
 			if (ret != Splitpaths.end())
 			{
-				iIndex = ret - Splitpaths.begin();
+				iIndex = _int(ret - Splitpaths.begin());
 
 				for (_uint i = iIndex; i < Splitpaths.size(); ++i)
 				{

@@ -94,27 +94,6 @@ HRESULT CNonAnim::Render()
 	return S_OK;
 }
 
-_bool CNonAnim::Picking(_float3 * PickingPoint)
-{
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (m_pModelCom->Picking(m_pTransformCom, &m_vMousePickPos) == true)
-	{
-		CTerrain_Manager::Get_Instance()->Set_PickingWorldPos(m_vMousePickPos);
-		RELEASE_INSTANCE(CGameInstance);
-		return true;
-	}
-	else
-	{
-		ZeroMemory(&m_vMousePickPos, sizeof(_float3));
-	}
-
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return false;
-}
-
 void CNonAnim::PickingTrue()
 {
 	CImgui_Manager::PICKING_TYPE ePickingtype = CImgui_Manager::Get_Instance()->Get_PickingType();

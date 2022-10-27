@@ -91,6 +91,15 @@
     <ClCompile Include="..\Private\Picking.cpp">
       <Filter>01.Utility\08.Picking</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Animation.cpp">
+      <Filter>01.Utility\03.Components\06.Model\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HierarchyNode.cpp">
+      <Filter>01.Utility\03.Components\06.Model\HierachyNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Channel.cpp">
+      <Filter>01.Utility\03.Components\06.Model\Animation\Channel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -195,6 +204,15 @@
     <ClInclude Include="..\Public\Picking.h">
       <Filter>01.Utility\08.Picking</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Animation.h">
+      <Filter>01.Utility\03.Components\06.Model\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HierarchyNode.h">
+      <Filter>01.Utility\03.Components\06.Model\HierachyNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Channel.h">
+      <Filter>01.Utility\03.Components\06.Model\Animation\Channel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00.System">
@@ -289,6 +307,15 @@
     </Filter>
     <Filter Include="01.Utility\08.Picking">
       <UniqueIdentifier>{92c881bf-b3e3-4613-978e-2fdec9a0b47d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\06.Model\Animation">
+      <UniqueIdentifier>{b61d051c-4fa4-42a8-bd6a-d5b7a773b803}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\06.Model\HierachyNode">
+      <UniqueIdentifier>{fb1fba44-d0d3-450a-b52d-c58d34e8105f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\06.Model\Animation\Channel">
+      <UniqueIdentifier>{16f2aa01-9504-4753-b5e1-d6c4e7b6610f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

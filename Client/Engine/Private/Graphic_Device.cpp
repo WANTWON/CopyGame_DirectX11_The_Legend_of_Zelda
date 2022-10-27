@@ -39,8 +39,8 @@ HRESULT CGraphic_Device::Ready_Graphic_Device(HWND hWnd, GRAPHIC_DESC::WINMODE W
 	ZeroMemory(&ViewPortDesc, sizeof(D3D11_VIEWPORT));
 	ViewPortDesc.TopLeftX = 0;
 	ViewPortDesc.TopLeftY = 0;
-	ViewPortDesc.Width = iWinCX;
-	ViewPortDesc.Height = iWinCY;
+	ViewPortDesc.Width = (FLOAT)iWinCX;
+	ViewPortDesc.Height = (FLOAT)iWinCY;
 	ViewPortDesc.MinDepth = 0.f;
 	ViewPortDesc.MaxDepth = 1.f;
 

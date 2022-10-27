@@ -91,6 +91,20 @@ HRESULT CShader::Set_RawValue(const char* pConstantName, const void* pData, _uin
 	return pVariable->SetRawValue(pData, 0, iLength);
 }
 
+HRESULT CShader::Set_MatrixArray(const char * pConstantName, const _float4x4* pData, _uint iNumMatrices)
+{
+	if (nullptr == m_pEffect)
+		return E_FAIL;
+
+	ID3DX11EffectVariable*		pVariable = m_pEffect->GetVariableByName(pConstantName);
+	if (nullptr == pVariable)
+		return E_FAIL;
+
+	ID3DX11EffectMatrixVariable*		pMatrixVariable = pVariable->AsMatrix();
+
+	return pMatrixVariable->SetMatrixArray(&pData->_11, 0, iNumMatrices);
+}
+
 HRESULT CShader::Set_ShaderResourceView(const char* pConstantName, ID3D11ShaderResourceView* pSRV)
 {
 	if (nullptr == m_pEffect)
