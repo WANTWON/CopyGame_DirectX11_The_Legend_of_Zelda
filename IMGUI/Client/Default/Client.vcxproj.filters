@@ -138,9 +138,6 @@
     <ClInclude Include="..\Public\PickingMgr.h">
       <Filter>95.PickingMgr</Filter>
     </ClInclude>
-    <ClInclude Include="..\Bin\ShaderFiles\Client_Shader_Defines.hpp">
-      <Filter>97.ShaderFiles</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\BaseObj.h">
       <Filter>02.GameObjects\00.BaseObj</Filter>
     </ClInclude>
@@ -152,6 +149,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\ModelManager.h">
       <Filter>03.ToolManager\NonAnim_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Bin\ShaderFiles\Client_Shader_Defines.hpp">
+      <Filter>97.ShaderFiles</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -239,16 +239,16 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
+    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl">
+    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxModel.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl">
+    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl">
+    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxTex.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>
