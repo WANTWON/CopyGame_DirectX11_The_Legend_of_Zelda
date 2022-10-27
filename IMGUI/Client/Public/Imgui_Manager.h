@@ -53,12 +53,12 @@ public:
 	void Set_FilePath();
 	void Set_LayerTag();
 	void Set_Macro();
-	void Set_ObjectID();
 
 
 public:
 	void Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag);
 	void Read_Objects_Name( _tchar* cFolderPath);
+	void Add_TempTag(_tchar* TempTag) { m_TempLayerTags.push_back(TempTag); }
 	
 private:
 	ID3D11Device* m_pDevice = nullptr;

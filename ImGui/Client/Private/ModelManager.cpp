@@ -46,7 +46,7 @@ HRESULT CModelManager::Create_Model(LEVEL eLevel, const _tchar* pModelTag, const
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	Create_Model_Prototype(eLevel, pModelTag, pDevice, pContext, eModelType, PivotMatrix);
+	//Create_Model_Prototype(eLevel, pModelTag, pDevice, pContext, eModelType, PivotMatrix);
 
 	CNonAnim::NONANIMDESC  NonAnimDesc;
 	memcpy(&NonAnimDesc, &m_InitModelDesc, sizeof(CNonAnim::NONANIMDESC));

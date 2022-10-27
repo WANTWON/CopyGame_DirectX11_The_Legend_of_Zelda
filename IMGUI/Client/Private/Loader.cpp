@@ -9,6 +9,7 @@
 #include "Terrain.h"
 #include "NonAnim.h"
 #include "ModelManager.h"
+#include "Imgui_Manager.h"
 //#include "Effect.h"
 //#include "Sky.h"
 //#include "UI.h"
@@ -135,7 +136,10 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	/* ¸ðµ¨ ·Îµù Áß. */
 	lstrcpy(m_szLoadingText, TEXT("¸ðµ¨ ·Îµù Áß."));
 
-	_matrix			PivotMatrix = XMMatrixIdentity();
+	
+
+	if (FAILED(Loading_ForModel(TEXT("../../../Bin/Resources/Meshes/Field/"))))
+		return E_FAIL;
 
 	/*For.Prototype_Component_Model_Fiona*/
 	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
@@ -218,6 +222,47 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	m_isFinished = true;
 
 
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	_matrix			PivotMatrix = XMMatrixIdentity();
+
+	for (int i = 1; i < 17; ++i)
+	{
+		for (int j = 0; j < 7; ++j)
+		{
+			//const char* pFilePath = "../Bin/Resources/Meshes/Field/Field_%02d%c.fbx";
+
+			_tchar*			pModeltag = new _tchar[MAX_PATH];
+			_tchar*			szFilePath = new _tchar[MAX_PATH];
+			wsprintf(pModeltag, TEXT("Field_%02d%c.fbx"), i, j+65);
+			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/Field/Field_%02d%c.fbx"), i, j + 65);
+
+			char* FilePath= new char[MAX_PATH];
+			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
+
+			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, pModeltag,
+				CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, FilePath, PivotMatrix))))
+			{
+				delete pModeltag;
+				delete szFilePath;
+				delete FilePath;
+
+				continue;
+			}
+
+			CImgui_Manager::Get_Instance()->Add_TempTag(pModeltag);
+			CImgui_Manager::Get_Instance()->Add_TempTag(szFilePath);
+			
+			delete FilePath;
+				
+		}
+	}
+	
+	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
 

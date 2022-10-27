@@ -250,7 +250,7 @@ void CImgui_Manager::BrowseForFolder()
 			_ulong dwByte = 0;
 			CNonAnim::NONANIMDESC  ModelDesc;
 			_uint iNum = 0;
-
+			m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
 			list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, TEXT("Layer Map"));
 			if (nullptr == plistClone)
 			{
@@ -864,7 +864,11 @@ void CImgui_Manager::ShowPickedObj()
 
 	if (ImGui::Button("Delete Object")) 
 	{ 
-		ImGui::OpenPopup("Delete Object?"); 	
+		CPickingMgr* pPickingMgr = GET_INSTANCE(CPickingMgr);
+		if (pPickingMgr->Get_PickedObj() != nullptr)
+			ImGui::OpenPopup("Delete Object?"); 	
+		RELEASE_INSTANCE(CPickingMgr);
+
 	}
 	Show_PopupBox();
 	RELEASE_INSTANCE(CPickingMgr);
@@ -887,14 +891,13 @@ void CImgui_Manager::Show_PopupBox()
 		
 		ImGui::Text("Object Name : ");  ImGui::SameLine(); ImGui::Text(pNonAnim->Get_Modeltag());
 
-		if (ImGui::Button("OK", ImVec2(120, 0))) 
+		if (ImGui::Button("OK", ImVec2(120, 0)))
 		{ 
-			m_iCreatedSelected = 0;
-			pPickingMgr->Set_PickedObj(nullptr);
-			pPickedObj->Set_Dead(true);
-			m_pModel_Manager->Out_CreatedModel(pNonAnim);
-			ImGui::CloseCurrentPopup(); 
-			
+				m_iCreatedSelected = 0;
+				pPickingMgr->Set_PickedObj(nullptr);
+				pPickedObj->Set_Dead(true);
+				m_pModel_Manager->Out_CreatedModel(pNonAnim);
+				ImGui::CloseCurrentPopup();
 		}
 		ImGui::SetItemDefaultFocus();
 		ImGui::SameLine();
@@ -1276,7 +1279,6 @@ void CImgui_Manager::Free()
 	for (auto& iter : m_TempLayerTags)
 		Safe_Delete(iter);
 	m_TempLayerTags.clear();
-
 
 	m_stLayerTags.clear();
 	//CleanupDeviceD3D();

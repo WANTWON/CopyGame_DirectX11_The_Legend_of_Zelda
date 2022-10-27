@@ -242,7 +242,7 @@ CModel * CModel::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, 
 
 	if (FAILED(pInstance->Initialize_Prototype(eModelType, pModelFilePath, PivotMatrix)))
 	{
-		ERR_MSG(TEXT("Failed to Created : CModel"));
+		//ERR_MSG(TEXT("Failed to Created : CModel"));
 		Safe_Release(pInstance);
 	}
 

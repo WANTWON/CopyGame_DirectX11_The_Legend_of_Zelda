@@ -35,6 +35,7 @@ public:
 
 	HRESULT Loading_ForLogoLevel();
 	HRESULT Loading_ForGamePlayLevel();
+	HRESULT Loading_ForModel(_tchar* cFolderPath);
 
 
 private:
@@ -46,7 +47,7 @@ private:
 
 private:
 	HANDLE					m_hThread = 0;
-	CRITICAL_SECTION		m_CriticalSection;
+	CRITICAL_SECTION		m_CriticalSection;			
 
 
 public:
