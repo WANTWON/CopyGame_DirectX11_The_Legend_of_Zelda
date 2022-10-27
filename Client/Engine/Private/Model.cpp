@@ -174,7 +174,7 @@ HRESULT CModel::Create_Materials(const char* pModelFilePath)
 			char			szExt[MAX_PATH] = ".dds";
 			char			szTextureFileName[MAX_PATH] = "";
 
-			_splitpath_s(strPath.data, nullptr, 0, nullptr, 0, szName, MAX_PATH, nullptr, MAX_PATH);
+			_splitpath_s(strPath.data, nullptr, 0, nullptr, 0, szName, MAX_PATH, nullptr, 0);
 
 			strcpy_s(szTextureFileName, szName);
 			strcat_s(szTextureFileName, szExt);
