@@ -12,6 +12,10 @@ private:
 	virtual ~CLevel_Loading() = default;
 
 public:
+	HRESULT ForLoadingLevelTexture();
+	HRESULT Ready_Layer_BackGround(const _tchar* pLayerTag);
+
+public:
 	virtual HRESULT Initialize(LEVEL eNextLevel);
 	virtual void Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;

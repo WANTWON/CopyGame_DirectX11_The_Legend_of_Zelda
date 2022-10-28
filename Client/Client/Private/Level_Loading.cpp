@@ -5,23 +5,38 @@
 #include "Loader.h"
 #include "Level_Logo.h"
 #include "Level_GamePlay.h"
+#include "BackGround.h"
 
+bool g_FirstLoading = false;
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
 {
 }
 
+
+
 HRESULT CLevel_Loading::Initialize(LEVEL eNextLevel)
 {
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
+	if (g_FirstLoading)
+	{
+
+		if (FAILED(Ready_Layer_BackGround(TEXT("Layer_UI"))))
+			return E_FAIL;
+	}
+
+
+	g_FirstLoading = true;
 	m_eNextLevel = eNextLevel;
 
 	m_pLoader = CLoader::Create(m_pDevice, m_pContext, eNextLevel);
 	if (nullptr == m_pLoader)
 		return E_FAIL;
+
+	
 
 	return S_OK;
 }
@@ -32,8 +47,6 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 
 	if (true == m_pLoader->Get_Finished())
 	{
-		if (GetKeyState(VK_RETURN) & 0x8000)
-		{
 			/* 넥스트레벨에 대한 준비가 끝나면 실제 넥스트레벨을 할당한다. */
 			CLevel*			pNewLevel = nullptr;
 
@@ -58,8 +71,7 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 			if (FAILED(pGameInstance->Open_Level(m_eNextLevel, pNewLevel)))
 				return;
 
-			Safe_Release(pGameInstance);
-		}		
+			Safe_Release(pGameInstance);		
 	}
 }
 
@@ -68,6 +80,36 @@ void CLevel_Loading::Late_Tick(_float fTimeDelta)
 	__super::Late_Tick(fTimeDelta);
 
 	SetWindowText(g_hWnd, m_pLoader->Get_LoadingText());
+}
+
+HRESULT CLevel_Loading::ForLoadingLevelTexture()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	
+
+	RELEASE_INSTANCE(CGameInstance);
+	g_FirstLoading = true;
+
+	return S_OK;
+}
+
+HRESULT CLevel_Loading::Ready_Layer_BackGround(const _tchar * pLayerTag)
+{
+	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
+	Safe_AddRef(pGameInstance);
+
+
+	CBackGround::BACKGROUNDESC BackgroundDesc;
+	BackgroundDesc.eVisibleScreen = CBackGround::VISIBLE_LOADING;
+	BackgroundDesc.pTextureTag = TEXT("Prototype_Component_Texture_LoadingScreen_UI");
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_LOADING, pLayerTag,
+		&BackgroundDesc)))
+		return E_FAIL;
+
+	Safe_Release(pGameInstance);
+
+	return S_OK;
 }
 
 CLevel_Loading * CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevel)

@@ -41,6 +41,12 @@ CHierarchyNode * CModel::Get_BonePtr(const char * pBoneName) const
 	return *iter;
 }
 
+void CModel::Set_CurrentAnimIndex(_uint iAnimIndex)
+{
+	m_iCurrentAnimIndex = iAnimIndex;
+	//m_Animations[m_iCurrentAnimIndex]->Set_TimeReset();
+}
+
 HRESULT CModel::Initialize_Prototype(TYPE eModelType, const char * pModelFilePath, _fmatrix PivotMatrix)
 {
 	m_eModelType = eModelType;
@@ -95,10 +101,19 @@ HRESULT CModel::SetUp_Material(CShader * pShader, const char * pConstantName, _u
 	return pShader->Set_ShaderResourceView(pConstantName, m_Materials[m_Meshes[iMeshIndex]->Get_MaterialIndex()].pMaterials[eType]->Get_SRV());
 }
 
-HRESULT CModel::Play_Animation(_float fTimeDelta)
+_bool CModel::Play_Animation(_float fTimeDelta, _bool isLoop)
 {
 	/* 뼈의 m_TransformationMatrix행렬을 갱신한다. */
-	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta);
+	if (m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, isLoop))
+	{
+		for (auto& pBoneNode : m_Bones)
+		{
+			/* 뼈의 m_CombinedTransformationMatrix행렬을 갱신한다. */
+			pBoneNode->Invalidate_CombinedTransformationmatrix();
+		}
+		return true;
+	}
+		
 
 	for (auto& pBoneNode : m_Bones)
 	{
@@ -106,7 +121,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 		pBoneNode->Invalidate_CombinedTransformationmatrix();
 	}
 
-	return S_OK;
+	return false;
 }
 
 HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iPassIndex)

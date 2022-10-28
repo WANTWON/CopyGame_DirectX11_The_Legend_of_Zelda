@@ -47,7 +47,7 @@ void CBackGround::Late_Tick(_float fTimeDelta)
 
 HRESULT CBackGround::Render()
 {
-	if (!CUI_Manager::Get_Instance()->Get_UI_Open())
+	if (!CUI_Manager::Get_Instance()->Get_UI_Open() && m_BackgroundDesc.eVisibleScreen == VISIBLE_PLAYGAME)
 		return E_FAIL;
 
 	if (FAILED(__super::Render()))
@@ -56,8 +56,12 @@ HRESULT CBackGround::Render()
 	return S_OK;
 }
 
-HRESULT CBackGround::Ready_Components()
+HRESULT CBackGround::Ready_Components(void * pArg)
 {
+	if (pArg != nullptr)
+		memcpy(&m_BackgroundDesc, pArg, sizeof(BACKGROUNDESC));
+
+
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))
 		return E_FAIL;
@@ -71,7 +75,7 @@ HRESULT CBackGround::Ready_Components()
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_BackGround_UI"), (CComponent**)&m_pTextureCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, m_BackgroundDesc.pTextureTag, (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */

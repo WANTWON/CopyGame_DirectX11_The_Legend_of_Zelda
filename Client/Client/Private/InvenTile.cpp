@@ -124,7 +124,7 @@ _uint CInvenTile::Get_TextureNum()
 	return m_pItem->Get_TextureNum();
 }
 
-HRESULT CInvenTile::Ready_Components()
+HRESULT CInvenTile::Ready_Components(void * pArg)
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))

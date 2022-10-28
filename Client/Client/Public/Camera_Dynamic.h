@@ -11,6 +11,8 @@ BEGIN(Client)
 class CCamera_Dynamic final : public CCamera
 {
 public:
+	enum CAMERAMODE {CAM_PLAYER, CAM_TURNMODE};
+
 	typedef struct tagCameraDesc_Derived
 	{
 		_uint						iTest;
@@ -28,7 +30,13 @@ public:
 	virtual void Late_Tick(_float fTimeDelta)override;
 	virtual HRESULT Render() override;
 
+public:
+	void Player_Camera(_float fTimeDelta);
+	void Turn_Camera(_float fTimeDelta);
 
+private:
+	CAMERAMODE m_eCamMode = CAM_PLAYER;
+	_float3 m_vDistance = _float3(0, 6, -10);
 
 public:
 	static CCamera_Dynamic* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

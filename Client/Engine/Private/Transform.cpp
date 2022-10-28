@@ -79,6 +79,19 @@ void CTransform::Go_Right(_float fTimeDelta)
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
+void CTransform::Jump(_float fTimeDelta, _float fVelocity, _float fGravity)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	float fSpeed = fVelocity * fTimeDelta - (0.5*fGravity*fTimeDelta*fTimeDelta);
+
+	vPosition += XMVectorSet(0.f, fSpeed, 0.f, 0.f);
+	
+	float y = XMVectorGetY(vPosition);
+	if ( y <= 0)
+		vPosition = XMVectorSetY(vPosition, 0.f);
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
 {
 	_matrix		RotationMatrix = XMMatrixRotationAxis(vAxis, m_TransformDesc.fRotationPerSec * fTimeDelta);
@@ -86,6 +99,14 @@ void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
 	Set_State(CTransform::STATE_RIGHT, XMVector3TransformNormal(Get_State(CTransform::STATE_RIGHT), RotationMatrix));
 	Set_State(CTransform::STATE_UP, XMVector3TransformNormal(Get_State(CTransform::STATE_UP), RotationMatrix));
 	Set_State(CTransform::STATE_LOOK, XMVector3TransformNormal(Get_State(CTransform::STATE_LOOK), RotationMatrix));
+}
+
+void CTransform::Follow_Target(_float fTimeDelta, _vector TargetPos, _vector distance)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	_vector     vNewPos = TargetPos + distance;
+	Set_State(CTransform::STATE_POSITION, vNewPos);
+	
 }
 
 void CTransform::LookAt(_fvector vAt)

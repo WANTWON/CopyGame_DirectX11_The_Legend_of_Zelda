@@ -19,5 +19,6 @@ namespace Client
 
 extern HWND			g_hWnd;
 extern HINSTANCE	g_hInst;
+extern bool			g_FirstLoading;
 
 using namespace Client;

@@ -82,7 +82,7 @@ HRESULT CUIButton::Render()
 	return S_OK;
 }
 
-HRESULT CUIButton::Ready_Components()
+HRESULT CUIButton::Ready_Components(void * pArg)
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))

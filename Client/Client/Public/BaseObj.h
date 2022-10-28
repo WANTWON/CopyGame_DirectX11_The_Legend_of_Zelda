@@ -2,6 +2,7 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 #include "Transform.h"
+#include "UI_Manager.h"
 
 BEGIN(Engine)
 class CShader;
@@ -32,6 +33,7 @@ public:
 	virtual _bool Picking(_float3* PickingPoint) { return false; };
 	virtual void PickingTrue() {};
 	void Change_Direction();
+	
 
 public:
 	OBJID Get_ObjectID() { return m_eObjectID; }

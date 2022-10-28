@@ -15,7 +15,7 @@ CObj_UI::CObj_UI(const CObj_UI & rhs)
 
 HRESULT CObj_UI::Initialize(void * pArg)
 {
-	if (FAILED(Ready_Components()))
+	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixTranspose(XMMatrixIdentity()));

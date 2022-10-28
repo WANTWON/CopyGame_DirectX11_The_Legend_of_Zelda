@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Camera_Dynamic.h"
 #include "GameInstance.h"
+#include "Player.h"
 
 CCamera_Dynamic::CCamera_Dynamic(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera(pDevice, pContext)
@@ -35,44 +36,14 @@ int CCamera_Dynamic::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	if (GetKeyState('W') < 0)
+	if (m_eCamMode == CAM_PLAYER)
 	{
-		m_pTransform->Go_Straight(fTimeDelta);
+		Player_Camera(fTimeDelta);
 	}
-
-	if (GetKeyState('S') < 0)
+	else if (m_eCamMode == CAM_TURNMODE)
 	{
-		m_pTransform->Go_Backward(fTimeDelta);
+		Turn_Camera(fTimeDelta);
 	}
-
-	if (GetKeyState('A') < 0)
-	{
-		
-		m_pTransform->Go_Left(fTimeDelta);
-	}
-
-	if (GetKeyState('D') < 0)
-	{
-		
-		m_pTransform->Go_Right(fTimeDelta);
-	}
-
-	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
-	Safe_AddRef(pGameInstance);
-
-	/*_long			MouseMove = 0;
-
-	if (MouseMove = pGameInstance->Get_DIMMoveState(DIMM_X))
-	{
-		m_pTransform->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * 0.1f);
-	}
-
-	if (MouseMove = pGameInstance->Get_DIMMoveState(DIMM_Y))
-	{
-		m_pTransform->Turn(m_pTransform->Get_State(CTransform::STATE_RIGHT), fTimeDelta * MouseMove * 0.1f);
-	}*/
-
-	Safe_Release(pGameInstance);
 
 	if (FAILED(Bind_OnPipeLine()))
 		return OBJ_NOEVENT;
@@ -92,6 +63,42 @@ HRESULT CCamera_Dynamic::Render()
 
 	
 	return S_OK;
+}
+
+void CCamera_Dynamic::Player_Camera(_float fTimeDelta)
+{
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+
+	if (pGameInstance->Key_Pressing(DIK_F1))
+	{
+		m_vDistance.y -= 0.03f;
+		m_vDistance.z -= 0.06f;
+	}
+	if (pGameInstance->Key_Pressing(DIK_F2))
+	{
+		m_vDistance.y += 0.03f;
+		m_vDistance.z += 0.06f;
+	}
+
+
+	CPlayer* pTarget = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+
+	Safe_AddRef(pTarget);
+
+	_vector m_TargetPos = pTarget->Get_Position();
+
+	Safe_Release(pTarget);
+
+	m_pTransform->LookAt(m_TargetPos);
+
+	m_pTransform->Follow_Target(fTimeDelta, m_TargetPos, XMVectorSet(m_vDistance.x , m_vDistance.y, m_vDistance.z, 0.f));
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CCamera_Dynamic::Turn_Camera(_float fTimeDelta)
+{
 }
 
 CCamera_Dynamic * CCamera_Dynamic::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

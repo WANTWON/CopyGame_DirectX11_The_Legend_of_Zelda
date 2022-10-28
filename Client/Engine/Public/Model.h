@@ -21,9 +21,7 @@ public:
 	class CHierarchyNode* Get_BonePtr(const char* pBoneName) const;
 
 public:
-	void Set_CurrentAnimIndex(_uint iAnimIndex) {
-		m_iCurrentAnimIndex = iAnimIndex;
-	}
+	void Set_CurrentAnimIndex(_uint iAnimIndex);
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eModelType, const char* pModelFilePath, _fmatrix PivotMatrix);
@@ -31,7 +29,7 @@ public:
 
 public:
 	HRESULT SetUp_Material(class CShader* pShader, const char* pConstantName, _uint iMeshIndex, aiTextureType eType);
-	HRESULT Play_Animation(_float fTimeDelta);
+	_bool Play_Animation(_float fTimeDelta, _bool isLoop);
 	HRESULT Render(class CShader* pShader, _uint iMeshIndex, _uint iPassIndex = 0);
 
 	

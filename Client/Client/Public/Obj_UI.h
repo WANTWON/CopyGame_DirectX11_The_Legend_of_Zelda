@@ -51,7 +51,7 @@ protected:
 	
 
 protected:
-	virtual HRESULT Ready_Components() = 0;
+	virtual HRESULT Ready_Components(void * pArg = nullptr) = 0;
 	virtual HRESULT SetUp_ShaderResources() = 0; /* 셰이더 전역변수에 값을 전달한다. */
 	virtual HRESULT SetUp_ShaderID() { return S_OK; };
 

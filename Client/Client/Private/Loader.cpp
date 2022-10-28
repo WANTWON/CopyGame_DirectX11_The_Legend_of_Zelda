@@ -5,12 +5,13 @@
 
 
 #include "Camera_Dynamic.h"
-#include "BackGround.h"
 #include "Terrain.h"
 #include "InvenTile.h"
 #include "UIButton.h"
 #include "InvenItem.h"
 #include "Player.h"
+#include "BackGround.h"
+
 //#include "Effect.h"
 //#include "Sky.h"
 //#include "UI.h"
@@ -149,7 +150,7 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 	/*For.Prototype_Component_VIBuffer_Terrain*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Terrain/Height.bmp")))))
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 30,30, -0.01f))))
 		return E_FAIL;
 
 	_matrix			PivotMatrix = XMMatrixIdentity();
@@ -157,7 +158,7 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	/*For.Prototype_Component_Model_Fiona*/
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Link"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Link/Link_Anim.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Link/Link_Anim2.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	///*For.Prototype_Component_VIBuffer_Cube */
@@ -263,8 +264,16 @@ HRESULT CLoader::Loading_For_UITexture()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_BackGround_UI"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Inventory.png"), 1))))
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreen_UI"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/LoadingScreen.dds"), 1))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_TitleScreen"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/TitleScreen.dds"), 1))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_InventoryBackGround_UI"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Inventory.dds"), 1))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_InvenTile"),

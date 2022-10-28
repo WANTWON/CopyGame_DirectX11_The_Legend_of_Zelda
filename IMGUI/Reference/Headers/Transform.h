@@ -51,9 +51,12 @@ public:
 	void Go_Backward(_float fTimeDelta);
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);	
+	void Jump(_float fTimeDelta, _float fVelocity, _float fGravity);
 
 public:
 	void Turn(_fvector vAxis, _float fTimeDelta);
+	void Follow_Target(_float fTimeDelta, _vector TargetPos, _vector distance = XMVectorSet(0.f,0.f,0.f,0.f));
+
 	void LookAt(_fvector vAt);
 	void Change_Direction(_float UpDown, _float RightLeft);
 

@@ -61,7 +61,7 @@ HRESULT CInvenItem::Render()
 	return S_OK;
 }
 
-HRESULT CInvenItem::Ready_Components()
+HRESULT CInvenItem::Ready_Components(void * pArg)
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))

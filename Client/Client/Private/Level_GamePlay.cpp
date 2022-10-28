@@ -7,6 +7,7 @@
 #include "InvenTile.h"
 #include "UIButton.h"
 #include "InvenItem.h"
+#include "BackGround.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -96,7 +97,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Player"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Player"), LEVEL_STATIC, pLayerTag, nullptr)))
 		return E_FAIL;	
 
 	Safe_Release(pGameInstance);
@@ -173,7 +174,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_UI"), LEVEL_GAMEPLAY, pLayerTag)))
 		//return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, pLayerTag, nullptr)))
+	CBackGround::BACKGROUNDESC BackgroundDesc;
+	BackgroundDesc.eVisibleScreen = CBackGround::VISIBLE_PLAYGAME;
+	BackgroundDesc.pTextureTag = TEXT("Prototype_Component_Texture_InventoryBackGround_UI");
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, pLayerTag, 
+		&BackgroundDesc)))
 		return E_FAIL;
 
 
@@ -217,7 +222,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 			InvenDesc.eTileType = CInvenTile::INEVEN_TILE;
 			InvenDesc.eState = CInvenTile::STATE_DEFAULT;
 			InvenDesc.eEquipKey = CInvenTile::EQUIP_NONE;
-			InvenDesc.vPosition = _float2(780 + j*110, 260 + i*120);
+			InvenDesc.vPosition = _float2(_float(780 + j*110), _float(260 + i*120));
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_InvenTile_UI"), LEVEL_STATIC, pLayerTag, &InvenDesc)))
 				return E_FAIL;

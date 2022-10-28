@@ -28,10 +28,21 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 int CPlayer::Tick(_float fTimeDelta)
 {
+	if (CUI_Manager::Get_Instance()->Get_UI_Open())
+		return OBJ_NOEVENT;
+
 	Key_Input(fTimeDelta);
 	
-	m_pModelCom->Set_CurrentAnimIndex(m_iAnimNum);
-	m_pModelCom->Play_Animation(fTimeDelta);
+	
+	if (m_eAnim != m_ePreAnim)
+	{
+		m_pModelCom->Set_CurrentAnimIndex(m_eAnim);
+		m_ePreAnim = m_eAnim;
+	}
+	
+	Change_Animation(fTimeDelta);
+	
+		
 
 	
 	return OBJ_NOEVENT;
@@ -39,6 +50,9 @@ int CPlayer::Tick(_float fTimeDelta)
 
 void CPlayer::Late_Tick(_float fTimeDelta)
 {
+	if (CUI_Manager::Get_Instance()->Get_UI_Open())
+		return;
+
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
@@ -56,15 +70,27 @@ HRESULT CPlayer::Render()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
-			return E_FAIL;
-
-		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, 0)))
-			return E_FAIL;
+		Render_Model((MESH_NAME)i);
 	}
+
+
+	/*Render_Model(MESH_HAIR);
+	Render_Model(MESH_CLOTHES);
+	Render_Model(MESH_EAR);
+	Render_Model(MESH_HAT);
+	Render_Model(MESH_FACE);
+	Render_Model(MESH_SHOES);
+	Render_Model(MESH_MOUSE);
+	Render_Model(MESH_BELT);
+	
+	Render_Model(m_eLeftHand);
+	Render_Model(m_eRightHand);
+	*/
 
 	return S_OK;
 }
+
+
 
 void CPlayer::Key_Input(_float fTimeDelta)
 {
@@ -83,9 +109,11 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		m_pTransformCom->Go_Straight(fTimeDelta);
 	}
 	else
+	{
 		m_eDir[DIR_X] = 0.f;
-
-
+		Change_Direction();
+	}
+		
 
 
 	if (pGameInstacne->Key_Pressing(DIK_DOWN))
@@ -101,31 +129,40 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		m_pTransformCom->Go_Straight(fTimeDelta);
 	}
 	else
+	{
 		m_eDir[DIR_Z] = 0.f;
-
-
-
-
-	if (m_eDir[DIR_X] == 0 && m_eDir[DIR_Z] == 0)
-	{
-		m_iAnimNum = IDLE;
-	}
-	else if (m_eDir[DIR_X] == 0 || m_eDir[DIR_Z] == 0)
-	{
-		CTransform::TRANSFORMDESC pTransformDesc = m_pTransformCom->Get_TransformDesc();
-		pTransformDesc.fSpeedPerSec = 5.f;
-		m_pTransformCom->Set_TransformDesc(pTransformDesc);
-		m_iAnimNum = RUN;
-	}
-	else
-	{
-		CTransform::TRANSFORMDESC pTransformDesc = m_pTransformCom->Get_TransformDesc();
-		pTransformDesc.fSpeedPerSec = 2.5f;
-		m_pTransformCom->Set_TransformDesc(pTransformDesc);
-		m_iAnimNum = RUN;
+		Change_Direction();
 	}
 		
+	
 
+	if (pGameInstacne->Key_Up(DIK_X))
+	{
+		if (m_eAnim == ANIM::SLASH_HOLD_LP)
+			m_eAnim = ANIM::SLASH_HOLD_ED;
+		else
+			m_eAnim = ANIM::SLASH;
+	}
+	if (pGameInstacne->Key_Pressing(DIK_X))
+	{
+		if (m_eAnim != ANIM::SLASH_HOLD_LP)
+			m_eAnim = ANIM::SLASH_HOLD_ST;
+	}
+	else if (pGameInstacne->Key_Up(DIK_Y))
+	{
+		if (m_eAnim == ANIM::SHIELD_LP)
+			m_eAnim = SHIELD_ED;
+		else if(m_eAnim != ANIM::SHIELD_LP)
+			m_eAnim = ANIM::SHIELD_ST;
+	}
+
+
+	if (pGameInstacne->Key_Down(DIK_LCONTROL))
+	{
+		m_eAnim = ANIM::JUMP;
+	}
+
+		
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -179,6 +216,85 @@ HRESULT CPlayer::SetUp_ShaderResources()
 HRESULT CPlayer::SetUp_ShaderID()
 {
 	return S_OK;
+}
+
+void CPlayer::Render_Model(MESH_NAME eMeshName)
+{
+	if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", eMeshName, aiTextureType_DIFFUSE)))
+		return;
+
+	if (FAILED(m_pModelCom->Render(m_pShaderCom, eMeshName, 0)))
+		return;
+}
+
+void CPlayer::Change_Direction()
+{
+	__super::Change_Direction();
+
+	if (m_eDir[DIR_X] == 0 && m_eDir[DIR_Z] == 0)
+	{
+		if (m_eAnim == RUN)
+			m_eAnim = IDLE;
+	}
+	else if (m_eDir[DIR_X] == 0 || m_eDir[DIR_Z] == 0)
+	{
+		CTransform::TRANSFORMDESC pTransformDesc = m_pTransformCom->Get_TransformDesc();
+		pTransformDesc.fSpeedPerSec = 5.f;
+		m_pTransformCom->Set_TransformDesc(pTransformDesc);
+
+		if (m_eAnim != JUMP)
+				m_eAnim = RUN;
+	}
+	else
+	{
+		CTransform::TRANSFORMDESC pTransformDesc = m_pTransformCom->Get_TransformDesc();
+		pTransformDesc.fSpeedPerSec = 2.5f;
+		m_pTransformCom->Set_TransformDesc(pTransformDesc);
+		if (m_eAnim != JUMP)
+			m_eAnim = RUN;
+	}
+}
+
+void CPlayer::Change_Animation(_float fTimeDelta)
+{
+	switch (m_eAnim)
+	{
+	case Client::CPlayer::IDLE:
+	case Client::CPlayer::RUN:
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
+		break;
+	case Client::CPlayer::JUMP:
+		m_bIsLoop = false;
+		m_pTransformCom->Jump(fTimeDelta, 1.f, 4.5);
+		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+			m_eAnim = IDLE;
+		break;
+	case Client::CPlayer::SLASH_HOLD_ST:
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+			m_eAnim = SLASH_HOLD_LP;
+		break;
+	case Client::CPlayer::SHIELD_ST:
+	case Client::CPlayer::SHIELD_HIT:
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+			m_eAnim = SHIELD_LP;
+		break;
+	case Client::CPlayer::LAND:
+	case Client::CPlayer::SLASH:
+	case Client::CPlayer::SHIELD_ED:
+	case Client::CPlayer::SLASH_HOLD_ED:
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+			m_eAnim = IDLE;
+		break;
+	default:
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
+		break;
+	}
+	
 }
 
 CPlayer * CPlayer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
