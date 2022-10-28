@@ -28,10 +28,10 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 int CPlayer::Tick(_float fTimeDelta)
 {
-	if (CUI_Manager::Get_Instance()->Get_UI_Open())
-		return OBJ_NOEVENT;
+	if (CUI_Manager::Get_Instance()->Get_UI_Open() != true)
+		Key_Input(fTimeDelta);
 
-	Key_Input(fTimeDelta);
+	
 	
 	
 	if (m_eAnim != m_ePreAnim)
@@ -50,8 +50,6 @@ int CPlayer::Tick(_float fTimeDelta)
 
 void CPlayer::Late_Tick(_float fTimeDelta)
 {
-	if (CUI_Manager::Get_Instance()->Get_UI_Open())
-		return;
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);

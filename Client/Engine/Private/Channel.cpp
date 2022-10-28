@@ -61,8 +61,6 @@ HRESULT CChannel::Initialize(CModel* pModel, aiNodeAnim * pAIChannel)
 
 void CChannel::Invalidate_TransformationMatrix(_float fCurrentTime)
 {
-//	for (_uint i = 0; i < 999999; ++i)
-//		int a = 10;
 
 	_vector			vScale, vRotation, vPosition;
 
