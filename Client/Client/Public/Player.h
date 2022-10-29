@@ -40,12 +40,16 @@ private:
 	CModel*					m_pModelCom = nullptr;
 	ANIM					m_eAnim = IDLE;
 	ANIM					m_ePreAnim = IDLE;
+	_float					m_eAnimSpeed = 1.f;
 
 	//LeftHand : MESH_SHEILD, MESH_OCARINA 
 	//RightHand : MESH_SWORD MESH_SWORD2 MESH_HOOK, MESH_SHOVEL, MESH_WAND, MESH_FILPPER
 	MESH_NAME				m_eLeftHand = MESH_SHEILD;
 	MESH_NAME				m_eRightHand = MESH_SWORD;
 	_bool					m_bIsLoop = true;
+	_float					m_fTime = 0.f;
+	_float					m_MaxTime = 0.f;
+	
 
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;

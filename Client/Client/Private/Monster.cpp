@@ -105,7 +105,6 @@ void CMonster::Calculate_Direction(_vector vTargetPos)
 	_vector vCross = XMVector3Cross(vTargetDir, vLook);
 
 	m_pTransformCom->LookAt(vTargetPos);
-	//m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fAngleDegree);
 }
 
 _float CMonster::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
@@ -118,10 +117,10 @@ _float CMonster::Take_Damage(float fDamage, void * DamageType, CGameObject * Dam
 	if (m_tInfo.iCurrentHp <= 0)
 	{
 		m_tInfo.iCurrentHp = 0.f;
-		m_bDead = true;
+		return m_tInfo.iCurrentHp;
 	}
 
-	return fDamage;
+	return m_tInfo.iCurrentHp;
 }
 
 

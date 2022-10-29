@@ -61,12 +61,12 @@ HRESULT CChannel::Initialize(CModel* pModel, aiNodeAnim * pAIChannel)
 
 void CChannel::Invalidate_TransformationMatrix(_float fCurrentTime)
 {
-
-	_vector			vScale, vRotation, vPosition;
-
+	KEYFRAME		FirstKeyframe = m_KeyFrames.front();
 	KEYFRAME		LastKeyframe = m_KeyFrames.back();
 
-	if (fCurrentTime >= LastKeyframe.fTime)	
+	_vector  vScale, vRotation, vPosition;
+
+	 if (fCurrentTime >= LastKeyframe.fTime)	
 	{
 		vScale = XMLoadFloat3(&LastKeyframe.vScale);
 		vRotation = XMLoadFloat4(&LastKeyframe.vRotation);
@@ -96,6 +96,11 @@ void CChannel::Invalidate_TransformationMatrix(_float fCurrentTime)
 		vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, fRatio);
 		vPosition = XMVectorLerp(vSourPosition, vDestPosition, fRatio);
 		vPosition = XMVectorSetW(vPosition, 1.f);
+
+		XMStoreFloat3(&m_vScale, vScale);
+		XMStoreFloat4(&m_vRotation, vRotation);
+		XMStoreFloat4(&m_vPosition, vPosition);
+
 	}
 
 	_matrix		TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);

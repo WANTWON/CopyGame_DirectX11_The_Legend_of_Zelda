@@ -31,7 +31,7 @@ public:
 	HRESULT SetUp_Material(class CShader* pShader, const char* pConstantName, _uint iMeshIndex, aiTextureType eType);
 	_bool Play_Animation(_float fTimeDelta, _bool isLoop);
 	HRESULT Render(class CShader* pShader, _uint iMeshIndex, _uint iPassIndex = 0);
-
+	HRESULT Set_AnimationReset();
 	
 
 private:

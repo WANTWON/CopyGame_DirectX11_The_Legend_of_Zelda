@@ -20,7 +20,7 @@ HRESULT COctorock::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_tInfo.iMaxHp = 150;
+	m_tInfo.iMaxHp = 3;
 	m_tInfo.fDamage = 20.f;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
@@ -99,6 +99,8 @@ void COctorock::Change_Animation(_float fTimeDelta)
 	case Client::COctorock::DEAD:
 	case Client::COctorock::DEAD_FIRE:
 		m_bIsLoop = false;
+		m_pTransformCom->Go_Backward(fTimeDelta*4);
+		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 			m_bDead = true;
 		break;
@@ -158,7 +160,7 @@ HRESULT COctorock::SetUp_ShaderResources()
 
 _bool COctorock::IsDead()
 {
-	if (m_bDead && m_eState == STATE::DEAD && GetTickCount() > m_dwDeathTime + 1500)
+	if (m_bDead && m_eState == STATE::DEAD )//&& m_dwDeathTime + 1000 < GetTickCount())
 		return true;
 	else if (m_bDead && m_eState != STATE::DEAD)
 	{
@@ -223,7 +225,7 @@ void COctorock::Follow_Target(_float fTimeDelta)
 
 void COctorock::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove)
+	if (!m_bMove && m_eState == DEAD)
 		return;
 
 	// Check for Target, AggroRadius
@@ -258,7 +260,7 @@ void COctorock::Patrol(_float fTimeDelta)
 	// Switch between Idle and Walk (based on time)
 	if (m_eState == STATE::IDLE)
 	{
-		if (GetTickCount() > m_dwIdleTime + (rand() % 3000) * (rand() % 2 + 1) + 3000)
+		if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 2 + 1) + 3000)
 		{
 			m_eState = STATE::WALK;
 			m_dwWalkTime = GetTickCount();
@@ -287,9 +289,9 @@ void COctorock::Patrol(_float fTimeDelta)
 
 _float COctorock::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
 {
-	_float fDmg = __super::Take_Damage(fDamage, DamageType, DamageCauser);
+	_float fHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
 
-	if (fDmg > 0)
+	if (fHp > 0)
 	{
 		if (!m_bDead)
 		{
@@ -303,8 +305,10 @@ _float COctorock::Take_Damage(float fDamage, void * DamageType, CGameObject * Da
 		m_bIsAttacking = false;
 		m_dwAttackTime = GetTickCount();
 
-		return fDmg;
+		return fHp;
 	}
+	else
+		m_eState = STATE::DEAD;
 
 	return 0.f;
 }

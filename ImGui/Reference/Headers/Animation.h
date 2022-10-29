@@ -13,7 +13,7 @@ private:
 public:
 	HRESULT Initialize(class CModel* pModel, aiAnimation* pAIAnimation);
 	_bool Invalidate_TransformationMatrix(_float fTimeDelta, _bool isLoop);
-	void Set_TimeReset() { m_fCurrentTime = 0.f; }
+	void Set_TimeReset();
 
 private:
 	char				m_szName[MAX_PATH] = "";

@@ -44,7 +44,6 @@ CHierarchyNode * CModel::Get_BonePtr(const char * pBoneName) const
 void CModel::Set_CurrentAnimIndex(_uint iAnimIndex)
 {
 	m_iCurrentAnimIndex = iAnimIndex;
-	//m_Animations[m_iCurrentAnimIndex]->Set_TimeReset();
 }
 
 HRESULT CModel::Initialize_Prototype(TYPE eModelType, const char * pModelFilePath, _fmatrix PivotMatrix)
@@ -135,6 +134,13 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iPassIndex)
 	pShader->Begin(iPassIndex);
 
 	m_Meshes[iMeshIndex]->Render();
+
+	return S_OK;
+}
+
+HRESULT CModel::Set_AnimationReset()
+{
+	m_Animations[m_iCurrentAnimIndex]->Set_TimeReset();
 
 	return S_OK;
 }

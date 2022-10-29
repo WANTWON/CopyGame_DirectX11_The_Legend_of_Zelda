@@ -36,14 +36,14 @@ int CCamera_Dynamic::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	if (m_eCamMode == CAM_PLAYER)
+	/*if (m_eCamMode == CAM_PLAYER)
 	{
 		Player_Camera(fTimeDelta);
 	}
 	else if (m_eCamMode == CAM_TURNMODE)
 	{
 		Turn_Camera(fTimeDelta);
-	}
+	}*/
 
 	if (FAILED(Bind_OnPipeLine()))
 		return OBJ_NOEVENT;

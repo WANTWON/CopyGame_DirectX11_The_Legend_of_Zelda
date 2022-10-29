@@ -36,17 +36,16 @@ _bool CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, _bool isLoo
 
 	if (m_fCurrentTime >= m_fDuration)
 	{
-		m_fCurrentTime = 0.f;
+		Set_TimeReset();
 		m_isFinished = true;
+		if (!isLoop)
+			return m_isFinished;
 	}
 	else
 		m_isFinished = false;
 
 	for (auto& pChannel : m_Channels)
 	{
-		if (true == m_isFinished)
-			pChannel->Reset();
-
 		pChannel->Invalidate_TransformationMatrix(m_fCurrentTime);
 	}
 
@@ -54,6 +53,15 @@ _bool CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, _bool isLoo
 		m_isFinished = false; //루프를 돌 때는 무조건 false로 반환하게 하려고
 	 
 	return m_isFinished; //루프를 돌지 않고 애니메이션이 끝났을 때
+}
+
+void CAnimation::Set_TimeReset()
+{
+	m_fCurrentTime = 0.f;
+	for (auto& pChannel : m_Channels)
+	{
+		pChannel->Reset();
+	}
 }
 
 CAnimation * CAnimation::Create( CModel* pModel, aiAnimation * pAIAnimation)

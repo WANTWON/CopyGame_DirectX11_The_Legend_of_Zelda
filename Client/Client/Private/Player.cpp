@@ -139,10 +139,19 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		if (m_eAnim == ANIM::SLASH_HOLD_LP)
 			m_eAnim = ANIM::SLASH_HOLD_ED;
 		else
+		{
 			m_eAnim = ANIM::SLASH;
+			m_pModelCom->Set_AnimationReset();
+		}
 	}
-	if (pGameInstacne->Key_Pressing(DIK_X))
+	else if (pGameInstacne->Key_Pressing(DIK_X))
 	{
+		if (m_eAnim == ANIM::SLASH)
+		{
+			RELEASE_INSTANCE(CGameInstance);
+			return;
+		}
+		
 		if (m_eAnim != ANIM::SLASH_HOLD_LP)
 			m_eAnim = ANIM::SLASH_HOLD_ST;
 	}
@@ -155,9 +164,10 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	}
 
 
-	if (pGameInstacne->Key_Down(DIK_LCONTROL))
+	if (pGameInstacne->Key_Pressing(DIK_LCONTROL))
 	{
 		m_eAnim = ANIM::JUMP;
+		m_fTime = 0.f;
 	}
 
 		
@@ -258,41 +268,63 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	switch (m_eAnim)
 	{
 	case Client::CPlayer::IDLE:
-	case Client::CPlayer::RUN:
 		m_bIsLoop = true;
-		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
+		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
+		break;
+	case Client::CPlayer::RUN:
+		m_eAnimSpeed = 1.3f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CPlayer::JUMP:
+	{
+		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
-		m_pTransformCom->Jump(fTimeDelta, 1.f, 4.5);
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
-			m_eAnim = IDLE;
+		_vector		vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		m_fTime += 0.1f;
+		m_pTransformCom->Jump(m_fTime, 2.f, 1.4f);
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eAnim = LAND;
 		break;
+	}
 	case Client::CPlayer::SLASH_HOLD_ST:
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		m_eAnimSpeed = 2.f;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eAnim = SLASH_HOLD_LP;
 		break;
 	case Client::CPlayer::SHIELD_ST:
 	case Client::CPlayer::SHIELD_HIT:
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eAnim = SHIELD_LP;
 		break;
 	case Client::CPlayer::LAND:
+		m_eAnimSpeed = 3.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eAnim = IDLE;
+		break;
 	case Client::CPlayer::SLASH:
+		m_eAnimSpeed = 1.5f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eAnim = IDLE;
+		break;
 	case Client::CPlayer::SHIELD_ED:
 	case Client::CPlayer::SLASH_HOLD_ED:
+		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eAnim = IDLE;
 		break;
 	default:
 		m_bIsLoop = true;
-		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
+		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
 		break;
 	}
 	
+	m_eAnimSpeed = 1.f;
 }
 
 CPlayer * CPlayer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

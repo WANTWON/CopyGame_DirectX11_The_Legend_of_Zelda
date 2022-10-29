@@ -84,12 +84,37 @@ void CTransform::Jump(_float fTimeDelta, _float fVelocity, _float fGravity)
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	float fSpeed = fVelocity * fTimeDelta - (0.5*fGravity*fTimeDelta*fTimeDelta);
 
-	vPosition += XMVectorSet(0.f, fSpeed, 0.f, 0.f);
+	vPosition = XMVectorSetY(vPosition, fSpeed);
 	
 	float y = XMVectorGetY(vPosition);
 	if ( y <= 0)
 		vPosition = XMVectorSetY(vPosition, 0.f);
 	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+void CTransform::Go_PosTarget(_float fTimeDelta, _vector TargetPos, _vector distance)
+{
+	_vector vPos = Get_State(CTransform::STATE_POSITION);
+	_vector vNewPos = vPos + distance;
+	_vector vDir = vNewPos - vPos;
+
+	vDir = XMVector3Normalize(vDir);
+
+	vPos += vDir*fTimeDelta*m_TransformDesc.fSpeedPerSec;
+
+	Set_State(CTransform::STATE_POSITION, vPos);
+}
+
+void CTransform::Go_PosDir(_float fTimeDelta, _vector vecDir)
+{
+	_vector vPos = Get_State(CTransform::STATE_POSITION);
+	_vector vDir = vecDir;
+
+	vDir = XMVector3Normalize(vDir);
+
+	vPos += vDir*fTimeDelta*m_TransformDesc.fSpeedPerSec;
+
+	Set_State(CTransform::STATE_POSITION, vPos);
 }
 
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
