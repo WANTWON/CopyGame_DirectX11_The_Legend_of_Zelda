@@ -175,7 +175,7 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
 	TransformDesc.fSpeedPerSec = 5.f;
-	TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
 
@@ -221,7 +221,7 @@ void CPlayer::Render_Model(MESH_NAME eMeshName)
 	if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", eMeshName, aiTextureType_DIFFUSE)))
 		return;
 
-	if (FAILED(m_pModelCom->Render(m_pShaderCom, eMeshName, 0)))
+	if (FAILED(m_pModelCom->Render(m_pShaderCom, eMeshName, m_eShaderID)))
 		return;
 }
 

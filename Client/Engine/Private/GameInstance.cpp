@@ -395,6 +395,15 @@ HRESULT CGameInstance::Render_Font(const _tchar * pFontTag, const _tchar * pText
 	return m_pFont_Manager->Render_Font(pFontTag, pText, vPos, vColor, fScale);
 }
 
+void CGameInstance::Apply_Damage_Multi(_float fDamage, vector<CGameObject*>& vecDamagedObj, CGameObject * DamageCauser, void * AttackType)
+{
+	for (auto& iter = vecDamagedObj.begin(); iter != vecDamagedObj.end();)
+	{
+		(*iter)->Take_Damage(fDamage, AttackType, DamageCauser);
+		iter++;
+	}
+}
+
 void CGameInstance::Release_Engine()
 {
 	CGameInstance::Get_Instance()->Destroy_Instance();

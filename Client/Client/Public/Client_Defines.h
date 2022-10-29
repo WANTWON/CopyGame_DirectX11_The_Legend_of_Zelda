@@ -11,6 +11,14 @@ namespace Client
 	enum SHADERUI_ID { UI_ALPHATEST, UI_ALPHABLEND, UI_PICKED };
 
 	enum DIR { MINUS, NONE, PLUS };
+
+	typedef struct ObjectInfo
+	{
+		float iMaxHp;
+		float iCurrentHp;
+		float fDamage;
+		//vector<Item*> vItemDrops;
+	}OBJINFO;
 }
 
 #include <process.h>

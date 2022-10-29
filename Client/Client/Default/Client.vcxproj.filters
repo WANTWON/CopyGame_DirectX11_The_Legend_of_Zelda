@@ -61,6 +61,12 @@
     <Filter Include="02.GameObjects\02.Player">
       <UniqueIdentifier>{2a2f6828-11ef-4b28-a218-49dc0b8693d6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\03.Monster">
+      <UniqueIdentifier>{176bbdcc-cb7d-42f6-8ed7-b6ae261f9ea1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.Monster\00.Octorock">
+      <UniqueIdentifier>{f0d3fb72-495a-48e4-9f30-554b6b7b10d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -132,6 +138,12 @@
     <ClInclude Include="..\..\..\Bin\ShaderFiles\Client_Shader_Defines.hpp">
       <Filter>97.ShaderFiles</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Monster.h">
+      <Filter>02.GameObjects\03.Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Octorock.h">
+      <Filter>02.GameObjects\03.Monster\00.Octorock</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -187,6 +199,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Player.cpp">
       <Filter>02.GameObjects\02.Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster.cpp">
+      <Filter>02.GameObjects\03.Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Octorock.cpp">
+      <Filter>02.GameObjects\03.Monster\00.Octorock</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

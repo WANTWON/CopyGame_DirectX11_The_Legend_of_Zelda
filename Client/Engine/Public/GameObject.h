@@ -29,16 +29,18 @@ public:
 public:
 	virtual _bool Picking(_float3* PickingPoint) { return true; }
 	virtual void PickingTrue() { return; }
+	virtual _float Take_Damage(float fDamage, void* DamageType, CGameObject* DamageCauser) { return 0.f; };
 
 	_bool	Get_Dead() { return m_bDead; }
 	_float  Get_CamDistance() { return m_fCamDistance; }
 	void	Set_Dead(_bool bDead) { m_bDead = bDead; }
 	void	Set_Picked(_bool type) { m_bPicked = type; }
 
+	
 protected:
 	HRESULT Add_Components(const _tchar* pComponentTag, _uint iLevelIndex, const _tchar* pPrototypeTag, CComponent** ppOut, void* pArg = nullptr);
 	void Compute_CamDistance(_vector vWorldPos);
-
+	
 
 protected:
 	ID3D11Device* m_pDevice = nullptr;
