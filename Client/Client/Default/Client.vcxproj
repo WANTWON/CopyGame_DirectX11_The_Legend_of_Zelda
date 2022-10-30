@@ -184,6 +184,7 @@
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\MoblinSword.h" />
     <ClInclude Include="..\Public\Monster.h" />
+    <ClInclude Include="..\Public\NonAnim.h" />
     <ClInclude Include="..\Public\Obj_UI.h" />
     <ClInclude Include="..\Public\Octorock.h" />
     <ClInclude Include="..\Public\Player.h" />
@@ -209,6 +210,7 @@
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\MoblinSword.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\Private\NonAnim.cpp" />
     <ClCompile Include="..\Private\Obj_UI.cpp" />
     <ClCompile Include="..\Private\Octorock.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />

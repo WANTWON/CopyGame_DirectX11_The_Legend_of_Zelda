@@ -7,7 +7,7 @@ class CMoblinSword final : public CMonster
 {
 public:
 	enum STATE {
-		DAMAGE_B, DAMAGE_F, DEAD_D, DEAD_F, DEAD_FIRE, FALL, FIND,
+		DAMAGE_B, DAMAGE_F, DEAD_B, DEAD_F, DEAD_FIRE, FALL, FIND,
 		GUARD, KYOROKYORO, PIYO, STAGGER, STANCE_WAIT, STANCE_WALK, IDLE, WALK};
 
 private:

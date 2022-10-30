@@ -153,6 +153,9 @@
     <ClInclude Include="..\Public\MoblinSword.h">
       <Filter>02.GameObjects\03.Monster\01.MoblinSword</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\NonAnim.h">
+      <Filter>02.GameObjects\01.NonAnim</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -217,6 +220,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MoblinSword.cpp">
       <Filter>02.GameObjects\03.Monster\01.MoblinSword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NonAnim.cpp">
+      <Filter>02.GameObjects\01.NonAnim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

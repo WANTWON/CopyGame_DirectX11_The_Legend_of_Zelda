@@ -32,7 +32,7 @@ HRESULT CMonster::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_eObjectID = OBJID::OBJ_MONSTER;
-
+	Set_Scale(_float3(0.5, 0.5, 0.5));
 
 	return S_OK;
 }
@@ -81,30 +81,33 @@ HRESULT CMonster::Render()
 }
 
 
-void CMonster::Calculate_Direction(_vector vTargetPos)
+CMonster::DMG_DIRECTION CMonster::Calculate_Direction()
 {
+	if (m_pTarget == nullptr)
+		return FRONT;
+
 	// New Logic
-	_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-	vLook = XMVectorSetY(vLook, 0.f);
-	_vector vTargetDir = vTargetPos - Get_Position();
-	vLook = XMVector3Normalize(vLook);
-	vTargetDir = XMVector3Normalize(vTargetDir);
+	_vector vLook = XMVector3Normalize( m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+	_vector vTargetDir = XMVector3Normalize(dynamic_cast<CPlayer*>(m_pTarget)->Get_TransformState(CTransform::STATE_LOOK));
 
 	_vector fDot = XMVector3Dot(vTargetDir, vLook);
 	_float fAngleRadian = acos(XMVectorGetX(fDot));
 	_float fAngleDegree = XMConvertToDegrees(fAngleRadian);
 
 	if (fAngleDegree < 0 || fAngleDegree > 360 )
-		return;
+		return FRONT;
 
-	if (fAngleDegree > 180 )
-	{
+	if (fAngleDegree > 180)
 		fAngleDegree = 360 - fAngleDegree;
-	}
+	
+	if (fAngleDegree > 90)
+		m_eDmg_Direction = FRONT;
+	else
+		m_eDmg_Direction = BACK;
 
 	_vector vCross = XMVector3Cross(vTargetDir, vLook);
 
-	m_pTransformCom->LookAt(vTargetPos);
+	return m_eDmg_Direction;
 }
 
 _float CMonster::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)

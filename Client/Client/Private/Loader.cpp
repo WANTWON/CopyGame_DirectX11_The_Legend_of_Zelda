@@ -6,16 +6,18 @@
 
 #include "Camera_Dynamic.h"
 #include "Terrain.h"
-#include "InvenTile.h"
-#include "UIButton.h"
-#include "InvenItem.h"
 #include "Player.h"
-#include "BackGround.h"
+#include "NonAnim.h"
 
 //for Monster
 #include "Octorock.h"
 #include "MoblinSword.h"
 
+//for UI
+#include "BackGround.h"
+#include "InvenTile.h"
+#include "UIButton.h"
+#include "InvenItem.h"
 //#include "Effect.h"
 //#include "Sky.h"
 //#include "UI.h"
@@ -141,7 +143,7 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 	_matrix			PivotMatrix = XMMatrixIdentity();
 
-	/*for (int i = 1; i < 17; ++i)
+	for (int i = 1; i < 17; ++i)
 	{
 		for (int j = 0; j < 7; ++j)
 		{
@@ -156,17 +158,17 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, pModeltag,
 				CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, FilePath, PivotMatrix))))
 			{
-				delete pModeltag;
-				delete szFilePath;
-				delete FilePath;
+				Safe_Delete(pModeltag);
+				Safe_Delete(szFilePath);
+				Safe_Delete(FilePath);
 
 				continue;
 			}
+			delete szFilePath;
 			delete FilePath;
-
 		}
 	}
-*/
+
 
 	/*For.Prototype_Component_Model_Link*/
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
@@ -258,6 +260,10 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CInvenItem"),
 		CInvenItem::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NonAnim"),
+		CNonAnim::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);

@@ -12,6 +12,7 @@ class CMonster abstract : public CBaseObj
 {
 public:
 	enum MONSTER_ID { MONSTER_OCTOROCK, MONSTER_MOBLINSWORD, MONSTER_END };
+	enum DMG_DIRECTION {FRONT, BACK};
 
 protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -38,7 +39,7 @@ public: // Get& Set
 	_bool Get_Hited(void) { return m_bHit; }
 
 protected:
-	void Calculate_Direction(_vector vTargetPos);
+	DMG_DIRECTION Calculate_Direction();
 	virtual void AI_Behaviour(_float fTimeDelta) { };
 	virtual void Find_Target() { };
 	virtual void Follow_Target(_float fTimeDelta) { };
@@ -67,6 +68,7 @@ protected:
 
 	MONSTER_ID	m_eMonsterID = MONSTER_END;
 	OBJINFO  m_tInfo;
+	DMG_DIRECTION	m_eDmg_Direction = FRONT;
 
 protected: /* For.Components */
 	CModel*					m_pModelCom = nullptr;

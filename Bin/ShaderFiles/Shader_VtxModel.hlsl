@@ -5,6 +5,8 @@ matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 vector			g_vCamPosition;
 
+matrix			g_BoneMatrices[256];
+
 
 texture2D		g_DiffuseTexture;
 texture2D		g_OcculsionTexture;

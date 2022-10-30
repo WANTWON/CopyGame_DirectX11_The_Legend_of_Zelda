@@ -201,7 +201,7 @@ void COctorock::Find_Target()
 			{
 				CTransform* PlayerTransform = (CTransform*)pGameInstance->Get_Component(LEVEL_STATIC,TEXT("Layer_Player"), TEXT("Com_Transform"));
 				_vector vTargetPos = PlayerTransform->Get_State(CTransform::STATE_POSITION);
-				m_fDistanceToTarget =  XMVectorGetX(XMVector3Length(Get_Position() - vTargetPos));
+				m_fDistanceToTarget =  XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
 				m_pTarget = pTarget;
 			}
 			else
@@ -219,10 +219,9 @@ void COctorock::Follow_Target(_float fTimeDelta)
 
 	m_eState = STATE::WALK;
 
-	_vector vTargetPos = dynamic_cast<CBaseObj*>(m_pTarget)->Get_Position();
+	_vector vTargetPos = dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
 
-	Calculate_Direction(vTargetPos);
-
+	m_pTransformCom->LookAt(vTargetPos);
 	m_pTransformCom->Go_Straight(fTimeDelta);
 
 	m_bIsAttacking = false;
@@ -243,7 +242,7 @@ void COctorock::AI_Behaviour(_float fTimeDelta)
 			// If in AttackRadius > Attack
 			if (m_fDistanceToTarget < m_fAttackRadius)
 			{
-				m_pTransformCom->LookAt(dynamic_cast<CBaseObj*>(m_pTarget)->Get_Position());
+				m_pTransformCom->LookAt(dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
 				if (!m_bIsAttacking && GetTickCount() > m_dwAttackTime + 1500)
 				{
 					m_eState = STATE::ATTACK_ST;

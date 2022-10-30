@@ -304,7 +304,7 @@ void CGameInstance::Clear_Layer(_uint iLevelIndex, const _tchar * LayerTag)
 
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const _tchar * pPrototypeTag, CComponent * pPrototype)
 {
-	if (nullptr == m_pComponent_Manager)
+	if (nullptr == m_pComponent_Manager || pPrototype == nullptr)
 		return E_FAIL;
 
 	if (FAILED(m_pComponent_Manager->Add_Prototype(iLevelIndex, pPrototypeTag, pPrototype)))

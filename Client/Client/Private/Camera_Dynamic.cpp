@@ -69,6 +69,17 @@ void CCamera_Dynamic::Player_Camera(_float fTimeDelta)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
+	if (m_lMouseWheel > 0)
+		m_lMouseWheel -= 0.001;
+	if (m_lMouseWheel < 0)
+		m_lMouseWheel += 0.001;
+
+	if (m_lMouseWheel += (pGameInstance->Get_DIMMoveState(DIMM_WHEEL)*0.05))
+	{
+		m_vDistance.y -= _float(fTimeDelta*m_lMouseWheel*0.01f);
+		m_vDistance.z += _float(fTimeDelta*m_lMouseWheel*0.01f);
+	}
+
 
 	if (pGameInstance->Key_Pressing(DIK_F1))
 	{
@@ -86,7 +97,7 @@ void CCamera_Dynamic::Player_Camera(_float fTimeDelta)
 
 	Safe_AddRef(pTarget);
 
-	_vector m_TargetPos = pTarget->Get_Position();
+	_vector m_TargetPos = pTarget->Get_TransformState(CTransform::STATE_POSITION);
 
 	Safe_Release(pTarget);
 

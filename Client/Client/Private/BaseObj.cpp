@@ -56,13 +56,13 @@ void CBaseObj::Change_Direction()
 
 
 
-_vector CBaseObj::Get_Position()
+_vector CBaseObj::Get_TransformState(CTransform::STATE eState)
 {
 	if (m_pTransformCom == nullptr)
 		return _vector();
 
 
-	return m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	return m_pTransformCom->Get_State(eState);
 }
 
 void CBaseObj::Set_State(CTransform::STATE eState, _fvector vState)
@@ -76,6 +76,11 @@ void CBaseObj::Set_State(CTransform::STATE eState, _fvector vState)
 void CBaseObj::Set_Scale(_float3 vScale)
 {
 	m_vScale = vScale;
+
+	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, m_vScale.x);
+	m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_vScale.y);
+	m_pTransformCom->Set_Scale(CTransform::STATE_LOOK, m_vScale.z);
+
 }
 
 void CBaseObj::Free()

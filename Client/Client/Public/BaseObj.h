@@ -38,7 +38,7 @@ public:
 public:
 	OBJID Get_ObjectID() { return m_eObjectID; }
 	_float3 Get_Scale() { return m_vScale; };
-	_vector Get_Position();
+	_vector Get_TransformState(CTransform::STATE eState);
 	void Set_State(CTransform::STATE eState, _fvector vState);
 	void Set_Scale(_float3 vScale);
 
