@@ -2,12 +2,12 @@
 #include "..\Public\Loader.h"
 
 #include "GameInstance.h"
-
-
 #include "Camera_Dynamic.h"
 #include "Terrain.h"
 #include "Player.h"
 #include "NonAnim.h"
+
+#include "Level_Manager.h"
 
 //for Monster
 #include "Octorock.h"
@@ -18,10 +18,6 @@
 #include "InvenTile.h"
 #include "UIButton.h"
 #include "InvenItem.h"
-//#include "Effect.h"
-//#include "Sky.h"
-//#include "UI.h"
-
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -164,8 +160,8 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 				continue;
 			}
-			delete szFilePath;
-			delete FilePath;
+			Safe_Delete(szFilePath);
+			Safe_Delete(FilePath);
 		}
 	}
 

@@ -135,7 +135,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		Change_Direction();
 	}
 		
-	
+
 
 	if (pGameInstacne->Key_Up(DIK_X))
 	{
