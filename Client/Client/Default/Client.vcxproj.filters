@@ -67,6 +67,12 @@
     <Filter Include="02.GameObjects\03.Monster\00.Octorock">
       <UniqueIdentifier>{f0d3fb72-495a-48e4-9f30-554b6b7b10d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\01.NonAnim">
+      <UniqueIdentifier>{702373a4-8bfc-4fcf-b1a3-b6e9013b66eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.Monster\01.MoblinSword">
+      <UniqueIdentifier>{1ea90761-5912-46ea-a861-ce80f25ae670}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -144,6 +150,9 @@
     <ClInclude Include="..\Public\Octorock.h">
       <Filter>02.GameObjects\03.Monster\00.Octorock</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MoblinSword.h">
+      <Filter>02.GameObjects\03.Monster\01.MoblinSword</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -205,6 +214,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Octorock.cpp">
       <Filter>02.GameObjects\03.Monster\00.Octorock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MoblinSword.cpp">
+      <Filter>02.GameObjects\03.Monster\01.MoblinSword</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

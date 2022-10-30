@@ -182,6 +182,7 @@
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\MainApp.h" />
+    <ClInclude Include="..\Public\MoblinSword.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\Obj_UI.h" />
     <ClInclude Include="..\Public\Octorock.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
+    <ClCompile Include="..\Private\MoblinSword.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\Obj_UI.cpp" />
     <ClCompile Include="..\Private\Octorock.cpp" />

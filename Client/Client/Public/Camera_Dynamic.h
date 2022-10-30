@@ -36,7 +36,7 @@ public:
 
 private:
 	CAMERAMODE m_eCamMode = CAM_PLAYER;
-	_float3 m_vDistance = _float3(0, 6, -10);
+	_float3 m_vDistance = _float3(0, 6, -6);
 
 public:
 	static CCamera_Dynamic* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

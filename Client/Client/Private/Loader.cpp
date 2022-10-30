@@ -14,6 +14,7 @@
 
 //for Monster
 #include "Octorock.h"
+#include "MoblinSword.h"
 
 //#include "Effect.h"
 //#include "Sky.h"
@@ -140,15 +141,47 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 	_matrix			PivotMatrix = XMMatrixIdentity();
 
-	/*For.Prototype_Component_Model_Fiona*/
+	/*for (int i = 1; i < 17; ++i)
+	{
+		for (int j = 0; j < 7; ++j)
+		{
+			_tchar*			pModeltag = new _tchar[MAX_PATH];
+			_tchar*			szFilePath = new _tchar[MAX_PATH];
+			wsprintf(pModeltag, TEXT("Field_%02d%c.fbx"), i, j + 65);
+			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/Field/Field_%02d%c.fbx"), i, j + 65);
+
+			char* FilePath = new char[MAX_PATH];
+			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
+
+			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, pModeltag,
+				CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, FilePath, PivotMatrix))))
+			{
+				delete pModeltag;
+				delete szFilePath;
+				delete FilePath;
+
+				continue;
+			}
+			delete FilePath;
+
+		}
+	}
+*/
+
+	/*For.Prototype_Component_Model_Link*/
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Link"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Link/Link_Anim.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	/*For.Prototype_Component_Model_Octorock*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Octorock"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Monster/Octorock/Octorock.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_MoblinSword*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_MoblinSword"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Monster/MoblinSword/MoblinSword.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/* 셰이더 로딩 중. */
@@ -205,6 +238,10 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Octorock"),
 		COctorock::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MoblinSword"),
+		CMoblinSword::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround_UI"),

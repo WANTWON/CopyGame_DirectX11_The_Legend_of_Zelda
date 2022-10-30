@@ -11,7 +11,7 @@ BEGIN(Client)
 class CMonster abstract : public CBaseObj
 {
 public:
-	enum MONSTER_ID { MONSTER_OCTOROCK, MONSTER_END };
+	enum MONSTER_ID { MONSTER_OCTOROCK, MONSTER_MOBLINSWORD, MONSTER_END };
 
 protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

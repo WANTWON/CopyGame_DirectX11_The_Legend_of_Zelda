@@ -56,7 +56,8 @@ void CLevel_GamePlay::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
+	//SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
+	SetWindowText(g_hWnd, TEXT("해킹완료."));
 }
 
 HRESULT CLevel_GamePlay::Ready_Lights()
@@ -265,8 +266,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _tchar * pLayerTag)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Octorock"), LEVEL_STATIC, pLayerTag, &_float3(2.f, 0.f, 1.f))))
-		return E_FAIL;
+	for (int i = 0; i < 5; ++i)
+	{
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Octorock"), LEVEL_STATIC, pLayerTag, &_float3(rand()%20 +1, 0.f, rand() % 20 + 1))))
+			return E_FAIL;
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MoblinSword"), LEVEL_STATIC, pLayerTag, &_float3(rand() % 20 + 1, 0.f, rand() % 20 + 1))))
+			return E_FAIL;
+	}
+
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;

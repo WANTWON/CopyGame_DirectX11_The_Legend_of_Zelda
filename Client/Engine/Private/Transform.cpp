@@ -130,6 +130,8 @@ void CTransform::Follow_Target(_float fTimeDelta, _vector TargetPos, _vector dis
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector     vNewPos = TargetPos + distance;
+
+
 	Set_State(CTransform::STATE_POSITION, vNewPos);
 	
 }
