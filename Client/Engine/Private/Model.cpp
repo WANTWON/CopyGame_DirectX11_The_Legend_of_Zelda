@@ -188,14 +188,48 @@ HRESULT CModel::Create_Materials(const char* pModelFilePath)
 		{
 			aiString		strPath;
 
-			if (FAILED(pAIMaterial->GetTexture(aiTextureType(j), 0, &strPath)))
-				continue;
+			if (j == 6)
+			{
+				if (FAILED(pAIMaterial->GetTexture(aiTextureType(8), 0, &strPath)))
+				{
+					if((FAILED(pAIMaterial->GetTexture(aiTextureType(2), 0, &strPath))))
+						continue;
+				}
+					
+			}
+			else
+			{
+				if (FAILED(pAIMaterial->GetTexture(aiTextureType(j), 0, &strPath)))
+					continue;
+			}
+			
 
 			char			szName[MAX_PATH] = "";
 			char			szExt[MAX_PATH] = ".dds";
 			char			szTextureFileName[MAX_PATH] = "";
 
 			_splitpath_s(strPath.data, nullptr, 0, nullptr, 0, szName, MAX_PATH, nullptr, 0);
+
+			if (j == 6)
+			{
+				char* ptr = strstr(szName, "smt");  
+
+				if (ptr) {
+					strncpy(ptr, "nml", 3);  
+					puts(szName);
+				}
+				else
+				{
+					ptr = strstr(szName, "occ");  
+
+					if (ptr) {
+						strncpy(ptr, "nml", 3);
+						puts(szName);
+					}
+				}
+
+			}
+
 
 			strcpy_s(szTextureFileName, szName);
 			strcat_s(szTextureFileName, szExt);
@@ -212,8 +246,8 @@ HRESULT CModel::Create_Materials(const char* pModelFilePath)
 			MultiByteToWideChar(CP_ACP, 0, szFullPath, (int)strlen(szFullPath), szRealPath, MAX_PATH);
 
 			ModelMaterial.pMaterials[j] = CTexture::Create(m_pDevice, m_pContext, szRealPath);
-			if (nullptr == ModelMaterial.pMaterials[j])
-				return E_FAIL;
+			//if (nullptr == ModelMaterial.pMaterials[j])
+				//return E_FAIL;
 		}
 
 		m_Materials.push_back(ModelMaterial);		

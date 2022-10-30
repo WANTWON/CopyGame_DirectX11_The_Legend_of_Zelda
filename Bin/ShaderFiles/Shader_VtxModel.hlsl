@@ -8,6 +8,7 @@ vector			g_vCamPosition;
 
 texture2D		g_DiffuseTexture;
 texture2D		g_OcculsionTexture;
+texture2D		g_NormalTexture;
 
 float4			g_vLightDiffuse = float4(1.f, 1.f, 1.f, 1.f);
 float4			g_vLightAmbient = float4(0.3f, 0.3f, 0.3f, 1.f);

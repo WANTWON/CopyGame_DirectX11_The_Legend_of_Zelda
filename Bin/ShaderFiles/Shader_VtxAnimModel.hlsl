@@ -3,6 +3,7 @@
 
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D		g_DiffuseTexture;
+texture2D		g_NormalTexture;
 
 
 /* 정점들에게 곱해져야할 행렬. */
