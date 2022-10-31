@@ -43,12 +43,6 @@
     <Filter Include="95.UI\01. BackGround">
       <UniqueIdentifier>{57566d9b-4982-490a-9436-a60395b8dd99}</UniqueIdentifier>
     </Filter>
-    <Filter Include="95.UI\02. InvenTile">
-      <UniqueIdentifier>{37acfc00-5104-4b3a-9122-478460e1c85b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="95.UI\03. InvenItem">
-      <UniqueIdentifier>{98a8fba2-465d-43fd-9bba-0ccc270e4b67}</UniqueIdentifier>
-    </Filter>
     <Filter Include="95.UI\04. UIButton">
       <UniqueIdentifier>{1301e89d-dc8c-4c2b-bb34-ee43c21d52d0}</UniqueIdentifier>
     </Filter>
@@ -72,6 +66,18 @@
     </Filter>
     <Filter Include="02.GameObjects\03.Monster\01.MoblinSword">
       <UniqueIdentifier>{1ea90761-5912-46ea-a861-ce80f25ae670}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="95.UI\02. Inventory">
+      <UniqueIdentifier>{a03ca03d-fc3c-4419-847f-970cb5a55716}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="95.UI\02. Inventory\00. InvenTile">
+      <UniqueIdentifier>{37acfc00-5104-4b3a-9122-478460e1c85b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="95.UI\02. Inventory\01. InvenItem">
+      <UniqueIdentifier>{98a8fba2-465d-43fd-9bba-0ccc270e4b67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="95.UI\03. PlayerState">
+      <UniqueIdentifier>{c158d6cc-1b69-4972-9042-26d179eca7c9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -124,7 +130,7 @@
       <Filter>95.UI\01. BackGround</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\InvenTile.h">
-      <Filter>95.UI\02. InvenTile</Filter>
+      <Filter>95.UI\02. Inventory\00. InvenTile</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Obj_UI.h">
       <Filter>95.UI\00. ObjUI%28Base%29</Filter>
@@ -133,7 +139,7 @@
       <Filter>95.UI\04. UIButton</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\InvenItem.h">
-      <Filter>95.UI\03. InvenItem</Filter>
+      <Filter>95.UI\02. Inventory\01. InvenItem</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BaseObj.h">
       <Filter>02.GameObjects\00.BaseObj</Filter>
@@ -155,6 +161,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\NonAnim.h">
       <Filter>02.GameObjects\01.NonAnim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Hp.h">
+      <Filter>95.UI\03. PlayerState</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -195,7 +204,7 @@
       <Filter>95.UI\01. BackGround</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\InvenTile.cpp">
-      <Filter>95.UI\02. InvenTile</Filter>
+      <Filter>95.UI\02. Inventory\00. InvenTile</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Obj_UI.cpp">
       <Filter>95.UI\00. ObjUI%28Base%29</Filter>
@@ -204,7 +213,7 @@
       <Filter>95.UI\04. UIButton</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\InvenItem.cpp">
-      <Filter>95.UI\03. InvenItem</Filter>
+      <Filter>95.UI\02. Inventory\01. InvenItem</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BaseObj.cpp">
       <Filter>02.GameObjects\00.BaseObj</Filter>
@@ -223,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\NonAnim.cpp">
       <Filter>02.GameObjects\01.NonAnim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Hp.cpp">
+      <Filter>95.UI\03. PlayerState</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

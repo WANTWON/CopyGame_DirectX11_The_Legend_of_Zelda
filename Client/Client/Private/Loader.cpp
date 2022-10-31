@@ -139,7 +139,7 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 	_matrix			PivotMatrix = XMMatrixIdentity();
 
-	for (int i = 1; i < 17; ++i)
+	/*for (int i = 1; i < 17; ++i)
 	{
 		for (int j = 0; j < 7; ++j)
 		{
@@ -163,7 +163,7 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 			Safe_Delete(szFilePath);
 			Safe_Delete(FilePath);
 		}
-	}
+	}*/
 
 
 	/*For.Prototype_Component_Model_Link*/
@@ -270,6 +270,10 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 HRESULT CLoader::Loading_For_UITexture()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Heart"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Hp/Heart.dds"), 5))))
+		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreen_UI"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/LoadingScreen.dds"), 1))))

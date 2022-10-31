@@ -48,7 +48,7 @@ private:
 	virtual HRESULT SetUp_ShaderResources() override; /* 셰이더 전역변수에 값을 전달한다. */
 	virtual HRESULT SetUp_ShaderID() override;
 	void Render_Model(MESH_NAME eMeshName);
-	void TransformChange(_float fTimeDelta);
+	void Change_Direction(_float fTimeDelta);
 	void SetDirection_byLook(_float fTimeDelta);
 	void SetDirection_byPosition(_float fTimeDelta);
 	void Change_Animation(_float fTimeDelta);

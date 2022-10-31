@@ -37,6 +37,9 @@ private:
 	CObj_UI* m_EquipTile[EQUIP_END] = { nullptr };
 	vector<CObj_UI*> m_InvenTile;
 
+	/*For Player State*/
+	vector<CObj_UI*> m_HpList;
+
 
 public:
 	void Free() override;

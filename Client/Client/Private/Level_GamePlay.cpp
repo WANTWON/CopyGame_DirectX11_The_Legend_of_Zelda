@@ -32,8 +32,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-		return E_FAIL;
+	//if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+		//return E_FAIL;
 
 	//if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	//	return E_FAIL;	
@@ -119,26 +119,26 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
 		return E_FAIL;
 
-	HANDLE hFile = 0;
-	_ulong dwByte = 0;
-	CNonAnim::NONANIMDESC  ModelDesc;
-	_uint iNum = 0;
+	//HANDLE hFile = 0;
+	//_ulong dwByte = 0;
+	//CNonAnim::NONANIMDESC  ModelDesc;
+	//_uint iNum = 0;
 
-	hFile = CreateFile(TEXT("../../../Bin/Data/Test222.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
-		return E_FAIL;
+	//hFile = CreateFile(TEXT("../../../Bin/Data/Test222.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	//if (0 == hFile)
+	//	return E_FAIL;
 
-	/* 타일의 개수 받아오기 */
-	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+	///* 타일의 개수 받아오기 */
+	//ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
 
-	for (_uint i = 0; i < iNum; ++i)
-	{
-		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), LEVEL_GAMEPLAY, pLayerTag, &ModelDesc)))
-			return E_FAIL;
-	}
+	//for (_uint i = 0; i < iNum; ++i)
+	//{
+	//	ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+	//	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), LEVEL_GAMEPLAY, pLayerTag, &ModelDesc)))
+	//		return E_FAIL;
+	//}
 
-	CloseHandle(hFile);
+	//CloseHandle(hFile);
 
 	Safe_Release(pGameInstance);
 
