@@ -15,8 +15,9 @@ class CPlayer final : public CBaseObj
 public:
 	//ST : Start,  LP : Loop, ED : End
 	enum ANIM {
-		IDLE, RUN, WALK, JUMP, LAND, SLASH, SLASH_HOLD_ED, SLASH_HOLD_LP, SLASH_HOLD_ST,
-		SHIELD_ED, SHIELD_LP, SHIELD_ST, SHIELD_HIT
+		IDLE, RUN, WALK, D_FALL, D_JUMP, D_LAND, JUMP, LAND, S_SLASH, SLASH, SLASH_HOLD_B, SLASH_HOLD_ED, SLASH_HOLD_F,
+		SLASH_HOLD_L, SLASH_HOLD_LP, SLASH_HOLD_R, SLASH_HOLD_ST, SHIELD_ED, SHIELD_LP, SHIELD_ST, SHIELD_HIT,
+		BOW_ED, BOW_ST, DASH_ED, DASH_LP, DASH_ST, DMG_B, DMG_F
 	};
 
 	enum MESH_NAME {
@@ -47,8 +48,11 @@ private:
 	virtual HRESULT SetUp_ShaderResources() override; /* 셰이더 전역변수에 값을 전달한다. */
 	virtual HRESULT SetUp_ShaderID() override;
 	void Render_Model(MESH_NAME eMeshName);
-	void Change_Direction();
+	void TransformChange(_float fTimeDelta);
+	void SetDirection_byLook(_float fTimeDelta);
+	void SetDirection_byPosition(_float fTimeDelta);
 	void Change_Animation(_float fTimeDelta);
+
 
 
 private:
@@ -64,6 +68,9 @@ private:
 	_bool					m_bIsLoop = true;
 	_float					m_fTime = 0.f;
 	_float					m_MaxTime = 0.f;
+
+	_float					m_fStartHeight = 4.2f;
+	_float					m_fEndHeight = 4.2f;
 	
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

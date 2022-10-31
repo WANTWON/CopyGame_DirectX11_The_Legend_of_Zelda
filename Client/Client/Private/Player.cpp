@@ -24,7 +24,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 		return E_FAIL;
 
 	Set_Scale(_float3(0.5, 0.5, 0.5));
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 4.2f, 10.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, m_fStartHeight, 10.f, 1.f));
 
 	return S_OK;
 }
@@ -32,28 +32,25 @@ HRESULT CPlayer::Initialize(void * pArg)
 int CPlayer::Tick(_float fTimeDelta)
 {
 	if (CUI_Manager::Get_Instance()->Get_UI_Open() != true)
+	{
 		Key_Input(fTimeDelta);
+		Change_Direction(fTimeDelta);
+	}
 
-	
-	
-	
+
 	if (m_eState != m_ePreState)
 	{
+		m_pModelCom->Set_AnimationReset();
 		m_pModelCom->Set_CurrentAnimIndex(m_eState);
 		m_ePreState = m_eState;
 	}
-	
-	Change_Animation(fTimeDelta);
-	
-		
 
-	
+	Change_Animation(fTimeDelta);
 	return OBJ_NOEVENT;
 }
 
 void CPlayer::Late_Tick(_float fTimeDelta)
 {
-
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
@@ -67,13 +64,12 @@ HRESULT CPlayer::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-	_uint		iNumMeshes = m_pModelCom->Get_NumMeshContainers();
+	_uint	iNumMeshes = m_pModelCom->Get_NumMeshContainers();
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
 		Render_Model((MESH_NAME)i);
 	}
-
 
 	/*Render_Model(MESH_HAIR);
 	Render_Model(MESH_CLOTHES);
@@ -83,7 +79,7 @@ HRESULT CPlayer::Render()
 	Render_Model(MESH_SHOES);
 	Render_Model(MESH_MOUSE);
 	Render_Model(MESH_BELT);
-	
+
 	Render_Model(m_eLeftHand);
 	Render_Model(m_eRightHand);
 	*/
@@ -97,86 +93,81 @@ void CPlayer::Key_Input(_float fTimeDelta)
 {
 	CGameInstance* pGameInstacne = GET_INSTANCE(CGameInstance);
 
+	/* Move Left and Right*/
 	if (pGameInstacne->Key_Pressing(DIK_LEFT))
-	{
 		m_eDir[DIR_X] = -1.f;
-		Change_Direction();
-		m_pTransformCom->Go_Straight(fTimeDelta);
-	}
 	else if (pGameInstacne->Key_Pressing(DIK_RIGHT))
-	{
 		m_eDir[DIR_X] = 1.f;
-		Change_Direction();
-		m_pTransformCom->Go_Straight(fTimeDelta);
-	}
 	else
-	{
 		m_eDir[DIR_X] = 0.f;
-		Change_Direction();
-	}
-		
 
-
+	/* Move Up And Down*/
 	if (pGameInstacne->Key_Pressing(DIK_DOWN))
-	{
 		m_eDir[DIR_Z] = -1.f;
-		Change_Direction();
-		m_pTransformCom->Go_Straight(fTimeDelta);
-	}
 	else if (pGameInstacne->Key_Pressing(DIK_UP))
-	{
 		m_eDir[DIR_Z] = 1.f;
-		Change_Direction();
-		m_pTransformCom->Go_Straight(fTimeDelta);
-	}
 	else
-	{
 		m_eDir[DIR_Z] = 0.f;
-		Change_Direction();
-	}
-		
 
-
+	/* Use X Key (Attack)*/
 	if (pGameInstacne->Key_Up(DIK_X))
 	{
-		if (m_eState == ANIM::SLASH_HOLD_LP)
+		/* Special Sword Attack */
+		if (m_eState == ANIM::SLASH_HOLD_LP || m_eState == ANIM::SLASH_HOLD_F ||
+			m_eState == ANIM::SLASH_HOLD_L || m_eState == ANIM::SLASH_HOLD_B || m_eState == ANIM::SLASH_HOLD_R)
 			m_eState = ANIM::SLASH_HOLD_ED;
 		else
 		{
-			m_eState = ANIM::SLASH;
+			switch (m_eRightHand)
+			{
+			case Client::CPlayer::MESH_SWORD:
+			case Client::CPlayer::MESH_SWORD2:
+				m_eState = SLASH;
+				break;
+			case Client::CPlayer::MESH_WAND:
+				m_eState = S_SLASH;
+				break;
+			case Client::CPlayer::MESH_NONE:
+				break;
+			default:
+				break;
+			}
 			m_pModelCom->Set_AnimationReset();
 		}
 	}
 	else if (pGameInstacne->Key_Pressing(DIK_X))
 	{
-		if (m_eState == ANIM::SLASH)
-		{
-			RELEASE_INSTANCE(CGameInstance);
-			return;
-		}
-		
-		if (m_eState != ANIM::SLASH_HOLD_LP)
+		if(m_eState == IDLE)
 			m_eState = ANIM::SLASH_HOLD_ST;
+		else if (m_eState == SLASH_HOLD_B || m_eState == SLASH_HOLD_F || m_eState == SLASH_HOLD_R || m_eState == SLASH_HOLD_L)
+			m_eState = SLASH_HOLD_LP;
 	}
 	else if (pGameInstacne->Key_Up(DIK_Y))
 	{
 		if (m_eState == ANIM::SHIELD_LP)
 			m_eState = SHIELD_ED;
-		else if(m_eState != ANIM::SHIELD_LP)
+		else if (m_eState != ANIM::SHIELD_LP)
 			m_eState = ANIM::SHIELD_ST;
 	}
 
 
-	if (pGameInstacne->Key_Pressing(DIK_LCONTROL))
+	/*Jump*/
+	if (pGameInstacne->Key_Down(DIK_LCONTROL))
 	{
-		if (m_eState != JUMP)
+		if (m_eState == JUMP)
+		{
+			m_eState = ANIM::D_JUMP;
+			m_fTime = 0.f;
+			m_fStartHeight = XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		}
+
+		if (m_eState != JUMP && m_eState != D_JUMP && m_eState != D_FALL)
 		{
 			m_eState = ANIM::JUMP;
 			m_fTime = 0.f;
+			m_fStartHeight = 4.2f;
 		}
 	}
-
-		
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -190,7 +181,7 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
-	TransformDesc.fSpeedPerSec = 1.f;
+	TransformDesc.fSpeedPerSec = 3.f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
@@ -241,32 +232,59 @@ void CPlayer::Render_Model(MESH_NAME eMeshName)
 		return;
 }
 
-void CPlayer::Change_Direction()
+void CPlayer::Change_Direction(_float fTimeDelta)
 {
+
+	if (m_eState == SLASH_HOLD_LP || m_eState == SLASH_HOLD_ST || m_eState == SLASH_HOLD_B ||
+		m_eState == SLASH_HOLD_F || m_eState == SLASH_HOLD_L || m_eState == SLASH_HOLD_R)
+		SetDirection_byPosition(fTimeDelta);
+	else
+		SetDirection_byLook(fTimeDelta);
+}
+
+void CPlayer::SetDirection_byLook(_float fTimeDelta)
+{
+	CTransform::TRANSFORMDESC TransformDesc = m_pTransformCom->Get_TransformDesc();
+	TransformDesc.fSpeedPerSec = 3.f;
+	m_pTransformCom->Set_TransformDesc(TransformDesc);
+
 	__super::Change_Direction();
 
 	if (m_eDir[DIR_X] == 0 && m_eDir[DIR_Z] == 0)
 	{
-		if (m_eState == RUN)
-			m_eState = IDLE;
-	}
-	else if (m_eDir[DIR_X] == 0 || m_eDir[DIR_Z] == 0)
-	{
-		CTransform::TRANSFORMDESC pTransformDesc = m_pTransformCom->Get_TransformDesc();
-		pTransformDesc.fSpeedPerSec = 3.0f;
-		m_pTransformCom->Set_TransformDesc(pTransformDesc);
-
-		if (m_eState != JUMP)
-				m_eState = RUN;
+		if (m_eState == RUN) m_eState = IDLE;
 	}
 	else
 	{
-		CTransform::TRANSFORMDESC pTransformDesc = m_pTransformCom->Get_TransformDesc();
-		pTransformDesc.fSpeedPerSec = 1.5f;
-		m_pTransformCom->Set_TransformDesc(pTransformDesc);
-		if (m_eState != JUMP)
+		if (m_eState != JUMP && m_eState != D_JUMP && m_eState != D_FALL)
 			m_eState = RUN;
+		m_pTransformCom->Go_Straight(fTimeDelta);
 	}
+
+}
+
+void CPlayer::SetDirection_byPosition(_float fTimeDelta)
+{
+
+	CTransform::TRANSFORMDESC TransformDesc = m_pTransformCom->Get_TransformDesc();
+	TransformDesc.fSpeedPerSec = 1.5f;
+	m_pTransformCom->Set_TransformDesc(TransformDesc);
+
+	///////////////// 이 부분에서 나의 룩벡터와 Direction Vector를 통해 각도로 방향 세팅 예정
+	if (m_eDir[DIR_X] > 0)
+		m_eState = SLASH_HOLD_R;
+	else if (m_eDir[DIR_X] < 0)
+		m_eState = SLASH_HOLD_L;
+
+	if (m_eDir[DIR_Z] > 0)
+		m_eState = SLASH_HOLD_F;
+	else if (m_eDir[DIR_Z] < 0)
+		m_eState = SLASH_HOLD_B;
+
+	
+	_vector vDirection = XMVectorSet(m_eDir[DIR_X], 0, m_eDir[DIR_Z], 0);
+	m_pTransformCom->Go_PosDir(fTimeDelta, vDirection);
+
 }
 
 void CPlayer::Change_Animation(_float fTimeDelta)
@@ -278,6 +296,11 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CPlayer::RUN:
+	case Client::CPlayer::SLASH_HOLD_F:
+	case Client::CPlayer::SLASH_HOLD_B:
+	case Client::CPlayer::SLASH_HOLD_L:
+	case Client::CPlayer::SLASH_HOLD_R:
+	case Client::CPlayer::SLASH_HOLD_LP:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
@@ -286,11 +309,36 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	{
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
-		_vector		vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		m_fTime += 0.1f;
-		m_pTransformCom->Jump(m_fTime, 3.f, 2.0f, 4.2f);
+		m_pTransformCom->Jump(m_fTime, 3.f, 2.0f, m_fStartHeight, m_fEndHeight);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
 			m_eState = LAND;
+			_vector vPosition = XMVectorSetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 4.2f);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+		}
+		break;
+	}
+	case Client::CPlayer::D_JUMP:
+	{
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		m_fTime += 0.1f;
+		m_pTransformCom->Jump(m_fTime, 3.f, 2.0f, m_fStartHeight, m_fEndHeight);
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eState = D_FALL;
+		break;
+	}
+	case Client::CPlayer::D_FALL:
+	{
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		m_fTime += 0.1f;
+		m_pTransformCom->Jump(m_fTime, 3.f, 2.0f, m_fStartHeight, m_fEndHeight);
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eState = D_LAND;
+		if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 4.2f)
+			m_eState = D_LAND;
 		break;
 	}
 	case Client::CPlayer::SLASH_HOLD_ST:
@@ -306,12 +354,14 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 			m_eState = SHIELD_LP;
 		break;
 	case Client::CPlayer::LAND:
+	case Client::CPlayer::D_LAND:
 		m_eAnimSpeed = 3.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = IDLE;
 		break;
 	case Client::CPlayer::SLASH:
+	case Client::CPlayer::S_SLASH:
 		m_eAnimSpeed = 1.5f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
@@ -329,7 +379,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
 		break;
 	}
-	
+
 	m_eAnimSpeed = 1.f;
 }
 

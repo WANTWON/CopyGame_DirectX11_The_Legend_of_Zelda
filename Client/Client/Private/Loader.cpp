@@ -130,7 +130,7 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 
 	/* 모델 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("모델 로딩 중."));
+	lstrcpy(m_szLoadingText, TEXT("해킹 중."));
 
 	/*For.Prototype_Component_VIBuffer_Terrain*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),

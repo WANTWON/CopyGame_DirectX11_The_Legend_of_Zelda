@@ -22,6 +22,7 @@ public:
 
 public:
 	void Set_CurrentAnimIndex(_uint iAnimIndex);
+	void Set_TimeReset();
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eModelType, const char* pModelFilePath, _fmatrix PivotMatrix);

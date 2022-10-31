@@ -79,16 +79,16 @@ void CTransform::Go_Right(_float fTimeDelta)
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
-void CTransform::Jump(_float fTimeDelta, _float fVelocity, _float fGravity, _float iHeight)
+void CTransform::Jump(_float fTimeDelta, _float fVelocity, _float fGravity, _float fStartiHeight, _float fEndiHeight)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
-	float fSpeed = iHeight + fVelocity * fTimeDelta - (0.5*fGravity*fTimeDelta*fTimeDelta);
+	float fSpeed = fStartiHeight + fVelocity * fTimeDelta - (0.5*fGravity*fTimeDelta*fTimeDelta);
 
 	vPosition = XMVectorSetY(vPosition, fSpeed);
 	
 	float y = XMVectorGetY(vPosition);
-	if ( y <= iHeight)
-		vPosition = XMVectorSetY(vPosition, iHeight);
+	if ( y <= fEndiHeight)
+		vPosition = XMVectorSetY(vPosition, fEndiHeight);
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
