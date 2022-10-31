@@ -242,7 +242,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 		{			
 
 			CInvenTile::INVENDESC InvenDesc;
-			InvenDesc.eTileType = CInvenTile::INEVEN_TILE;
+			InvenDesc.eTileType = CInvenTile::INVEN_TILE;
 			InvenDesc.eState = CInvenTile::STATE_DEFAULT;
 			InvenDesc.eEquipKey = CInvenTile::EQUIP_NONE;
 			InvenDesc.vPosition = _float2(_float(780 + j*110), _float(260 + i*120));
@@ -266,13 +266,18 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 		return E_FAIL;
 
 
-	CInvenItem::ITEMDESC ItemDesc;
-	ItemDesc.eItemType = CInvenItem::ITEM_USABLE;
-	ItemDesc.eItemUsage = CInvenItem::USAGE_END;
-	ItemDesc.vPosition = _float2(500, 600);
+	for (int i = 0; i < 5; ++i)
+	{
+		CInvenItem::ITEMDESC ItemDesc;
+		ItemDesc.eItemType = CInvenItem::ITEM_EQUIP;
+		ItemDesc.m_iTextureNum = (CInvenItem::EQUIP_TEXLIST)(i+1);
+		ItemDesc.vPosition = _float2(165, 245 + 70*i);
 
-	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_UIItem"), &ItemDesc)))
-		//return E_FAIL;
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_EquipItem"), &ItemDesc)))
+			return E_FAIL;
+	}
+
+	
 
 
 

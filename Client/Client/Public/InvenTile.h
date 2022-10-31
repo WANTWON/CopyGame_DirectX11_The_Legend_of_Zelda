@@ -7,13 +7,13 @@ class CInvenItem;
 class CInvenTile final : public CObj_UI
 {
 public:
-	enum TILE_TYPE { INEVEN_TILE, EQUIP_TILE };
+	enum TILE_TYPE { INVEN_TILE, EQUIP_TILE };
 	enum EQUIP_KEY { EQUIP_X, EQUIP_Y, EQUIP_NONE };
 	enum TILE_STATE { STATE_DEFAULT, STATE_EQUIP };
 
 	typedef struct InvenTiletag
 	{
-		TILE_TYPE eTileType = INEVEN_TILE;
+		TILE_TYPE eTileType = INVEN_TILE;
 		EQUIP_KEY eEquipKey = EQUIP_NONE;
 		TILE_STATE eState = STATE_DEFAULT;
 		_float2 vPosition = _float2(0.f, 0.f);

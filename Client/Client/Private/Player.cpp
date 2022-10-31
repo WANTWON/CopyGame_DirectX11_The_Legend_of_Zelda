@@ -234,6 +234,8 @@ void CPlayer::Render_Model(MESH_NAME eMeshName)
 
 void CPlayer::Change_Direction(_float fTimeDelta)
 {
+	if (m_eState == SLASH_HOLD_ED)
+		return;
 
 	if (m_eState == SLASH_HOLD_LP || m_eState == SLASH_HOLD_ST || m_eState == SLASH_HOLD_B ||
 		m_eState == SLASH_HOLD_F || m_eState == SLASH_HOLD_L || m_eState == SLASH_HOLD_R)

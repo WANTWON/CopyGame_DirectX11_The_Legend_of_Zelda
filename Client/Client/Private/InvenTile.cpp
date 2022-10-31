@@ -34,12 +34,12 @@ HRESULT CInvenTile::Initialize(void * pArg)
 
 	m_eShaderID = UI_ALPHABLEND;
 
-	if (m_InvenDesc.eTileType == INEVEN_TILE)
+	if (m_InvenDesc.eTileType == INVEN_TILE)
 		CUI_Manager::Get_Instance()->Add_InvenGroup(this);
 
 	CInvenItem::ITEMDESC ItemDesc;
 	ItemDesc.eItemType = CInvenItem::ITEM_USABLE;
-	ItemDesc.eItemUsage = CInvenItem::USAGE_END;
+	ItemDesc.m_iTextureNum = CInvenItem::ITEM_NONE;
 	ItemDesc.vPosition = m_fPosition;
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_InvenItem"), &ItemDesc)))
@@ -52,7 +52,10 @@ HRESULT CInvenTile::Initialize(void * pArg)
 		iTextureNum = 0;
 
 	if (m_InvenDesc.eTileType == EQUIP_TILE)
+	{
 		dynamic_cast<CInvenItem*>(m_pItem)->Set_TextureNum(0);
+		dynamic_cast<CInvenItem*>(m_pItem)->Set_ItemSize(_float2(85, 85));
+	}
 	else
 		dynamic_cast<CInvenItem*>(m_pItem)->Set_TextureNum(iTextureNum);
 
@@ -140,7 +143,7 @@ HRESULT CInvenTile::Ready_Components(void * pArg)
 
 	switch (m_InvenDesc.eTileType)
 	{
-	case INEVEN_TILE:
+	case INVEN_TILE:
 		/* For.Com_Texture */
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_InvenTile"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
