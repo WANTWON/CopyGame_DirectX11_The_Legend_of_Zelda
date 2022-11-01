@@ -96,7 +96,7 @@ void CImgui_Manager::Tick(_float fTimeDelta)
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	
+
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	m_iCurrentLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
 	CTerrain_Manager::TERRAINDESC TerrainDesc = m_pTerrain_Manager->Get_TerrainDesc();
@@ -218,7 +218,7 @@ void CImgui_Manager::Show_GuiTick()
 	if (m_bShowSimpleMousePos)      ShowSimpleMousePos(&m_bShowSimpleMousePos);
 	if (m_bShowPickedObject)		ShowPickedObjLayOut(&m_bShowPickedObject);
 	if (m_bFilePath)				Set_File_Path_Dialog();
-	if (m_bShow_app_style_editor)  { ImGui::Begin("Dear ImGui Style Editor", &m_bShow_app_style_editor); ImGui::ShowStyleEditor(); ImGui::End(); }
+	if (m_bShow_app_style_editor) { ImGui::Begin("Dear ImGui Style Editor", &m_bShow_app_style_editor); ImGui::ShowStyleEditor(); ImGui::End(); }
 	ImGui::End();
 
 }
@@ -257,7 +257,7 @@ void CImgui_Manager::BrowseForFolder()
 				m_bSave = false;
 				return;
 			}
-				
+
 
 			iNum = (_int)plistClone->size();
 
@@ -381,29 +381,70 @@ void CImgui_Manager::Set_Macro()
 	static int LoopOption[2]{ 0 };
 	static float fDistance[3]{ 0.f };
 	static float fPosition[3]{ 0.f };
-	ImGui::Text("Col & Row :"); ImGui::SameLine(); ImGui::InputInt2("##Col & Row", LoopOption);
-	ImGui::Text("DistanceXYZ :"); ImGui::SameLine(); ImGui::InputFloat3("##DistanceXYZ", fDistance);
-	ImGui::Text("PositionXYZ :"); ImGui::SameLine(); ImGui::InputFloat3("##PositionXYZ", fPosition);
-	
-	if (ImGui::Button("Create Macro"))
-	{
-		for (int i = 0; i < LoopOption[0]; ++i)
-		{
-			for (int j = 0; j < LoopOption[1]; ++j)
-			{
-				_int iIndex = i*LoopOption[1] + j;
 
-				m_InitDesc.vPosition = _float3(fPosition[0] + j*fDistance[0], fPosition[1], fPosition[2] + i*fDistance[2]);
-				_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
-				Create_Model(ModelTags[iIndex], LayerTag);
-				m_TempLayerTags.push_back(LayerTag);			
-			}
-			int a = 0;
-		}
-		int a = 0;
+	const char* MacroTypeList[] = { "Col & Row", "Col & Aphabet" };
+	static int MacroType = 0;
+	ImGui::Combo("MacroType", &MacroType, MacroTypeList, IM_ARRAYSIZE(MacroTypeList));
+
+	switch (MacroType)
+	{
+	case 0:
+		ImGui::Text("Col & Row :"); ImGui::SameLine(); ImGui::InputInt2("##Col & Row", LoopOption);
+		break;
+	case 1:
+		ImGui::Text("Col & Aphabet :"); ImGui::SameLine(); ImGui::InputInt2("##Col & Row", LoopOption);
+		break;
+	default:
+		break;
 	}
 
-	int a = 0;
+
+	ImGui::Text("DistanceXYZ :"); ImGui::SameLine(); ImGui::InputFloat3("##DistanceXYZ", fDistance);
+	ImGui::Text("PositionXYZ :"); ImGui::SameLine(); ImGui::InputFloat3("##PositionXYZ", fPosition);
+
+	if (ImGui::Button("Create Macro"))
+	{
+		if (MacroType == 0)
+		{
+			for (int i = 0; i < LoopOption[0]; ++i)
+			{
+				for (int j = 0; j < LoopOption[1]; ++j)
+				{
+					_int iIndex = i*LoopOption[1] + j;
+
+					m_InitDesc.vPosition = _float3(fPosition[0] + j*fDistance[0], fPosition[1], fPosition[2] + i*fDistance[2]);
+					_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+					Create_Model(ModelTags[iIndex], LayerTag);
+					m_TempLayerTags.push_back(LayerTag);
+				}
+			}
+		}
+		else if (MacroType == 1)
+		{
+			_int iIndex = 0;
+			for (int i = 0; i < LoopOption[0]; ++i)
+			{
+				for (int j = 0; j < LoopOption[1]; ++j)
+				{
+					if (iIndex >= ModelTags.size())
+						continue;
+
+					_int LastAlphabet = j + 65;
+					_int LastAlphabet2 = ModelTags[iIndex][_tcslen(ModelTags[iIndex]) - 5];
+
+					if (LastAlphabet2 != LastAlphabet)
+						continue;
+
+					m_InitDesc.vPosition = _float3(fPosition[0] + j*fDistance[0], fPosition[1], fPosition[2] + i*fDistance[2]);
+					_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+					Create_Model(ModelTags[iIndex], LayerTag);
+					m_TempLayerTags.push_back(LayerTag);
+					iIndex++;
+
+				}
+			}
+		}
+	}
 
 }
 
@@ -442,7 +483,7 @@ void CImgui_Manager::Set_Terrain_Map()
 		if (FAILED(m_pTerrain_Manager->Create_Terrain(pLevelIndex, TEXT("Layer_Terrain"))))
 			return;
 	}
-	
+
 	ImGui::SameLine();
 	ImGui::Checkbox("WireFrame", &TerrainDesc.m_bShowWireFrame);
 	m_pTerrain_Manager->Set_bWireFrame(TerrainDesc.m_bShowWireFrame);
@@ -458,23 +499,23 @@ void CImgui_Manager::Set_Terrain_Map()
 
 void CImgui_Manager::Set_Object_Map()
 {
-	ImGui::NewLine(); 
+	ImGui::NewLine();
 	ImGui::BulletText("Transform Setting");
 
 	static _float Position[3] = { m_InitDesc.vPosition.x , m_InitDesc.vPosition.y, m_InitDesc.vPosition.z };
 	ImGui::Text("Position"); ImGui::SameLine();
 	ImGui::InputFloat3("##1", Position);
 	m_InitDesc.vPosition = _float3(Position[0], Position[1], Position[2]);
-	
+
 	static _float Scale[3] = { m_InitDesc.vScale.x , m_InitDesc.vScale.y, m_InitDesc.vScale.z };
 	ImGui::Text("Scale"); ImGui::SameLine();
 	ImGui::InputFloat3("##Scale", Scale);
 	m_InitDesc.vScale = _float3(Scale[0], Scale[1], Scale[2]);
-	
+
 	static _float Rotation[3] = { m_InitDesc.vRotation.x , m_InitDesc.vRotation.y, m_InitDesc.vRotation.z };
 	ImGui::Text("Rotation axis"); ImGui::SameLine();
 	ImGui::InputFloat3("##2", Rotation);
-	m_InitDesc.vRotation = _float3( Rotation[0], Rotation[1], Rotation[2]);
+	m_InitDesc.vRotation = _float3(Rotation[0], Rotation[1], Rotation[2]);
 
 	static _float Offset[2] = { m_InitDesc.m_fAngle , m_fDist };
 	ImGui::Text("Rotaion Angle / dist"); ImGui::SameLine();
@@ -862,11 +903,11 @@ void CImgui_Manager::ShowPickedObj()
 
 	}
 
-	if (ImGui::Button("Delete Object")) 
-	{ 
+	if (ImGui::Button("Delete Object"))
+	{
 		CPickingMgr* pPickingMgr = GET_INSTANCE(CPickingMgr);
 		if (pPickingMgr->Get_PickedObj() != nullptr)
-			ImGui::OpenPopup("Delete Object?"); 	
+			ImGui::OpenPopup("Delete Object?");
 		RELEASE_INSTANCE(CPickingMgr);
 
 	}
@@ -888,16 +929,16 @@ void CImgui_Manager::Show_PopupBox()
 		CNonAnim* pNonAnim = dynamic_cast<CNonAnim*>(pPickedObj);
 		ImGui::Text("Are yoou Sure Delete This Object?\n\n");
 		ImGui::Separator();
-		
+
 		ImGui::Text("Object Name : ");  ImGui::SameLine(); ImGui::Text(pNonAnim->Get_Modeltag());
 
 		if (ImGui::Button("OK", ImVec2(120, 0)))
-		{ 
-				m_iCreatedSelected = 0;
-				pPickingMgr->Set_PickedObj(nullptr);
-				pPickedObj->Set_Dead(true);
-				m_pModel_Manager->Out_CreatedModel(pNonAnim);
-				ImGui::CloseCurrentPopup();
+		{
+			m_iCreatedSelected = 0;
+			pPickingMgr->Set_PickedObj(nullptr);
+			pPickedObj->Set_Dead(true);
+			m_pModel_Manager->Out_CreatedModel(pNonAnim);
+			ImGui::CloseCurrentPopup();
 		}
 		ImGui::SetItemDefaultFocus();
 		ImGui::SameLine();
@@ -1084,7 +1125,7 @@ void CImgui_Manager::Show_ModelList()
 
 	// ------------------------ Right -----------------------------------
 	{
-		
+
 		ImGui::BeginGroup();
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 		char szLayertag[MAX_PATH] = "";
@@ -1121,7 +1162,7 @@ void CImgui_Manager::Show_ModelList()
 			}
 			ImGui::EndTabBar();
 		}
-		
+
 		ImGui::EndChild();
 		ImGui::EndGroup();
 	}
@@ -1158,7 +1199,7 @@ void CImgui_Manager::Show_CurrentModelList()
 					m_iCreatedSelected = i;
 					vecCreatedModel[i]->Set_Picked();
 				}
-					
+
 				i++;
 			}
 		}

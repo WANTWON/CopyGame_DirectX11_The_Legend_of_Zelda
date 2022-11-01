@@ -94,9 +94,20 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	vector		vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	vector		vMtrlOcculsion = g_OcculsionTexture.Sample(LinearSampler, In.vTexUV);
+	vector		vMtrlNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
+	
+	vector		vLook = In.vWorldPos - g_vCamPosition;
+	vector		vReflect = reflect(normalize(g_vLightDir), normalize(vMtrlNormal));
 
-	Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) *saturate(In.fShade + g_vLightAmbient * g_vMtrlAmbient)
-		+ (g_vLightSpecular * vMtrlOcculsion) * In.fSpecular;
+	float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 20);
+	float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(vMtrlNormal)), 0.f);
+
+
+	Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) *saturate(In.fShade + g_vLightAmbient * g_vMtrlAmbient )
+		+ (g_vLightSpecular * vMtrlNormal) * In.fSpecular;
+
+	//Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) *saturate(fShade + g_vLightAmbient * g_vMtrlAmbient)
+		//+ (g_vLightSpecular * vMtrlOcculsion) * fSpecular ;
 
 
 	if (Out.vColor.a <= 0.3f)
