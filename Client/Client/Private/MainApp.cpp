@@ -45,8 +45,8 @@ void CMainApp::Tick(_float fTimeDelta)
 	if (m_pGameInstance->Key_Up(DIK_I))
 		m_pUI_Manager->Set_UI_Open();
 
-	if (m_pUI_Manager->Get_UI_Open())
-		m_pUI_Manager->Tick();
+	if (m_pUI_Manager->Get_UI_Open() && m_pGameInstance->Get_CurrentLevelIndex() != LEVEL_LOADING)
+		m_pUI_Manager->Tick_Inventory();
 
 	m_pGameInstance->Tick_Engine(fTimeDelta);
 

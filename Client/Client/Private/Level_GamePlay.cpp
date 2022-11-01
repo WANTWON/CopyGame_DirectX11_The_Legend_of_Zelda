@@ -32,8 +32,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	//if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-		//return E_FAIL;
+	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+		return E_FAIL;
 
 	//if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	//	return E_FAIL;	
@@ -50,6 +50,7 @@ void CLevel_GamePlay::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);	
 
+	CUI_Manager::Get_Instance()->Tick_PlayerState();
 
 }
 
@@ -119,26 +120,26 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
 		return E_FAIL;
 
-	//HANDLE hFile = 0;
-	//_ulong dwByte = 0;
-	//CNonAnim::NONANIMDESC  ModelDesc;
-	//_uint iNum = 0;
+	HANDLE hFile = 0;
+	_ulong dwByte = 0;
+	CNonAnim::NONANIMDESC  ModelDesc;
+	_uint iNum = 0;
 
-	//hFile = CreateFile(TEXT("../../../Bin/Data/Test222.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	//if (0 == hFile)
-	//	return E_FAIL;
+	hFile = CreateFile(TEXT("../../../Bin/Data/Test222.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
+		return E_FAIL;
 
-	///* 타일의 개수 받아오기 */
-	//ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
 
-	//for (_uint i = 0; i < iNum; ++i)
-	//{
-	//	ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
-	//	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), LEVEL_GAMEPLAY, pLayerTag, &ModelDesc)))
-	//		return E_FAIL;
-	//}
+	for (_uint i = 0; i < iNum; ++i)
+	{
+		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), LEVEL_GAMEPLAY, pLayerTag, &ModelDesc)))
+			return E_FAIL;
+	}
 
-	//CloseHandle(hFile);
+	CloseHandle(hFile);
 
 	Safe_Release(pGameInstance);
 
@@ -277,7 +278,51 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 			return E_FAIL;
 	}
 
-	
+	for (int i = 0; i < 5; ++i)
+	{
+		CInvenItem::ITEMDESC ItemDesc;
+		ItemDesc.eItemType = CInvenItem::ITEM_QUEST;
+		ItemDesc.m_iTextureNum = (CInvenItem::QUEST_TEXLIST)(0);
+		ItemDesc.vPosition = _float2(645, 245 + 70 * i);
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_EquipItem"), &ItemDesc)))
+			return E_FAIL;
+	}
+
+
+	for (int i = 0; i < 5; ++i)
+	{
+		CInvenItem::ITEMDESC ItemDesc;
+		ItemDesc.eItemType = CInvenItem::ITEM_DGNKEY;
+		ItemDesc.m_iTextureNum = (CInvenItem::EQUIP_TEXLIST)(i + 1);
+		ItemDesc.vPosition = _float2(285 + 55 * i, 545);
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_DongeonKey"), &ItemDesc)))
+			return E_FAIL;
+	}
+
+	for (int i = 0; i < 4; ++i)
+	{
+		_float2 vPosition = _float2(0.f, 0.f);
+		
+		vPosition.x = (i == 1 || i == 2) ?  400 + 95.f : 400 + 40.f;
+
+		vPosition.y = 230.f + i * 70.f;
+
+		CInvenItem::ITEMDESC ItemDesc;
+		ItemDesc.eItemType = CInvenItem::ITEM_COLLECT;
+		ItemDesc.m_iTextureNum = (CInvenItem::EQUIP_TEXLIST)(i*2 + 1);
+		ItemDesc.vPosition = vPosition;
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_Collect"), &ItemDesc)))
+			return E_FAIL;
+
+		vPosition.x = (i == 1 || i == 2) ? 400 - 95.f : 400 - 40.f;
+		ItemDesc.m_iTextureNum = (CInvenItem::EQUIP_TEXLIST)(i*2 + 2);
+		ItemDesc.vPosition = vPosition;
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_Collect"), &ItemDesc)))
+			return E_FAIL;
+	}
 
 
 
@@ -292,10 +337,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _tchar * pLayerTag)
 
 	for (int i = 0; i < 5; ++i)
 	{
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Octorock"), LEVEL_STATIC, pLayerTag, &_float3(rand()%20 +10, 4.1f, rand() % 20 + 10))))
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Octorock"), LEVEL_STATIC, pLayerTag, &_float3(rand()%20 +10.f, 4.1f, rand() % 20 + 10.f))))
 			return E_FAIL;
 
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MoblinSword"), LEVEL_STATIC, pLayerTag, &_float3(rand() % 20 + 10, 4.1f, rand() % 20 + 10))))
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MoblinSword"), LEVEL_STATIC, pLayerTag, &_float3(rand() % 20 + 10.f, 4.1f, rand() % 20 + 10.f))))
 			return E_FAIL;
 	}
 

@@ -21,7 +21,7 @@ HRESULT COctorock::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_tInfo.iMaxHp = 3;
-	m_tInfo.fDamage = 20.f;
+	m_tInfo.iDamage = 20.f;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
 	m_fAttackRadius = 5.f;

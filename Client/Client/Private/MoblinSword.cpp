@@ -21,7 +21,7 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_tInfo.iMaxHp = 3;
-	m_tInfo.fDamage = 20.f;
+	m_tInfo.iDamage = 20.f;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
 	m_fAttackRadius = 2.f;
@@ -123,8 +123,18 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CMoblinSword::DEAD_F:
 		m_pTransformCom->Go_Backward(fTimeDelta * 4);
+		m_bIsLoop = false;
+		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
+		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+			m_bDead = true;
+		break;
 	case Client::CMoblinSword::DEAD_B:
 		m_pTransformCom->Go_Straight(fTimeDelta * 4);
+		m_bIsLoop = false;
+		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
+		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+			m_bDead = true;
+		break;
 	case Client::CMoblinSword::DEAD_FIRE:
 		m_bIsLoop = false;
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));

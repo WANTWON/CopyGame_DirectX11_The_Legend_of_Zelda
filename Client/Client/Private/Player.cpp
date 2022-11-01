@@ -26,6 +26,10 @@ HRESULT CPlayer::Initialize(void * pArg)
 	Set_Scale(_float3(0.5, 0.5, 0.5));
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, m_fStartHeight, 10.f, 1.f));
 
+	m_tInfo.iMaxHp = 50;
+	m_tInfo.iDamage = 20.f;
+	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
+
 	return S_OK;
 }
 

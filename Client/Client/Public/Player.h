@@ -40,6 +40,7 @@ public:
 public:
 	ANIM Get_AnimState() { return m_eState; }
 	void Set_AnimState(ANIM eAnim) { m_eState = eAnim; }
+	OBJINFO Get_Info() { return m_tInfo; }
 
 private:
 	void Key_Input(_float fTimeDelta);
@@ -56,6 +57,8 @@ private:
 
 
 private:
+	OBJINFO  m_tInfo;
+
 	CModel*					m_pModelCom = nullptr;
 	ANIM					m_eState = IDLE;
 	ANIM					m_ePreState = IDLE;

@@ -17,7 +17,9 @@ private:
 	virtual ~CUI_Manager() = default;
 
 public:
-	void Tick();
+	void Initialize_PlayerState();
+	void Tick_Inventory();
+	void Tick_PlayerState();
 
 public:
 	void Set_UI_Open();
@@ -27,6 +29,7 @@ public:
 
 public:
 	void Add_InvenGroup(CObj_UI* pObj) { m_InvenTile.push_back(pObj);  }
+	void Add_HpGroup(CObj_UI* pObj) { m_HpList.push_back(pObj); }
 
 private:
 	_bool m_bUIOpen = false;

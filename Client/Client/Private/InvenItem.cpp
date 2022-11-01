@@ -33,12 +33,23 @@ HRESULT CInvenItem::Initialize(void * pArg)
 
 	m_eShaderID = UI_ALPHABLEND;
 
-	if (m_ItemDesc.eItemType == ITEM_EQUIP)
+
+	switch (m_ItemDesc.eItemType)
 	{
-		m_fSize.x = 70;
-		m_fSize.y = 70;
-		
+	case ITEM_EQUIP:
+	case ITEM_QUEST:
+		m_fSize = _float2(70, 70);
+		break;
+	case ITEM_DGNKEY:
+		m_fSize = _float2(70, 70);
+		break;
+	case ITEM_USABLE:
+		m_fSize = _float2(95, 95);
+		break;
+	default:
+		break;
 	}
+		
 
 	return S_OK;
 }
@@ -57,7 +68,7 @@ void CInvenItem::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 
-	if (m_ItemDesc.eItemType == ITEM_EQUIP)
+	if (m_ItemDesc.eItemType != ITEM_USABLE)
 		m_bShow = CUI_Manager::Get_Instance()->Get_UI_Open();
 }
 
@@ -95,6 +106,21 @@ HRESULT CInvenItem::Ready_Components(void * pArg)
 	case ITEM_USABLE:
 		/* For.Com_Texture */
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_UsableItem"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case ITEM_COLLECT:
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_CollectItem"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case ITEM_DGNKEY:
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_DungeonKey"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case ITEM_QUEST:
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_QuestItem"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
 	}
