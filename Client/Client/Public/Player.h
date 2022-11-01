@@ -70,11 +70,13 @@ private:
 	MESH_NAME				m_eRightHand = MESH_SWORD;
 	_bool					m_bIsLoop = true;
 	_float					m_fTime = 0.f;
-	_float					m_MaxTime = 0.f;
 
 	_float					m_fStartHeight = 4.2f;
 	_float					m_fEndHeight = 4.2f;
 	
+	_int					m_iDash[DIR_END] = { 0 };
+	DWORD					m_dwDashTime = GetTickCount();
+
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

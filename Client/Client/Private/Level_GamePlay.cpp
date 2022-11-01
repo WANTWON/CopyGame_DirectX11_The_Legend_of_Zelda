@@ -337,10 +337,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _tchar * pLayerTag)
 
 	for (int i = 0; i < 5; ++i)
 	{
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Octorock"), LEVEL_STATIC, pLayerTag, &_float3(rand()%20 +10.f, 4.1f, rand() % 20 + 10.f))))
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Octorock"), LEVEL_STATIC, pLayerTag, &_float3(rand()%20 +10.f, 4.1f, rand() % 10 + 10.f))))
 			return E_FAIL;
 
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MoblinSword"), LEVEL_STATIC, pLayerTag, &_float3(rand() % 20 + 10.f, 4.1f, rand() % 20 + 10.f))))
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MoblinSword"), LEVEL_STATIC, pLayerTag, &_float3(rand() % 20 + 10.f, 4.1f, rand() % 10 + 10.f))))
 			return E_FAIL;
 	}
 

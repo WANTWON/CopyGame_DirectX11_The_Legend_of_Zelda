@@ -98,14 +98,48 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	CGameInstance* pGameInstacne = GET_INSTANCE(CGameInstance);
 
 	/* Move Left and Right*/
-	if (pGameInstacne->Key_Pressing(DIK_LEFT))
+	if (pGameInstacne->Key_Down(DIK_LEFT))
+	{
+		if (m_eState != DASH_LP)
+		{
+			m_iDash[DIR_X]--;
+			m_dwDashTime = GetTickCount();
+		}
+	
+	}
+	else if (pGameInstacne->Key_Down(DIK_RIGHT))
+	{
+		if (m_eState != DASH_LP)
+		{
+			m_iDash[DIR_X]++;
+			m_dwDashTime = GetTickCount();
+		}
+	}
+	else if (pGameInstacne->Key_Pressing(DIK_LEFT))
 		m_eDir[DIR_X] = -1.f;
 	else if (pGameInstacne->Key_Pressing(DIK_RIGHT))
 		m_eDir[DIR_X] = 1.f;
 	else
 		m_eDir[DIR_X] = 0.f;
 
+
 	/* Move Up And Down*/
+	if (pGameInstacne->Key_Down(DIK_DOWN))
+	{
+		if (m_eState != DASH_LP)
+		{
+			m_iDash[DIR_Z]--;
+			m_dwDashTime = GetTickCount();
+		}
+	}
+	else if (pGameInstacne->Key_Down(DIK_UP))
+	{
+		if (m_eState != DASH_LP)
+		{
+			m_iDash[DIR_Z]++;
+			m_dwDashTime = GetTickCount();
+		}
+	}
 	if (pGameInstacne->Key_Pressing(DIK_DOWN))
 		m_eDir[DIR_Z] = -1.f;
 	else if (pGameInstacne->Key_Pressing(DIK_UP))
@@ -113,7 +147,8 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	else
 		m_eDir[DIR_Z] = 0.f;
 
-	/* Use X Key (Attack)*/
+
+	/* Use X Key & Y Key (Attack and Use Item)*/
 	if (pGameInstacne->Key_Up(DIK_X))
 	{
 		/* Special Sword Attack */
@@ -155,8 +190,8 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	}
 
 
-	/*Jump*/
-	if (pGameInstacne->Key_Down(DIK_LCONTROL))
+	/*Jump_Key*/
+	if (pGameInstacne->Key_Down(DIK_LCONTROL) && m_eState != DASH_LP)
 	{
 		if (m_eState == JUMP)
 		{
@@ -172,6 +207,18 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_fStartHeight = 4.2f;
 		}
 	}
+
+
+	if (m_dwDashTime + 300 < GetTickCount())
+	{
+		if (m_eState != DASH_ST && m_eState != DASH_LP && m_eState != DASH_ED)
+		{
+			m_iDash[DIR_Z] = 0;
+			m_iDash[DIR_X] = 0;
+		}
+			
+	}
+
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -238,7 +285,7 @@ void CPlayer::Render_Model(MESH_NAME eMeshName)
 
 void CPlayer::Change_Direction(_float fTimeDelta)
 {
-	if (m_eState == SLASH_HOLD_ED)
+	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
 		return;
 
 	if (m_eState == SLASH_HOLD_LP || m_eState == SLASH_HOLD_ST || m_eState == SLASH_HOLD_B ||
@@ -251,19 +298,31 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 void CPlayer::SetDirection_byLook(_float fTimeDelta)
 {
 	CTransform::TRANSFORMDESC TransformDesc = m_pTransformCom->Get_TransformDesc();
-	TransformDesc.fSpeedPerSec = 3.f;
+	TransformDesc.fSpeedPerSec = m_eState == DASH_LP ? 5.f : 3.f;
 	m_pTransformCom->Set_TransformDesc(TransformDesc);
+
 
 	__super::Change_Direction();
 
 	if (m_eDir[DIR_X] == 0 && m_eDir[DIR_Z] == 0)
 	{
 		if (m_eState == RUN) m_eState = IDLE;
+		if (m_eState == DASH_LP) m_eState = DASH_ED;
 	}
 	else
 	{
 		if (m_eState != JUMP && m_eState != D_JUMP && m_eState != D_FALL)
-			m_eState = RUN;
+		{
+			if (abs(m_iDash[DIR_X]) > 1 || abs(m_iDash[DIR_Z]) > 1)
+			{
+				if(m_eState != DASH_LP)
+					m_eState = DASH_ST;
+			}	
+			else
+				m_eState = RUN;
+		}
+			
+	
 		m_pTransformCom->Go_Straight(fTimeDelta);
 	}
 
@@ -302,6 +361,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CPlayer::RUN:
+	case Client::CPlayer::DASH_LP:
 	case Client::CPlayer::SLASH_HOLD_F:
 	case Client::CPlayer::SLASH_HOLD_B:
 	case Client::CPlayer::SLASH_HOLD_L:
@@ -373,6 +433,13 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = IDLE;
 		break;
+	case Client::CPlayer::DASH_ST:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eState = DASH_LP;
+		break;
+	case Client::CPlayer::DASH_ED:
 	case Client::CPlayer::SHIELD_ED:
 	case Client::CPlayer::SLASH_HOLD_ED:
 		m_eAnimSpeed = 2.f;
