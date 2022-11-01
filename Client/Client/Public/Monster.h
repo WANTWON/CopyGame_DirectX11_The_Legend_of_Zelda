@@ -5,6 +5,7 @@
 
 BEGIN(Engine)
 class CModel;
+class CCollider;
 END
 
 BEGIN(Client)
@@ -72,7 +73,9 @@ protected:
 
 protected: /* For.Components */
 	CModel*					m_pModelCom = nullptr;
-
+	CCollider*				m_pAABBCom = nullptr;
+	CCollider*				m_pOBBCom = nullptr;
+	CCollider*				m_pSPHERECom = nullptr;
 
 public:
 	virtual void Free() override;

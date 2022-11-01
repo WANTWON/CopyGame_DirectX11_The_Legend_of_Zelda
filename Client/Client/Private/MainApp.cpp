@@ -64,7 +64,7 @@ HRESULT CMainApp::Render()
 	m_pRenderer->Render_GameObjects();
 
 	m_pGameInstance->Present();
-
+#ifdef _DEBUG
 	++m_iNumRender;
 
 	if (m_fTimeAcc > 1.0f)
@@ -76,7 +76,7 @@ HRESULT CMainApp::Render()
 		m_fTimeAcc = 0.f;
 		m_iNumRender = 0;
 	}
-
+#endif // _DEBUG
 	return S_OK;
 }
 

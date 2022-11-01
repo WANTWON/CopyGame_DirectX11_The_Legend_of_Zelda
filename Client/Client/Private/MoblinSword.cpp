@@ -72,13 +72,15 @@ int CMoblinSword::Tick(_float fTimeDelta)
 	AI_Behaviour(fTimeDelta);
 	m_pModelCom->Set_CurrentAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
+
+	//m_pAABBCom->Update(m_pTransformCom->Get_WorldMatrix());
+	m_pOBBCom->Update(m_pTransformCom->Get_WorldMatrix());
 	return OBJ_NOEVENT;
 }
 
 void CMoblinSword::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
-
 }
 
 HRESULT CMoblinSword::Render()
@@ -86,6 +88,12 @@ HRESULT CMoblinSword::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
+#ifdef _DEBUG
+	//m_pAABBCom->Render();
+	m_pOBBCom->Render();
+	/*m_pSPHERECom->Render();*/
+
+#endif
 	return S_OK;
 }
 
@@ -170,6 +178,31 @@ HRESULT CMoblinSword::Ready_Components(void * pArg)
 	/* For.Com_Model*/
 	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_MoblinSword"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
+
+	CCollider::COLLIDERDESC		ColliderDesc;
+
+	/* For.Com_AABB */
+	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
+
+	ColliderDesc.vScale = _float3(0.7f, 0.7f, 0.7f);
+	ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
+	if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
+		return E_FAIL;
+
+	/* For.Com_OBB*/
+	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+	ColliderDesc.vPosition = _float3(0.f, 0.5f, 0.f);
+	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+		return E_FAIL;
+
+	/* For.Com_SPHERE */
+	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }

@@ -136,4 +136,8 @@ void CMonster::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 
+	Safe_Release(m_pAABBCom);
+	Safe_Release(m_pOBBCom);
+	Safe_Release(m_pSPHERECom);
+
 }
