@@ -381,6 +381,7 @@ void CImgui_Manager::Set_Macro()
 	static int LoopOption[2]{ 0 };
 	static float fDistance[3]{ 0.f };
 	static float fPosition[3]{ 0.f };
+	static float fScale[3]{ 1.f };
 
 	const char* MacroTypeList[] = { "Col & Row", "Col & Aphabet" };
 	static int MacroType = 0;
@@ -401,6 +402,7 @@ void CImgui_Manager::Set_Macro()
 
 	ImGui::Text("DistanceXYZ :"); ImGui::SameLine(); ImGui::InputFloat3("##DistanceXYZ", fDistance);
 	ImGui::Text("PositionXYZ :"); ImGui::SameLine(); ImGui::InputFloat3("##PositionXYZ", fPosition);
+	ImGui::Text("ScaleXYZ :"); ImGui::SameLine(); ImGui::InputFloat3("##ScaleXYZ", fScale);
 
 	if (ImGui::Button("Create Macro"))
 	{
@@ -413,6 +415,7 @@ void CImgui_Manager::Set_Macro()
 					_int iIndex = i*LoopOption[1] + j;
 
 					m_InitDesc.vPosition = _float3(fPosition[0] + j*fDistance[0], fPosition[1], fPosition[2] + i*fDistance[2]);
+					m_InitDesc.vScale = _float3(fScale[0] , fScale[1], fScale[2] );
 					_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
 					Create_Model(ModelTags[iIndex], LayerTag);
 					m_TempLayerTags.push_back(LayerTag);
@@ -436,6 +439,7 @@ void CImgui_Manager::Set_Macro()
 						continue;
 
 					m_InitDesc.vPosition = _float3(fPosition[0] + j*fDistance[0], fPosition[1], fPosition[2] + i*fDistance[2]);
+					m_InitDesc.vScale = _float3(fScale[0], fScale[1], fScale[2]);
 					_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
 					Create_Model(ModelTags[iIndex], LayerTag);
 					m_TempLayerTags.push_back(LayerTag);

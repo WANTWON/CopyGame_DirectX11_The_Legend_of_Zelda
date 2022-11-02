@@ -32,7 +32,7 @@ HRESULT CMonster::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_eObjectID = OBJID::OBJ_MONSTER;
-	Set_Scale(_float3(0.5, 0.5, 0.5));
+	//Set_Scale(_float3(0.5, 0.5, 0.5));
 
 	return S_OK;
 }

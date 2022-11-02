@@ -217,6 +217,8 @@ HRESULT CGameInstance::Open_Level(unsigned int iLevelIndex, CLevel * pNewLevel)
 	if (nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
+
+
 	return m_pLevel_Manager->Open_Level(iLevelIndex, pNewLevel);
 }
 

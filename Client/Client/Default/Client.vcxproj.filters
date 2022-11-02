@@ -79,6 +79,9 @@
     <Filter Include="95.UI\03. PlayerState">
       <UniqueIdentifier>{c158d6cc-1b69-4972-9042-26d179eca7c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\03.TailCave">
+      <UniqueIdentifier>{ad8ba1ec-e482-40ae-b02f-775c9db6d21b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -165,6 +168,9 @@
     <ClInclude Include="..\Public\Hp.h">
       <Filter>95.UI\03. PlayerState</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_TailCave.h">
+      <Filter>01.Levels\03.TailCave</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -235,6 +241,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Hp.cpp">
       <Filter>95.UI\03. PlayerState</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_TailCave.cpp">
+      <Filter>01.Levels\03.TailCave</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,10 @@
 #include "InvenItem.h"
 #include "BackGround.h"
 #include "NonAnim.h"
+#include "Player.h"
+#include "Level_Loading.h"
+
+_bool g_bUIMadefirst = false;
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -38,9 +42,13 @@ HRESULT CLevel_GamePlay::Initialize()
 	//if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	//	return E_FAIL;	
 
-	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
-		return E_FAIL;
+	if (g_bUIMadefirst == false)
+	{
+		if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
+			return E_FAIL;
 
+		g_bUIMadefirst = true;
+	}
 	
 
 	return S_OK;
@@ -52,6 +60,19 @@ void CLevel_GamePlay::Tick(_float fTimeDelta)
 
 	CUI_Manager::Get_Instance()->Tick_PlayerState();
 
+	if (GetKeyState(VK_SPACE) & 0x8000)
+	{
+		CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
+		Safe_AddRef(pGameInstance);
+
+		pGameInstance->Set_DestinationLevel(LEVEL_TAILCAVE);
+		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TAILCAVE))))
+			return;
+
+		Safe_Release(pGameInstance);
+	}
+
+
 }
 
 void CLevel_GamePlay::Late_Tick(_float fTimeDelta)
@@ -59,7 +80,7 @@ void CLevel_GamePlay::Late_Tick(_float fTimeDelta)
 	__super::Late_Tick(fTimeDelta);
 
 	//SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
-	SetWindowText(g_hWnd, TEXT("해킹완료."));
+	SetWindowText(g_hWnd, TEXT("GamePlaye Level."));
 }
 
 HRESULT CLevel_GamePlay::Ready_Lights()
@@ -106,6 +127,28 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Player"), LEVEL_STATIC, pLayerTag, nullptr)))
 		return E_FAIL;	
 
+
+	if (pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")) == nullptr)
+	{
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Player"), LEVEL_STATIC, pLayerTag, nullptr)))
+			return E_FAIL;
+	}
+	else
+	{
+		CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+
+		LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
+		switch (ePastLevel)
+		{
+		case Client::LEVEL_TAILCAVE:
+			pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(10, 4.2, 10, 1));
+			break;
+		}
+
+
+	}
+
+
 	Safe_Release(pGameInstance);
 
 	
@@ -117,15 +160,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
-		return E_FAIL;
+	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
+		//return E_FAIL;
 
 	HANDLE hFile = 0;
 	_ulong dwByte = 0;
 	CNonAnim::NONANIMDESC  ModelDesc;
 	_uint iNum = 0;
 
-	hFile = CreateFile(TEXT("../../../Bin/Data/Test222.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	hFile = CreateFile(TEXT("../../../Bin/Data/FiledMap.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
 		return E_FAIL;
 
@@ -337,10 +380,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _tchar * pLayerTag)
 
 	for (int i = 0; i < 5; ++i)
 	{
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Octorock"), LEVEL_STATIC, pLayerTag, &_float3(rand()%20 +10.f, 4.1f, rand() % 10 + 10.f))))
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Octorock"), LEVEL_GAMEPLAY, pLayerTag, &_float3(rand()%20 +10.f, 4.1f, rand() % 10 + 10.f))))
 			return E_FAIL;
 
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MoblinSword"), LEVEL_STATIC, pLayerTag, &_float3(rand() % 20 + 10.f, 4.1f, rand() % 10 + 10.f))))
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MoblinSword"), LEVEL_GAMEPLAY, pLayerTag, &_float3(rand() % 20 + 10.f, 4.1f, rand() % 10 + 10.f))))
 			return E_FAIL;
 	}
 

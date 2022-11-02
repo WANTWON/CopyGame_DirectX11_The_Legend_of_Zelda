@@ -21,7 +21,7 @@ HRESULT COctorock::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_tInfo.iMaxHp = 3;
-	m_tInfo.iDamage = 20.f;
+	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
 	m_fAttackRadius = 5.f;
@@ -132,7 +132,7 @@ HRESULT COctorock::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Model*/

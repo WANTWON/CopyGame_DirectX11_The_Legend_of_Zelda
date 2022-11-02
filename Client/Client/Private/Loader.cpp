@@ -42,6 +42,9 @@ unsigned int APIENTRY Thread_Main(void* pArg)
 	case LEVEL_GAMEPLAY:
 		pLoader->Loading_ForGamePlayLevel();
 		break;
+	case LEVEL_TAILCAVE:
+		pLoader->Loading_ForTailCaveLevel();
+		break;
 	}
 
 	LeaveCriticalSection(&pLoader->Get_CriticalSection());
@@ -73,19 +76,14 @@ HRESULT CLoader::Loading_ForLogoLevel()
 	Safe_AddRef(pGameInstance);
 
 	/* 텍스쳐 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("텍스쳐 로딩 중."));
+	lstrcpy(m_szLoadingText, TEXT("UI 텍스쳐 로딩 중."));
 	if (FAILED(Loading_For_UITexture()))
 		return E_FAIL;
 
-
-	/* 모델 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("모델 로딩 중."));
-	
-
-	/* 셰이더 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("셰이더 로딩 중."));
-	
-	
+	/* 객체 원형 생성 중. */
+	lstrcpy(m_szLoadingText, TEXT("Static data 생성 중."));
+	if (FAILED(Loading_ForStaticLevel()))
+		return E_FAIL;
 
 	/* 객체 원형 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("객체 생성 중."));
@@ -102,18 +100,52 @@ HRESULT CLoader::Loading_ForLogoLevel()
 	return S_OK;
 }
 
-HRESULT CLoader::Loading_ForGamePlayLevel()
+HRESULT CLoader::Loading_ForStaticLevel()
 {
-	CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	if (nullptr == pGameInstance)
 		return E_FAIL;
 
-	Safe_AddRef(pGameInstance);
+	
+
+
+	/*For.Prototype_Component_Model_Link*/
+	_matrix			PivotMatrix = XMMatrixIdentity();
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Link"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Link/Link_Anim.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/* 셰이더 로딩 중. */
+	lstrcpy(m_szLoadingText, TEXT("셰이더 로딩 중."));
+	/* For.Prototype_Component_Shader_VtxNorTex*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxNorTex"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Shaderfiles/Shader_VtxNorTex.hlsl"), VTXNORTEX_DECLARATION::Elements, VTXNORTEX_DECLARATION::iNumElements))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Shader_VtxModel */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Shaderfiles/Shader_VtxModel.hlsl"), VTXMODEL_DECLARATION::Elements, VTXMODEL_DECLARATION::iNumElements))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Shader_VtxAnimModel */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Shaderfiles/Shader_VtxAnimModel.hlsl"), VTXANIMMODEL_DECLARATION::Elements, VTXANIMMODEL_DECLARATION::iNumElements))))
+		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_ForGamePlayLevel()
+{
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+	if (nullptr == pGameInstance)
+		return E_FAIL;
 
 	/* 텍스쳐 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐 로딩 중."));
-
-
 	/*For.Prototype_Component_Texture_Terrain*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Terrain"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Terrain/Grass_%d.dds"), 2))))
@@ -130,30 +162,8 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 		return E_FAIL;
 
 
-	/* 콜라이더 생성 중. */
-	lstrcpy(m_szLoadingText, TEXT("콜라이더 생성 중."));
-
-	/* For.Prototype_Component_Collider_AABB */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
-		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
-		return E_FAIL;
-
-	/* For.Prototype_Component_Collider_OBB */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
-		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
-		return E_FAIL;
-
-	/* For.Prototype_Component_Collider_SPHERE */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_SPHERE"),
-		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
-		return E_FAIL;
-
-
-
-
 	/* 모델 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("해킹 중."));
-
+	lstrcpy(m_szLoadingText, TEXT("모델 생성 중."));
 	/*For.Prototype_Component_VIBuffer_Terrain*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 30,30, -0.01f))))
@@ -187,14 +197,8 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 		}
 	}
 
-
-	/*For.Prototype_Component_Model_Link*/
-	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Link"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Link/Link_Anim.fbx", PivotMatrix))))
-		return E_FAIL;
-
 	/*For.Prototype_Component_Model_Octorock*/
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Octorock"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Monster/Octorock/Octorock.fbx", PivotMatrix))))
 		return E_FAIL;
@@ -204,35 +208,89 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Monster/MoblinSword/MoblinSword.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	/* 셰이더 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("셰이더 로딩 중."));
 
-	/* For.Prototype_Component_Shader_VtxNorTex*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxNorTex"), 
-		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Shaderfiles/Shader_VtxNorTex.hlsl"), VTXNORTEX_DECLARATION::Elements, VTXNORTEX_DECLARATION::iNumElements))))
+
+
+	/* 콜라이더 생성 중. */
+	lstrcpy(m_szLoadingText, TEXT("콜라이더 생성 중."));
+
+	/* For.Prototype_Component_Collider_AABB */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
 		return E_FAIL;
 
-	/* For.Prototype_Component_Shader_VtxModel */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Shaderfiles/Shader_VtxModel.hlsl"), VTXMODEL_DECLARATION::Elements, VTXMODEL_DECLARATION::iNumElements))))
+	/* For.Prototype_Component_Collider_OBB */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
 		return E_FAIL;
 
-	/* For.Prototype_Component_Shader_VtxAnimModel */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Shaderfiles/Shader_VtxAnimModel.hlsl"), VTXANIMMODEL_DECLARATION::Elements, VTXANIMMODEL_DECLARATION::iNumElements))))
+	/* For.Prototype_Component_Collider_SPHERE */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_SPHERE"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
 		return E_FAIL;
+
 
 	/* 객체 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("객체 생성 중."));
 
 
-
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 
-	Safe_Release(pGameInstance);
+	RELEASE_INSTANCE(CGameInstance);
 
 	m_isFinished = true;
 
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_ForTailCaveLevel()
+{
+
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+	if (nullptr == pGameInstance)
+		return E_FAIL;
+
+
+	_matrix			PivotMatrix = XMMatrixIdentity();
+	/* 모델 로딩 중. */
+	lstrcpy(m_szLoadingText, TEXT("모델 생성 중."));
+	for (int i = 1; i < 9; ++i)
+	{
+		for (int j = 0; j < 7; ++j)
+		{
+			//const char* pFilePath = "../Bin/Resources/Meshes/Field/Field_%02d%c.fbx";
+
+			_tchar*			pModeltag = new _tchar[MAX_PATH];
+			_tchar*			szFilePath = new _tchar[MAX_PATH];
+			wsprintf(pModeltag, TEXT("Lv01TailCave_%02d%c.fbx"), i, j + 65);
+			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/TailCave/Lv01TailCave_%02d%c.fbx"), i, j + 65);
+
+			char* FilePath = new char[MAX_PATH];
+			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
+
+			if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, pModeltag,
+				CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, FilePath, PivotMatrix))))
+			{
+				Safe_Delete(pModeltag);
+				Safe_Delete(szFilePath);
+				Safe_Delete(FilePath);
+
+				continue;
+			}
+			Safe_Delete(szFilePath);
+			Safe_Delete(FilePath);
+
+		}
+
+		int a = 0;
+	}
+
+	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	m_isFinished = true;
 
 	return S_OK;
 }
@@ -346,7 +404,6 @@ HRESULT CLoader::Loading_For_UITexture()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_QuestItem"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Item/QuestItem_%d.png"), 2))))
 		return E_FAIL;
-
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Hp"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Hp/Heart%02d.dds"), 5))))

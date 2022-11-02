@@ -34,7 +34,9 @@ public:
 	HRESULT Initialize(LEVEL eNextLevel);
 
 	HRESULT Loading_ForLogoLevel();
+	HRESULT Loading_ForStaticLevel();
 	HRESULT Loading_ForGamePlayLevel();
+	HRESULT Loading_ForTailCaveLevel();
 
 public:
 	HRESULT Loading_For_ObjectPrototype();

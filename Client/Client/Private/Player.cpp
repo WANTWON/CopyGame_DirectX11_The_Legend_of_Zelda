@@ -23,11 +23,11 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	Set_Scale(_float3(0.5, 0.5, 0.5));
+	//Set_Scale(_float3(0.5, 0.5, 0.5));
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, m_fStartHeight, 10.f, 1.f));
 
 	m_tInfo.iMaxHp = 50;
-	m_tInfo.iDamage = 20.f;
+	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
 	return S_OK;
@@ -238,11 +238,11 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Link"), (CComponent**)&m_pModelCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Link"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
 	return S_OK;
@@ -298,7 +298,7 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 void CPlayer::SetDirection_byLook(_float fTimeDelta)
 {
 	CTransform::TRANSFORMDESC TransformDesc = m_pTransformCom->Get_TransformDesc();
-	TransformDesc.fSpeedPerSec = m_eState == DASH_LP ? 5.f : 3.f;
+	TransformDesc.fSpeedPerSec = m_eState == DASH_LP ? 7.f : 5.f;
 	m_pTransformCom->Set_TransformDesc(TransformDesc);
 
 

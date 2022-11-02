@@ -70,7 +70,7 @@ HRESULT CTerrain::Ready_Components(void* pArg)
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxNorTex"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxNorTex"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Texture */
@@ -92,7 +92,7 @@ HRESULT CTerrain::Ready_Components(void* pArg)
 	TerrainDesc.m_iPositionZ = 0;
 	TerrainDesc.m_iVerticeNumX = 30;
 	TerrainDesc.m_iVerticeNumZ = 30;
-	TerrainDesc. m_fHeight = -0.01;
+	TerrainDesc. m_fHeight = -0.01f;
 
 	if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"), (CComponent**)&m_pVIBufferCom, &TerrainDesc)))
 		return E_FAIL;

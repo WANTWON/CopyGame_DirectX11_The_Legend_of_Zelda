@@ -35,7 +35,7 @@ void CUI_Manager::Tick_Inventory()
 		m_iPickedIndex--;
 
 		if (m_iPickedIndex < 0)
-			m_iPickedIndex = m_InvenTile.size() -1 ;
+			m_iPickedIndex = (int)m_InvenTile.size() -1 ;
 	}
 	
 
@@ -102,7 +102,7 @@ void CUI_Manager::Tick_PlayerState()
 		int iCol = 0;
 		for (int i = 0; i < iMaxHp; ++i)
 		{
-			_float2 vPostion = _float2(30 + (i % 8) * 30, 30 + iCol * 20);
+			_float2 vPostion = _float2(30.f + (i % 8) * 30.f, 30.f + iCol * 20.f);
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Hp"), LEVEL_STATIC, TEXT("Layer_Hp"), &vPostion)))
 				return;

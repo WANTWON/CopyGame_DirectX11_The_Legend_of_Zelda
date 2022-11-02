@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#include "..\Public\MoblinSword.h"
+#include "..\Public\Rola.h"
 #include "Player.h"
 
-CMoblinSword::CMoblinSword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CRola::CRola(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
 {
 }
 
-HRESULT CMoblinSword::Initialize_Prototype()
+HRESULT CRola::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
@@ -15,7 +15,7 @@ HRESULT CMoblinSword::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CMoblinSword::Initialize(void * pArg)
+HRESULT CRola::Initialize(void * pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -34,7 +34,7 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 	return S_OK;
 }
 
-int CMoblinSword::Tick(_float fTimeDelta)
+int CRola::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
@@ -79,12 +79,12 @@ int CMoblinSword::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CMoblinSword::Late_Tick(_float fTimeDelta)
+void CRola::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 }
 
-HRESULT CMoblinSword::Render()
+HRESULT CRola::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
@@ -98,20 +98,20 @@ HRESULT CMoblinSword::Render()
 	return S_OK;
 }
 
-void CMoblinSword::Change_Animation(_float fTimeDelta)
+void CRola::Change_Animation(_float fTimeDelta)
 {
 	switch (m_eState)
 	{
-	case Client::CMoblinSword::KYOROKYORO:
-	case Client::CMoblinSword::IDLE:
-	case Client::CMoblinSword::STANCE_WAIT:
-	case Client::CMoblinSword::WALK:
+	case Client::CRola::KYOROKYORO:
+	case Client::CRola::IDLE:
+	case Client::CRola::STANCE_WAIT:
+	case Client::CRola::WALK:
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*2, m_bIsLoop);
 		break;
-	case Client::CMoblinSword::DAMAGE_F:
-	case Client::CMoblinSword::DAMAGE_B:
-	case Client::CMoblinSword::GUARD:
+	case Client::CRola::DAMAGE_F:
+	case Client::CRola::DAMAGE_B:
+	case Client::CRola::GUARD:
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
@@ -119,9 +119,9 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 			m_bHit = false;
 		}
 		break;
-	case Client::CMoblinSword::FIND:
-	case Client::CMoblinSword::STANCE_WALK:
-	case Client::CMoblinSword::STAGGER:
+	case Client::CRola::FIND:
+	case Client::CRola::STANCE_WALK:
+	case Client::CRola::STAGGER:
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
@@ -130,21 +130,21 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 			m_bHit = false;
 		}
 		break;
-	case Client::CMoblinSword::DEAD_F:
+	case Client::CRola::DEAD_F:
 		m_pTransformCom->Go_Backward(fTimeDelta * 4);
 		m_bIsLoop = false;
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 			m_bDead = true;
 		break;
-	case Client::CMoblinSword::DEAD_B:
+	case Client::CRola::DEAD_B:
 		m_pTransformCom->Go_Straight(fTimeDelta * 4);
 		m_bIsLoop = false;
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 			m_bDead = true;
 		break;
-	case Client::CMoblinSword::DEAD_FIRE:
+	case Client::CRola::DEAD_FIRE:
 		m_bIsLoop = false;
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
@@ -157,7 +157,7 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 	}
 }
 
-HRESULT CMoblinSword::Ready_Components(void * pArg)
+HRESULT CRola::Ready_Components(void * pArg)
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))
@@ -177,7 +177,7 @@ HRESULT CMoblinSword::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_MoblinSword"), (CComponent**)&m_pModelCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Rola"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
 	CCollider::COLLIDERDESC		ColliderDesc;
@@ -208,7 +208,7 @@ HRESULT CMoblinSword::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CMoblinSword::SetUp_ShaderResources()
+HRESULT CRola::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -229,7 +229,7 @@ HRESULT CMoblinSword::SetUp_ShaderResources()
 	return S_OK;
 }
 
-_bool CMoblinSword::IsDead()
+_bool CRola::IsDead()
 {
 	if (m_bDead && m_eState == STATE::DEAD_F)//&& m_dwDeathTime + 1000 < GetTickCount())
 		return true;
@@ -242,7 +242,7 @@ _bool CMoblinSword::IsDead()
 	return false;
 }
 
-void CMoblinSword::Find_Target()
+void CRola::Find_Target()
 {
 	if (!m_bHit && !m_bDead)
 	{
@@ -278,7 +278,7 @@ void CMoblinSword::Find_Target()
 		//m_pTarget = nullptr;
 }
 
-void CMoblinSword::Follow_Target(_float fTimeDelta)
+void CRola::Follow_Target(_float fTimeDelta)
 {
 	if (m_pTarget == nullptr)
 		return;
@@ -290,7 +290,7 @@ void CMoblinSword::Follow_Target(_float fTimeDelta)
 	m_bIsAttacking = true;
 }
 
-void CMoblinSword::AI_Behaviour(_float fTimeDelta)
+void CRola::AI_Behaviour(_float fTimeDelta)
 {
 	if (!m_bMove || m_eState == DEAD_F || m_eState == STAGGER || m_eState == DEAD_B || m_bHit )
 		return;
@@ -324,7 +324,7 @@ void CMoblinSword::AI_Behaviour(_float fTimeDelta)
 		Patrol(fTimeDelta);
 }
 
-void CMoblinSword::Patrol(_float fTimeDelta)
+void CRola::Patrol(_float fTimeDelta)
 {
 	// Switch between Idle and Walk (based on time)
 	m_bAggro = false;
@@ -358,7 +358,7 @@ void CMoblinSword::Patrol(_float fTimeDelta)
 	}
 }
 
-_float CMoblinSword::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
+_float CRola::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
 {
 	_float fHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
 
@@ -393,33 +393,33 @@ _float CMoblinSword::Take_Damage(float fDamage, void * DamageType, CGameObject *
 	return 0.f;
 }
 
-CMoblinSword * CMoblinSword::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CRola * CRola::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CMoblinSword*	pInstance = new CMoblinSword(pDevice, pContext);
+	CRola*	pInstance = new CRola(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		ERR_MSG(TEXT("Failed to Created : CMoblinSword"));
+		ERR_MSG(TEXT("Failed to Created : CRola"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CMoblinSword::Clone(void * pArg)
+CGameObject * CRola::Clone(void * pArg)
 {
-	CMoblinSword*	pInstance = new CMoblinSword(*this);
+	CRola*	pInstance = new CRola(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		ERR_MSG(TEXT("Failed to Cloned : CMoblinSword"));
+		ERR_MSG(TEXT("Failed to Cloned : CRola"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CMoblinSword::Free()
+void CRola::Free()
 {
 	__super::Free();
 }
