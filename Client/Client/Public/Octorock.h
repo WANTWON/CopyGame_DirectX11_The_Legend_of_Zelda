@@ -31,7 +31,7 @@ private:
 private:
 	virtual void AI_Behaviour(_float fTimeDelta) override;
 	void Patrol(_float fTimeDelta);
-	virtual _float Take_Damage(float fDamage, void* DamageType, CGameObject* DamageCauser) override;
+	virtual _uint Take_Damage(float fDamage, void* DamageType, CGameObject* DamageCauser) override;
 
 private:
 	STATE m_eState = IDLE;

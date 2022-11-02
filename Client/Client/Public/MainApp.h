@@ -30,6 +30,7 @@ private:
 	ID3D11DeviceContext*	m_pContext = nullptr;
 	CRenderer*				m_pRenderer = nullptr;
 	CUI_Manager*			m_pUI_Manager = nullptr;
+
 #ifdef _DEBUG
 private:
 	_uint					m_iNumRender = 0;

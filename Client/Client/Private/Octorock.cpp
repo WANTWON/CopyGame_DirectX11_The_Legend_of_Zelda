@@ -30,6 +30,7 @@ HRESULT COctorock::Initialize(void * pArg)
 	_vector vecPostion = XMLoadFloat3((_float3*)pArg);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
+
 	return S_OK;
 }
 
@@ -50,6 +51,8 @@ int COctorock::Tick(_float fTimeDelta)
 	AI_Behaviour(fTimeDelta);
 	m_pModelCom->Set_CurrentAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
+
+
 	return OBJ_NOEVENT;
 }
 
@@ -63,6 +66,13 @@ HRESULT COctorock::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
+
+#ifdef _DEBUG
+	//m_pAABBCom->Render();
+	m_pOBBCom->Render();
+	/*m_pSPHERECom->Render();*/
+
+#endif
 
 	return S_OK;
 }
@@ -137,6 +147,14 @@ HRESULT COctorock::Ready_Components(void * pArg)
 
 	/* For.Com_Model*/
 	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Octorock"), (CComponent**)&m_pModelCom)))
+		return E_FAIL;
+
+	/* For.Com_OBB*/
+	CCollider::COLLIDERDESC		ColliderDesc;
+	ColliderDesc.vScale = _float3(1.f, 2.f, 1.f);
+	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+	ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
+	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -292,7 +310,7 @@ void COctorock::Patrol(_float fTimeDelta)
 	}
 }
 
-_float COctorock::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
+_uint COctorock::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
 {
 	_float fHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
 
@@ -315,7 +333,7 @@ _float COctorock::Take_Damage(float fDamage, void * DamageType, CGameObject * Da
 	else
 		m_eState = STATE::DEAD;
 
-	return 0.f;
+	return 0;
 }
 
 COctorock * COctorock::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

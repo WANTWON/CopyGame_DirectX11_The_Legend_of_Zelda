@@ -31,6 +31,8 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 	_vector vecPostion = XMLoadFloat3((_float3*)pArg);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
+
+	
 	return S_OK;
 }
 
@@ -74,8 +76,6 @@ int CMoblinSword::Tick(_float fTimeDelta)
 	m_pModelCom->Set_CurrentAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
 
-	//m_pAABBCom->Update(m_pTransformCom->Get_WorldMatrix());
-	m_pOBBCom->Update(m_pTransformCom->Get_WorldMatrix());
 	return OBJ_NOEVENT;
 }
 
@@ -93,8 +93,8 @@ HRESULT CMoblinSword::Render()
 	//m_pAABBCom->Render();
 	m_pOBBCom->Render();
 	/*m_pSPHERECom->Render();*/
-
 #endif
+
 	return S_OK;
 }
 
@@ -182,13 +182,13 @@ HRESULT CMoblinSword::Ready_Components(void * pArg)
 
 	CCollider::COLLIDERDESC		ColliderDesc;
 
-	/* For.Com_AABB */
-	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
+	///* For.Com_AABB */
+	//ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
 
-	ColliderDesc.vScale = _float3(0.7f, 0.7f, 0.7f);
-	ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
-		return E_FAIL;
+	//ColliderDesc.vScale = _float3(0.7f, 0.7f, 0.7f);
+	//ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
+	//if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
+	//	return E_FAIL;
 
 	/* For.Com_OBB*/
 	ColliderDesc.vScale = _float3(1.f, 2.f, 1.f);
@@ -197,12 +197,12 @@ HRESULT CMoblinSword::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
-	/* For.Com_SPHERE */
-	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
-	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
-		return E_FAIL;
+	///* For.Com_SPHERE */
+	//ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+	//ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+	//ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+	//if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
+	//	return E_FAIL;
 
 
 	return S_OK;
@@ -358,7 +358,7 @@ void CMoblinSword::Patrol(_float fTimeDelta)
 	}
 }
 
-_float CMoblinSword::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
+_uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
 {
 	_float fHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
 
@@ -390,7 +390,7 @@ _float CMoblinSword::Take_Damage(float fDamage, void * DamageType, CGameObject *
 	}
 		
 
-	return 0.f;
+	return 0;
 }
 
 CMoblinSword * CMoblinSword::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

@@ -20,6 +20,13 @@ public: /* 내 콜라이더가 생성될 때 취해야할 초기 상태. */
 		_float3		vPosition;
 	}COLLIDERDESC;
 
+	typedef struct tagOBB
+	{
+		_float3		vCenter;
+		_float3		vAlignAxis[3];
+		_float3		vCenterAxis[3];
+	}OBBDESC;
+
 private:
 	CCollider(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCollider(const CCollider& rhs);
@@ -32,6 +39,13 @@ public:
 public:
 	void Update(_fmatrix WorldMatrix);
 	HRESULT Render();
+
+public:
+	_bool Collision(class CCollider* pTargetCollider);
+
+	_bool Collision_AABB(class CCollider* pTargetCollider);
+	_bool Collision_OBB(class CCollider* pTargetCollider);
+
 
 private:
 	TYPE					m_eType = TYPE_END;
@@ -55,6 +69,10 @@ private:
 
 private:
 	_matrix Remove_Rotation(_fmatrix Matrix);
+	_float3 Compute_Min();
+	_float3 Compute_Max();
+
+	OBBDESC Compute_OBBDesc();
 
 
 public:

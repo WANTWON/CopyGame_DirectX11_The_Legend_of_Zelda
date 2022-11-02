@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\BaseObj.h"
-
+#include "GameInstance.h"
 
 CBaseObj::CBaseObj(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CGameObject(pDevice, pContext)
@@ -54,6 +54,16 @@ void CBaseObj::Change_Direction()
 	}
 }
 
+void CBaseObj::Update_Collider()
+{
+	if (m_pAABBCom != nullptr)
+		m_pAABBCom->Update(m_pTransformCom->Get_WorldMatrix());
+	else if (m_pOBBCom != nullptr)
+		m_pOBBCom->Update(m_pTransformCom->Get_WorldMatrix());
+	else if (m_pSPHERECom != nullptr)
+		m_pSPHERECom->Update(m_pTransformCom->Get_WorldMatrix());
+}
+
 
 
 _vector CBaseObj::Get_TransformState(CTransform::STATE eState)
@@ -81,6 +91,18 @@ void CBaseObj::Set_Scale(_float3 vScale)
 	m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_vScale.y);
 	m_pTransformCom->Set_Scale(CTransform::STATE_LOOK, m_vScale.z);
 
+}
+
+CCollider * CBaseObj::Get_Collider()
+{
+	if (m_pAABBCom != nullptr)
+		return m_pAABBCom;
+	else if (m_pOBBCom != nullptr)
+		return m_pOBBCom;
+	else if (m_pSPHERECom != nullptr)
+		return m_pSPHERECom;
+	else
+		return nullptr;
 }
 
 void CBaseObj::Free()

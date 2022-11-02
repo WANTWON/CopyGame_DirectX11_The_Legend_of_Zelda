@@ -77,6 +77,7 @@ private:
 	_int					m_iDash[DIR_END] = { 0 };
 	DWORD					m_dwDashTime = GetTickCount();
 
+
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

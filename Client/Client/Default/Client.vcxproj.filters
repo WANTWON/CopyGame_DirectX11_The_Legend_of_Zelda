@@ -85,6 +85,9 @@
     <Filter Include="02.GameObjects\03.Monster\02.Rola">
       <UniqueIdentifier>{277fde18-006f-4e25-bf82-100d2c0979fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="94.CollisionMgr">
+      <UniqueIdentifier>{30a8f8a5-3e7e-4b8b-9e02-4c3a30fa0e3b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -177,6 +180,7 @@
     <ClInclude Include="..\Public\Rola.h">
       <Filter>02.GameObjects\03.Monster\02.Rola</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Collision_Manger.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -254,6 +258,7 @@
     <ClCompile Include="..\Private\Rola.cpp">
       <Filter>02.GameObjects\03.Monster\02.Rola</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Collision_Manger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

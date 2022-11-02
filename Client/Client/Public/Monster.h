@@ -5,7 +5,6 @@
 
 BEGIN(Engine)
 class CModel;
-class CCollider;
 END
 
 BEGIN(Client)
@@ -44,7 +43,7 @@ protected:
 	virtual void AI_Behaviour(_float fTimeDelta) { };
 	virtual void Find_Target() { };
 	virtual void Follow_Target(_float fTimeDelta) { };
-	virtual _float Take_Damage(float fDamage, void* DamageType, CGameObject* DamageCauser);
+	virtual _uint Take_Damage(float fDamage, void* DamageType, CGameObject* DamageCauser);
 	virtual HRESULT Drop_Items() { return S_OK; };
 	virtual _bool IsDead() = 0;
 
@@ -73,9 +72,7 @@ protected:
 
 protected: /* For.Components */
 	CModel*					m_pModelCom = nullptr;
-	CCollider*				m_pAABBCom = nullptr;
-	CCollider*				m_pOBBCom = nullptr;
-	CCollider*				m_pSPHERECom = nullptr;
+
 
 public:
 	virtual void Free() override;

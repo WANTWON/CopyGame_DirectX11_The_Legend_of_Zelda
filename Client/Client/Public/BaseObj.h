@@ -3,11 +3,13 @@
 #include "GameObject.h"
 #include "Transform.h"
 #include "UI_Manager.h"
+#include "Collision_Manger.h"
 
 BEGIN(Engine)
 class CShader;
 class CRenderer;
 class CTransform;
+class CCollider;
 END
 
 BEGIN(Client)
@@ -30,9 +32,8 @@ public:
 	virtual HRESULT Render();
 
 public:
-	virtual _bool Picking(_float3* PickingPoint) { return false; };
-	virtual void PickingTrue() {};
 	void Change_Direction();
+	void Update_Collider();
 	
 
 public:
@@ -41,6 +42,7 @@ public:
 	_vector Get_TransformState(CTransform::STATE eState);
 	void Set_State(CTransform::STATE eState, _fvector vState);
 	void Set_Scale(_float3 vScale);
+	CCollider*	Get_Collider();
 
 	
 protected: /* For.Components */
@@ -48,6 +50,9 @@ protected: /* For.Components */
 	CRenderer*				m_pRendererCom = nullptr;
 	CTransform*				m_pTransformCom = nullptr;
 
+	CCollider*				m_pAABBCom = nullptr;
+	CCollider*				m_pOBBCom = nullptr;
+	CCollider*				m_pSPHERECom = nullptr;
 
 protected:
 	virtual HRESULT Ready_Components(void* pArg) = 0;

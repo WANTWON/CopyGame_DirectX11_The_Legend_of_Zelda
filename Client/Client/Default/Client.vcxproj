@@ -175,6 +175,7 @@
     <ClInclude Include="..\Public\CameraManager.h" />
     <ClInclude Include="..\Public\Camera_Dynamic.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\Collision_Manger.h" />
     <ClInclude Include="..\Public\Hp.h" />
     <ClInclude Include="..\Public\InvenItem.h" />
     <ClInclude Include="..\Public\InvenTile.h" />
@@ -204,6 +205,7 @@
     <ClCompile Include="..\Private\BaseObj.cpp" />
     <ClCompile Include="..\Private\CameraManager.cpp" />
     <ClCompile Include="..\Private\Camera_Dynamic.cpp" />
+    <ClCompile Include="..\Private\Collision_Manger.cpp" />
     <ClCompile Include="..\Private\Hp.cpp" />
     <ClCompile Include="..\Private\InvenItem.cpp" />
     <ClCompile Include="..\Private\InvenTile.cpp" />

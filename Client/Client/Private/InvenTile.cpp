@@ -47,7 +47,7 @@ HRESULT CInvenTile::Initialize(void * pArg)
 
 	list<CGameObject*>* pItemList =  CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_InvenItem"));
 	m_pItem = dynamic_cast<CInvenItem*>(pItemList->back()); 
-	_uint iTextureNum = pItemList->size() - 2;
+	_uint iTextureNum = (_uint)pItemList->size() - 2;
 	if (iTextureNum >= 6)
 		iTextureNum = 0;
 

@@ -11,6 +11,7 @@
 #include "NonAnim.h"
 #include "Player.h"
 #include "Level_Loading.h"
+#include "Collision_Manger.h"
 
 _bool g_bUIMadefirst = false;
 
@@ -81,6 +82,9 @@ void CLevel_GamePlay::Late_Tick(_float fTimeDelta)
 
 	//SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
 	SetWindowText(g_hWnd, TEXT("GamePlaye Level."));
+
+	CCollision_Manager::Get_Instance()->Update_Collider();
+	CCollision_Manager::Get_Instance()->CollisionwithBullet();
 }
 
 HRESULT CLevel_GamePlay::Ready_Lights()

@@ -34,6 +34,7 @@ HRESULT CMonster::Initialize(void* pArg)
 	m_eObjectID = OBJID::OBJ_MONSTER;
 	//Set_Scale(_float3(0.5, 0.5, 0.5));
 
+	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
 	return S_OK;
 }
 
@@ -110,16 +111,16 @@ CMonster::DMG_DIRECTION CMonster::Calculate_Direction()
 	return m_eDmg_Direction;
 }
 
-_float CMonster::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
+_uint CMonster::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
 {
 	if (fDamage <= 0 || m_bDead)
-		return 0.f;
+		return 0;
 
 	m_tInfo.iCurrentHp -= fDamage;
 
 	if (m_tInfo.iCurrentHp <= 0)
 	{
-		m_tInfo.iCurrentHp = 0.f;
+		m_tInfo.iCurrentHp = 0;
 		return m_tInfo.iCurrentHp;
 	}
 

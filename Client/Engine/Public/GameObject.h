@@ -29,8 +29,7 @@ public:
 public:
 	virtual _bool Picking(_float3* PickingPoint) { return true; }
 	virtual void PickingTrue() { return; }
-	virtual _float Take_Damage(float fDamage, void* DamageType, CGameObject* DamageCauser) { return 0.f; };
-
+	virtual _uint Take_Damage(float fDamage, void* DamageType, CGameObject* DamageCauser) { return 0; };
 	_bool	Get_Dead() { return m_bDead; }
 	_float  Get_CamDistance() { return m_fCamDistance; }
 	void	Set_Dead(_bool bDead) { m_bDead = bDead; }
