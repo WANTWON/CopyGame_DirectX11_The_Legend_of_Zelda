@@ -46,25 +46,7 @@ int CRola::Tick(_float fTimeDelta)
 			_int iNumRand = rand() % 2;
 			if (iNumRand == 0)
 				Take_Damage(1, nullptr, nullptr);
-			else
-			{
-				m_eState = GUARD;
-				m_pTransformCom->LookAt(dynamic_cast<CPlayer*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
-				m_bAggro = true;
-			}
-				
 		}
-		
-		if (m_bIsAttacking)
-		{
-			CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(m_pTarget)->Get_AnimState();
-			if (ePlayerState == CPlayer::SHIELD_LP || ePlayerState == CPlayer::SHIELD_ST)
-			{
-					m_eState = STAGGER;
-					dynamic_cast<CPlayer*>(m_pTarget)->Set_AnimState(CPlayer::SHIELD_HIT);
-					m_bIsAttacking = false;
-			}	
-		}	
 	}
 
 
@@ -102,53 +84,38 @@ void CRola::Change_Animation(_float fTimeDelta)
 {
 	switch (m_eState)
 	{
-	case Client::CRola::KYOROKYORO:
 	case Client::CRola::IDLE:
-	case Client::CRola::STANCE_WAIT:
-	case Client::CRola::WALK:
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*2, m_bIsLoop);
 		break;
-	case Client::CRola::DAMAGE_F:
-	case Client::CRola::DAMAGE_B:
-	case Client::CRola::GUARD:
+	case Client::CRola::PUSH:
+	case Client::CRola::DAMAGE:
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
 			m_eState = IDLE;
 			m_bHit = false;
 		}
-		break;
-	case Client::CRola::FIND:
-	case Client::CRola::STANCE_WALK:
-	case Client::CRola::STAGGER:
+		break;		break;
+	case Client::CRola::DEAD:
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
-		{
-			m_bIsAttacking = false;
-			m_eState = IDLE;
-			m_bHit = false;
-		}
-		break;
-	case Client::CRola::DEAD_F:
-		m_pTransformCom->Go_Backward(fTimeDelta * 4);
-		m_bIsLoop = false;
-		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 			m_bDead = true;
 		break;
-	case Client::CRola::DEAD_B:
-		m_pTransformCom->Go_Straight(fTimeDelta * 4);
+	case Client::CRola::DEAD_ST:
 		m_bIsLoop = false;
-		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
-			m_bDead = true;
+			m_eState = DEAD;
 		break;
-	case Client::CRola::DEAD_FIRE:
+	case Client::CRola::JUMP_ST:
 		m_bIsLoop = false;
-		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
-			m_bDead = true;
+			m_eState = JUMP;
+		break;
+	case Client::CRola::JUMP:
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+			m_eState = JUMP_ED;
 		break;
 	default:
 		m_bIsLoop = true;
@@ -182,26 +149,12 @@ HRESULT CRola::Ready_Components(void * pArg)
 
 	CCollider::COLLIDERDESC		ColliderDesc;
 
-	/* For.Com_AABB */
-	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
-
-	ColliderDesc.vScale = _float3(0.7f, 0.7f, 0.7f);
-	ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
-		return E_FAIL;
 
 	/* For.Com_OBB*/
 	ColliderDesc.vScale = _float3(1.f, 2.f, 1.f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
-		return E_FAIL;
-
-	/* For.Com_SPHERE */
-	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
-	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		return E_FAIL;
 
 
@@ -231,12 +184,12 @@ HRESULT CRola::SetUp_ShaderResources()
 
 _bool CRola::IsDead()
 {
-	if (m_bDead && m_eState == STATE::DEAD_F)//&& m_dwDeathTime + 1000 < GetTickCount())
+	if (m_bDead && m_eState == STATE::DEAD)//&& m_dwDeathTime + 1000 < GetTickCount())
 		return true;
-	else if (m_bDead && m_eState != STATE::DEAD_F)
+	else if (m_bDead && m_eState != STATE::DEAD && m_eState != STATE::DEAD_ST)
 	{
 		m_dwDeathTime = GetTickCount();
-		m_eState = STATE::DEAD_F;
+		m_eState = STATE::DEAD_ST;
 	}
 
 	return false;
@@ -283,7 +236,7 @@ void CRola::Follow_Target(_float fTimeDelta)
 	if (m_pTarget == nullptr)
 		return;
 
-	m_eState = STATE::STANCE_WALK;
+	//m_eState = STATE::JUMP_ST;
 	_vector vTargetPos = dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
 	m_pTransformCom->LookAt(vTargetPos);
 	m_pTransformCom->Go_Straight(fTimeDelta*1.5f);
@@ -292,7 +245,7 @@ void CRola::Follow_Target(_float fTimeDelta)
 
 void CRola::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_eState == DEAD_F || m_eState == STAGGER || m_eState == DEAD_B || m_bHit )
+	if (!m_bMove || m_eState == DEAD || m_eState == DEAD_ST || m_bHit )
 		return;
 
 	// Check for Target, AggroRadius
@@ -308,7 +261,7 @@ void CRola::AI_Behaviour(_float fTimeDelta)
 				m_pTransformCom->LookAt(dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
 				if (!m_bIsAttacking && GetTickCount() > m_dwAttackTime + 1500)
 				{
-					m_eState = STATE::STANCE_WALK;
+					m_eState = STATE::PUSH;
 					m_dwAttackTime = GetTickCount();
 					m_bIsAttacking = true;
 				}
@@ -329,11 +282,11 @@ void CRola::Patrol(_float fTimeDelta)
 	// Switch between Idle and Walk (based on time)
 	m_bAggro = false;
 
-	if (m_eState == STATE::IDLE || m_eState == STATE::KYOROKYORO)
+	if (m_eState == STATE::IDLE)
 	{
 		if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 2 + 1) + 3000)
 		{
-			m_eState = STATE::WALK;
+			m_eState = STATE::JUMP_ST;
 			m_dwWalkTime = GetTickCount();
 
 			m_eDir[DIR_X] = rand() % 3 - 1;
@@ -341,17 +294,17 @@ void CRola::Patrol(_float fTimeDelta)
 
 		}
 	}
-	else if (m_eState == STATE::WALK)
+	else if (m_eState == STATE::JUMP_ED)
 	{
 		if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 2 + 1) + 1500)
 		{
-			m_eState = rand()%2 == 0 ?  STATE::IDLE : STATE::KYOROKYORO;
+			m_eState = STATE::IDLE;
 			m_dwIdleTime = GetTickCount();
 		}
 	}
 
 	// Movement
-	if (m_eState == STATE::WALK)
+	if (m_eState == STATE::JUMP)
 	{
 		Change_Direction();
 		m_pTransformCom->Go_Straight(fTimeDelta);
@@ -367,10 +320,8 @@ _uint CRola::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageC
 		if (!m_bDead)
 		{
 			m_bHit = true;
-			if (Calculate_Direction() == FRONT)
-				m_eState = STATE::DAMAGE_F;
-			else
-				m_eState = STATE::DAMAGE_B;
+			
+			m_eState = STATE::DAMAGE;
 			m_bMove = true;
 		}
 
@@ -383,10 +334,7 @@ _uint CRola::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageC
 	}
 	else
 	{
-		if (Calculate_Direction() == FRONT)
-			m_eState = STATE::DEAD_F;
-		else
-			m_eState = STATE::DEAD_B;
+		m_eState = STATE::DEAD_ST;
 	}
 		
 

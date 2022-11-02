@@ -21,7 +21,7 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_tInfo.iMaxHp = 3;
-	m_tInfo.iDamage = 20.f;
+	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
 	m_fAttackRadius = 2.f;
@@ -286,7 +286,7 @@ void CMoblinSword::Follow_Target(_float fTimeDelta)
 	m_eState = STATE::STANCE_WALK;
 	_vector vTargetPos = dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
 	m_pTransformCom->LookAt(vTargetPos);
-	m_pTransformCom->Go_Straight(fTimeDelta*1.5);
+	m_pTransformCom->Go_Straight(fTimeDelta*1.5f);
 	m_bIsAttacking = true;
 }
 
@@ -360,9 +360,9 @@ void CMoblinSword::Patrol(_float fTimeDelta)
 
 _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
 {
-	_float fHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
+	_uint iHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
 
-	if (fHp > 0)
+	if (iHp > 0)
 	{
 		if (!m_bDead)
 		{
@@ -379,7 +379,7 @@ _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CGameObject * 
 		m_bIsAttacking = false;
 		m_dwAttackTime = GetTickCount();
 
-		return fHp;
+		return iHp;
 	}
 	else
 	{

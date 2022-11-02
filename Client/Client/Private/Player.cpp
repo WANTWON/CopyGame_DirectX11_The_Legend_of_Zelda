@@ -124,11 +124,11 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		}
 	}
 	else if (pGameInstacne->Key_Pressing(DIK_LEFT))
-		m_eDir[DIR_X] = -1.f;
+		m_eDir[DIR_X] = -1;
 	else if (pGameInstacne->Key_Pressing(DIK_RIGHT))
-		m_eDir[DIR_X] = 1.f;
+		m_eDir[DIR_X] = 1;
 	else
-		m_eDir[DIR_X] = 0.f;
+		m_eDir[DIR_X] = 0;
 
 
 	/* Move Up And Down*/
@@ -149,11 +149,11 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		}
 	}
 	if (pGameInstacne->Key_Pressing(DIK_DOWN))
-		m_eDir[DIR_Z] = -1.f;
+		m_eDir[DIR_Z] = -1;
 	else if (pGameInstacne->Key_Pressing(DIK_UP))
-		m_eDir[DIR_Z] = 1.f;
+		m_eDir[DIR_Z] = 1;
 	else
-		m_eDir[DIR_Z] = 0.f;
+		m_eDir[DIR_Z] = 0;
 
 
 	/* Use X Key & Y Key (Attack and Use Item)*/
@@ -363,7 +363,7 @@ void CPlayer::SetDirection_byPosition(_float fTimeDelta)
 		m_eState = SLASH_HOLD_B;
 
 	
-	_vector vDirection = XMVectorSet(m_eDir[DIR_X], 0, m_eDir[DIR_Z], 0);
+	_vector vDirection = XMVectorSet((_float)m_eDir[DIR_X], 0.f, (_float)m_eDir[DIR_Z], 0.f);
 	m_pTransformCom->Go_PosDir(fTimeDelta, vDirection);
 
 }
