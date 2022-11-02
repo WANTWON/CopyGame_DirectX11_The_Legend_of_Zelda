@@ -11,6 +11,7 @@
 #include "NonAnim.h"
 #include "Player.h"
 #include "Level_Loading.h"
+#include "CameraManager.h"
 
 CLevel_TailCave::CLevel_TailCave(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -37,7 +38,7 @@ HRESULT CLevel_TailCave::Initialize()
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
 		return E_FAIL;
 	
-
+	CCameraManager::Get_Instance()->Ready_Camera(LEVEL::LEVEL_TAILCAVE);
 	return S_OK;
 }
 
@@ -112,7 +113,8 @@ HRESULT CLevel_TailCave::Ready_Layer_Player(const _tchar * pLayerTag)
 
 	CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
-	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(30, 0.1, 0, 1));
+	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36, 0.1, 3, 1));
+	pPlayer->Set_JumpingHeight(0.1f);
 			
 	Safe_Release(pGameInstance);
 
@@ -178,7 +180,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Camera(const _tchar * pLayerTag)
 
 	CameraDesc.iTest = 10;
 
-	CameraDesc.CameraDesc.vEye = _float4(0.f, 10.0f, -10.f, 1.f);
+	CameraDesc.CameraDesc.vEye = _float4(0.f, 9.8f, -4.5f, 1.f);
 	CameraDesc.CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 
 	CameraDesc.CameraDesc.fFovy = XMConvertToRadians(60.0f);
@@ -202,14 +204,8 @@ HRESULT CLevel_TailCave::Ready_Layer_Monster(const _tchar * pLayerTag)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	for (int i = 0; i < 5; ++i)
-	{
-		/*if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Octorock"), LEVEL_STATIC, pLayerTag, &_float3(rand()%20 +10.f, 4.1f, rand() % 10 + 10.f))))
-			return E_FAIL;
-
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MoblinSword"), LEVEL_STATIC, pLayerTag, &_float3(rand() % 20 + 10.f, 4.1f, rand() % 10 + 10.f))))
-			return E_FAIL;*/
-	}
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Rola"), LEVEL_TAILCAVE, pLayerTag, &_float3(67.f, 0.1f, 25.f))))
+		return E_FAIL;
 
 
 	RELEASE_INSTANCE(CGameInstance);

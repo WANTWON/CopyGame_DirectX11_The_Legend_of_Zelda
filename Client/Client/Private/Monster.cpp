@@ -43,7 +43,11 @@ int CMonster::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 
 	if (IsDead())
+	{
+		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
 		return OBJ_DEAD;
+	}
+		
 
 	return OBJ_NOEVENT;
 }
@@ -131,6 +135,9 @@ _uint CMonster::Take_Damage(float fDamage, void * DamageType, CGameObject * Dama
 void CMonster::Free()
 {
 	__super::Free();
+
+
+	
 
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pRendererCom);

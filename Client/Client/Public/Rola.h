@@ -34,6 +34,8 @@ private:
 
 private:
 	STATE m_eState = IDLE;
+	_bool m_bJump = false;
+	_int  m_iDmgCount = 0;
 
 public:
 	static CRola* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

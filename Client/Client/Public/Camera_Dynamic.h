@@ -11,17 +11,25 @@ BEGIN(Client)
 class CCamera_Dynamic final : public CCamera
 {
 public:
-	enum CAMERAMODE {CAM_PLAYER, CAM_TURNMODE};
+	enum CAMERAMODE {CAM_PLAYER, CAM_SHAKING};
 
 	typedef struct tagCameraDesc_Derived
 	{
 		_uint						iTest;
 		CCamera::CAMERADESC			CameraDesc;
 	}CAMERADESC_DERIVED;
+
 private:
 	CCamera_Dynamic(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCamera_Dynamic(const CCamera_Dynamic& rhs);
 	virtual ~CCamera_Dynamic() = default;
+
+public:
+	void Set_CamMode(CAMERAMODE _eCamMode, _float fPower, _float fVelocity, _float fMinusVelocity)
+	{
+		m_eCamMode = _eCamMode; m_fPower = fPower; m_fVelocity = fVelocity; m_fMinusVelocity = fMinusVelocity;
+	}
+
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -32,12 +40,19 @@ public:
 
 public:
 	void Player_Camera(_float fTimeDelta);
-	void Turn_Camera(_float fTimeDelta);
+	void Shaking_Camera(_float fTimeDelta, _float fPower);
 
 private:
-	CAMERAMODE m_eCamMode = CAM_PLAYER;
-	_float3 m_vDistance = _float3(0, 8, -8);
+	CAMERAMODE		m_eCamMode = CAM_PLAYER;
+	_float4			m_vDistance = _float4(0, 10, -10, 0.f);
 	_long			m_lMouseWheel = 0;
+
+
+	/* For Shaking Camera */
+	_float m_fPower = 0.f;
+	_float m_fVelocity = 0.f;
+	_float m_fMinusVelocity = 0.f;
+	_int   m_iShakingCount = 0;
 public:
 	static CCamera_Dynamic* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;

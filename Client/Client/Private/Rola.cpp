@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "..\Public\Rola.h"
 #include "Player.h"
+#include "CameraManager.h"
+
 
 CRola::CRola(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -20,11 +22,11 @@ HRESULT CRola::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_tInfo.iMaxHp = 3;
+	m_tInfo.iMaxHp = 20;
 	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
-	m_fAttackRadius = 2.f;
+	m_fAttackRadius = 1.f;
 	m_fPatrolRadius = 7.f;
 	m_eMonsterID = MONSTER_MOBLINSWORD;
 
@@ -85,43 +87,64 @@ void CRola::Change_Animation(_float fTimeDelta)
 	switch (m_eState)
 	{
 	case Client::CRola::IDLE:
+		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
-		m_pModelCom->Play_Animation(fTimeDelta*2, m_bIsLoop);
+		m_pModelCom->Play_Animation(fTimeDelta * m_fAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CRola::PUSH:
 	case Client::CRola::DAMAGE:
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_eState = IDLE;
+			m_bIsAttacking = false;
 			m_bHit = false;
 		}
 		break;		break;
 	case Client::CRola::DEAD:
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_bDead = true;
 		break;
 	case Client::CRola::DEAD_ST:
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_eState = DEAD;
 		break;
 	case Client::CRola::JUMP_ST:
+		m_fAnimSpeed = 4.f;
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_eState = JUMP;
 		break;
 	case Client::CRola::JUMP:
+		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_eState = JUMP_ED;
 		break;
+	case Client::CRola::JUMP_ED:
+	{
+		CCamera_Dynamic* pCamera = dynamic_cast<CCamera_Dynamic*>(CCameraManager::Get_Instance()->Get_CurrentCamera());
+		pCamera->Set_CamMode(CCamera_Dynamic::CAM_SHAKING, 0.1f, 0.1f, 0.01f);
+		m_fAnimSpeed = 4.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta* m_fAnimSpeed, m_bIsLoop))
+		{
+			if (m_bJump)
+				m_eState = JUMP_ST;
+			else
+				m_eState = IDLE;
+		}
+		break;
+	}
 	default:
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
 		break;
 	}
+
+	m_fAnimSpeed = 1.f;
 }
 
 HRESULT CRola::Ready_Components(void * pArg)
@@ -134,7 +157,7 @@ HRESULT CRola::Ready_Components(void * pArg)
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
-	TransformDesc.fSpeedPerSec = 2.0f;
+	TransformDesc.fSpeedPerSec = 1.0f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
@@ -154,7 +177,7 @@ HRESULT CRola::Ready_Components(void * pArg)
 	ColliderDesc.vScale = _float3(1.f, 2.f, 1.f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
 
@@ -227,8 +250,6 @@ void CRola::Find_Target()
 				m_pTarget = nullptr;
 		}
 	}
-	//else
-		//m_pTarget = nullptr;
 }
 
 void CRola::Follow_Target(_float fTimeDelta)
@@ -236,42 +257,31 @@ void CRola::Follow_Target(_float fTimeDelta)
 	if (m_pTarget == nullptr)
 		return;
 
-	//m_eState = STATE::JUMP_ST;
 	_vector vTargetPos = dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
 	m_pTransformCom->LookAt(vTargetPos);
 	m_pTransformCom->Go_Straight(fTimeDelta*1.5f);
-	m_bIsAttacking = true;
 }
 
 void CRola::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_eState == DEAD || m_eState == DEAD_ST || m_bHit )
+	if (!m_bMove || m_eState == DEAD || m_eState == DEAD_ST || m_bHit || m_bIsAttacking)
 		return;
 
 	// Check for Target, AggroRadius
 	Find_Target();
-	if (m_bAggro && m_fDistanceToTarget < m_fPatrolRadius)
-	{
 
-		if (m_pTarget)
+	if (m_iDmgCount % 4 == 3 && m_fDistanceToTarget < m_fAttackRadius)
+	{
+		int a = 0;
+		m_pTransformCom->LookAt(dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
+		if (!m_bIsAttacking && GetTickCount() > m_dwAttackTime + 1500)
 		{
-			// If in AttackRadius > Attack
-			if (m_fDistanceToTarget < m_fAttackRadius)
-			{
-				m_pTransformCom->LookAt(dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
-				if (!m_bIsAttacking && GetTickCount() > m_dwAttackTime + 1500)
-				{
-					m_eState = STATE::PUSH;
-					m_dwAttackTime = GetTickCount();
-					m_bIsAttacking = true;
-				}
-				else if (!m_bIsAttacking)
-					m_eState = STATE::IDLE;
-			}
-			else
-				Follow_Target(fTimeDelta);
-				
+			m_eState = STATE::PUSH;
+			m_dwAttackTime = GetTickCount();
+			m_bIsAttacking = true;
 		}
+		else if (!m_bIsAttacking)
+			m_eState = STATE::IDLE;
 	}
 	else
 		Patrol(fTimeDelta);
@@ -279,35 +289,35 @@ void CRola::AI_Behaviour(_float fTimeDelta)
 
 void CRola::Patrol(_float fTimeDelta)
 {
-	// Switch between Idle and Walk (based on time)
 	m_bAggro = false;
+	if (m_fDistanceToTarget > m_fPatrolRadius)
+		return;
+
+	// Switch between Idle and Walk (based on time)
 
 	if (m_eState == STATE::IDLE)
 	{
-		if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 2 + 1) + 3000)
+		if (GetTickCount() > m_dwIdleTime + 2000)
 		{
+			m_bJump = true;
 			m_eState = STATE::JUMP_ST;
 			m_dwWalkTime = GetTickCount();
 
-			m_eDir[DIR_X] = rand() % 3 - 1;
-			m_eDir[DIR_Z] = m_eDir[DIR_X] == 0 ? rand() % 3 - 1 : 0;
-
 		}
 	}
-	else if (m_eState == STATE::JUMP_ED)
+	else if (m_bJump)
 	{
-		if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 2 + 1) + 1500)
+		if (GetTickCount() > m_dwWalkTime + 5000)
 		{
-			m_eState = STATE::IDLE;
+			m_bJump = false;
 			m_dwIdleTime = GetTickCount();
 		}
 	}
 
 	// Movement
-	if (m_eState == STATE::JUMP)
+	if (m_bJump && m_fDistanceToTarget > m_fAttackRadius)
 	{
-		Change_Direction();
-		m_pTransformCom->Go_Straight(fTimeDelta);
+		Follow_Target(fTimeDelta);
 	}
 }
 
@@ -320,7 +330,7 @@ _uint CRola::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageC
 		if (!m_bDead)
 		{
 			m_bHit = true;
-			
+			m_iDmgCount++;
 			m_eState = STATE::DAMAGE;
 			m_bMove = true;
 		}
@@ -336,7 +346,7 @@ _uint CRola::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageC
 	{
 		m_eState = STATE::DEAD_ST;
 	}
-		
+
 
 	return 0;
 }

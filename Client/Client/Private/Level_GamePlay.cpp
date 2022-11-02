@@ -66,6 +66,7 @@ void CLevel_GamePlay::Tick(_float fTimeDelta)
 		CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
 		Safe_AddRef(pGameInstance);
 
+		CCollision_Manager::Get_Instance()->Clear_CollisionGroup(CCollision_Manager::COLLISION_MONSTER);
 		pGameInstance->Set_DestinationLevel(LEVEL_TAILCAVE);
 		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TAILCAVE))))
 			return;
@@ -219,7 +220,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _tchar * pLayerTag)
 
 	CameraDesc.iTest = 10;
 
-	CameraDesc.CameraDesc.vEye = _float4(0.f, 10.0f, -10.f, 1.f);
+	CameraDesc.CameraDesc.vEye = _float4(0.f, 8.0f, -8.f, 1.f);
 	CameraDesc.CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 
 	CameraDesc.CameraDesc.fFovy = XMConvertToRadians(60.0f);

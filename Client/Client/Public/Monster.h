@@ -56,23 +56,25 @@ protected:
 
 	_bool m_bAggro = false;
 	_bool m_bIsAttacking = false;
-	//_bool m_bDidDamage = false;
 	_bool m_bHit = false;
 	_bool m_bMove = true;
 
-//For Move Time
+
+	//For Move Time
 	DWORD m_dwDeathTime = GetTickCount();
 	DWORD m_dwAttackTime = GetTickCount();
 	DWORD m_dwIdleTime = GetTickCount();
 	DWORD m_dwWalkTime = GetTickCount();
 
+
 	MONSTER_ID	m_eMonsterID = MONSTER_END;
 	OBJINFO  m_tInfo;
 	DMG_DIRECTION	m_eDmg_Direction = FRONT;
 
+
 protected: /* For.Components */
 	CModel*					m_pModelCom = nullptr;
-
+	_float					m_fAnimSpeed = 1.f;
 
 public:
 	virtual void Free() override;

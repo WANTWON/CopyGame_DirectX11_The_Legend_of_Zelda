@@ -212,7 +212,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		{
 			m_eState = ANIM::JUMP;
 			m_fTime = 0.f;
-			m_fStartHeight = 4.2f;
+			m_fStartHeight = m_fEndHeight;
 		}
 	}
 
@@ -396,7 +396,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
 			m_eState = LAND;
-			_vector vPosition = XMVectorSetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 4.2f);
+			_vector vPosition = XMVectorSetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_fEndHeight);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 		}
 		break;
@@ -419,7 +419,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_pTransformCom->Jump(m_fTime, 3.f, 2.0f, m_fStartHeight, m_fEndHeight);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = D_LAND;
-		if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 4.2f)
+		if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= m_fEndHeight)
 			m_eState = D_LAND;
 		break;
 	}

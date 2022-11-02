@@ -41,6 +41,7 @@ public:
 	ANIM Get_AnimState() { return m_eState; }
 	void Set_AnimState(ANIM eAnim) { m_eState = eAnim; }
 	OBJINFO Get_Info() { return m_tInfo; }
+	void Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
 
 private:
 	void Key_Input(_float fTimeDelta);
