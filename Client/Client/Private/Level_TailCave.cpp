@@ -110,15 +110,10 @@ HRESULT CLevel_TailCave::Ready_Layer_Player(const _tchar * pLayerTag)
 	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Player"), LEVEL_STATIC, pLayerTag, nullptr)))
-		return E_FAIL;	
-
-
 	CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
 	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(30, 0.1, 0, 1));
-		
-	
+			
 	Safe_Release(pGameInstance);
 
 	

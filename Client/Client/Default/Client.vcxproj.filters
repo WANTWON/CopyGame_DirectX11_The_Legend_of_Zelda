@@ -82,6 +82,9 @@
     <Filter Include="01.Levels\03.TailCave">
       <UniqueIdentifier>{ad8ba1ec-e482-40ae-b02f-775c9db6d21b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\03.Monster\02.Rola">
+      <UniqueIdentifier>{277fde18-006f-4e25-bf82-100d2c0979fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -171,6 +174,9 @@
     <ClInclude Include="..\Public\Level_TailCave.h">
       <Filter>01.Levels\03.TailCave</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Rola.h">
+      <Filter>02.GameObjects\03.Monster\02.Rola</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -244,6 +250,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_TailCave.cpp">
       <Filter>01.Levels\03.TailCave</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Rola.cpp">
+      <Filter>02.GameObjects\03.Monster\02.Rola</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

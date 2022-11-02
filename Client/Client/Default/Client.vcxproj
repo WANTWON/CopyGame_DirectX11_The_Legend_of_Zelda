@@ -190,6 +190,7 @@
     <ClInclude Include="..\Public\Obj_UI.h" />
     <ClInclude Include="..\Public\Octorock.h" />
     <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\Rola.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\UIButton.h" />
     <ClInclude Include="..\Public\UI_Manager.h" />
@@ -218,6 +219,7 @@
     <ClCompile Include="..\Private\Obj_UI.cpp" />
     <ClCompile Include="..\Private\Octorock.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
+    <ClCompile Include="..\Private\Rola.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\UIButton.cpp" />
     <ClCompile Include="..\Private\UI_Manager.cpp" />

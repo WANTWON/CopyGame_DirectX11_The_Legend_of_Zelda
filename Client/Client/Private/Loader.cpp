@@ -286,6 +286,13 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 		int a = 0;
 	}
 
+
+	/*For.Prototype_Component_Model_Octorock*/
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Rola"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Monster/Rola/Rola.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 
 	RELEASE_INSTANCE(CGameInstance);

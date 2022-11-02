@@ -3,7 +3,7 @@
 
 
 BEGIN(Client)
-class CMoblinSword final : public CMonster
+class CRola final : public CMonster
 {
 public:
 	enum STATE {
@@ -11,8 +11,8 @@ public:
 		GUARD, KYOROKYORO, PIYO, STAGGER, STANCE_WAIT, STANCE_WALK, IDLE, WALK};
 
 private:
-	CMoblinSword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual ~CMoblinSword() = default;
+	CRola(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual ~CRola() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -38,7 +38,7 @@ private:
 	STATE m_eState = IDLE;
 
 public:
-	static CMoblinSword* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CRola* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 
