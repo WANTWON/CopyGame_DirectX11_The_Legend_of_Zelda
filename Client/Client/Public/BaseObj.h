@@ -34,7 +34,7 @@ public:
 public:
 	void Change_Direction();
 	void Update_Collider();
-	
+	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) { return 0; };
 
 public:
 	OBJID Get_ObjectID() { return m_eObjectID; }

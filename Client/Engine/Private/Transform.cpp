@@ -85,9 +85,9 @@ void CTransform::Jump(_float fTimeDelta, _float fVelocity, _float fGravity, _flo
 	float fSpeed = fStartiHeight + fVelocity * fTimeDelta - (0.5*fGravity*fTimeDelta*fTimeDelta);
 
 	vPosition = XMVectorSetY(vPosition, fSpeed);
-	
+
 	float y = XMVectorGetY(vPosition);
-	if ( y <= fEndiHeight)
+	if (y <= fEndiHeight)
 		vPosition = XMVectorSetY(vPosition, fEndiHeight);
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
@@ -95,7 +95,7 @@ void CTransform::Jump(_float fTimeDelta, _float fVelocity, _float fGravity, _flo
 void CTransform::Go_PosTarget(_float fTimeDelta, _vector TargetPos, _vector distance)
 {
 	_vector vPos = Get_State(CTransform::STATE_POSITION);
-	_vector vNewPos = vPos + distance;
+	_vector vNewPos = TargetPos + distance;
 	_vector vDir = vNewPos - vPos;
 
 	vDir = XMVector3Normalize(vDir);
@@ -133,14 +133,31 @@ void CTransform::Follow_Target(_float fTimeDelta, _vector TargetPos, _vector dis
 
 
 	Set_State(CTransform::STATE_POSITION, vNewPos);
-	
+
 }
 
 void CTransform::LookAt(_fvector vAt)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
-
 	_vector		vLook = vAt - vPosition;
+	_vector		vMyOriginalLook = Get_State(CTransform::STATE_LOOK);
+
+
+	_vector		vAxisY = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+	_vector		vRight = XMVector3Cross(vAxisY, vLook);
+	_vector		vUp = XMVector3Cross(vLook, vRight);
+
+	Set_State(STATE_RIGHT, XMVector3Normalize(vRight) * Get_Scale(CTransform::STATE_RIGHT));
+	Set_State(STATE_UP, XMVector3Normalize(vUp) * Get_Scale(CTransform::STATE_UP));
+	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * Get_Scale(CTransform::STATE_LOOK));
+
+}
+
+void CTransform::LookDir(_fvector vDir)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+
+	_vector		vLook = vDir;
 	_vector		vAxisY = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
 	_vector		vRight = XMVector3Cross(vAxisY, vLook);
@@ -157,8 +174,8 @@ void CTransform::Change_Direction(_float UpDown, _float RightLeft)
 		return;
 
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
-	_vector		vLook = vPosition +  XMVectorSet(RightLeft, 0.f, UpDown, 0.f) - vPosition;
-	
+	_vector		vLook = vPosition + XMVectorSet(RightLeft, 0.f, UpDown, 0.f) - vPosition;
+
 	_vector		vAxisY = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
 	_vector		vRight = XMVector3Cross(vAxisY, vLook);
@@ -193,7 +210,7 @@ CComponent * CTransform::Clone(void * pArg)
 		ERR_MSG(TEXT("Failed to Cloned : CTransform"));
 		Safe_Release(pInstance);
 	}
-		
+
 	return pInstance;
 }
 

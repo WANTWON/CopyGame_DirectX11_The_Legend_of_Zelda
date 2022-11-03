@@ -61,6 +61,7 @@ public:
 	void Follow_Target(_float fTimeDelta, _vector TargetPos, _vector distance = XMVectorSet(0.f,0.f,0.f,0.f));
 
 	void LookAt(_fvector vAt);
+	void LookDir(_fvector vDir);
 	void Change_Direction(_float UpDown, _float RightLeft);
 
 private:			

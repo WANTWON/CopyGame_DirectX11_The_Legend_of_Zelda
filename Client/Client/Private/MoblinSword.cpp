@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\MoblinSword.h"
 #include "Player.h"
+#include "MonsterBullet.h"
 
 CMoblinSword::CMoblinSword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -24,7 +25,7 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
-	m_fAttackRadius = 2.f;
+	m_fAttackRadius = 5.f;
 	m_fPatrolRadius = 7.f;
 	m_eMonsterID = MONSTER_MOBLINSWORD;
 
@@ -32,7 +33,7 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 
-	
+
 	return S_OK;
 }
 
@@ -40,36 +41,6 @@ int CMoblinSword::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
-
-	if (m_fDistanceToTarget < 2.f)
-	{
-		if (CGameInstance::Get_Instance()->Key_Down(DIK_X))
-		{
-			_int iNumRand = rand() % 2;
-			if (iNumRand == 0)
-				Take_Damage(1, nullptr, nullptr);
-			else
-			{
-				m_eState = GUARD;
-				m_pTransformCom->LookAt(dynamic_cast<CPlayer*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
-				m_bAggro = true;
-			}
-				
-		}
-		
-		if (m_bIsAttacking)
-		{
-			CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(m_pTarget)->Get_AnimState();
-			if (ePlayerState == CPlayer::SHIELD_LP || ePlayerState == CPlayer::SHIELD_ST)
-			{
-					m_eState = STAGGER;
-					dynamic_cast<CPlayer*>(m_pTarget)->Set_AnimState(CPlayer::SHIELD_HIT);
-					m_bIsAttacking = false;
-			}	
-		}	
-	}
-
-
 
 
 	AI_Behaviour(fTimeDelta);
@@ -82,6 +53,38 @@ int CMoblinSword::Tick(_float fTimeDelta)
 void CMoblinSword::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
+
+
+
+
+	if (m_bAggro&& m_bIsAttacking &&m_pTarget != nullptr 
+		&& true == m_pOBBCom->Collision((m_pTarget)->Get_Collider()))
+	{
+		CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(m_pTarget)->Get_AnimState();
+		if (ePlayerState == CPlayer::SHIELD_LP || ePlayerState == CPlayer::SHIELD_ST)
+		{
+			m_eState = STAGGER;
+			dynamic_cast<CPlayer*>(m_pTarget)->Set_AnimState(CPlayer::SHIELD_HIT);
+			m_bIsAttacking = false;
+		}
+		else
+		{
+			m_eState = STAGGER;
+			m_dwAttackTime = GetTickCount();
+			m_dwIdleTime = GetTickCount();
+			m_bIsAttacking = false;
+			
+			CMonsterBullet::BULLETDESC BulletDesc;
+			BulletDesc.eOwner = MONSTER_MOBLINSWORD;
+			BulletDesc.eBulletType = CMonsterBullet::DEFAULT;
+			BulletDesc.vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+			
+			dynamic_cast<CPlayer*>(m_pTarget)->Take_Damage(1.f, &BulletDesc, nullptr);
+			
+		}
+	}
+
+
 }
 
 HRESULT CMoblinSword::Render()
@@ -105,9 +108,15 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 	case Client::CMoblinSword::KYOROKYORO:
 	case Client::CMoblinSword::IDLE:
 	case Client::CMoblinSword::STANCE_WAIT:
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta * 2, m_bIsLoop);
+		break;
 	case Client::CMoblinSword::WALK:
 		m_bIsLoop = true;
-		m_pModelCom->Play_Animation(fTimeDelta*2, m_bIsLoop);
+		if (m_bIsAttacking)
+			m_pModelCom->Play_Animation(fTimeDelta * 4, m_bIsLoop);
+		else
+			m_pModelCom->Play_Animation(fTimeDelta * 2, m_bIsLoop);
 		break;
 	case Client::CMoblinSword::DAMAGE_F:
 	case Client::CMoblinSword::DAMAGE_B:
@@ -121,9 +130,15 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CMoblinSword::FIND:
 	case Client::CMoblinSword::STANCE_WALK:
+		m_bIsLoop = true;
+		m_bHit = false;
+		m_pTransformCom->Go_Straight(fTimeDelta * 3);
+		m_pModelCom->Play_Animation(fTimeDelta * 4, m_bIsLoop);
+		break;
 	case Client::CMoblinSword::STAGGER:
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		m_pTransformCom->Go_Backward(fTimeDelta);
+		if (m_pModelCom->Play_Animation(fTimeDelta * 2, m_bIsLoop))
 		{
 			m_bIsAttacking = false;
 			m_eState = IDLE;
@@ -268,14 +283,13 @@ void CMoblinSword::Find_Target()
 				CTransform* PlayerTransform = (CTransform*)pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Transform"));
 				_vector vTargetPos = PlayerTransform->Get_State(CTransform::STATE_POSITION);
 				m_fDistanceToTarget = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
-				m_pTarget = pTarget;
+				m_pTarget = dynamic_cast<CBaseObj*>(pTarget);
 			}
 			else
 				m_pTarget = nullptr;
 		}
 	}
-	//else
-		//m_pTarget = nullptr;
+
 }
 
 void CMoblinSword::Follow_Target(_float fTimeDelta)
@@ -283,42 +297,65 @@ void CMoblinSword::Follow_Target(_float fTimeDelta)
 	if (m_pTarget == nullptr)
 		return;
 
-	m_eState = STATE::STANCE_WALK;
-	_vector vTargetPos = dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
+	m_bIsAttacking = true;
+	m_eState = STATE::WALK;
+	_vector vTargetPos = (m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
 	m_pTransformCom->LookAt(vTargetPos);
 	m_pTransformCom->Go_Straight(fTimeDelta*1.5f);
-	m_bIsAttacking = true;
 }
 
 void CMoblinSword::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_eState == DEAD_F || m_eState == STAGGER || m_eState == DEAD_B || m_bHit )
+	if (!m_bMove || m_bHit ||
+		m_eState == DEAD_F || m_eState == STAGGER || m_eState == DEAD_B || m_eState == GUARD)
 		return;
 
 	// Check for Target, AggroRadius
 	Find_Target();
 	if (m_bAggro && m_fDistanceToTarget < m_fPatrolRadius)
 	{
-
-		if (m_pTarget)
+		if (!m_bIsAttacking && m_dwIdleTime + 3000 < GetTickCount())
 		{
-			// If in AttackRadius > Attack
-			if (m_fDistanceToTarget < m_fAttackRadius)
+			m_bIsAttacking = true;
+			m_dwAttackTime = GetTickCount();
+			CCollider::COLLIDERDESC CollisionDesc = m_pOBBCom->Get_CollisionDesc();
+			CollisionDesc.vScale = _float3(2.f, 2.f, 2.f);
+			m_pOBBCom->Set_CollisionDesc(CollisionDesc);
+		}
+		if (m_bIsAttacking && GetTickCount() > m_dwAttackTime + 3000)
+		{
+			m_dwIdleTime = GetTickCount();
+			m_bIsAttacking = false;
+			CCollider::COLLIDERDESC CollisionDesc = m_pOBBCom->Get_CollisionDesc();
+			CollisionDesc.vScale = _float3(1.f, 2.f, 1.f);
+			m_pOBBCom->Set_CollisionDesc(CollisionDesc);
+		}
+
+
+		if (m_fDistanceToTarget < m_fAttackRadius)
+		{
+
+			if (m_pTarget)
 			{
-				m_pTransformCom->LookAt(dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
-				if (!m_bIsAttacking && GetTickCount() > m_dwAttackTime + 1500)
+				if (m_bIsAttacking)
 				{
 					m_eState = STATE::STANCE_WALK;
-					m_dwAttackTime = GetTickCount();
-					m_bIsAttacking = true;
 				}
 				else if (!m_bIsAttacking)
-					m_eState = STATE::IDLE;
+				{
+					m_pTransformCom->LookAt((m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
+					m_eState = STATE::STANCE_WAIT;
+				}
 			}
-			else
-				Follow_Target(fTimeDelta);
-				
 		}
+		else
+		{
+			Follow_Target(fTimeDelta);
+			m_bIsAttacking = false;
+			m_dwAttackTime = GetTickCount();
+			m_dwIdleTime = GetTickCount();
+		}
+			
 	}
 	else
 		Patrol(fTimeDelta);
@@ -329,7 +366,8 @@ void CMoblinSword::Patrol(_float fTimeDelta)
 	// Switch between Idle and Walk (based on time)
 	m_bAggro = false;
 
-	if (m_eState == STATE::IDLE || m_eState == STATE::KYOROKYORO)
+
+	if (m_eState == STATE::IDLE || m_eState == STATE::KYOROKYORO || m_eState == STATE::STANCE_WALK)
 	{
 		if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 2 + 1) + 3000)
 		{
@@ -345,7 +383,7 @@ void CMoblinSword::Patrol(_float fTimeDelta)
 	{
 		if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 2 + 1) + 1500)
 		{
-			m_eState = rand()%2 == 0 ?  STATE::IDLE : STATE::KYOROKYORO;
+			m_eState = STATE::KYOROKYORO;
 			m_dwIdleTime = GetTickCount();
 		}
 	}
@@ -358,8 +396,21 @@ void CMoblinSword::Patrol(_float fTimeDelta)
 	}
 }
 
-_uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
+_uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
+	if (m_eState == DAMAGE_B || m_eState == DAMAGE_F || m_eState == GUARD)
+		return 0;
+
+	_int iNumRand = rand() % 3;
+	if (iNumRand == 0) //random È®·ü·Î Shield Mode
+	{
+		m_eState = GUARD;
+		m_pTransformCom->LookAt(dynamic_cast<CPlayer*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
+		m_bAggro = true;
+		return 0;
+	}
+
+
 	_uint iHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
 
 	if (iHp > 0)
@@ -377,6 +428,7 @@ _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CGameObject * 
 
 		m_bAggro = true;
 		m_bIsAttacking = false;
+		m_dwIdleTime = GetTickCount();
 		m_dwAttackTime = GetTickCount();
 
 		return iHp;
@@ -388,7 +440,7 @@ _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CGameObject * 
 		else
 			m_eState = STATE::DEAD_B;
 	}
-		
+
 
 	return 0;
 }

@@ -42,10 +42,13 @@ public:
 
 public:
 	_bool Collision(class CCollider* pTargetCollider);
-
 	_bool Collision_AABB(class CCollider* pTargetCollider);
 	_bool Collision_OBB(class CCollider* pTargetCollider);
 
+
+public:
+	void Set_CollisionDesc(COLLIDERDESC CollisionDesc) { m_ColliderDesc = CollisionDesc; }
+	COLLIDERDESC Get_CollisionDesc() { return m_ColliderDesc; };
 
 private:
 	TYPE					m_eType = TYPE_END;

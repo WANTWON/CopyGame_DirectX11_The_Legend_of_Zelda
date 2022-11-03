@@ -11,7 +11,7 @@ BEGIN(Client)
 class CMonster abstract : public CBaseObj
 {
 public:
-	enum MONSTER_ID { MONSTER_OCTOROCK, MONSTER_MOBLINSWORD, MONSTER_END };
+	enum MONSTER_ID { MONSTER_OCTOROCK, MONSTER_MOBLINSWORD, MONSTER_ROLA, MONSTER_END };
 	enum DMG_DIRECTION {FRONT, BACK};
 
 protected:
@@ -26,11 +26,15 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+public:
+	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser);
+
+
 protected:
 	virtual HRESULT Ready_Components(void* pArg = nullptr) = 0;
-	virtual HRESULT SetUp_ShaderResources() = 0;
+	virtual HRESULT SetUp_ShaderResources() { return S_OK; };
 	virtual HRESULT SetUp_ShaderID() { return S_OK; };
-	virtual void Change_Animation(_float fTimeDelta) = 0;
+	virtual void Change_Animation(_float fTimeDelta) {};
 
 
 public: // Get& Set
@@ -40,15 +44,15 @@ public: // Get& Set
 
 protected:
 	DMG_DIRECTION Calculate_Direction();
+	_vector Calculate_PosDirction();
 	virtual void AI_Behaviour(_float fTimeDelta) { };
 	virtual void Find_Target() { };
 	virtual void Follow_Target(_float fTimeDelta) { };
-	virtual _uint Take_Damage(float fDamage, void* DamageType, CGameObject* DamageCauser);
 	virtual HRESULT Drop_Items() { return S_OK; };
 	virtual _bool IsDead() = 0;
 
 protected:
-	CGameObject* m_pTarget = nullptr;
+	CBaseObj* m_pTarget = nullptr;
 	_float m_fAttackRadius = .5f;
 	_float m_fDistanceToTarget = 0.f;
 	_float m_fPatrolRadius = 3.f;

@@ -1,7 +1,8 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "..\Public\Rola.h"
 #include "Player.h"
 #include "CameraManager.h"
+#include "MonsterBullet.h"
 
 
 CRola::CRola(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -28,7 +29,7 @@ HRESULT CRola::Initialize(void * pArg)
 
 	m_fAttackRadius = 1.f;
 	m_fPatrolRadius = 7.f;
-	m_eMonsterID = MONSTER_MOBLINSWORD;
+	m_eMonsterID = MONSTER_ROLA;
 
 	_vector vecPostion = XMLoadFloat3((_float3*)pArg);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
@@ -41,24 +42,17 @@ int CRola::Tick(_float fTimeDelta)
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
 
-	if (m_fDistanceToTarget < 2.f)
-	{
-		if (CGameInstance::Get_Instance()->Key_Down(DIK_X))
-		{
-			_int iNumRand = rand() % 2;
-			if (iNumRand == 0)
-				Take_Damage(1, nullptr, nullptr);
-		}
-	}
-
-
 
 
 	AI_Behaviour(fTimeDelta);
-	m_pModelCom->Set_CurrentAnimIndex(m_eState);
+	if (m_eState != m_ePreState)
+	{
+		m_pModelCom->Set_AnimationReset();
+		m_pModelCom->Set_CurrentAnimIndex(m_eState);
+		m_ePreState = m_eState;
+	}
 	Change_Animation(fTimeDelta);
 
-	//m_pAABBCom->Update(m_pTransformCom->Get_WorldMatrix());
 	m_pOBBCom->Update(m_pTransformCom->Get_WorldMatrix());
 	return OBJ_NOEVENT;
 }
@@ -66,6 +60,33 @@ int CRola::Tick(_float fTimeDelta)
 void CRola::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
+
+
+	if (m_pTarget != nullptr && true == m_pOBBCom->Collision(m_pTarget->Get_Collider()) && m_eState == JUMP_ED)
+	{
+		CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(m_pTarget)->Get_AnimState();
+		if (ePlayerState == CPlayer::SHIELD_LP || ePlayerState == CPlayer::SHIELD_ST)
+		{
+			Take_Damage(1.f, nullptr, nullptr);
+			dynamic_cast<CPlayer*>(m_pTarget)->Set_AnimState(CPlayer::SHIELD_HIT);
+			m_bIsAttacking = false;
+		}
+		else
+		{
+			m_dwAttackTime = GetTickCount();
+			m_dwIdleTime = GetTickCount();
+			m_bIsAttacking = false;
+
+			CMonsterBullet::BULLETDESC BulletDesc;
+			BulletDesc.eOwner = MONSTER_ROLA;
+			BulletDesc.eBulletType = CMonsterBullet::DEFAULT;
+			BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+			BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+			dynamic_cast<CPlayer*>(m_pTarget)->Take_Damage(1.f, &BulletDesc, nullptr);
+			m_bBackStep = true;
+
+		}
+	}
 }
 
 HRESULT CRola::Render()
@@ -92,11 +113,22 @@ void CRola::Change_Animation(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta * m_fAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CRola::PUSH:
-	case Client::CRola::DAMAGE:
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
+			m_eAttackDir = m_eAttackDir == RIGHT ? LEFT : RIGHT;
 			m_eState = IDLE;
+			m_bIsAttacking = false;
+			m_bHit = false;
+		}
+		break;		break;
+	case Client::CRola::DAMAGE:
+		m_bIsLoop = false;
+		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		m_pTransformCom->Go_PosDir(fTimeDelta, vDir);
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+		{
+			m_eState = JUMP_ST;
 			m_bIsAttacking = false;
 			m_bHit = false;
 		}
@@ -112,29 +144,31 @@ void CRola::Change_Animation(_float fTimeDelta)
 			m_eState = DEAD;
 		break;
 	case Client::CRola::JUMP_ST:
-		m_fAnimSpeed = 4.f;
+		m_fAnimSpeed = 3.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_eState = JUMP;
 		break;
 	case Client::CRola::JUMP:
-		m_fAnimSpeed = 2.f;
+		m_fAnimSpeed = 2.0f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+		{
 			m_eState = JUMP_ED;
+		}
 		break;
 	case Client::CRola::JUMP_ED:
 	{
 		CCamera_Dynamic* pCamera = dynamic_cast<CCamera_Dynamic*>(CCameraManager::Get_Instance()->Get_CurrentCamera());
 		pCamera->Set_CamMode(CCamera_Dynamic::CAM_SHAKING, 0.1f, 0.1f, 0.01f);
-		m_fAnimSpeed = 4.f;
+		m_fAnimSpeed = 3.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta* m_fAnimSpeed, m_bIsLoop))
 		{
-			if (m_bJump)
+			//if (m_bJump)
 				m_eState = JUMP_ST;
-			else
-				m_eState = IDLE;
+			//else
+			//	m_eState = IDLE;
 		}
 		break;
 	}
@@ -158,7 +192,7 @@ HRESULT CRola::Ready_Components(void * pArg)
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
 	TransformDesc.fSpeedPerSec = 1.0f;
-	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
+	TransformDesc.fRotationPerSec = XMConvertToRadians(3.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
 
@@ -174,7 +208,7 @@ HRESULT CRola::Ready_Components(void * pArg)
 
 
 	/* For.Com_OBB*/
-	ColliderDesc.vScale = _float3(1.f, 2.f, 1.f);
+	ColliderDesc.vScale = _float3(2.f, 2.f, 2.f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
@@ -244,7 +278,7 @@ void CRola::Find_Target()
 				CTransform* PlayerTransform = (CTransform*)pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Transform"));
 				_vector vTargetPos = PlayerTransform->Get_State(CTransform::STATE_POSITION);
 				m_fDistanceToTarget = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
-				m_pTarget = pTarget;
+				m_pTarget = dynamic_cast<CBaseObj*>(pTarget);
 			}
 			else
 				m_pTarget = nullptr;
@@ -257,7 +291,7 @@ void CRola::Follow_Target(_float fTimeDelta)
 	if (m_pTarget == nullptr)
 		return;
 
-	_vector vTargetPos = dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
+	_vector vTargetPos =m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
 	m_pTransformCom->LookAt(vTargetPos);
 	m_pTransformCom->Go_Straight(fTimeDelta*1.5f);
 }
@@ -270,18 +304,32 @@ void CRola::AI_Behaviour(_float fTimeDelta)
 	// Check for Target, AggroRadius
 	Find_Target();
 
-	if (m_iDmgCount % 4 == 3 && m_fDistanceToTarget < m_fAttackRadius)
+	if (m_bBackStep)
 	{
-		int a = 0;
-		m_pTransformCom->LookAt(dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
-		if (!m_bIsAttacking && GetTickCount() > m_dwAttackTime + 1500)
+		if (m_fDistanceToTarget > 4.f)
+			m_bBackStep = false;
+
+		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
+		m_pTransformCom->Go_Backward(fTimeDelta*3);
+	}
+
+	if (m_iDmgCount % 4 == 3 && m_fDistanceToTarget < m_fPatrolRadius)
+	{
+		Moving_AttackPosition(fTimeDelta);
+
+		if (m_bSpecialAttack == true)
 		{
-			m_eState = STATE::PUSH;
-			m_dwAttackTime = GetTickCount();
-			m_bIsAttacking = true;
-		}
-		else if (!m_bIsAttacking)
-			m_eState = STATE::IDLE;
+			if (!m_bIsAttacking && GetTickCount() > m_dwAttackTime + 2000)
+			{
+				m_eState = STATE::PUSH;
+				m_dwAttackTime = GetTickCount();
+				m_bIsAttacking = true;
+				m_iDmgCount++;
+				m_bSpecialAttack = false;
+			}
+			else if (!m_bIsAttacking)
+				m_eState = STATE::JUMP_ST;
+		}	
 	}
 	else
 		Patrol(fTimeDelta);
@@ -297,23 +345,10 @@ void CRola::Patrol(_float fTimeDelta)
 
 	if (m_eState == STATE::IDLE)
 	{
-		if (GetTickCount() > m_dwIdleTime + 2000)
-		{
-			m_bJump = true;
-			m_eState = STATE::JUMP_ST;
-			m_dwWalkTime = GetTickCount();
-
-		}
+		m_bJump = true;
+		m_eState = STATE::JUMP_ST;	
 	}
-	else if (m_bJump)
-	{
-		if (GetTickCount() > m_dwWalkTime + 5000)
-		{
-			m_bJump = false;
-			m_dwIdleTime = GetTickCount();
-		}
-	}
-
+	
 	// Movement
 	if (m_bJump && m_fDistanceToTarget > m_fAttackRadius)
 	{
@@ -321,8 +356,86 @@ void CRola::Patrol(_float fTimeDelta)
 	}
 }
 
-_uint CRola::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
+_bool CRola::Moving_AttackPosition(_float fTimeDelta)
 {
+	if (m_bSpecialAttack == true)
+		return true;
+
+	if (m_eAttackDir == RIGHT)
+	{
+		_float Distance = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - XMLoadFloat4(&m_fRAttackPos)));
+		if (Distance < 0.5f)
+		{
+			m_pTransformCom->LookAt(XMLoadFloat4(&m_fLAttackPos));
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_fRAttackPos));
+			m_bSpecialAttack = true;
+			m_bJump = false;
+			
+		}
+		else
+		{
+			_vector		vLook = XMLoadFloat4(&m_fLAttackPos) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_vector		vMyOriginalLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+			vMyOriginalLook = XMVectorSetY(vMyOriginalLook, XMVectorGetY(vLook));
+			_vector vLookDot = XMVector3AngleBetweenVectors(XMVector3Normalize(vLook), XMVector3Normalize(vMyOriginalLook));
+			_float fAngle = XMConvertToDegrees(XMVectorGetX(vLookDot));
+
+			_vector vCross = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vMyOriginalLook));
+			_vector vDot = XMVector3Dot(XMVector3Normalize(vCross), XMVector3Normalize(XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+
+			_float fScala = XMVectorGetX(vDot);
+
+			if (fScala < 0.f)
+				fAngle = 360.f - fAngle;
+
+			if (fAngle > 5)
+				m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), -1.f);
+			m_pTransformCom->Go_PosTarget(fTimeDelta, XMLoadFloat4(&m_fRAttackPos));
+
+		}
+	}
+	else
+	{
+		_float Distance = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - XMLoadFloat4(&m_fLAttackPos)));
+		if (Distance < 0.5f)
+		{
+			
+			m_pTransformCom->LookAt(XMLoadFloat4(&m_fRAttackPos));
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_fLAttackPos));
+			m_bSpecialAttack = true;
+			m_bJump = false;
+		}
+		else
+		{
+			_vector		vLook = XMLoadFloat4(&m_fRAttackPos) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_vector		vMyOriginalLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+			vMyOriginalLook = XMVectorSetY(vMyOriginalLook, XMVectorGetY(vLook));
+			_vector vLookDot = XMVector3AngleBetweenVectors(XMVector3Normalize(vLook), XMVector3Normalize(vMyOriginalLook));
+			_float fAngle = XMConvertToDegrees(XMVectorGetX(vLookDot));
+
+			_vector vCross = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vMyOriginalLook));
+			_vector vDot = XMVector3Dot(XMVector3Normalize(vCross), XMVector3Normalize(XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+
+			_float fScala = XMVectorGetX(vDot);
+
+			if (fScala < 0.f)
+				fAngle = 360.f - fAngle;
+
+			if ( fAngle > 5)
+				m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), 1.f);
+			m_pTransformCom->Go_PosTarget(fTimeDelta, XMLoadFloat4(&m_fLAttackPos));
+		}
+	}
+	return false;
+}
+
+_uint CRola::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
+{
+	if (m_eState == DAMAGE)
+		return 0;
+
 	_uint iHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
 
 	if (iHp > 0)
@@ -343,10 +456,7 @@ _uint CRola::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageC
 		return iHp;
 	}
 	else
-	{
 		m_eState = STATE::DEAD_ST;
-	}
-
 
 	return 0;
 }

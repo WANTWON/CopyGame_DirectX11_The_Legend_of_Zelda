@@ -94,6 +94,12 @@
     <Filter Include="02.GameObjects\04.Bullet">
       <UniqueIdentifier>{84b03df0-49c8-454a-bf6d-0b5554e73cc4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\04.Bullet\00.MonsterBullet">
+      <UniqueIdentifier>{77e60bdc-6388-4a8a-a552-b3ce200b3b8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\04.Bullet\01.PlayerBullet">
+      <UniqueIdentifier>{a01df109-d708-4035-937d-125f61229e8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -186,7 +192,15 @@
     <ClInclude Include="..\Public\Rola.h">
       <Filter>02.GameObjects\03.Monster\02.Rola</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Collision_Manger.h" />
+    <ClInclude Include="..\Public\Collision_Manger.h">
+      <Filter>94.CollisionMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MonsterBullet.h">
+      <Filter>02.GameObjects\04.Bullet\00.MonsterBullet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerBullet.h">
+      <Filter>02.GameObjects\04.Bullet\01.PlayerBullet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -264,7 +278,15 @@
     <ClCompile Include="..\Private\Rola.cpp">
       <Filter>02.GameObjects\03.Monster\02.Rola</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Collision_Manger.cpp" />
+    <ClCompile Include="..\Private\Collision_Manger.cpp">
+      <Filter>94.CollisionMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MonsterBullet.cpp">
+      <Filter>02.GameObjects\04.Bullet\00.MonsterBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerBullet.cpp">
+      <Filter>02.GameObjects\04.Bullet\01.PlayerBullet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

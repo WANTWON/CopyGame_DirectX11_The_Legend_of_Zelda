@@ -20,6 +20,10 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+public:
+	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
+
+
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
@@ -31,7 +35,6 @@ private:
 private:
 	virtual void AI_Behaviour(_float fTimeDelta) override;
 	void Patrol(_float fTimeDelta);
-	virtual _uint Take_Damage(float fDamage, void* DamageType, CGameObject* DamageCauser) override;
 
 private:
 	STATE m_eState = IDLE;

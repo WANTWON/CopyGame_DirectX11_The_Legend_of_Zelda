@@ -68,6 +68,9 @@ void CLevel_TailCave::Late_Tick(_float fTimeDelta)
 
 	//SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
 	SetWindowText(g_hWnd, TEXT("TailCave Level."));
+
+	CCollision_Manager::Get_Instance()->Update_Collider();
+	CCollision_Manager::Get_Instance()->CollisionwithBullet();
 }
 
 HRESULT CLevel_TailCave::Ready_Lights()

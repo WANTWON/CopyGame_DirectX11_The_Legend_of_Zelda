@@ -27,8 +27,12 @@ public:
 	void	Clear_CollisionGroup(COLLSIONGROUP CollisionGroup);
 public:
 	_bool	CollisionwithGroup(COLLSIONGROUP CollisionGroup, CCollider* pCollider);
+	_bool	CollisionwithGroup(COLLSIONGROUP SourGroup, COLLSIONGROUP DestGroup, CBaseObj** outSour, CBaseObj** outDest);
 	void	CollisionwithBullet();
 	void	Update_Collider();
+
+private:
+	_float  Calculate_Direction(CBaseObj* Sour, CBaseObj* Dest, _float* vCross = nullptr);
 
 private:
 	list<CBaseObj*>		m_GameObjects[COLLISION_END];

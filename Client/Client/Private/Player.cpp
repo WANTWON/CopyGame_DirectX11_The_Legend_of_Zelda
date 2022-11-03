@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "..\Public\Player.h"
-
+#include "PlayerBullet.h"
 #include "GameInstance.h"
+#include "MonsterBullet.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -101,12 +102,57 @@ HRESULT CPlayer::Render()
 
 
 
+_uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
+{
+	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE)
+		return 0;
+
+	if (fDamage <= 0 || m_bDead)
+		return 0;
+
+	m_tInfo.iCurrentHp -= fDamage;
+
+	if (m_tInfo.iCurrentHp <= 0)
+		m_tInfo.iCurrentHp = 0;
+
+
+	CMonsterBullet::BULLETDESC BulletDesc;
+	memcpy(&BulletDesc, DamageType, sizeof(CMonsterBullet::BULLETDESC));
+
+	if (BulletDesc.eBulletType == CMonsterBullet::DEFAULT && BulletDesc.eOwner == CMonster::MONSTER_ROLA)
+	{
+		m_eState = DMG_PRESS;
+	}
+	else
+	{
+		_vector BulletLook = BulletDesc.vLook;
+		_vector PlayerLook = Get_TransformState(CTransform::STATE_LOOK);
+		_vector fDot = XMVector3Dot(BulletLook, PlayerLook);
+		_float fAngleRadian = acos(XMVectorGetX(fDot));
+		_float fAngleDegree = XMConvertToDegrees(fAngleRadian);
+		_vector vCross = XMVector3Cross(BulletLook, PlayerLook);
+
+		if (fAngleDegree > 0.f && fAngleDegree <= 90.f)
+			m_eState = CPlayer::DMG_B;
+		else if (fAngleDegree > 90.f && fAngleDegree <= 180.f)
+			m_eState = CPlayer::DMG_F;
+
+	}
+	
+
+	return 0;
+}
+
 void CPlayer::Key_Input(_float fTimeDelta)
 {
-	CGameInstance* pGameInstacne = GET_INSTANCE(CGameInstance);
+
+	if (m_eState == DMG_B || m_eState == DMG_F)
+		return;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	/* Move Left and Right*/
-	if (pGameInstacne->Key_Down(DIK_LEFT))
+	if (pGameInstance->Key_Down(DIK_LEFT))
 	{
 		if (m_eState != DASH_LP)
 		{
@@ -115,7 +161,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		}
 	
 	}
-	else if (pGameInstacne->Key_Down(DIK_RIGHT))
+	else if (pGameInstance->Key_Down(DIK_RIGHT))
 	{
 		if (m_eState != DASH_LP)
 		{
@@ -123,16 +169,16 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_dwDashTime = GetTickCount();
 		}
 	}
-	else if (pGameInstacne->Key_Pressing(DIK_LEFT))
+	else if (pGameInstance->Key_Pressing(DIK_LEFT))
 		m_eDir[DIR_X] = -1;
-	else if (pGameInstacne->Key_Pressing(DIK_RIGHT))
+	else if (pGameInstance->Key_Pressing(DIK_RIGHT))
 		m_eDir[DIR_X] = 1;
 	else
 		m_eDir[DIR_X] = 0;
 
 
 	/* Move Up And Down*/
-	if (pGameInstacne->Key_Down(DIK_DOWN))
+	if (pGameInstance->Key_Down(DIK_DOWN))
 	{
 		if (m_eState != DASH_LP)
 		{
@@ -140,7 +186,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_dwDashTime = GetTickCount();
 		}
 	}
-	else if (pGameInstacne->Key_Down(DIK_UP))
+	else if (pGameInstance->Key_Down(DIK_UP))
 	{
 		if (m_eState != DASH_LP)
 		{
@@ -148,16 +194,16 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_dwDashTime = GetTickCount();
 		}
 	}
-	if (pGameInstacne->Key_Pressing(DIK_DOWN))
+	if (pGameInstance->Key_Pressing(DIK_DOWN))
 		m_eDir[DIR_Z] = -1;
-	else if (pGameInstacne->Key_Pressing(DIK_UP))
+	else if (pGameInstance->Key_Pressing(DIK_UP))
 		m_eDir[DIR_Z] = 1;
 	else
 		m_eDir[DIR_Z] = 0;
 
 
 	/* Use X Key & Y Key (Attack and Use Item)*/
-	if (pGameInstacne->Key_Up(DIK_X))
+	if (pGameInstance->Key_Up(DIK_Z))
 	{
 		/* Special Sword Attack */
 		if (m_eState == ANIM::SLASH_HOLD_LP || m_eState == ANIM::SLASH_HOLD_F ||
@@ -169,8 +215,19 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			{
 			case Client::CPlayer::MESH_SWORD:
 			case Client::CPlayer::MESH_SWORD2:
+			{
 				m_eState = SLASH;
+				CPlayerBullet::BULLETDESC BulletDesc;
+				BulletDesc.eBulletType = CPlayerBullet::SWORD;
+				BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+				BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+				BulletDesc.vInitPositon += BulletDesc.vLook;
+				BulletDesc.fDeadTime = 0.5f;
+				if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_Bullet"), &BulletDesc)))
+					break;
+
 				break;
+			}
 			case Client::CPlayer::MESH_WAND:
 				m_eState = S_SLASH;
 				break;
@@ -182,14 +239,14 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_pModelCom->Set_AnimationReset();
 		}
 	}
-	else if (pGameInstacne->Key_Pressing(DIK_X))
+	else if (pGameInstance->Key_Pressing(DIK_Z))
 	{
 		if(m_eState == IDLE)
 			m_eState = ANIM::SLASH_HOLD_ST;
 		else if (m_eState == SLASH_HOLD_B || m_eState == SLASH_HOLD_F || m_eState == SLASH_HOLD_R || m_eState == SLASH_HOLD_L)
 			m_eState = SLASH_HOLD_LP;
 	}
-	else if (pGameInstacne->Key_Up(DIK_Y))
+	else if (pGameInstance->Key_Up(DIK_Y))
 	{
 		if (m_eState == ANIM::SHIELD_LP)
 			m_eState = SHIELD_ED;
@@ -199,7 +256,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 
 	/*Jump_Key*/
-	if (pGameInstacne->Key_Down(DIK_LCONTROL) && m_eState != DASH_LP)
+	if (pGameInstance->Key_Down(DIK_LCONTROL) && m_eState != DASH_LP)
 	{
 		if (m_eState == JUMP)
 		{
@@ -301,6 +358,9 @@ void CPlayer::Render_Model(MESH_NAME eMeshName)
 
 void CPlayer::Change_Direction(_float fTimeDelta)
 {
+	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE)
+		return;
+
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
 		return;
 
@@ -439,6 +499,53 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::D_LAND:
 		m_eAnimSpeed = 3.f;
 		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eState = IDLE;
+		break;
+	case Client::CPlayer::DMG_PRESS:
+		m_eAnimSpeed = 2.f;
+		if (m_fScale > 0.1f && !m_bPressed)
+		{
+			m_fScale -= 0.1f;
+			Set_Scale(_float3(1.f, m_fScale, 1.f));	
+
+			if (m_fScale <= 0.1f)
+			{
+				m_bPressed = true;
+				m_dwPressedTime = GetTickCount();
+			}
+		}
+
+		if(m_bPressed && m_dwPressedTime + 1000 < GetTickCount())
+		{
+			if (m_fScale < 1.f)
+			{
+				m_fScale += 0.1f;
+				Set_Scale(_float3(1.f, m_fScale, 1.f));
+			}
+		}
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			m_fScale = 1.f;
+			m_bPressed = false;
+			m_eState = IDLE;
+			Set_Scale(_float3(1.f, m_fScale, 1.f));
+		}
+			
+		break;
+	case Client::CPlayer::DMG_B:
+	case Client::CPlayer::DMG_QUAKE:
+		m_eAnimSpeed = 1.5f;
+		m_bIsLoop = false;
+		m_pTransformCom->Go_Straight(fTimeDelta*0.4f);
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eState = IDLE;
+		break;
+	case Client::CPlayer::DMG_F:
+		m_eAnimSpeed = 1.5f;
+		m_bIsLoop = false;
+		m_pTransformCom->Go_Backward(fTimeDelta*0.1f);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = IDLE;
 		break;

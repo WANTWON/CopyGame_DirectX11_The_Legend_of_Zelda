@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Octorock.h"
 #include "Player.h"
+#include "MonsterBullet.h"
 
 COctorock::COctorock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -38,15 +39,6 @@ int COctorock::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
-
-	if (m_fDistanceToTarget < 2.f)
-	{
-		if (CGameInstance::Get_Instance()->Key_Down(DIK_X))
-			Take_Damage(1, nullptr, nullptr);
-	}
-
-	
-
 
 	AI_Behaviour(fTimeDelta);
 	m_pModelCom->Set_CurrentAnimIndex(m_eState);
@@ -91,6 +83,15 @@ void COctorock::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
 			m_eState = ATTACK_ED;
+			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+			CMonsterBullet::BULLETDESC BulletDesc;
+			BulletDesc.eBulletType = CMonsterBullet::OCTOROCK;
+			BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+			BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterBullet"), LEVEL_TAILCAVE, TEXT("Layer_Bullet"), &BulletDesc)))
+				return;
+			RELEASE_INSTANCE(CGameInstance);
 			//make bullet
 		}
 		break;
@@ -220,7 +221,7 @@ void COctorock::Find_Target()
 				CTransform* PlayerTransform = (CTransform*)pGameInstance->Get_Component(LEVEL_STATIC,TEXT("Layer_Player"), TEXT("Com_Transform"));
 				_vector vTargetPos = PlayerTransform->Get_State(CTransform::STATE_POSITION);
 				m_fDistanceToTarget =  XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
-				m_pTarget = pTarget;
+				m_pTarget = dynamic_cast<CBaseObj*>(pTarget);
 			}
 			else
 				m_pTarget = nullptr;
@@ -237,7 +238,7 @@ void COctorock::Follow_Target(_float fTimeDelta)
 
 	m_eState = STATE::WALK;
 
-	_vector vTargetPos = dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
+	_vector vTargetPos = (m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
 
 	m_pTransformCom->LookAt(vTargetPos);
 	m_pTransformCom->Go_Straight(fTimeDelta);
@@ -260,7 +261,7 @@ void COctorock::AI_Behaviour(_float fTimeDelta)
 			// If in AttackRadius > Attack
 			if (m_fDistanceToTarget < m_fAttackRadius)
 			{
-				m_pTransformCom->LookAt(dynamic_cast<CBaseObj*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
+				m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
 				if (!m_bIsAttacking && GetTickCount() > m_dwAttackTime + 1500)
 				{
 					m_eState = STATE::ATTACK_ST;
@@ -310,9 +311,13 @@ void COctorock::Patrol(_float fTimeDelta)
 	}
 }
 
-_uint COctorock::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
+_uint COctorock::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
-	_float fHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
+	if (m_eState == DAMAGE)
+		return 0;
+
+
+	_uint fHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
 
 	if (fHp > 0)
 	{

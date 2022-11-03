@@ -4,15 +4,20 @@
 #include "GameInstance.h"
 #include "Camera_Dynamic.h"
 #include "Terrain.h"
-#include "Player.h"
+
 #include "NonAnim.h"
 
 #include "Level_Manager.h"
+
+//for Player
+#include "Player.h"
+#include "PlayerBullet.h"
 
 //for Monster
 #include "Octorock.h"
 #include "MoblinSword.h"
 #include "Rola.h"
+#include "MonsterBullet.h"
 
 //for UI
 #include "BackGround.h"
@@ -224,7 +229,10 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Monster/MoblinSword/MoblinSword.fbx", PivotMatrix))))
 		return E_FAIL;
 
-
+	/*For.Prototype_Component_Model_OctorockBullet*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_OctorockBullet"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Bullet/Octorock/Octorock.fbx", PivotMatrix))))
+		return E_FAIL;
 
 
 	/* 콜라이더 생성 중. */
@@ -389,6 +397,15 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Rola"),
 		CRola::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
+		CMonsterBullet::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_PlayerBullet"),
+		CPlayerBullet::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);

@@ -17,7 +17,7 @@ public:
 	enum ANIM {
 		IDLE, RUN, WALK, D_FALL, D_JUMP, D_LAND, JUMP, LAND, S_SLASH, SLASH, SLASH_HOLD_B, SLASH_HOLD_ED, SLASH_HOLD_F,
 		SLASH_HOLD_L, SLASH_HOLD_LP, SLASH_HOLD_R, SLASH_HOLD_ST, SHIELD_ED, SHIELD_LP, SHIELD_ST, SHIELD_HIT,
-		BOW_ED, BOW_ST, DASH_ED, DASH_LP, DASH_ST, DMG_B, DMG_F
+		BOW_ED, BOW_ST, DASH_ED, DASH_LP, DASH_ST, DMG_B, DMG_F, DMG_PRESS, DMG_QUAKE
 	};
 
 	enum MESH_NAME {
@@ -41,8 +41,9 @@ public:
 	ANIM Get_AnimState() { return m_eState; }
 	void Set_AnimState(ANIM eAnim) { m_eState = eAnim; }
 	OBJINFO Get_Info() { return m_tInfo; }
+	void Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
-
+	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
 private:
 	void Key_Input(_float fTimeDelta);
 private:
@@ -58,7 +59,7 @@ private:
 
 
 private:
-	OBJINFO  m_tInfo;
+	OBJINFO					m_tInfo;
 
 	CModel*					m_pModelCom = nullptr;
 	ANIM					m_eState = IDLE;
@@ -77,6 +78,9 @@ private:
 	
 	_int					m_iDash[DIR_END] = { 0 };
 	DWORD					m_dwDashTime = GetTickCount();
+	_float					m_fScale = 1.f;
+	_bool					m_bPressed = false;
+	DWORD					m_dwPressedTime = GetTickCount();
 
 
 public:

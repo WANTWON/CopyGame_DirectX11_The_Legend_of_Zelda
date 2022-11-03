@@ -98,24 +98,40 @@ CMonster::DMG_DIRECTION CMonster::Calculate_Direction()
 	_vector fDot = XMVector3Dot(vTargetDir, vLook);
 	_float fAngleRadian = acos(XMVectorGetX(fDot));
 	_float fAngleDegree = XMConvertToDegrees(fAngleRadian);
-
-	if (fAngleDegree < 0 || fAngleDegree > 360 )
-		return FRONT;
-
-	if (fAngleDegree > 180)
-		fAngleDegree = 360 - fAngleDegree;
-	
-	if (fAngleDegree > 90)
-		m_eDmg_Direction = FRONT;
-	else
-		m_eDmg_Direction = BACK;
-
 	_vector vCross = XMVector3Cross(vTargetDir, vLook);
+
+
+	if (XMVectorGetY(vCross) > 0.f)
+	{
+		if (fAngleDegree > 0.f && fAngleDegree <= 90.f)
+			m_eDmg_Direction = BACK;
+		else if (fAngleDegree > 90.f && fAngleDegree <= 180.f)
+			m_eDmg_Direction = FRONT;
+	}
+	else
+	{
+		if (fAngleDegree > 0.f && fAngleDegree <= 90.f)
+			m_eDmg_Direction = BACK;
+		else if (fAngleDegree > 90.f && fAngleDegree <= 180.f)
+			m_eDmg_Direction = FRONT;
+	}
 
 	return m_eDmg_Direction;
 }
 
-_uint CMonster::Take_Damage(float fDamage, void * DamageType, CGameObject * DamageCauser)
+_vector CMonster::Calculate_PosDirction()
+{
+	if (m_pTarget == nullptr)
+		return _vector();
+
+	// New Logic
+	_vector vMyPos = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	_vector vTargetPos = XMVector3Normalize(dynamic_cast<CPlayer*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
+
+	return vTargetPos - vMyPos;
+}
+
+_uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
 	if (fDamage <= 0 || m_bDead)
 		return 0;
