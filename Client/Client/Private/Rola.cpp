@@ -120,6 +120,19 @@ void CRola::Change_Animation(_float fTimeDelta)
 			m_eState = IDLE;
 			m_bIsAttacking = false;
 			m_bHit = false;
+
+
+			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+			CMonsterBullet::BULLETDESC BulletDesc;
+			BulletDesc.eOwner = MONSTER_ROLA;
+			BulletDesc.eBulletType = CMonsterBullet::ROLA;
+			BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+			BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+			BulletDesc.vLook = XMVectorSetY(BulletDesc.vLook, 0.f);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterBullet"), LEVEL_TAILCAVE, TEXT("Layer_Bullet"), &BulletDesc)))
+				return;
+			RELEASE_INSTANCE(CGameInstance);
 		}
 		break;		break;
 	case Client::CRola::DAMAGE:

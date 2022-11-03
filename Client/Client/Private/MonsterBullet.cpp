@@ -43,6 +43,16 @@ HRESULT CMonsterBullet::Initialize(void * pArg)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		m_pTransformCom->LookDir(m_BulletDesc.vLook);
 		break;
+	case ROLA:
+	{
+		Set_Scale(_float3(1, 1, 1));
+		_float PosY = XMVectorGetY(m_BulletDesc.vInitPositon);
+		PosY += 2.f;
+		m_BulletDesc.vInitPositon = XMVectorSetY(m_BulletDesc.vInitPositon, PosY);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
+		m_pTransformCom->LookDir(m_BulletDesc.vLook);
+		break;
+	}
 	default:
 		break;
 	}
@@ -135,8 +145,10 @@ HRESULT CMonsterBullet::Ready_Components(void * pArg)
 	/* For.Com_Transform */
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
-
-	TransformDesc.fSpeedPerSec = 5.0f;
+	if(m_BulletDesc.eBulletType == OCTOROCK)
+		TransformDesc.fSpeedPerSec = 5.0f;
+	else
+		TransformDesc.fSpeedPerSec = 2.0f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
@@ -155,7 +167,7 @@ HRESULT CMonsterBullet::Ready_Components(void * pArg)
 		break;
 	case ROLA:
 		/* For.Com_Model*/
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), iLevel, TEXT("Prototype_Component_Model_Octorock"), (CComponent**)&m_pModelCom)))
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), iLevel, TEXT("Prototype_Component_Model_RolaBullet"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
 	default:
@@ -167,6 +179,8 @@ HRESULT CMonsterBullet::Ready_Components(void * pArg)
 	ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+	if(m_BulletDesc.eBulletType == ROLA)
+		ColliderDesc.vScale = _float3(5.f, 0.5f, 0.5f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), iLevel, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
@@ -220,6 +234,13 @@ void CMonsterBullet::Moving_OctorockBullet(_float fTimeDelta)
 
 void CMonsterBullet::Moving_RolaBullet(_float fTimeDelta)
 {
+	_vector vAxis = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+	/*_float Y = XMVectorGetY(vAxis);
+	Y += 1;
+	vAxis = XMVectorSetY(vAxis, Y);*/
+
+	m_pTransformCom->Turn(vAxis, 5.f);
+	m_pTransformCom->Go_PosDir(fTimeDelta, m_BulletDesc.vLook);
 }
 
 CMonsterBullet * CMonsterBullet::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

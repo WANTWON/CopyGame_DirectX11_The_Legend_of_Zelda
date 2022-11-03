@@ -317,6 +317,11 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Monster/Rola/Rola.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_RolaBullet*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_RolaBullet"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Bullet/RollingSpike/RollingSpike.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	/* 콜라이더 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("콜라이더 생성 중."));
 

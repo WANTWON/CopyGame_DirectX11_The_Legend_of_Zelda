@@ -89,7 +89,7 @@ void COctorock::Change_Animation(_float fTimeDelta)
 			BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
 			BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
 
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterBullet"), LEVEL_TAILCAVE, TEXT("Layer_Bullet"), &BulletDesc)))
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterBullet"), LEVEL_GAMEPLAY, TEXT("Layer_Bullet"), &BulletDesc)))
 				return;
 			RELEASE_INSTANCE(CGameInstance);
 			//make bullet
