@@ -32,6 +32,9 @@ public:
 		return TransposeMatrix; }
 	_float Get_Scale(STATE eState) { return XMVectorGetX(XMVector3Length(XMLoadFloat4x4(&m_WorldMatrix).r[eState])); }
 	TRANSFORMDESC Get_TransformDesc() { return m_TransformDesc;  }
+	const _float4x4* Get_World4x4Ptr() const {
+		return &m_WorldMatrix;
+	}
 
 	void Set_State(STATE eState, _fvector vState) {
 		_matrix		WorldMatrix = XMLoadFloat4x4(&m_WorldMatrix);
@@ -58,8 +61,9 @@ public:
 
 public:
 	void Turn(_fvector vAxis, _float fTimeDelta);
-	void Follow_Target(_float fTimeDelta, _vector TargetPos, _vector distance = XMVectorSet(0.f,0.f,0.f,0.f));
+	void Rotation(_fvector vAxis, _float fRadian);
 
+	void Follow_Target(_float fTimeDelta, _vector TargetPos, _vector distance = XMVectorSet(0.f,0.f,0.f,0.f));
 	void LookAt(_fvector vAt);
 	void LookDir(_fvector vDir);
 	void Change_Direction(_float UpDown, _float RightLeft);

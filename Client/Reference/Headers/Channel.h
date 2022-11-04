@@ -14,6 +14,10 @@ public:
 	HRESULT Initialize(class CModel* pModel, aiNodeAnim* pAIChannel);
 	void Invalidate_TransformationMatrix(_float fCurrentTime);
 	void Reset();
+	_bool Linear_Interpolation(KEYFRAME NextKeyFrame, _float fLinearCurrentTime, _float fLinearTotalTime);
+
+public: /*Get*/
+	KEYFRAME	Get_StartKeyFrame(void) { return m_KeyFrames[0]; }
 
 private:
 	char					m_szName[MAX_PATH] = "";
@@ -24,9 +28,7 @@ private:
 	vector<KEYFRAME>		m_KeyFrames;
 
 	_uint					m_iCurrentKeyFrameIndex = 0;
-	_float3					m_vScale;
-	_float4					m_vRotation;
-	_float4					m_vPosition;
+	KEYFRAME				m_KeyFrame_Linear;
 
 public:
 	static CChannel* Create(class CModel* pModel, aiNodeAnim* pAIChannel);

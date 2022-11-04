@@ -47,7 +47,7 @@ HRESULT CMonsterBullet::Initialize(void * pArg)
 	{
 		Set_Scale(_float3(1, 1, 1));
 		_float PosY = XMVectorGetY(m_BulletDesc.vInitPositon);
-		PosY += 2.f;
+		PosY += 1.f;
 		m_BulletDesc.vInitPositon = XMVectorSetY(m_BulletDesc.vInitPositon, PosY);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		m_pTransformCom->LookDir(m_BulletDesc.vLook);
@@ -239,7 +239,7 @@ void CMonsterBullet::Moving_RolaBullet(_float fTimeDelta)
 	Y += 1;
 	vAxis = XMVectorSetY(vAxis, Y);*/
 
-	m_pTransformCom->Turn(vAxis, 5.f);
+	m_pTransformCom->Turn(vAxis, 10.f);
 	m_pTransformCom->Go_PosDir(fTimeDelta, m_BulletDesc.vLook);
 }
 
@@ -272,6 +272,8 @@ CGameObject * CMonsterBullet::Clone(void * pArg)
 void CMonsterBullet::Free()
 {
 	__super::Free();
+
+	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MBULLET, this);
 
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pRendererCom);

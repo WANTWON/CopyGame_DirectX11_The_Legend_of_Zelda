@@ -19,6 +19,7 @@ public:
 	list<CGameObject*>* Get_ObjectList(_uint iSceneID, const _tchar * pLayerTag);
 	void Clear(_uint iLevelIndex);
 	void Clear_Layer(_uint iLevelIndex, const _tchar* LayerTag);
+	class CGameObject* Clone_GameObject(const _tchar* pPrototypeTag, void* pArg = nullptr);
 
 public:
 	HRESULT Reserve_Container(_uint iNumLevels);

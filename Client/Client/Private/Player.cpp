@@ -3,6 +3,7 @@
 #include "PlayerBullet.h"
 #include "GameInstance.h"
 #include "MonsterBullet.h"
+#include "Weapon.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -24,6 +25,10 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
+	if (FAILED(Ready_Parts()))
+		return E_FAIL;
+
+
 	//Set_Scale(_float3(0.5, 0.5, 0.5));
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, m_fStartHeight, 10.f, 1.f));
 
@@ -31,6 +36,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
+	m_pModelCom->Set_CurrentAnimIndex(m_eState);
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PLAYER, this);
 	return S_OK;
 }
@@ -46,19 +52,31 @@ int CPlayer::Tick(_float fTimeDelta)
 
 	if (m_eState != m_ePreState)
 	{
-		m_pModelCom->Set_AnimationReset();
-		m_pModelCom->Set_CurrentAnimIndex(m_eState);
+		//m_pModelCom->Set_AnimationReset();
+		m_pModelCom->Set_NextAnimIndex(m_eState);
 		m_ePreState = m_eState;
 	}
 
 	Change_Animation(fTimeDelta);
+
+	for (auto& pParts : m_Parts)
+		pParts->Tick(fTimeDelta);
+
 	return OBJ_NOEVENT;
 }
 
 void CPlayer::Late_Tick(_float fTimeDelta)
 {
+	for (auto& pParts : m_Parts)
+		pParts->Late_Tick(fTimeDelta);
+
+
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_BOW]);
+	}
+		
 }
 
 HRESULT CPlayer::Render()
@@ -287,6 +305,36 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+HRESULT CPlayer::Ready_Parts()
+{
+	m_Parts.resize(PARTS_END);
+
+	/* For.Weapon */
+	CHierarchyNode*		pSocket = m_pModelCom->Get_BonePtr("hand_L");
+	if (nullptr == pSocket)
+		return E_FAIL;
+
+	CWeapon::WEAPONDESC		WeaponDesc;
+	WeaponDesc.pSocket = pSocket;
+	WeaponDesc.SocketPivotMatrix = m_pModelCom->Get_PivotFloat4x4();
+	WeaponDesc.pParentWorldMatrix = m_pTransformCom->Get_World4x4Ptr();
+	Safe_AddRef(pSocket);
+
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	m_Parts[PARTS_BOW] = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
+	if (nullptr == m_Parts[PARTS_BOW])
+		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+
+
+
+
+	return S_OK;
+}
+
 HRESULT CPlayer::Ready_Components(void* pArg)
 {
 	/* For.Com_Renderer */
@@ -504,12 +552,12 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CPlayer::DMG_PRESS:
 		m_eAnimSpeed = 2.f;
-		if (m_fScale > 0.1f && !m_bPressed)
+		if (m_fPressedScale > 0.1f && !m_bPressed)
 		{
-			m_fScale -= 0.1f;
-			Set_Scale(_float3(1.f, m_fScale, 1.f));	
+			m_fPressedScale -= 0.1f;
+			Set_Scale(_float3(1.f, m_fPressedScale, 1.f));	
 
-			if (m_fScale <= 0.1f)
+			if (m_fPressedScale <= 0.1f)
 			{
 				m_bPressed = true;
 				m_dwPressedTime = GetTickCount();
@@ -518,19 +566,19 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 
 		if(m_bPressed && m_dwPressedTime + 1000 < GetTickCount())
 		{
-			if (m_fScale < 1.f)
+			if (m_fPressedScale < 1.f)
 			{
-				m_fScale += 0.1f;
-				Set_Scale(_float3(1.f, m_fScale, 1.f));
+				m_fPressedScale += 0.1f;
+				Set_Scale(_float3(1.f, m_fPressedScale, 1.f));
 			}
 		}
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
-			m_fScale = 1.f;
+			m_fPressedScale = 1.f;
 			m_bPressed = false;
 			m_eState = IDLE;
-			Set_Scale(_float3(1.f, m_fScale, 1.f));
+			Set_Scale(_float3(1.f, m_fPressedScale, 1.f));
 		}
 			
 		break;

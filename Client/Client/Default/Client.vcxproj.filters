@@ -100,6 +100,9 @@
     <Filter Include="02.GameObjects\04.Bullet\01.PlayerBullet">
       <UniqueIdentifier>{a01df109-d708-4035-937d-125f61229e8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\02.Player\Weapon">
+      <UniqueIdentifier>{48ef9c7f-970a-44b0-96ec-7ff3f84bb05d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -201,6 +204,9 @@
     <ClInclude Include="..\Public\PlayerBullet.h">
       <Filter>02.GameObjects\04.Bullet\01.PlayerBullet</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Weapon.h">
+      <Filter>02.GameObjects\02.Player\Weapon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -286,6 +292,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\PlayerBullet.cpp">
       <Filter>02.GameObjects\04.Bullet\01.PlayerBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Weapon.cpp">
+      <Filter>02.GameObjects\02.Player\Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

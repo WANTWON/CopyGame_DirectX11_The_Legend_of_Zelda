@@ -6,12 +6,12 @@
 #include "Terrain.h"
 
 #include "NonAnim.h"
-
 #include "Level_Manager.h"
 
 //for Player
 #include "Player.h"
 #include "PlayerBullet.h"
+#include "Weapon.h"
 
 //for Monster
 #include "Octorock.h"
@@ -120,6 +120,12 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Link"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Link/Link_Anim.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Bow*/
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Bow"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Link/Bow.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/* 셰이더 로딩 중. */
@@ -408,9 +414,13 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 		CMonsterBullet::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_PlayerBullet"),
 		CPlayerBullet::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_Weapon */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
+		CWeapon::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);

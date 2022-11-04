@@ -295,6 +295,14 @@ list<CGameObject*>* CGameInstance::Get_ObjectList(_uint iSceneID, const _tchar *
 	return m_pObject_Manager->Get_ObjectList(iSceneID, pLayerTag);
 }
 
+CGameObject * CGameInstance::Clone_GameObject(const _tchar * pPrototypeTag, void * pArg)
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+
+	return m_pObject_Manager->Clone_GameObject(pPrototypeTag, pArg);
+}
+
 void CGameInstance::Clear_Layer(_uint iLevelIndex, const _tchar * LayerTag)
 {
 	if (nullptr == m_pObject_Manager)

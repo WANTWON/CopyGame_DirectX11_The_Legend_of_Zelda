@@ -153,7 +153,7 @@ void CMonster::Free()
 	__super::Free();
 
 
-	
+	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
 
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pRendererCom);

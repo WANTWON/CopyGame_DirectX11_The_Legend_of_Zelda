@@ -39,6 +39,7 @@ private:
 	
 private:
 	STATE m_eState = IDLE;
+	STATE m_ePreState = FIND;
 
 public:
 	static CMoblinSword* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

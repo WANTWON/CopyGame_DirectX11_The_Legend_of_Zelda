@@ -25,6 +25,8 @@ public:
 		MESH_SWORD2, MESH_OCARINA, MESH_SHOVEL, MESH_SHOES, MESH_WAND, MESH_BELT, MESH_MOUSE, MESH_FILPPER, MESH_NONE
 	};
 
+	enum PARTS { PARTS_BOW, PARTS_END };
+
 private:
 	CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CPlayer(const CPlayer& rhs);
@@ -44,19 +46,24 @@ public:
 	void Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
+
 private:
 	void Key_Input(_float fTimeDelta);
+	void Change_Direction(_float fTimeDelta);
+	void Change_Animation(_float fTimeDelta);
+	void Render_Model(MESH_NAME eMeshName);
+
 private:
+	HRESULT Ready_Parts();
 	virtual HRESULT Ready_Components(void* pArg) override;
 	virtual HRESULT SetUp_ShaderResources() override; /* 셰이더 전역변수에 값을 전달한다. */
 	virtual HRESULT SetUp_ShaderID() override;
-	void Render_Model(MESH_NAME eMeshName);
-	void Change_Direction(_float fTimeDelta);
 	void SetDirection_byLook(_float fTimeDelta);
 	void SetDirection_byPosition(_float fTimeDelta);
-	void Change_Animation(_float fTimeDelta);
+	
 
-
+private:
+	vector<class CGameObject*>			m_Parts;
 
 private:
 	OBJINFO					m_tInfo;
@@ -66,20 +73,20 @@ private:
 	ANIM					m_ePreState = IDLE;
 	_float					m_eAnimSpeed = 1.f;
 
+	_int					m_iDash[DIR_END] = { 0 };
 	//LeftHand : MESH_SHEILD, MESH_OCARINA 
 	//RightHand : MESH_SWORD MESH_SWORD2 MESH_HOOK, MESH_SHOVEL, MESH_WAND, MESH_FILPPER
 	MESH_NAME				m_eLeftHand = MESH_SHEILD;
 	MESH_NAME				m_eRightHand = MESH_SWORD;
 	_bool					m_bIsLoop = true;
-	_float					m_fTime = 0.f;
+	_bool					m_bPressed = false;
 
+	_float					m_fTime = 0.f;
 	_float					m_fStartHeight = 4.2f;
 	_float					m_fEndHeight = 4.2f;
-	
-	_int					m_iDash[DIR_END] = { 0 };
+	_float					m_fPressedScale = 1.f;
+
 	DWORD					m_dwDashTime = GetTickCount();
-	_float					m_fScale = 1.f;
-	_bool					m_bPressed = false;
 	DWORD					m_dwPressedTime = GetTickCount();
 
 

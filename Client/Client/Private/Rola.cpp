@@ -47,8 +47,7 @@ int CRola::Tick(_float fTimeDelta)
 	AI_Behaviour(fTimeDelta);
 	if (m_eState != m_ePreState)
 	{
-		m_pModelCom->Set_AnimationReset();
-		m_pModelCom->Set_CurrentAnimIndex(m_eState);
+		m_pModelCom->Set_NextAnimIndex(m_eState);
 		m_ePreState = m_eState;
 	}
 	Change_Animation(fTimeDelta);

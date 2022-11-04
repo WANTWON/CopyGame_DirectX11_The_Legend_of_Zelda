@@ -17,7 +17,8 @@ CModel::CModel(const CModel & rhs)
 	, m_iNumMeshes(rhs.m_iNumMeshes)
 	, m_iNumMaterials(rhs.m_iNumMaterials)	
 	, m_iNumBones(rhs.m_iNumBones)
-	, m_PivotMatrix(rhs.m_PivotMatrix)		
+	, m_PivotMatrix(rhs.m_PivotMatrix)	
+	, m_eModelType(rhs.m_eModelType)
 {
 	for (auto& pMeshContainer : rhs.m_Meshes)
 	{
@@ -84,6 +85,9 @@ HRESULT CModel::Initialize_Prototype(TYPE eModelType, const char * pModelFilePat
 
 HRESULT CModel::Initialize(void * pArg)
 {
+	if (TYPE_NONANIM == m_eModelType)
+		return S_OK;
+
 	if (FAILED(Create_HierarchyNodes(m_pAIScene->mRootNode)))
 		return E_FAIL;
 
@@ -110,17 +114,37 @@ HRESULT CModel::SetUp_Material(CShader * pShader, const char * pConstantName, _u
 
 _bool CModel::Play_Animation(_float fTimeDelta, _bool isLoop)
 {
-	/* 뼈의 m_TransformationMatrix행렬을 갱신한다. */
-	if (m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, isLoop))
-	{
-		for (auto& pBoneNode : m_Bones)
+
+	if (m_iCurrentAnimIndex != m_iNextAnimIndex)
+	{	//TODO: 현재애님과 다음 애님프레임간의 선형보간 함수 호출 할 것.
+		if (m_bInterupted)
 		{
-			/* 뼈의 m_CombinedTransformationMatrix행렬을 갱신한다. */
-			pBoneNode->Invalidate_CombinedTransformationmatrix();
+			m_Animations[m_iCurrentAnimIndex]->Set_TimeReset();
+			m_bInterupted = false;
 		}
-		return true;
+		m_bLinearFinished = m_Animations[m_iCurrentAnimIndex]->Animation_Linear_Interpolation(fTimeDelta, m_Animations[m_iNextAnimIndex]);
+
+		if (m_bLinearFinished == true)
+		{
+			m_Animations[m_iCurrentAnimIndex]->Set_TimeReset();
+
+			m_iCurrentAnimIndex = m_iNextAnimIndex;
+
+		}
 	}
-		
+	else
+	{
+		/* 뼈의 m_TransformationMatrix행렬을 갱신한다. */
+		if (m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, isLoop))
+		{
+			for (auto& pBoneNode : m_Bones)
+			{
+				/* 뼈의 m_CombinedTransformationMatrix행렬을 갱신한다. */
+				pBoneNode->Invalidate_CombinedTransformationmatrix();
+			}
+			return true;
+		}
+	}
 
 	for (auto& pBoneNode : m_Bones)
 	{

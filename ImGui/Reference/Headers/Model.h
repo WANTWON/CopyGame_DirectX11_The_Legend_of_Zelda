@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include "HierarchyNode.h"
 
 BEGIN(Engine)
 
@@ -17,11 +18,17 @@ public:
 	_uint	Get_NumMeshContainers() const {
 		return m_iNumMeshes;
 	}
-
+	_float4x4 Get_PivotFloat4x4() const {
+		return m_PivotMatrix;
+	}
 	class CHierarchyNode* Get_BonePtr(const char* pBoneName) const;
 
 public:
 	void Set_CurrentAnimIndex(_uint iAnimIndex);
+	/*For. NextTotalBody_Anim*/
+	void Set_NextAnimIndex(_uint iAnimIndex) { if (m_iNextAnimIndex != iAnimIndex) { m_bInterupted = true; }
+		m_iNextAnimIndex = iAnimIndex;
+	}
 	void Set_TimeReset();
 
 public:
@@ -60,6 +67,12 @@ private:
 
 	_uint								m_iCurrentAnimIndex = 0;
 
+
+	/*For. NextIndex*/
+	_uint								m_iNextAnimIndex = 0;
+	/*For. Lineared*/
+	_bool								m_bLinearFinished = false;
+	_bool								m_bInterupted = false;
 private:
 	_float4x4				m_PivotMatrix;
 

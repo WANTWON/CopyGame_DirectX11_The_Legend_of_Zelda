@@ -57,11 +57,37 @@ _bool CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, _bool isLoo
 
 void CAnimation::Set_TimeReset()
 {
-	m_fCurrentTime = 0.f;
+	
 	for (auto& pChannel : m_Channels)
 	{
 		pChannel->Reset();
 	}
+	m_fCurrentTime = 0.f;
+}
+
+
+_bool CAnimation::Animation_Linear_Interpolation(_float fTimeDelta, CAnimation * NextAnim)
+{
+	/* 현재 재생중인 시간. */
+	vector<CChannel*> NextAnimChannels = NextAnim->Get_Channels();
+
+	m_bLinearFinished = false;
+	m_fLinear_CurrentTime += fTimeDelta;
+
+	if (!m_bLinearFinished)
+	{
+		for (_uint i = 0; i<m_iNumChannels; ++i)
+		{
+			if (m_Channels[i]->Linear_Interpolation(NextAnimChannels[i]->Get_StartKeyFrame(), m_fLinear_CurrentTime, m_fTotal_Linear_Duration))
+			{
+				m_fLinear_CurrentTime = 0.f;
+				m_bLinearFinished = true;
+				m_Channels[i]->Reset();
+			}
+
+		}
+	}
+	return m_bLinearFinished;
 }
 
 CAnimation * CAnimation::Create( CModel* pModel, aiAnimation * pAIAnimation)

@@ -39,9 +39,10 @@ int COctorock::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
+		
 
 	AI_Behaviour(fTimeDelta);
-	m_pModelCom->Set_CurrentAnimIndex(m_eState);
+	m_pModelCom->Set_NextAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
 
 
@@ -316,7 +317,6 @@ _uint COctorock::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 	if (m_eState == DAMAGE)
 		return 0;
 
-
 	_uint fHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
 
 	if (fHp > 0)
@@ -327,7 +327,6 @@ _uint COctorock::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 			m_eState = STATE::DAMAGE;
 			m_bMove = true;
 		}
-
 
 		m_bAggro = true;
 		m_bIsAttacking = false;
@@ -363,7 +362,6 @@ CGameObject * COctorock::Clone(void * pArg)
 		ERR_MSG(TEXT("Failed to Cloned : COctorock"));
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
 

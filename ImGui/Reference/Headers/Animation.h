@@ -13,7 +13,14 @@ private:
 public:
 	HRESULT Initialize(class CModel* pModel, aiAnimation* pAIAnimation);
 	_bool Invalidate_TransformationMatrix(_float fTimeDelta, _bool isLoop);
-	void Set_TimeReset();
+	
+
+public:/*Get*/
+	vector<class CChannel*>	Get_Channels(void) { return m_Channels; }
+	void	Set_TimeReset();
+
+public:
+	_bool Animation_Linear_Interpolation(_float fTimeDelta, CAnimation* NextAnim);
 
 private:
 	char				m_szName[MAX_PATH] = "";
@@ -35,6 +42,11 @@ private:
 	_bool							m_isFinished = false;
 	_bool							m_isLoop = true;
 
+
+	/*For. Linear Time*/
+	_float m_fTotal_Linear_Duration = 0.2f;
+	_float m_fLinear_CurrentTime = 0.f;
+	_bool	m_bLinearFinished = false;
 
 public:
 	static CAnimation* Create(class CModel* pModel, aiAnimation* pAIAnimation);

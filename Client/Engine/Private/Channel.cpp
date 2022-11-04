@@ -97,11 +97,12 @@ void CChannel::Invalidate_TransformationMatrix(_float fCurrentTime)
 		vPosition = XMVectorLerp(vSourPosition, vDestPosition, fRatio);
 		vPosition = XMVectorSetW(vPosition, 1.f);
 
-		XMStoreFloat3(&m_vScale, vScale);
-		XMStoreFloat4(&m_vRotation, vRotation);
-		XMStoreFloat4(&m_vPosition, vPosition);
-
 	}
+
+	 XMStoreFloat3(&m_KeyFrame_Linear.vPosition, vPosition);
+	 XMStoreFloat4(&m_KeyFrame_Linear.vRotation, vRotation);
+	 XMStoreFloat3(&m_KeyFrame_Linear.vScale, vScale);
+
 
 	_matrix		TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 	
@@ -112,6 +113,46 @@ void CChannel::Invalidate_TransformationMatrix(_float fCurrentTime)
 void CChannel::Reset()
 {
 	m_iCurrentKeyFrameIndex = 0;
+}
+
+_bool CChannel::Linear_Interpolation(KEYFRAME NextKeyFrame, _float fLinearCurrentTime, _float fLinearTotalTime)
+{
+	_vector			vScale, vRotation, vPosition;
+
+	if (fLinearCurrentTime >= fLinearTotalTime)
+		return true;
+
+	_float		fRatio = fLinearCurrentTime / fLinearTotalTime;
+
+
+	_vector		vSourScale, vSourRotation, vSourPosition;
+	_vector		vDestScale, vDestRotation, vDestPosition;
+
+	vDestScale = XMLoadFloat3(&NextKeyFrame.vScale);
+	vDestRotation = XMLoadFloat4(&NextKeyFrame.vRotation);
+	vDestPosition = XMLoadFloat3(&NextKeyFrame.vPosition);
+
+	vSourScale = XMLoadFloat3(&m_KeyFrame_Linear.vScale);
+	vSourRotation = XMLoadFloat4(&m_KeyFrame_Linear.vRotation);
+	vSourPosition = XMLoadFloat3(&m_KeyFrame_Linear.vPosition);
+
+
+
+	vScale = XMVectorLerp(vSourScale, vDestScale, fRatio);
+	vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, fRatio);
+	vPosition = XMVectorLerp(vSourPosition, vDestPosition, fRatio);
+	vPosition = XMVectorSetW(vPosition, 1.f);
+
+
+	XMStoreFloat3(&m_KeyFrame_Linear.vPosition, vPosition);
+	XMStoreFloat4(&m_KeyFrame_Linear.vRotation, vRotation);
+	XMStoreFloat3(&m_KeyFrame_Linear.vScale, vScale);
+
+	_matrix		TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
+
+	m_pBoneNode->Set_TransformationMatrix(TransformationMatrix);
+
+	return false;
 }
 
 CChannel * CChannel::Create( CModel* pModel, aiNodeAnim * pAIChannel)

@@ -112,6 +112,15 @@ void CObject_Manager::Clear_Layer(_uint iLevelIndex, const _tchar * pLayerTag)
 	pLayer->Free();
 }
 
+CGameObject * CObject_Manager::Clone_GameObject(const _tchar * pPrototypeTag, void * pArg)
+{
+	CGameObject*		pPrototype = Find_Prototype(pPrototypeTag);
+	if (nullptr == pPrototype)
+		return nullptr;
+
+	return pPrototype->Clone(pArg);
+}
+
 CGameObject * CObject_Manager::Find_Objects(_uint iLevelIndex, const _tchar * pLayerTag, _uint iIndex)
 {
 	CLayer* pLayer = Find_Layer(iLevelIndex, pLayerTag);
