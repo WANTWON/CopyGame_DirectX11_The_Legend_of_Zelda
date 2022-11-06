@@ -58,9 +58,9 @@ void CBaseObj::Update_Collider()
 {
 	if (m_pAABBCom != nullptr)
 		m_pAABBCom->Update(m_pTransformCom->Get_WorldMatrix());
-	else if (m_pOBBCom != nullptr)
+	if (m_pOBBCom != nullptr)
 		m_pOBBCom->Update(m_pTransformCom->Get_WorldMatrix());
-	else if (m_pSPHERECom != nullptr)
+	if (m_pSPHERECom != nullptr)
 		m_pSPHERECom->Update(m_pTransformCom->Get_WorldMatrix());
 }
 

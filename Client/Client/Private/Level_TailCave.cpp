@@ -136,7 +136,7 @@ HRESULT CLevel_TailCave::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	CNonAnim::NONANIMDESC  ModelDesc;
 	_uint iNum = 0;
 
-	hFile = CreateFile(TEXT("../../../Bin/Data/TailCaveMap.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	hFile = CreateFile(TEXT("../../../Bin/Data/TailCaveMap1.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
 		return E_FAIL;
 
@@ -207,8 +207,15 @@ HRESULT CLevel_TailCave::Ready_Layer_Monster(const _tchar * pLayerTag)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Rola"), LEVEL_TAILCAVE, pLayerTag, &_float3(67.f, 0.1f, 25.f))))
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Rola"), LEVEL_TAILCAVE, pLayerTag, &_float3(75.f, 0.1f, 25.f))))
 		return E_FAIL;
+
+	for (int i = 0; i < 5; ++i)
+	{
+		
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Pawn"), LEVEL_TAILCAVE, pLayerTag, &_float3(rand() % 20 + 10.f, 0.1f, rand() % 10 + 10.f))))
+			return E_FAIL;
+	}
 
 
 	RELEASE_INSTANCE(CGameInstance);

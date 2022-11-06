@@ -5,6 +5,7 @@
 
 BEGIN(Engine)
 
+class CTransform;
 class ENGINE_DLL CModel final : public CComponent
 {
 public:
@@ -40,6 +41,7 @@ public:
 	_bool Play_Animation(_float fTimeDelta, _bool isLoop);
 	HRESULT Render(class CShader* pShader, _uint iMeshIndex, _uint iPassIndex = 0);
 	HRESULT Set_AnimationReset();
+	_bool Picking(CTransform * pTransform, _float3 * pOut);
 	
 
 private:

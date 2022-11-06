@@ -88,9 +88,6 @@
     <Filter Include="94.CollisionMgr">
       <UniqueIdentifier>{30a8f8a5-3e7e-4b8b-9e02-4c3a30fa0e3b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\03.Monster\03.SeaUrchin">
-      <UniqueIdentifier>{36fe2785-0cd5-41fe-bdf4-789eb567803b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\04.Bullet">
       <UniqueIdentifier>{84b03df0-49c8-454a-bf6d-0b5554e73cc4}</UniqueIdentifier>
     </Filter>
@@ -102,6 +99,9 @@
     </Filter>
     <Filter Include="02.GameObjects\02.Player\Weapon">
       <UniqueIdentifier>{48ef9c7f-970a-44b0-96ec-7ff3f84bb05d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.Monster\03.Pawn">
+      <UniqueIdentifier>{36fe2785-0cd5-41fe-bdf4-789eb567803b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -207,6 +207,9 @@
     <ClInclude Include="..\Public\Weapon.h">
       <Filter>02.GameObjects\02.Player\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Pawn.h">
+      <Filter>02.GameObjects\03.Monster\03.Pawn</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -295,6 +298,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Weapon.cpp">
       <Filter>02.GameObjects\02.Player\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Pawn.cpp">
+      <Filter>02.GameObjects\03.Monster\03.Pawn</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

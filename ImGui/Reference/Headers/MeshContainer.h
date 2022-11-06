@@ -26,6 +26,7 @@ public:
 
 public:
 	HRESULT SetUp_Bones(class CModel* pModel);
+	_bool Picking(CTransform * pTransform, _float3 * pOut);
 
 private:
 	char						m_szName[MAX_PATH] = "";

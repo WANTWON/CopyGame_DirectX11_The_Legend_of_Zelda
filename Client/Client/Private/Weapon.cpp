@@ -31,6 +31,7 @@ HRESULT CWeapon::Initialize(void * pArg)
 	m_pTransformCom->Set_Scale(CTransform::STATE_LOOK, 2.f);
 
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
+	//m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(90.0f));
 
 	return S_OK;
 }
@@ -116,8 +117,8 @@ HRESULT CWeapon::Ready_Components()
 
 
 	/* For.Com_OBB*/
-	ColliderDesc.vScale = _float3(0.3f, 0.3f, 0.3f);
-	ColliderDesc.vPosition = _float3(0.f, 0.0f, 0.f);
+	ColliderDesc.vScale = _float3(0.5f, 0.2f, 0.2f);
+	ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
