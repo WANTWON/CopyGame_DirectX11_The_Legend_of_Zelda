@@ -21,7 +21,7 @@ HRESULT CPawn::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_tInfo.iMaxHp = 10;
+	m_tInfo.iMaxHp = 3;
 	m_tInfo.iDamage = 4;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
@@ -77,8 +77,9 @@ void CPawn::Change_Animation(_float fTimeDelta)
 	{
 	case Client::CPawn::IDLE:
 	case Client::CPawn::WALK:
+		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
-		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CPawn::STUN:
 		m_bIsLoop = true;
@@ -87,10 +88,12 @@ void CPawn::Change_Animation(_float fTimeDelta)
 	case Client::CPawn::DEAD:
 	case Client::CPawn::DEADFALL:
 	{
-		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
-		m_pTransformCom->Go_PosDir(fTimeDelta, vDir);
+		m_fAnimSpeed = 2.f;
+		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
+		m_pTransformCom->Go_Backward(fTimeDelta);
+		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_bDead = true;
 		}
@@ -98,10 +101,11 @@ void CPawn::Change_Animation(_float fTimeDelta)
 	}
 	case Client::CPawn::DAMAGE:
 	{
+		m_fAnimSpeed = 3.f;
 		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
 		m_pTransformCom->Go_PosDir(fTimeDelta, vDir);
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_eState = STUN;
 		break;
 	}
@@ -122,7 +126,7 @@ HRESULT CPawn::Ready_Components(void * pArg)
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
-	TransformDesc.fSpeedPerSec = 1.f;
+	TransformDesc.fSpeedPerSec = 2.f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
@@ -137,14 +141,14 @@ HRESULT CPawn::Ready_Components(void * pArg)
 
 	/* For.Com_OBB*/
 	CCollider::COLLIDERDESC		ColliderDesc;
-	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+	ColliderDesc.vScale = _float3(1.5f, 1.5f, 1.5f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.0f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
 	/* For.Com_SHPERE */
-	ColliderDesc.vScale = _float3(5.f, 5.f, 5.f);
+	ColliderDesc.vScale = _float3(7.f, 7.f, 7.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
@@ -238,7 +242,7 @@ void CPawn::Follow_Target(_float fTimeDelta)
 
 void CPawn::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_eState == STUN || m_eState == DAMAGE  || m_eState == DEADFALL)
+	if (!m_bMove || m_eState == DAMAGE  || m_eState == DEADFALL)
 		return;
 
 	// Check for Target, AggroRadius
@@ -246,6 +250,7 @@ void CPawn::AI_Behaviour(_float fTimeDelta)
 
 	if (m_pTarget && m_pSPHERECom->Collision(m_pTarget->Get_Collider()) == true)
 	{
+		m_bAggro = true;
 		// If in AttackRadius > Attack
 		if (m_fDistanceToTarget < m_fAttackRadius)
 		{
@@ -258,40 +263,16 @@ void CPawn::AI_Behaviour(_float fTimeDelta)
 			Follow_Target(fTimeDelta);
 	}
 	else
-		Patrol(fTimeDelta);
+	{
+		if(m_bAggro)
+			Follow_Target(fTimeDelta);
+		else
+			m_eState = IDLE;
+	}
+	
 }
 
-void CPawn::Patrol(_float fTimeDelta)
-{
-	// Switch between Idle and Walk (based on time)
-	if (m_eState == STATE::IDLE)
-	{
-		if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 2 + 1) + 3000)
-		{
-			m_eState = STATE::WALK;
-			m_dwWalkTime = GetTickCount();
 
-			m_eDir[DIR_X] = rand() % 3 - 1;
-			m_eDir[DIR_Z] = m_eDir[DIR_X] == 0 ? rand() % 3 - 1 : 0;
-
-		}
-	}
-	else if (m_eState == STATE::WALK)
-	{
-		if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 2 + 1) + 1500)
-		{
-			m_eState = STATE::IDLE;
-			m_dwIdleTime = GetTickCount();
-		}
-	}
-
-	// Movement
-	if (m_eState == STATE::WALK)
-	{
-		Change_Direction();
-		m_pTransformCom->Go_Straight(fTimeDelta);
-	}
-}
 
 _uint CPawn::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {

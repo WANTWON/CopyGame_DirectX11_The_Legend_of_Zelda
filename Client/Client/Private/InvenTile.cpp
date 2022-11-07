@@ -45,11 +45,17 @@ HRESULT CInvenTile::Initialize(void * pArg)
 	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_InvenItem"), &ItemDesc)))
 		return E_FAIL;
 
-	list<CGameObject*>* pItemList =  CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_InvenItem"));
-	m_pItem = dynamic_cast<CInvenItem*>(pItemList->back()); 
-	_uint iTextureNum = (_uint)pItemList->size() - 2;
-	if (iTextureNum >= 6)
-		iTextureNum = 0;
+	_uint iTextureNum = 0;
+	list<CGameObject*>* pItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_InvenItem"));
+
+	if (pItemList != nullptr) //ø÷ Release Mode¿œ ∂ß æ»µ ?
+	{
+		m_pItem = dynamic_cast<CInvenItem*>(pItemList->back());
+		iTextureNum = (_uint)pItemList->size() - 2;
+		if (iTextureNum >= 6)
+			iTextureNum = 0;
+	}
+	
 
 	if (m_InvenDesc.eTileType == EQUIP_TILE)
 	{

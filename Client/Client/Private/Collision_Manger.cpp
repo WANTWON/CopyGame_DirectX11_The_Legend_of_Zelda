@@ -98,13 +98,7 @@ void CCollision_Manager::CollisionwithBullet()
 		}
 		else
 		{
-			/*_float fAngleDegree = Calculate_Direction(pMonsterBullet, pPlayer);
-			CPlayer::ANIM eState = CPlayer::DMG_F;
-			if (fAngleDegree > 0.f && fAngleDegree <= 90.f)
-				eState = CPlayer::DMG_B;
-			else if (fAngleDegree > 90.f && fAngleDegree <= 180.f)
-				eState = CPlayer::DMG_F;
-*/
+
 			CMonsterBullet::BULLETDESC BulletDesc = dynamic_cast<CMonsterBullet*>(pMonsterBullet)->Get_BulletDesc(); 
 			dynamic_cast<CPlayer*>(Player)->Take_Damage(1.f, &BulletDesc, nullptr);
 
@@ -117,6 +111,8 @@ void CCollision_Manager::CollisionwithBullet()
 	CBaseObj* pPlayerBullet = nullptr;
 	if (CollisionwithGroup(COLLISION_MONSTER, COLLISION_PBULLET, &pMonster, &pPlayerBullet))
 	{
+		CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")))->Get_AnimState();
+		if(ePlayerState == CPlayer::SLASH || ePlayerState == CPlayer::SLASH_HOLD_ED)
 		dynamic_cast<CMonster*>(pMonster)->Take_Damage(1, nullptr, nullptr);
 	}
 }
@@ -125,6 +121,9 @@ void CCollision_Manager::Update_Collider()
 {
 	for (_uint i = 0; i < COLLISION_END; ++i)
 	{
+		if (i == COLLISION_PBULLET)
+			continue;
+
 		for (auto& iter : m_GameObjects[i])
 			iter->Update_Collider();
 	}

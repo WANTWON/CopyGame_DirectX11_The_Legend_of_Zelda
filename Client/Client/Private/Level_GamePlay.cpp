@@ -48,10 +48,11 @@ HRESULT CLevel_GamePlay::Initialize()
 		if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 			return E_FAIL;
 
+		CUI_Manager::Get_Instance()->Initialize_PlayerState();
 		g_bUIMadefirst = true;
 	}
 	
-
+	
 	return S_OK;
 }
 

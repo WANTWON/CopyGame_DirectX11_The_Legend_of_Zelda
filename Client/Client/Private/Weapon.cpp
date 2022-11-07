@@ -4,12 +4,12 @@
 #include "GameInstance.h"
 
 CWeapon::CWeapon(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	: CGameObject(pDevice, pContext)
+	: CBaseObj(pDevice, pContext)
 {
 }
 
 CWeapon::CWeapon(const CWeapon & rhs)
-	: CGameObject(rhs)
+	: CBaseObj(rhs)
 {
 }
 
@@ -23,7 +23,7 @@ HRESULT CWeapon::Initialize(void * pArg)
 	if (nullptr != pArg)
 		memcpy(&m_WeaponDesc, pArg, sizeof(WEAPONDESC));
 
-	if (FAILED(Ready_Components()))
+	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
 	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, 2.f);
@@ -32,6 +32,8 @@ HRESULT CWeapon::Initialize(void * pArg)
 
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
 	//m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(90.0f));
+
+	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PBULLET, this);
 
 	return S_OK;
 }
@@ -87,7 +89,7 @@ HRESULT CWeapon::Render()
 	return S_OK;
 }
 
-HRESULT CWeapon::Ready_Components()
+HRESULT CWeapon::Ready_Components(void* pArg)
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))
@@ -117,7 +119,7 @@ HRESULT CWeapon::Ready_Components()
 
 
 	/* For.Com_OBB*/
-	ColliderDesc.vScale = _float3(0.5f, 0.2f, 0.2f);
+	ColliderDesc.vScale = _float3(0.7f, 0.2f, 0.2f);
 	ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;

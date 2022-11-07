@@ -3,9 +3,7 @@
 
 #include "GameInstance.h"
 #include "Camera_Dynamic.h"
-#include "Terrain.h"
 
-#include "NonAnim.h"
 #include "Level_Manager.h"
 
 //for Player
@@ -25,7 +23,14 @@
 #include "InvenTile.h"
 #include "UIButton.h"
 #include "InvenItem.h"
-#include "Hp.h"
+#include "PlayerState.h"
+
+//for Object 
+#include "Terrain.h"
+#include "NonAnim.h"
+#include "DgnKey.h"
+#include "TreasureBox.h"
+#include "FootSwitch.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -115,7 +120,6 @@ HRESULT CLoader::Loading_ForStaticLevel()
 
 	
 
-
 	/*For.Prototype_Component_Model_Link*/
 	_matrix			PivotMatrix = XMMatrixIdentity();
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
@@ -123,12 +127,32 @@ HRESULT CLoader::Loading_ForStaticLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Link/Link_Anim.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_SmallKey*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_SmallKey"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/DgnKey/SmallKey/SmallKey.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
 	/*For.Prototype_Component_Model_Bow*/
 	PivotMatrix = XMMatrixIdentity();
 	PivotMatrix = XMMatrixTranslation(0.f, 0.2f, 0.2f);
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Bow"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Link/Bow.fbx", PivotMatrix))))
 		return E_FAIL;
+
+	/*For.Prototype_Component_Model_TreasureBox*/
+	PivotMatrix = XMMatrixIdentity();
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_TreasureBox"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/TreasureBox/TreasureBox.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_FootSwitch*/
+	PivotMatrix = XMMatrixIdentity();
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_FootSwitch"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Switch/FootSwitch.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
 
 	/* 셰이더 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("셰이더 로딩 중."));
@@ -399,7 +423,7 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hp"),
-		CHp::Create(m_pDevice, m_pContext))))
+		CPlayerState::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 
@@ -437,6 +461,20 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterBullet"),
 		CMonsterBullet::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+	/*For.Prototype_GameObject_Object */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DgnKey"),
+		CDgnKey::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TreasureBox"),
+		CTreasureBox::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FootSwitch"),
+		CFootSwitch::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -500,6 +538,10 @@ HRESULT CLoader::Loading_For_UITexture()
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Hp"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Hp/Heart%02d.dds"), 5))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SmallKey"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Key/SmallKey_00.dds"), 1))))
 		return E_FAIL;
 
 

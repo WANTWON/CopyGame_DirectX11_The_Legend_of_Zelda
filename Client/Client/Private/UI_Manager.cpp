@@ -4,7 +4,7 @@
 #include "GameInstance.h"
 #include "InvenTile.h"
 #include "Player.h"
-#include "Hp.h"
+#include "PlayerState.h"
 
 IMPLEMENT_SINGLETON(CUI_Manager)
 
@@ -14,7 +14,19 @@ CUI_Manager::CUI_Manager()
 
 void CUI_Manager::Initialize_PlayerState()
 {
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	for (int i = 0; i < 4; ++i)
+	{
+		CPlayerState::STATEDESC StateDesc;
+		StateDesc.m_eType = CPlayerState::KEY;
+		StateDesc.fPosition = _float2(30.f + (i % 8) * 30.f, 90.f);
 
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Hp"), LEVEL_STATIC, TEXT("Layer_Hp"), &StateDesc)))
+			return;
+
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CUI_Manager::Tick_Inventory()
@@ -102,9 +114,11 @@ void CUI_Manager::Tick_PlayerState()
 		int iCol = 0;
 		for (int i = 0; i < iMaxHp; ++i)
 		{
-			_float2 vPostion = _float2(30.f + (i % 8) * 30.f, 30.f + iCol * 20.f);
+			CPlayerState::STATEDESC StateDesc;
+			StateDesc.m_eType = CPlayerState::HP;
+			StateDesc.fPosition = _float2(30.f + (i % 8) * 30.f, 30.f + iCol * 20.f);
 
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Hp"), LEVEL_STATIC, TEXT("Layer_Hp"), &vPostion)))
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Hp"), LEVEL_STATIC, TEXT("Layer_Hp"), &StateDesc)))
 				return;
 
 			if (i % 8 == 7)
@@ -119,16 +133,16 @@ void CUI_Manager::Tick_PlayerState()
 	_int iCurrentLastHp = (pPlayer->Get_Info().iCurrentHp) % 4;
 
 	for (int i = 0; i < iCurrentFullHp; ++i)
-		dynamic_cast<CHp*>(m_HpList[i])->Set_TextureNum(CHp::HP100);
+		dynamic_cast<CPlayerState*>(m_HpList[i])->Set_TextureNum(CPlayerState::HP100);
 	
 	if(iCurrentLastHp == 0)
-		dynamic_cast<CHp*>(m_HpList[iCurrentFullHp])->Set_TextureNum(CHp::HP0);
+		dynamic_cast<CPlayerState*>(m_HpList[iCurrentFullHp])->Set_TextureNum(CPlayerState::HP0);
 	if (iCurrentLastHp == 1)
-		dynamic_cast<CHp*>(m_HpList[iCurrentFullHp])->Set_TextureNum(CHp::HP25);
+		dynamic_cast<CPlayerState*>(m_HpList[iCurrentFullHp])->Set_TextureNum(CPlayerState::HP25);
 	if (iCurrentLastHp == 2)
-		dynamic_cast<CHp*>(m_HpList[iCurrentFullHp])->Set_TextureNum(CHp::HP50);
+		dynamic_cast<CPlayerState*>(m_HpList[iCurrentFullHp])->Set_TextureNum(CPlayerState::HP50);
 	if (iCurrentLastHp == 3)
-		dynamic_cast<CHp*>(m_HpList[iCurrentFullHp])->Set_TextureNum(CHp::HP75);
+		dynamic_cast<CPlayerState*>(m_HpList[iCurrentFullHp])->Set_TextureNum(CPlayerState::HP75);
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -148,6 +162,21 @@ void CUI_Manager::Set_EquipItem(EQUIP_BT eEquipBt, CObj_UI * pObj)
 {
 	m_EquipTile[eEquipBt] = pObj;
 }
+
+void CUI_Manager::Get_Key()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CPlayerState::STATEDESC StateDesc;
+	StateDesc.m_eType = CPlayerState::KEY;
+	StateDesc.fPosition = _float2(30.f + (m_KeyList.size() % 8) * 30.f, 70.f);
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Hp"), LEVEL_STATIC, TEXT("Layer_Hp"), &StateDesc)))
+		return;
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 
 
 void CUI_Manager::Free()

@@ -66,8 +66,8 @@ protected:
 	OBJID			m_eObjectID = OBJ_END;
 	_float3			m_vScale = _float3(1.f,1.f,1.f);
 	_float3			m_vMousePickPos;
-	_int				m_eDir[DIR_END] = { 0 };
-	_int				m_ePreDir[DIR_END] = { 0 };
+	_int			m_eDir[DIR_END] = { 0 };
+	_int			m_ePreDir[DIR_END] = { 0 };
 
 
 public:

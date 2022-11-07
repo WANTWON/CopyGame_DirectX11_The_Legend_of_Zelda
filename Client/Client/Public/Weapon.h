@@ -1,15 +1,10 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "BaseObj.h"
 
 
 BEGIN(Engine)
-
-class CShader;
-class CCollider;
-class CRenderer;
-class CTransform;
 class CModel;
 class CHierarchyNode;
 
@@ -18,7 +13,7 @@ END
 
 BEGIN(Client)
 
-class CWeapon final : public CGameObject
+class CWeapon final : public CBaseObj
 {
 public:
 	typedef struct tagWeaponDesc
@@ -42,14 +37,7 @@ public:
 	virtual HRESULT Render();
 
 private:
-	CShader*				m_pShaderCom = nullptr;	
-	CRenderer*				m_pRendererCom = nullptr;
-	CTransform*				m_pTransformCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
-
-	CCollider*				m_pAABBCom = nullptr;
-	CCollider*				m_pOBBCom = nullptr;
-	CCollider*				m_pSPHERECom = nullptr;
 
 private:
 	WEAPONDESC				m_WeaponDesc;
@@ -57,7 +45,7 @@ private:
 
 
 private:
-	HRESULT Ready_Components();
+	virtual HRESULT Ready_Components(void* pArg) override;
 	HRESULT SetUp_ShaderResources(); /* 셰이더 전역변수에 값을 전달한다. */
 
 

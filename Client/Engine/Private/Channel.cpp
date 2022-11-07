@@ -62,7 +62,7 @@ HRESULT CChannel::Initialize(CModel* pModel, aiNodeAnim * pAIChannel)
 void CChannel::Invalidate_TransformationMatrix(_float fCurrentTime)
 {
 	KEYFRAME		FirstKeyframe = m_KeyFrames.front();
-	KEYFRAME		LastKeyframe = m_KeyFrames[m_KeyFrames.size() - 1];
+	KEYFRAME		LastKeyframe = m_KeyFrames[m_KeyFrames.size() - 2];
 
 	_vector  vScale, vRotation, vPosition;
 

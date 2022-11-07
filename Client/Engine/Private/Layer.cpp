@@ -3,6 +3,7 @@
 
 CLayer::CLayer()
 {
+	m_GameObjects.resize(0);
 }
 
 CComponent * CLayer::Get_Component(const _tchar * pComponentTag, _uint iIndex)

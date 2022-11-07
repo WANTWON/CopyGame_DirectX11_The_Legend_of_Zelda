@@ -35,7 +35,7 @@ private:
 
 private:
 	virtual void AI_Behaviour(_float fTimeDelta) override;
-	void Patrol(_float fTimeDelta);
+
 
 private:
 	STATE m_eState = IDLE;

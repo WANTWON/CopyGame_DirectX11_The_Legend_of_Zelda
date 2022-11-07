@@ -30,6 +30,8 @@ public:
 public:
 	void Add_InvenGroup(CObj_UI* pObj) { m_InvenTile.push_back(pObj);  }
 	void Add_HpGroup(CObj_UI* pObj) { m_HpList.push_back(pObj); }
+	void Add_KeyGroup(CObj_UI* pObj) { m_KeyList.push_back(pObj); }
+	void Get_Key();
 
 private:
 	_bool m_bUIOpen = false;
@@ -42,6 +44,7 @@ private:
 
 	/*For Player State*/
 	vector<CObj_UI*> m_HpList;
+	vector<CObj_UI*> m_KeyList;
 
 
 public:

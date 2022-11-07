@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "Level_Loading.h"
 #include "CameraManager.h"
+#include "DgnKey.h"
 
 CLevel_TailCave::CLevel_TailCave(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -37,6 +38,9 @@ HRESULT CLevel_TailCave::Initialize()
 
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
 		return E_FAIL;
+
+	if (FAILED(Ready_Layer_Object(TEXT("Layer_Object"))))
+		return E_FAIL;
 	
 	CCameraManager::Get_Instance()->Ready_Camera(LEVEL::LEVEL_TAILCAVE);
 	return S_OK;
@@ -48,16 +52,7 @@ void CLevel_TailCave::Tick(_float fTimeDelta)
 
 	CUI_Manager::Get_Instance()->Tick_PlayerState();
 
-	if (GetKeyState(VK_SPACE) & 0x8000)
-	{
-		CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
-		Safe_AddRef(pGameInstance);
-
-		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TAILCAVE))))
-			return;
-
-		Safe_Release(pGameInstance);
-	}
+	
 
 
 }
@@ -116,7 +111,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Player(const _tchar * pLayerTag)
 
 	CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
-	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36, 0.1, 3, 1));
+	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.f, 0.1, 3.f, 1.f));
 	pPlayer->Set_JumpingHeight(0.1f);
 			
 	Safe_Release(pGameInstance);
@@ -207,19 +202,42 @@ HRESULT CLevel_TailCave::Ready_Layer_Monster(const _tchar * pLayerTag)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Rola"), LEVEL_TAILCAVE, pLayerTag, &_float3(75.f, 0.1f, 25.f))))
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Rola"), LEVEL_TAILCAVE, pLayerTag, &_float3(91.5f, 0.1f, 32.9f))))
 		return E_FAIL;
 
-	for (int i = 0; i < 5; ++i)
-	{
-		
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Pawn"), LEVEL_TAILCAVE, pLayerTag, &_float3(rand() % 20 + 10.f, 0.1f, rand() % 10 + 10.f))))
-			return E_FAIL;
-	}
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Pawn"), LEVEL_TAILCAVE, pLayerTag, &_float3(30.11f, 0.1f, 11.f))))
+		return E_FAIL;
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Pawn"), LEVEL_TAILCAVE, pLayerTag, &_float3(27.f, 0.1f, 7.5f))))
+		return E_FAIL;
 
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
+}
+
+HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CDgnKey::DGNKEYDESC DgnKeyDesc;
+	DgnKeyDesc.eType = CDgnKey::SMALL_KEY;
+	DgnKeyDesc.vPosition = _float3(25.75f, 15.3f, 10.28f);
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_DgnKey"), LEVEL_TAILCAVE, pLayerTag, &DgnKeyDesc)))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_TAILCAVE, pLayerTag, &_float3(12.5, 0.1f, 10.1f))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FootSwitch"), LEVEL_TAILCAVE, pLayerTag, &_float3(44.f, 0.1f, 22.f))))
+		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
+}
+
+void CLevel_TailCave::Check_Solved_Puzzle()
+{
 }
 
 CLevel_TailCave * CLevel_TailCave::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

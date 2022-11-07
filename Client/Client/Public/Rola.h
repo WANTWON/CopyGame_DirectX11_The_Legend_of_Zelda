@@ -47,8 +47,8 @@ private:
 	_bool m_bBackStep = false;
 	_int  m_iDmgCount = 0;
 
-	_float4 m_fLAttackPos = _float4(68.f, 0.f, 22.5f, 1.f);
-	_float4 m_fRAttackPos = _float4(74.f, 0.f, 22.5f, 1.f);
+	_float4 m_fLAttackPos = _float4(85.4f, 0.f, 32.9f, 1.f);
+	_float4 m_fRAttackPos = _float4(91.5f, 0.f, 32.9f, 1.f);
 	DIR		m_eAttackDir = LEFT;
 
 public:

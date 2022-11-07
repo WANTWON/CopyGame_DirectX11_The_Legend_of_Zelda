@@ -28,9 +28,6 @@
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{ffd39a2b-4897-4694-bc2f-d9c96bf2d061}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\01.Terrain">
-      <UniqueIdentifier>{6cd33bd8-14ca-4499-8f92-7d7ff986c039}</UniqueIdentifier>
-    </Filter>
     <Filter Include="96.Camera">
       <UniqueIdentifier>{55d7a379-9b3f-44de-b2a6-a82b799e9ebb}</UniqueIdentifier>
     </Filter>
@@ -103,6 +100,21 @@
     <Filter Include="02.GameObjects\03.Monster\03.Pawn">
       <UniqueIdentifier>{36fe2785-0cd5-41fe-bdf4-789eb567803b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\05.Object">
+      <UniqueIdentifier>{0dd72c5c-1e22-492a-8380-0dd9ba87836a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.NonAnim\01.Terrain">
+      <UniqueIdentifier>{6cd33bd8-14ca-4499-8f92-7d7ff986c039}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.NonAnim\02.DgnKey">
+      <UniqueIdentifier>{a763ca3b-af19-4589-8029-c83bf2105c38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\05.Object\01.FootSwitch">
+      <UniqueIdentifier>{acdfb9fa-9e30-4e97-800a-c3cdb52d4b0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\05.Object\00.Treasurebox">
+      <UniqueIdentifier>{99921f31-1be4-4c3b-b755-589da03728ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -139,7 +151,7 @@
       <Filter>01.Levels\01.Logo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
-      <Filter>02.GameObjects\01.Terrain</Filter>
+      <Filter>02.GameObjects\01.NonAnim\01.Terrain</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Camera_Dynamic.h">
       <Filter>96.Camera\Dynamic</Filter>
@@ -186,9 +198,6 @@
     <ClInclude Include="..\Public\NonAnim.h">
       <Filter>02.GameObjects\01.NonAnim</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Hp.h">
-      <Filter>95.UI\03. PlayerState</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Level_TailCave.h">
       <Filter>01.Levels\03.TailCave</Filter>
     </ClInclude>
@@ -209,6 +218,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Pawn.h">
       <Filter>02.GameObjects\03.Monster\03.Pawn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DgnKey.h">
+      <Filter>02.GameObjects\01.NonAnim\02.DgnKey</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerState.h">
+      <Filter>95.UI\03. PlayerState</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TreasureBox.h">
+      <Filter>02.GameObjects\05.Object\00.Treasurebox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FootSwitch.h">
+      <Filter>02.GameObjects\05.Object\01.FootSwitch</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -234,7 +255,7 @@
       <Filter>01.Levels\01.Logo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
-      <Filter>02.GameObjects\01.Terrain</Filter>
+      <Filter>02.GameObjects\01.NonAnim\01.Terrain</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Dynamic.cpp">
       <Filter>96.Camera\Dynamic</Filter>
@@ -278,9 +299,6 @@
     <ClCompile Include="..\Private\NonAnim.cpp">
       <Filter>02.GameObjects\01.NonAnim</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Hp.cpp">
-      <Filter>95.UI\03. PlayerState</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Level_TailCave.cpp">
       <Filter>01.Levels\03.TailCave</Filter>
     </ClCompile>
@@ -301,6 +319,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Pawn.cpp">
       <Filter>02.GameObjects\03.Monster\03.Pawn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DgnKey.cpp">
+      <Filter>02.GameObjects\01.NonAnim\02.DgnKey</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerState.cpp">
+      <Filter>95.UI\03. PlayerState</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TreasureBox.cpp">
+      <Filter>02.GameObjects\05.Object\00.Treasurebox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FootSwitch.cpp">
+      <Filter>02.GameObjects\05.Object\01.FootSwitch</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

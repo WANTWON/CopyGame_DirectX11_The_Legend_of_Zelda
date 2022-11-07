@@ -14,7 +14,7 @@ private:
 public:
 	class CComponent* Get_Component(const _tchar* pComponentTag, _uint iIndex = 0);
 	class CGameObject* Get_Object(_uint iIndex = 0);
-	list<CGameObject*>*		Get_ObjectList() { return &m_GameObjects; };
+	list<class CGameObject*>*		Get_ObjectList() { return &m_GameObjects; };
 public:
 	HRESULT Initialize();
 	HRESULT Add_GameObject(class CGameObject* pGameObject);

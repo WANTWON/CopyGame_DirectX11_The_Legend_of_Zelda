@@ -47,7 +47,6 @@ int CMoblinSword::Tick(_float fTimeDelta)
 
 	if (m_eState != m_ePreState)
 	{
-		//m_pModelCom->Set_AnimationReset();
 		m_pModelCom->Set_NextAnimIndex(m_eState);
 		m_ePreState = m_eState;
 	}

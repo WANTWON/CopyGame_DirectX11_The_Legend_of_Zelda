@@ -4,6 +4,7 @@
 #include "GameInstance.h"
 #include "MonsterBullet.h"
 #include "Weapon.h"
+#include "PipeLine.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -112,7 +113,7 @@ HRESULT CPlayer::Render()
 #ifdef _DEBUG
 	//m_pAABBCom->Render();
 	m_pOBBCom->Render();
-	m_pSPHERECom->Render();
+	//m_pSPHERECom->Render();
 #endif
 
 	return S_OK;
@@ -168,6 +169,17 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		return;
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+
+	if (pGameInstance->Key_Down(DIK_SPACE))
+	 {
+		if (m_eState == ITEM_GET_LP)
+			m_eState = ITEM_GET_ED;
+	}
+
+
+	if (m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP)
+		return;
 
 	/* Move Left and Right*/
 	if (pGameInstance->Key_Down(DIK_LEFT))
@@ -328,10 +340,6 @@ HRESULT CPlayer::Ready_Parts()
 
 	RELEASE_INSTANCE(CGameInstance);
 
-
-
-
-
 	return S_OK;
 }
 
@@ -370,8 +378,8 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
-		return E_FAIL;
+	//if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
+		//return E_FAIL;
 
 	return S_OK;
 }
@@ -413,7 +421,8 @@ void CPlayer::Render_Model(MESH_NAME eMeshName)
 
 void CPlayer::Change_Direction(_float fTimeDelta)
 {
-	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE)
+	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE ||
+		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP)
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
@@ -498,6 +507,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::SLASH_HOLD_L:
 	case Client::CPlayer::SLASH_HOLD_R:
 	case Client::CPlayer::SLASH_HOLD_LP:
+	case Client::CPlayer::ITEM_GET_LP:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
@@ -606,6 +616,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CPlayer::SLASH:
 	case Client::CPlayer::S_SLASH:
+	case Client::CPlayer::KEY_OPEN:
 		m_eAnimSpeed = 1.5f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
@@ -617,9 +628,22 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = DASH_LP;
 		break;
+	case Client::CPlayer::ITEM_GET_ST:
+	{
+		_matrix CamMatrix = XMMatrixInverse(nullptr, (CGameInstance::Get_Instance()->Get_TransformMatrix(CPipeLine::D3DTS_VIEW)));
+		_vector CamPosition = CamMatrix.r[3];
+		CamPosition = XMVectorSetY(CamPosition, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
+		m_pTransformCom->LookAt(CamPosition);
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eState = ITEM_GET_LP;
+		break;
+	}
 	case Client::CPlayer::DASH_ED:
 	case Client::CPlayer::SHIELD_ED:
 	case Client::CPlayer::SLASH_HOLD_ED:
+	case Client::CPlayer::ITEM_GET_ED:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
