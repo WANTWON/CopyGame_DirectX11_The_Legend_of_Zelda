@@ -31,8 +31,12 @@ HRESULT CTerrain::Initialize(void* pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	//if(m_eDebugtype == DEBUG_NONE)
-	CPickingMgr::Get_Instance()->Add_PickingGroup(this);
+	if (m_eDebugtype == DEBUG_SOILD)
+	{
+		CTerrain_Manager::Get_Instance()->Add_DebugTerrain(this);
+	}
+
+	//CPickingMgr::Get_Instance()->Add_PickingGroup(this);
 
 	m_eObjectID = OBJ_BACKGROUND;
 
@@ -41,18 +45,20 @@ HRESULT CTerrain::Initialize(void* pArg)
 
 int CTerrain::Tick(_float fTimeDelta)
 {
-	__super::Tick(fTimeDelta);		
+	__super::Tick(fTimeDelta);	
+	if (m_bDead)
+		return OBJ_DEAD;
+
 
 	if (m_eDebugtype == DEBUG_SOILD)
 	{
 		CTerrain_Manager::TERRAINDESC TerrainDesc = CTerrain_Manager::Get_Instance()->Get_TerrainDesc();
 		_vector vPosition = XMVectorSet(TerrainDesc.TerrainDesc.m_iPositionX, TerrainDesc.TerrainDesc.m_fHeight, TerrainDesc.TerrainDesc.m_iPositionZ, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-
 		m_bDebugShow = CTerrain_Manager::Get_Instance()->Get_TerrainShow();
 	}
 
-	return S_OK;
+	return OBJ_NOEVENT;
 }
 
 void CTerrain::Late_Tick(_float fTimeDelta)
@@ -95,6 +101,7 @@ _bool CTerrain::Picking(_float3 * PickingPoint)
 
 	if (m_pVIBufferCom->Picking(m_pTransformCom, PickingPoint) == true)
 	{
+		m_vMousePickPos = *PickingPoint;
 		CTerrain_Manager::Get_Instance()->Set_PickingWorldPos(m_vMousePickPos);
 		RELEASE_INSTANCE(CGameInstance);
 		return true;
@@ -116,10 +123,10 @@ void CTerrain::PickingTrue()
 
 	switch (ePickingtype)
 	{
-	case Client::CImgui_Manager::PICKING_OBJECT:
+	case Client::CImgui_Manager::PICKING_TERRAIN_TRANSFORM:
 		Set_Picked();
 		break;
-	case Client::CImgui_Manager::PICKING_TERRAIN:
+	case Client::CImgui_Manager::PICKING_TERRAIN_SHAPE:
 		Set_Terrain_Shape();
 		break;
 	default:
@@ -239,11 +246,11 @@ HRESULT CTerrain::SetUp_ShaderResources()
 void CTerrain::Set_Terrain_Shape()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	CPickingMgr::Get_Instance()->Set_PickedObj(nullptr);
-
-	if (pGameInstance->Mouse_Pressing(DIMK::DIMK_LBUTTON))
+	if (CGameInstance::Get_Instance()->Mouse_Pressing(DIMK_LBUTTON))
 	{
-		CTerrain_Manager::TERRAINSHAPEDESC TerrainShapeDesc =  CTerrain_Manager::Get_Instance()->Get_TerrainShapeDesc();
+		CPickingMgr::Get_Instance()->Set_PickedObj(nullptr);
+
+		CTerrain_Manager::TERRAINSHAPEDESC TerrainShapeDesc = CTerrain_Manager::Get_Instance()->Get_TerrainShapeDesc();
 
 		_float fHegith = TerrainShapeDesc.fHeight;
 		_float fRad = TerrainShapeDesc.fRadius;
@@ -251,6 +258,7 @@ void CTerrain::Set_Terrain_Shape()
 
 		m_pVIBufferCom->Set_Terrain_Shape(fHegith, fRad, fSharp, m_vMousePickPos, 1.f);
 	}
+	
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -258,7 +266,7 @@ void CTerrain::Set_Terrain_Shape()
 void CTerrain::Set_Picked()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Mouse_Up(DIMK::DIMK_LBUTTON))
+	if (pGameInstance->Mouse_Down(DIMK::DIMK_LBUTTON))
 	{
 		if (m_bPicked)
 			CPickingMgr::Get_Instance()->Set_PickedObj(nullptr);

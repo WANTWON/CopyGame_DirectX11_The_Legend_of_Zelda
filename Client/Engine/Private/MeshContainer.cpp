@@ -152,29 +152,33 @@ _bool CMeshContainer::Picking(CTransform * pTransform, _float3 * pOut)
 	vRayDir = XMLoadFloat3(&vTempRayDir);
 	vRayDir = XMVector3Normalize(vRayDir);
 
+	_matrix	WorldMatrix = pTransform->Get_WorldMatrix();
 	FACEINDICES32*		pIndices = new FACEINDICES32[m_iNumPrimitive];
 
-	for (_uint i = 0; i < m_iNumPrimitive / 3; ++i)
+	for (_uint i = 0; i < m_iNumPrimitive; ++i)
 	{
-		_matrix	WorldMatrix = pTransform->Get_WorldMatrix();
-
 		aiFace		AIFace = m_pAIMesh->mFaces[i];
 
-		_uint i0 = AIFace.mIndices[0];
-		_uint i1 = AIFace.mIndices[1];
-		_uint i2 = AIFace.mIndices[2];
+		pIndices[i]._0 = AIFace.mIndices[0];
+		pIndices[i]._1 = AIFace.mIndices[1];
+		pIndices[i]._2 = AIFace.mIndices[2];
+
+	}
+
+	for (_uint i = 0; i < m_iNumPrimitive; ++i)
+	{
 
 		_float3 vPosition0 = _float3(0.f, 0.f, 0.f);
 		_float3 vPosition1 = _float3(0.f, 0.f, 0.f);
 		_float3 vPosition2 = _float3(0.f, 0.f, 0.f);
 
-		memcpy(&vPosition0, &m_pAIMesh->mVertices[i0], sizeof(_float3));
+		memcpy(&vPosition0, &m_pAIMesh->mVertices[pIndices[i]._0], sizeof(_float3));
 		_vector vTemp_1 = XMLoadFloat3(&vPosition0);
 		vTemp_1 = XMVectorSetW(vTemp_1, 1.f);
-		memcpy(&vPosition1, &m_pAIMesh->mVertices[i1], sizeof(_float3));
+		memcpy(&vPosition1, &m_pAIMesh->mVertices[pIndices[i]._1], sizeof(_float3));
 		_vector vTemp_2 = XMLoadFloat3(&vPosition1);
 		vTemp_2 = XMVectorSetW(vTemp_2, 1.f);
-		memcpy(&vPosition2, &m_pAIMesh->mVertices[i2], sizeof(_float3));
+		memcpy(&vPosition2, &m_pAIMesh->mVertices[pIndices[i]._2], sizeof(_float3));
 		_vector vTemp_3 = XMLoadFloat3(&vPosition2);
 		vTemp_3 = XMVectorSetW(vTemp_3, 1.f);
 

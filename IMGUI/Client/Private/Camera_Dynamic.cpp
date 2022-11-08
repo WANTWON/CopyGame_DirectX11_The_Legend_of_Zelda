@@ -59,7 +59,6 @@ int CCamera_Dynamic::Tick(_float fTimeDelta)
 
 	if (GetKeyState('Q') < 0)
 	{
-
 		_vector Axis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 		m_pTransform->Turn(Axis, -fTimeDelta);
 	}

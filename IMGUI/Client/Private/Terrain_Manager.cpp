@@ -1,12 +1,22 @@
 #include "stdafx.h"
 #include "..\Public\Terrain_Manager.h"
 #include "GameInstance.h"
-
+#include "PickingMgr.h"
 IMPLEMENT_SINGLETON(CTerrain_Manager)
 
 CTerrain_Manager::CTerrain_Manager()
 {
-	
+
+}
+
+void CTerrain_Manager::Out_DebugTerrain()
+{
+	if (m_pTerrain == nullptr)
+		return;
+
+	CPickingMgr::Get_Instance()->Out_PickingGroup(m_pTerrain);
+	m_pTerrain->Set_Dead(true);
+	m_pTerrain = nullptr;
 }
 
 HRESULT CTerrain_Manager::Create_Terrain(LEVEL eLevel, const _tchar* pLayerTag)

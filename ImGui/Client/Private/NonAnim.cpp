@@ -27,7 +27,7 @@ HRESULT CNonAnim::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	//CPickingMgr::Get_Instance()->Add_PickingGroup(this);
+	CPickingMgr::Get_Instance()->Add_PickingGroup(this);
 
 	m_eObjectID = OBJ_BLOCK;
 
@@ -115,10 +115,10 @@ void CNonAnim::PickingTrue()
 
 	switch (ePickingtype)
 	{
-	case Client::CImgui_Manager::PICKING_OBJECT:
+	case Client::CImgui_Manager::PICKING_TERRAIN_TRANSFORM:
 		Set_Picked();
 		break;
-	case Client::CImgui_Manager::PICKING_TERRAIN:
+	case Client::CImgui_Manager::PICKING_TERRAIN_SHAPE:
 		break;
 	default:
 		break;

@@ -2,8 +2,10 @@
 #include "Base.h"
 #include "Client_Defines.h"
 #include "VIBuffer_Terrain.h"
+#include "Terrain.h"
 
 BEGIN(Client)
+
 
 class CTerrain_Manager final : public CBase
 {
@@ -35,12 +37,18 @@ private:
 	virtual ~CTerrain_Manager() = default;
 
 public:
+	void Add_DebugTerrain(class CTerrain* pTerrain) { m_pTerrain = pTerrain; }
+	void Out_DebugTerrain();
+
+public:
 	void Set_TerrainDesc(TERRAINDESC* eTerrainDesc) { memcpy(&m_TerrainDesc, eTerrainDesc, sizeof(TERRAINDESC)); }
 	void Set_TerrainShapeDesc(TERRAINSHAPEDESC* eTerrainDesc) { memcpy(&m_TerrainShapeDesc, eTerrainDesc, sizeof(TERRAINSHAPEDESC)); }
 	void Set_bWireFrame(_bool type) { m_TerrainDesc.m_bShowWireFrame = type; }
 	void Set_TerrainShow(_bool type) { m_bTerrainShow = type; }
 	void Set_MoveOffset(_int iOffset ) { m_iMoveOffset = iOffset; }
 	void Set_PickingWorldPos(_float3 vPickingPos) {m_vMousePickPos = vPickingPos;}
+
+public:
 	TERRAINDESC Get_TerrainDesc() const { return m_TerrainDesc; }
 	TERRAINSHAPEDESC Get_TerrainShapeDesc() const { return m_TerrainShapeDesc; }
 	_bool Get_TerrainShow() { return m_bTerrainShow; }
@@ -52,6 +60,7 @@ public:
 	HRESULT Create_Terrain(LEVEL eLevel, const _tchar* pLayerTag);
 
 private:
+	class CTerrain*		m_pTerrain =  nullptr;
 	TERRAINDESC		m_TerrainDesc;
 	TERRAINSHAPEDESC m_TerrainShapeDesc;
 	_bool m_bTerrainShow = true;

@@ -60,8 +60,11 @@ CImgui_Manager::CImgui_Manager()
 	Safe_AddRef(m_pModel_Manager);
 	Safe_AddRef(m_pTerrain_Manager);
 
-	char* LayerTag = "Layer Map";
+	char* LayerTag = "Layer_Map";
+	char* LayerTag2 = "Layer_Terrain";
+	
 	m_stLayerTags.push_back(LayerTag);
+	m_stLayerTags.push_back(LayerTag2);
 }
 
 
@@ -179,9 +182,9 @@ void CImgui_Manager::Show_GuiTick()
 		if (ImGui::BeginTabItem("Terrain Tool"))
 		{
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Moving Terrain"); ImGui::SameLine();
-			ImGui::RadioButton("##Picking for Moving Terrain", &m_PickingType, PICKING_OBJECT); ImGui::SameLine();
+			ImGui::RadioButton("##Picking for Moving Terrain", &m_PickingType, PICKING_TERRAIN_TRANSFORM); ImGui::SameLine();
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Shaping Terrain"); ImGui::SameLine();
-			ImGui::RadioButton("##Picking for Shaping Terrain", &m_PickingType, PICKING_TERRAIN);
+			ImGui::RadioButton("##Picking for Shaping Terrain", &m_PickingType, PICKING_TERRAIN_SHAPE);
 
 			Set_Terrain_Map();
 			Set_Terrain_Shape();
@@ -492,6 +495,21 @@ void CImgui_Manager::Set_Terrain_Map()
 	ImGui::InputInt("##MoveOffset", &iOffset);
 	m_pTerrain_Manager->Set_MoveOffset(iOffset);
 
+	if (ImGui::Button("Update Terrain"))
+	{
+		m_pTerrain_Manager->Out_DebugTerrain();
+
+		CTerrain_Manager::TERRAINDESC TerrainDesc = CTerrain_Manager::Get_Instance()->Get_TerrainDesc();
+		TerrainDesc.m_eDebugTerrain = CTerrain_Manager::DEBUG_SOILD;
+		TerrainDesc.m_bShowWireFrame = true;
+		//_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, TEXT("Layer_DebugTerrian"), &TerrainDesc)))
+			return;
+
+		//delete LayerTag;
+	}
+
+
 	if (ImGui::Button("Create Terrain"))
 	{
 		LEVEL pLevelIndex = (LEVEL)CLevel_Manager::Get_Instance()->Get_CurrentLevelIndex();
@@ -508,6 +526,25 @@ void CImgui_Manager::Set_Terrain_Map()
 	ImGui::NewLine();
 
 	m_pTerrain_Manager->Set_TerrainDesc(&TerrainDesc);
+	
+	if (m_PickingType == PICKING_TERRAIN_TRANSFORM)
+	{
+		if (CGameInstance::Get_Instance()->Mouse_Down(DIMK_LBUTTON))
+			CPickingMgr::Get_Instance()->Picking();
+	}
+
+	if (CGameInstance::Get_Instance()->Key_Up(DIK_Z))
+	{
+		
+		list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, TEXT("Layer_Terrain"));
+		if (nullptr == plistClone || plistClone->size() == 0)
+			return;
+
+		auto iter = --plistClone->end();
+		CPickingMgr::Get_Instance()->Out_PickingGroup(*iter);
+		Safe_Release(*iter);
+		plistClone->erase(iter);
+	}
 
 }
 
@@ -609,6 +646,11 @@ void CImgui_Manager::Set_Terrain_Shape()
 
 
 	m_pTerrain_Manager->Set_TerrainShapeDesc(&m_TerrainShapeDesc);
+
+	if (m_PickingType == PICKING_TERRAIN_SHAPE)
+	{
+		CPickingMgr::Get_Instance()->Picking();
+	}
 
 }
 
@@ -1183,7 +1225,7 @@ void CImgui_Manager::Show_ModelList()
 	}
 
 
-	if (m_bPickingMode && CGameInstance::Get_Instance()->Mouse_Down(DIMK_LBUTTON))
+	if (m_bPickingMode && CGameInstance::Get_Instance()->Key_Up(DIK_X))
 	{
 		if (CPickingMgr::Get_Instance()->Picking())
 		{
@@ -1194,7 +1236,8 @@ void CImgui_Manager::Show_ModelList()
 
 		}
 	}
-	else if (m_bPickingMode && CGameInstance::Get_Instance()->Key_Up(DIK_Z))
+
+	if (m_bPickingMode && CGameInstance::Get_Instance()->Key_Up(DIK_Z))
 	{
 		_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
 		m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
@@ -1286,15 +1329,8 @@ void CImgui_Manager::Show_CurrentModelList()
 		ImGui::EndGroup();
 	}
 
-	if (m_bPickingMode && CGameInstance::Get_Instance()->Mouse_Down(DIMK_LBUTTON))
-	{
-		if (CPickingMgr::Get_Instance()->Picking())
-		{
-			m_InitDesc.vPosition = CPickingMgr::Get_Instance()->Get_PickingPos();
-
-		}
-	}
-	else if (m_bPickingMode && CGameInstance::Get_Instance()->Key_Up(DIK_Z))
+	
+	if (m_bPickingMode && CGameInstance::Get_Instance()->Key_Up(DIK_Z))
 	{
 		_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
 		m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();

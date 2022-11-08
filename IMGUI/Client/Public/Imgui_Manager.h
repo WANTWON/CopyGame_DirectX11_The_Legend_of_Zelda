@@ -18,7 +18,7 @@ class CImgui_Manager final : public CBase
 	DECLARE_SINGLETON(CImgui_Manager)
 
 public:
-	enum PICKING_TYPE { PICKING_OBJECT, PICKING_TERRAIN };
+	enum PICKING_TYPE { PICKING_TERRAIN_TRANSFORM, PICKING_TERRAIN_SHAPE };
 
 private:
 	CImgui_Manager();

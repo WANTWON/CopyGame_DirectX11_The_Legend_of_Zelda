@@ -119,8 +119,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	TerrainDesc.m_eDebugTerrain = CTerrain_Manager::DEBUG_SOILD;
 	TerrainDesc.m_bShowWireFrame = true;
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, &TerrainDesc)))
-		return E_FAIL;
+	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, &TerrainDesc)))
+		//return E_FAIL;
 
 	/*TerrainDesc = CTerrain_Manager::Get_Instance()->Get_TerrainDesc();
 	TerrainDesc.m_eDebugTerrain = CTerrain_Manager::DEBUG_SOILD;
