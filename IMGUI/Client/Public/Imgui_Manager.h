@@ -56,7 +56,7 @@ public:
 
 
 public:
-	void Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag);
+	void Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag, _bool bCreatePrototype = false);
 	void Read_Objects_Name( _tchar* cFolderPath);
 	void Add_TempTag(_tchar* TempTag) { m_TempLayerTags.push_back(TempTag); }
 	
@@ -96,7 +96,7 @@ private:
 	/* For Picking */
 	_float3 m_vPickedObjPos = _float3(1.f, 1.f, 1.f);
 	_float3 m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
-	
+	_bool m_bPickingMode = false;
 
 	
 

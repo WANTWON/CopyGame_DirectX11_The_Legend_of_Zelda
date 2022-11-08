@@ -189,6 +189,10 @@ void CImgui_Manager::Show_GuiTick()
 		}
 		if (ImGui::BeginTabItem("Model Tool"))
 		{
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Object"); ImGui::SameLine();
+			ImGui::Checkbox("##Picking for Object", &m_bPickingMode);
+
+
 			if (ImGui::BeginTabBar("ModelsTabs", ImGuiTabBarFlags_None))
 			{
 				if (ImGui::BeginTabItem("Show Model List"))
@@ -201,6 +205,8 @@ void CImgui_Manager::Show_GuiTick()
 					Show_CurrentModelList();
 					ImGui::EndTabItem();
 				}
+
+
 				ImGui::EndTabBar();
 			}
 			ImGui::EndTabItem();
@@ -225,6 +231,9 @@ void CImgui_Manager::Show_GuiTick()
 
 void CImgui_Manager::BrowseForFolder()
 {
+
+	_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+
 	if (m_bSave)
 	{
 		OPENFILENAME OFN;
@@ -251,7 +260,7 @@ void CImgui_Manager::BrowseForFolder()
 			CNonAnim::NONANIMDESC  ModelDesc;
 			_uint iNum = 0;
 			m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
-			list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, TEXT("Layer Map"));
+			list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, LayerTag);
 			if (nullptr == plistClone)
 			{
 				m_bSave = false;
@@ -276,6 +285,7 @@ void CImgui_Manager::BrowseForFolder()
 			}
 
 			CloseHandle(hFile);
+			
 		}
 
 		m_bSave = false;
@@ -315,21 +325,22 @@ void CImgui_Manager::BrowseForFolder()
 
 			/* 타일의 개수 받아오기 */
 			ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
-
+			
 			for (_uint i = 0; i < iNum; ++i)
 			{
 				ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
 				m_pModel_Manager->Set_InitModelDesc(ModelDesc);
 				_tchar			szModeltag[MAX_PATH] = TEXT("");
 				MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, (_int)strlen(ModelDesc.pModeltag), szModeltag, MAX_PATH);
-				m_pModel_Manager->Create_Model(iLevel, szModeltag, TEXT("Layer_Model"), m_pDevice, m_pContext, CModel::TYPE_NONANIM, PivotMatrix);
+				m_pModel_Manager->Create_Model(iLevel, szModeltag, LayerTag, m_pDevice, m_pContext, CModel::TYPE_NONANIM, PivotMatrix);
 			}
-
 			CloseHandle(hFile);
 		}
 
 		m_bLoad = false;
 	}
+
+	delete LayerTag;
 }
 
 void CImgui_Manager::Set_FilePath()
@@ -381,7 +392,7 @@ void CImgui_Manager::Set_Macro()
 	static int LoopOption[2]{ 0 };
 	static float fDistance[3]{ 0.f };
 	static float fPosition[3]{ 0.f };
-	static float fScale[3]{ 1.f };
+	static float fScale[3]{ 1.f, 1.f, 1.f };
 
 	const char* MacroTypeList[] = { "Col & Row", "Col & Aphabet" };
 	static int MacroType = 0;
@@ -474,7 +485,7 @@ void CImgui_Manager::Set_Terrain_Map()
 	ImGui::DragInt("##PositionZ", &TerrainDesc.TerrainDesc.m_iPositionZ);
 
 	ImGui::Text("Position Y"); ImGui::SameLine();
-	ImGui::DragFloat("##PositionY", &TerrainDesc.TerrainDesc.m_fHeight, 1.f, -10, 10);
+	ImGui::DragFloat("##PositionY", &TerrainDesc.TerrainDesc.m_fHeight, 0.05f, -10, 10);
 
 	static _int iOffset = m_pTerrain_Manager->Get_MoveOffset();
 	ImGui::Text("Move Offset"); ImGui::SameLine();
@@ -633,7 +644,7 @@ void CImgui_Manager::ShowSimpleMousePos(bool* p_open)
 		ImGui::Separator();
 		if (ImGui::IsMousePosValid())
 		{
-			_float3 vPickingPos = m_pTerrain_Manager->Get_PickingPos();
+			_float3 vPickingPos = CPickingMgr::Get_Instance()->Get_PickingPos();
 			ImGui::Text("Mouse UI: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
 			ImGui::Text("Mouse World: (%.1f,%.1f,%.1f)", vPickingPos.x, vPickingPos.y, vPickingPos.z);
 		}
@@ -1170,11 +1181,45 @@ void CImgui_Manager::Show_ModelList()
 		ImGui::EndChild();
 		ImGui::EndGroup();
 	}
+
+
+	if (m_bPickingMode && CGameInstance::Get_Instance()->Mouse_Down(DIMK_LBUTTON))
+	{
+		if (CPickingMgr::Get_Instance()->Picking())
+		{
+			m_InitDesc.vPosition = CPickingMgr::Get_Instance()->Get_PickingPos();
+			_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+			Create_Model(ModelTags[selected], LayerTag, true);
+			m_TempLayerTags.push_back(LayerTag);
+
+		}
+	}
+	else if (m_bPickingMode && CGameInstance::Get_Instance()->Key_Up(DIK_Z))
+	{
+		_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+		m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
+		list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, LayerTag);
+		if (nullptr == plistClone || plistClone->size() == 0)
+		{
+			delete LayerTag;
+			return;
+		}
+			
+
+		auto iter = --plistClone->end();
+		m_pModel_Manager->Out_CreatedModel( dynamic_cast<CNonAnim*>(*iter));
+		Safe_Release(*iter);
+		plistClone->erase(iter);
+
+		delete LayerTag;
+	}
 }
 
 void CImgui_Manager::Show_CurrentModelList()
 {
-	vector<class CNonAnim*> vecCreatedModel = m_pModel_Manager->Get_CreatedModel();
+	//vector<class CNonAnim*> vecCreatedModel = m_pModel_Manager->Get_CreatedModel();
+	 vector<class CNonAnim*> vecCreatedModel = m_pModel_Manager->Get_CreatedModel();
+
 
 	// Left
 	{
@@ -1240,6 +1285,33 @@ void CImgui_Manager::Show_CurrentModelList()
 		if (ImGui::Button("Save")) {}
 		ImGui::EndGroup();
 	}
+
+	if (m_bPickingMode && CGameInstance::Get_Instance()->Mouse_Down(DIMK_LBUTTON))
+	{
+		if (CPickingMgr::Get_Instance()->Picking())
+		{
+			m_InitDesc.vPosition = CPickingMgr::Get_Instance()->Get_PickingPos();
+
+		}
+	}
+	else if (m_bPickingMode && CGameInstance::Get_Instance()->Key_Up(DIK_Z))
+	{
+		_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+		m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
+		list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, LayerTag);
+		if (nullptr == plistClone || plistClone->size() == 0)
+		{
+			delete LayerTag;
+			return;
+		}
+
+		auto iter = --plistClone->end();
+		m_pModel_Manager->Out_CreatedModel(dynamic_cast<CNonAnim*>(*iter));
+		Safe_Release(*iter);
+		plistClone->erase(iter);
+
+		delete LayerTag;
+	}
 }
 
 void CImgui_Manager::Read_Objects_Name(_tchar* cFolderPath)
@@ -1302,7 +1374,7 @@ void CImgui_Manager::Read_Objects_Name(_tchar* cFolderPath)
 	FindClose(hDir);
 }
 
-void CImgui_Manager::Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag)
+void CImgui_Manager::Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag, _bool bCreatePrototype)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
@@ -1310,7 +1382,7 @@ void CImgui_Manager::Create_Model(const _tchar* pPrototypeTag, const _tchar* pLa
 
 	_matrix			PivotMatrix = XMMatrixIdentity();
 	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
-	m_pModel_Manager->Create_Model(iLevel, pPrototypeTag, pLayerTag, m_pDevice, m_pContext, CModel::TYPE_NONANIM, PivotMatrix);
+	m_pModel_Manager->Create_Model(iLevel, pPrototypeTag, pLayerTag, m_pDevice, m_pContext, CModel::TYPE_NONANIM, PivotMatrix, bCreatePrototype);
 
 	RELEASE_INSTANCE(CGameInstance);
 }

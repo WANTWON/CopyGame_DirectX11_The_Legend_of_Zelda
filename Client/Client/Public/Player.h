@@ -83,8 +83,8 @@ private:
 	_bool					m_bPressed = false;
 
 	_float					m_fTime = 0.f;
-	_float					m_fStartHeight = 4.2f;
-	_float					m_fEndHeight = 4.2f;
+	_float					m_fStartHeight = 2.2f;
+	_float					m_fEndHeight = 2.2f;
 	_float					m_fPressedScale = 1.f;
 
 	DWORD					m_dwDashTime = GetTickCount();

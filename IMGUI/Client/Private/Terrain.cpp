@@ -31,8 +31,8 @@ HRESULT CTerrain::Initialize(void* pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	if(m_eDebugtype == DEBUG_NONE)
-		CPickingMgr::Get_Instance()->Add_PickingGroup(this);
+	//if(m_eDebugtype == DEBUG_NONE)
+	CPickingMgr::Get_Instance()->Add_PickingGroup(this);
 
 	m_eObjectID = OBJ_BACKGROUND;
 
@@ -93,7 +93,7 @@ _bool CTerrain::Picking(_float3 * PickingPoint)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (m_pVIBufferCom->Picking(m_pTransformCom, &m_vMousePickPos) == true)
+	if (m_pVIBufferCom->Picking(m_pTransformCom, PickingPoint) == true)
 	{
 		CTerrain_Manager::Get_Instance()->Set_PickingWorldPos(m_vMousePickPos);
 		RELEASE_INSTANCE(CGameInstance);

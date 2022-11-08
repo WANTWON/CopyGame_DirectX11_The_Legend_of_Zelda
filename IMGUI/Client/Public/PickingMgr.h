@@ -36,7 +36,7 @@ private:
 	class CGameObject*	m_pPickedObj = nullptr;
 	list<CGameObject*>	m_GameObjects;
 	_bool				m_bMouseInUI = false;
-	_float3				m_vPickingPos;
+	_float3				m_vPickingPos = _float3(0.f, 0.f, 0.f);
 
 public:
 	virtual void Free() override;

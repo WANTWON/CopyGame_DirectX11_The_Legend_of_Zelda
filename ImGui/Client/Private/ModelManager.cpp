@@ -42,11 +42,12 @@ HRESULT CModelManager::Create_Model_Prototype(LEVEL eLevel, const _tchar * pMode
 	return S_OK;
 }
 
-HRESULT CModelManager::Create_Model(LEVEL eLevel, const _tchar* pModelTag, const _tchar* pLayerTag, ID3D11Device * pDevice, ID3D11DeviceContext * pContext, CModel::TYPE eModelType, _fmatrix PivotMatrix)
+HRESULT CModelManager::Create_Model(LEVEL eLevel, const _tchar* pModelTag, const _tchar* pLayerTag, ID3D11Device * pDevice, ID3D11DeviceContext * pContext, CModel::TYPE eModelType, _fmatrix PivotMatrix, _bool bCreatePrototype)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	//Create_Model_Prototype(eLevel, pModelTag, pDevice, pContext, eModelType, PivotMatrix);
+	//if(bCreatePrototype)
+	//	Create_Model_Prototype(eLevel, pModelTag, pDevice, pContext, eModelType, PivotMatrix);
 
 	CNonAnim::NONANIMDESC  NonAnimDesc;
 	memcpy(&NonAnimDesc, &m_InitModelDesc, sizeof(CNonAnim::NONANIMDESC));

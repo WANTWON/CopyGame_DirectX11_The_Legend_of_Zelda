@@ -16,7 +16,7 @@ public:
 	{
 		CVIBuffer_Terrain::TERRAINDESC TerrainDesc;
 
-		_bool	m_bShowWireFrame = false;
+		_bool	m_bShowWireFrame = true;
 		TERRAIN_DEBUG_TYPE	m_eDebugTerrain = DEBUG_NONE;
 
 	}TERRAINDESC;

@@ -36,7 +36,7 @@ public:
 	virtual HRESULT Render();
 
 public:
-	virtual _bool Picking(_float3* PickingPoint) { return false; };
+	virtual _bool Picking(_float3* PickingPoint) override;
 	virtual void PickingTrue();
 	void Set_Picked();
 	const char* Get_Modeltag() { return m_ModelDesc.pModeltag; }

@@ -50,7 +50,8 @@ void CLevel_GamePlay::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	CPickingMgr::Get_Instance()->Picking();
+	
+	
 
 	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
 }
@@ -115,18 +116,18 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	TerrainDesc = CTerrain_Manager::Get_Instance()->Get_TerrainDesc();
 	TerrainDesc.TerrainDesc.m_iVerticeNumX = 50;
 	TerrainDesc.TerrainDesc.m_iVerticeNumZ = 50;
-	TerrainDesc.m_eDebugTerrain = CTerrain_Manager::DEBUG_WIRE;
+	TerrainDesc.m_eDebugTerrain = CTerrain_Manager::DEBUG_SOILD;
 	TerrainDesc.m_bShowWireFrame = true;
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, &TerrainDesc)))
 		return E_FAIL;
 
-	TerrainDesc = CTerrain_Manager::Get_Instance()->Get_TerrainDesc();
+	/*TerrainDesc = CTerrain_Manager::Get_Instance()->Get_TerrainDesc();
 	TerrainDesc.m_eDebugTerrain = CTerrain_Manager::DEBUG_SOILD;
 	CTerrain_Manager::Get_Instance()->Set_TerrainDesc(&TerrainDesc);
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, &TerrainDesc)))
-		return E_FAIL;
+		return E_FAIL;*/
 
 	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
 		//return E_FAIL;

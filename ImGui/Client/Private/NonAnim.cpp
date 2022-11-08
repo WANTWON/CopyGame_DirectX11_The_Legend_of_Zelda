@@ -100,6 +100,15 @@ HRESULT CNonAnim::Render()
 	return S_OK;
 }
 
+_bool CNonAnim::Picking(_float3 * PickingPoint)
+{
+	
+	if (true == m_pModelCom->Picking(m_pTransformCom, PickingPoint))
+		return true; 
+
+	return false;
+}
+
 void CNonAnim::PickingTrue()
 {
 	CImgui_Manager::PICKING_TYPE ePickingtype = CImgui_Manager::Get_Instance()->Get_PickingType();
@@ -183,11 +192,11 @@ HRESULT CNonAnim::SetUp_ShaderResources()
 
 HRESULT CNonAnim::SetUp_ShaderID()
 {
-	_bool m_bWireFrame = CTerrain_Manager::Get_Instance()->Get_TerrainDesc().m_bShowWireFrame;
+	//_bool m_bWireFrame = CTerrain_Manager::Get_Instance()->Get_TerrainDesc().m_bShowWireFrame;
 
-	if (m_bWireFrame)
-		m_eShaderID = SHADER_WIREFRAME;
-	else if (m_bPicked)
+	//if (m_bWireFrame)
+	//	m_eShaderID = SHADER_WIREFRAME;
+	 if (m_bPicked)
 		m_eShaderID = SHADER_PICKED;
 	else
 		m_eShaderID = SHADER_DEFAULT;
