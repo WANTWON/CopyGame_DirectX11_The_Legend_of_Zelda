@@ -56,9 +56,11 @@ vector<string> SplitPath(string path, char sep) {
 CImgui_Manager::CImgui_Manager()
 	: m_pTerrain_Manager(CTerrain_Manager::Get_Instance())
 	, m_pModel_Manager(CModelManager::Get_Instance())
+	, m_pNavigation_Manager(CNavigation_Manager::Get_Instance())
 {
 	Safe_AddRef(m_pModel_Manager);
 	Safe_AddRef(m_pTerrain_Manager);
+	Safe_AddRef(m_pNavigation_Manager);
 
 	char* LayerTag = "Layer_Map";
 	char* LayerTag2 = "Layer_Terrain";
@@ -214,9 +216,10 @@ void CImgui_Manager::Show_GuiTick()
 			}
 			ImGui::EndTabItem();
 		}
-		if (ImGui::BeginTabItem("Camera Tool"))
+		if (ImGui::BeginTabItem("Navigation Tool"))
 		{
-			ImGui::Text("This is the Camera Tool tab!\nblah blah blah blah blah");
+			ImGui::Text("This is the navigation tool ");
+			Navigation();
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
@@ -464,6 +467,22 @@ void CImgui_Manager::Set_Macro()
 		}
 	}
 
+}
+
+void CImgui_Manager::Navigation()
+{
+	if (CGameInstance::Get_Instance()->Key_Up(DIK_X))
+	{
+		if (CPickingMgr::Get_Instance()->Picking())
+		{
+			_vector Position = XMLoadFloat3(&CPickingMgr::Get_Instance()->Get_PickingPos());
+			Position = XMVectorSetW(Position, 1.f);
+			m_pNavigation_Manager->Click_Position(Position);
+		}
+		
+	}
+	m_pNavigation_Manager->Render();
+	
 }
 
 
@@ -1440,8 +1459,10 @@ void CImgui_Manager::Free()
 
 	Safe_Release(m_pModel_Manager);
 	Safe_Release(m_pTerrain_Manager);
+	Safe_Release(m_pNavigation_Manager);
 	CTerrain_Manager::Get_Instance()->Destroy_Instance();
 	CModelManager::Get_Instance()->Destroy_Instance();
+	CNavigation_Manager::Get_Instance()->Destroy_Instance();
 
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);

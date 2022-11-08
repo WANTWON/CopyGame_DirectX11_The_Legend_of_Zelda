@@ -6,6 +6,7 @@
 #include "Imgui_Manager.h"
 #include "PickingMgr.h"
 #include "ModelManager.h"
+#include "Navigation_Manager.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
@@ -39,6 +40,9 @@ HRESULT CMainApp::Initialize()
 
 	// MakeSpriteFont "폰트이름" /FontSize:32 /FastPack /CharacterRegion:0x0020-0x00FF /CharacterRegion:0x3131-0x3163 /CharacterRegion:0xAC00-0xD800 /DefaultCharacter:0xAC00 출력파일이름.spritefont
 	if (FAILED(m_pGameInstance->Add_Fonts(m_pDevice, m_pContext, TEXT("Font_Nexon"), TEXT("../../../Bin/Resources/Fonts/130.spritefont"))))
+		return E_FAIL;
+
+	if (FAILED(CNavigation_Manager::Get_Instance()->Initialize(m_pDevice, m_pContext)))
 		return E_FAIL;
 
 	return S_OK;

@@ -61,7 +61,10 @@
     <Filter Include="03.ToolManager\Terrain_Manager">
       <UniqueIdentifier>{02e7e0a7-9dd9-4440-9803-cc258d7f2b85}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.ToolManager\NonAnim_Manager">
+    <Filter Include="03.ToolManager\Navigation_Manager">
+      <UniqueIdentifier>{26fefdf4-849c-4684-a0fb-6fcb113ec272}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.ToolManager\Model_Manager">
       <UniqueIdentifier>{0694f4ed-81c0-46ee-a50f-aac9d496b329}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -148,10 +151,13 @@
       <Filter>03.ToolManager\Terrain_Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ModelManager.h">
-      <Filter>03.ToolManager\NonAnim_Manager</Filter>
+      <Filter>03.ToolManager\Model_Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Bin\ShaderFiles\Client_Shader_Defines.hpp">
       <Filter>97.ShaderFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Navigation_Manager.h">
+      <Filter>03.ToolManager\Navigation_Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -222,7 +228,10 @@
       <Filter>03.ToolManager\Terrain_Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ModelManager.cpp">
-      <Filter>03.ToolManager\NonAnim_Manager</Filter>
+      <Filter>03.ToolManager\Model_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Navigation_Manager.cpp">
+      <Filter>03.ToolManager\Navigation_Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

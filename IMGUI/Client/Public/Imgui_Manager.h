@@ -7,6 +7,7 @@
 #include "Terrain_Manager.h"
 #include "ModelManager.h"
 #include "NonAnim.h"
+#include "Navigation_Manager.h"
 
 BEGIN(Engine)
 class CGameObject;
@@ -54,6 +55,9 @@ public:
 	void Set_LayerTag();
 	void Set_Macro();
 
+	/* For Navigation Tool */
+	void Navigation();
+
 
 public:
 	void Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag, _bool bCreatePrototype = false);
@@ -76,8 +80,6 @@ private:
 	CTerrain_Manager::TERRAINDESC  m_TerrainDesc;
 	CTerrain_Manager::TERRAINSHAPEDESC  m_TerrainShapeDesc;
 	_bool m_bTerrain_Show = true;
-	_int m_PickingType = 0;
-	
 
 	/* For Object */
 	_tchar m_pFilePath[MAX_PATH] = L"../../../Bin/Resources/Meshes/";
@@ -97,6 +99,11 @@ private:
 	_float3 m_vPickedObjPos = _float3(1.f, 1.f, 1.f);
 	_float3 m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
 	_bool m_bPickingMode = false;
+	_int m_PickingType = 0;
+
+	/*For Navigation*/
+	CNavigation_Manager* m_pNavigation_Manager = nullptr;
+
 
 	
 
