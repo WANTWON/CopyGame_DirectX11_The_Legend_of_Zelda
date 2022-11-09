@@ -40,6 +40,7 @@ public:
 	HRESULT Add_Cell(_float3* vPoss, _bool bCheckOverlap = false);
 	void Click_Position(_vector vPosition);
 	void Clear_ClickedPosition();
+	void Update_ClickedPosition(_float3 position);
 	void Clear_Cells();
 	void Cancle_Cell();
 	void Sort_CellByPosition(_float3 * vPoss);

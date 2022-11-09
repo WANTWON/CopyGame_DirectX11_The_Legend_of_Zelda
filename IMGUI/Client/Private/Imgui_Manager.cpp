@@ -487,7 +487,7 @@ void CImgui_Manager::Set_Navigation()
 				ModelTag = ModelTag + to_string(i);
 				_tchar* RealModelTag = StringToTCHAR(ModelTag);
 				WideCharToMultiByte(CP_ACP, 0, RealModelTag, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
-				sprintf(label, szLayertag);
+				strcpy(label, szLayertag);
 				delete(RealModelTag);
 				if (ImGui::Selectable(label, m_iCellIndex == i))
 				{
@@ -516,6 +516,10 @@ void CImgui_Manager::Set_Navigation()
 		static float fPointA[3]{ 0,0,0 };
 		static float fPointB[3]{ 0,0,0 };
 		static float fPointC[3]{ 0,0,0 };
+		static float fClickedPosition[3]{ m_fClickPoint.x, m_fClickPoint.y, m_fClickPoint.z };
+		fClickedPosition[0] = m_fClickPoint.x;
+		fClickedPosition[1] = m_fClickPoint.y;
+		fClickedPosition[2] = m_fClickPoint.z;
 
 		if (pCurrentCell != nullptr)
 		{
@@ -536,6 +540,10 @@ void CImgui_Manager::Set_Navigation()
 		ImGui::Text("PointA :"); ImGui::SameLine(); ImGui::InputFloat3("##PointA", fPointA);
 		ImGui::Text("PointB :"); ImGui::SameLine(); ImGui::InputFloat3("##PointB", fPointB);
 		ImGui::Text("PointC :"); ImGui::SameLine(); ImGui::InputFloat3("##PointC", fPointC);
+
+		ImGui::Text("ClickPointXYZ :"); ImGui::SameLine(); ImGui::DragFloat3("##ClickPointXYZ", fClickedPosition);
+		m_fClickPoint = _float3(fClickedPosition[0], fClickedPosition[1], fClickedPosition[2]);
+		m_pNavigation_Manager->Update_ClickedPosition(m_fClickPoint);
 
 
 		if (ImGui::Button("Cancle Click Point"))
@@ -590,6 +598,7 @@ void CImgui_Manager::Set_Navigation()
 		{
 			_vector Position = XMLoadFloat3(&CPickingMgr::Get_Instance()->Get_PickingPos());
 			Position = XMVectorSetW(Position, 1.f);
+			m_fClickPoint = CPickingMgr::Get_Instance()->Get_PickingPos();
 			m_pNavigation_Manager->Click_Position(Position);
 		}
 

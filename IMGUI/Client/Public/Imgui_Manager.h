@@ -106,7 +106,7 @@ private:
 	CNavigation_Manager*					m_pNavigation_Manager = nullptr;
 	_int									m_iCellIndex = 0;
 	_int									m_iCellType = 0;
-	
+	_float3									m_fClickPoint = _float3(0.f, 0.f, 0.f);
 
 public:
 	virtual void Free() override;

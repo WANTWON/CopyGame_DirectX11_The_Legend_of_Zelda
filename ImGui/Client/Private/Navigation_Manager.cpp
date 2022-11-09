@@ -77,6 +77,18 @@ void CNavigation_Manager::Clear_ClickedPosition()
 	m_fMinDistance = MAX_NUM;
 }
 
+void CNavigation_Manager::Update_ClickedPosition(_float3 position)
+{
+	if (m_vClickedPoints.size() != 0)
+	{
+		m_vClickedPoints.back() = position;
+		_vector vPosition = XMLoadFloat3(&position);
+		vPosition = XMVectorSetW(vPosition, 1.f);
+		m_pClickedSymbol[m_vClickedPoints.size() - 1]->Set_State(CTransform::STATE_POSITION, vPosition);
+	}
+		
+}
+
 HRESULT CNavigation_Manager::Add_ClickedSymbol(_float3 vClickPos, SYMBOL Symboltype)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
