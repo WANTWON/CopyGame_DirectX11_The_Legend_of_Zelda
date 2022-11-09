@@ -71,6 +71,13 @@ void CNavigation_Manager::Clear_ClickedPosition()
 
 HRESULT CNavigation_Manager::Add_Cell(_float3 * vPoss, _bool bCheckOverlap)
 {
+	// 시계 방향으로 정리한다 0 1 2
+	Sort_CellByPosition(vPoss);
+	// 마우스 Lay와 Cell의 법선 벡터를 내적하여 2차 Sort를 한다.
+	Sort_CellByDot(vPoss);
+
+	if (Check_Sell(vPoss))
+		return E_FAIL;
 
 	// 추가한다.
 	CCell*			pCell = CCell::Create(m_pDevice, m_pContext, vPoss, m_Cells.size());
@@ -209,6 +216,93 @@ _float3 CNavigation_Manager::Find_MinDistance(_vector vPosition)
 	RELEASE_INSTANCE(CGameInstance);
 
 	return vClickPosition;
+}
+
+void CNavigation_Manager::Sort_CellByPosition(_float3 * vPoss)
+{
+	_float3 vTempPoss[3];
+
+	memcpy(vTempPoss, vPoss, sizeof(_float3) * 3);
+
+	// 정렬
+	for (_uint i = 0; i < 2; ++i)
+	{
+		_uint iMinIndex = i;
+		for (_uint j = i + 1; j < 3; ++j)
+		{
+			if (vTempPoss[iMinIndex].x > vTempPoss[j].x)
+			{
+				iMinIndex = j;
+			}
+		}
+
+		_float3 Temp;
+		Temp = vTempPoss[i];
+		vTempPoss[i] = vTempPoss[iMinIndex];
+		vTempPoss[iMinIndex] = Temp;
+	}
+
+	// 중간 x값을 찾는다. [1]  
+	// 작은 x값을 찾는다. [0]
+	// 만약 작은 x값의 z값이 중간 x값의 z값보다 작다면 반대로
+	if (vTempPoss[0].z < vTempPoss[1].z)
+	{
+		vPoss[0] = vTempPoss[1];
+		vPoss[1] = vTempPoss[2];
+		vPoss[2] = vTempPoss[0];
+	}
+	else
+	{
+		vPoss[0] = vTempPoss[1];
+		vPoss[1] = vTempPoss[0];
+		vPoss[2] = vTempPoss[2];
+	}
+}
+
+void CNavigation_Manager::Sort_CellByDot(_float3 * vPoss)
+{
+	_vector vABDir = XMLoadFloat3(&vPoss[1]) - XMLoadFloat3(&vPoss[0]);
+	_vector vBCDir = XMLoadFloat3(&vPoss[2]) - XMLoadFloat3(&vPoss[1]);
+	_vector vCloss = XMVector3Cross(vABDir, vBCDir);
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	_vector vMouseDir = pGameInstance->Get_RayDir() * -1.f;
+	vCloss = XMVector3Normalize(vCloss);
+	vMouseDir = XMVector3Normalize(vMouseDir);
+
+	if (0.f > XMVectorGetX(XMVector3Dot(vCloss, vMouseDir)))
+	{
+		_float3 vTemp = vPoss[0];
+		vPoss[0] = vPoss[2];
+		vPoss[2] = vTemp;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+_bool CNavigation_Manager::Check_Sell(_float3 * vPoss)
+{
+	for (_uint i = 0; i < m_Cells.size(); ++i)
+	{
+		if (nullptr == m_Cells[i])
+			continue;
+
+		_float3 vPoint[CCell::POINT_END];
+
+		vPoint[CCell::POINT_A] = m_Cells[i]->Get_PointValue(CCell::POINT_A);
+		vPoint[CCell::POINT_B] = m_Cells[i]->Get_PointValue(CCell::POINT_B);
+		vPoint[CCell::POINT_C] = m_Cells[i]->Get_PointValue(CCell::POINT_C);
+
+		if (XMVector3Equal(XMLoadFloat3(&vPoss[0]), XMLoadFloat3(&vPoint[CCell::POINT_A]))
+			&& XMVector3Equal(XMLoadFloat3(&vPoss[1]), XMLoadFloat3(&vPoint[CCell::POINT_B]))
+			&& XMVector3Equal(XMLoadFloat3(&vPoss[2]), XMLoadFloat3(&vPoint[CCell::POINT_C])))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 

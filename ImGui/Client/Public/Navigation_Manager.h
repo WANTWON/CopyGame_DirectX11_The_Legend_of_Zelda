@@ -26,6 +26,9 @@ public:
 public:
 	CCell* Find_PickingCell();
 	_float3 Find_MinDistance(_vector vPosition);
+	void Sort_CellByPosition(_float3 * vPoss);
+	void Sort_CellByDot(_float3 * vPoss);
+	_bool Check_Sell(_float3 * vPoss);
 
 public:
 	HRESULT Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
