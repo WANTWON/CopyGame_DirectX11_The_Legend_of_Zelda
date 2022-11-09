@@ -147,7 +147,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 		switch (ePastLevel)
 		{
 		case Client::LEVEL_TAILCAVE:
-			pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(10, 4.2, 10, 1));
+			pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 4.2f, 10.f, 1.f));
 			break;
 		}
 
@@ -166,8 +166,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
-	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
-		//return E_FAIL;
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, TEXT("Layer_Terrain"), nullptr)))
+		return E_FAIL;
 
 	HANDLE hFile = 0;
 	_ulong dwByte = 0;
@@ -321,7 +321,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 		CInvenItem::ITEMDESC ItemDesc;
 		ItemDesc.eItemType = CInvenItem::ITEM_EQUIP;
 		ItemDesc.m_iTextureNum = (CInvenItem::EQUIP_TEXLIST)(i+1);
-		ItemDesc.vPosition = _float2(165, 245 + 70*i);
+		ItemDesc.vPosition = _float2(165.f, 245.f + 70*i);
 
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_EquipItem"), &ItemDesc)))
 			return E_FAIL;
@@ -332,7 +332,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 		CInvenItem::ITEMDESC ItemDesc;
 		ItemDesc.eItemType = CInvenItem::ITEM_QUEST;
 		ItemDesc.m_iTextureNum = (CInvenItem::QUEST_TEXLIST)(0);
-		ItemDesc.vPosition = _float2(645, 245 + 70 * i);
+		ItemDesc.vPosition = _float2(645.f, 245.f + 70 * i);
 
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_EquipItem"), &ItemDesc)))
 			return E_FAIL;
@@ -344,7 +344,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 		CInvenItem::ITEMDESC ItemDesc;
 		ItemDesc.eItemType = CInvenItem::ITEM_DGNKEY;
 		ItemDesc.m_iTextureNum = (CInvenItem::EQUIP_TEXLIST)(i + 1);
-		ItemDesc.vPosition = _float2(285 + 55 * i, 545);
+		ItemDesc.vPosition = _float2(285.f + 55 * i, 545.f);
 
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_DongeonKey"), &ItemDesc)))
 			return E_FAIL;

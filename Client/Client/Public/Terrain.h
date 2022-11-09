@@ -7,7 +7,7 @@ BEGIN(Engine)
 
 class CTexture;
 class CVIBuffer_Terrain;
-
+class CNavigation;
 END
 
 
@@ -33,7 +33,7 @@ public:
 private:
 	CTexture*				m_pTextureCom[TYPE_END] = { nullptr };
 	CVIBuffer_Terrain*		m_pVIBufferCom = nullptr;
-
+	CNavigation*			m_pNavigationCom = nullptr;
 	ID3D11ShaderResourceView*			m_pFilterTexture = nullptr;
 private:
 	_uint					m_iPassIndex = 0;

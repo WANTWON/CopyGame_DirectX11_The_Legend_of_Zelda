@@ -29,16 +29,19 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar * pNavigationData)
 	HANDLE			hFile = CreateFile(pNavigationData, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
 		return E_FAIL;	
-
+	_uint iNum = 0;
 	_float3		vPoints[3];
 
-	while (true)
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+	for (_uint i = 0; i< iNum; ++i)
 	{
 		ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
 		if (0 == dwByte)
 			break;
 
-		CCell*			pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size());
+		CCell*			pCell = CCell::Create(m_pDevice, m_pContext, vPoints, (int)m_Cells.size());
 		if (nullptr == pCell)
 			return E_FAIL;
 
@@ -53,7 +56,7 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar * pNavigationData)
 
 #ifdef _DEBUG
 
-	m_pShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_Navigation.hlsl"), VTXPOS_DECLARATION::Elements, VTXPOS_DECLARATION::iNumElements);
+	m_pShader = CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/ShaderFiles/Shader_Navigation.hlsl"), VTXPOS_DECLARATION::Elements, VTXPOS_DECLARATION::iNumElements);
 	if (nullptr == m_pShader)
 		return E_FAIL;
 
@@ -69,6 +72,23 @@ HRESULT CNavigation::Initialize(void * pArg)
 
 
 	return S_OK;
+}
+
+_float CNavigation::Compute_Height(_vector vPosition, _float foffset)
+{
+	_vector PointA = XMLoadFloat3(&m_Cells[m_NaviDesc.iCurrentCellIndex]->Get_PointValue(CCell::POINT_A));
+	PointA = XMVectorSetW(PointA, 1.f);
+	_vector PointB = XMLoadFloat3(&m_Cells[m_NaviDesc.iCurrentCellIndex]->Get_PointValue(CCell::POINT_B));
+	PointB = XMVectorSetW(PointB, 1.f);
+	_vector PointC = XMLoadFloat3(&m_Cells[m_NaviDesc.iCurrentCellIndex]->Get_PointValue(CCell::POINT_C));
+	PointC = XMVectorSetW(PointC, 1.f);
+
+	_vector vPlane = XMPlaneFromPoints(PointA, PointB, PointC);
+
+	// _float		fHeight = (-ax - cz - d) / b;
+	_float		fHeight = (-XMVectorGetX(vPlane) * XMVectorGetX(vPosition) - XMVectorGetZ(vPlane) *XMVectorGetZ(vPosition) - XMVectorGetW(vPlane)) / XMVectorGetY(vPlane) + foffset;
+
+	return fHeight;
 }
 
 _bool CNavigation::isMove(_fvector vPosition)

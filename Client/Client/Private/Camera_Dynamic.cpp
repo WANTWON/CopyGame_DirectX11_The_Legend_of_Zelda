@@ -77,11 +77,11 @@ void CCamera_Dynamic::Player_Camera(_float fTimeDelta)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 	if (m_lMouseWheel > 0)
-		m_lMouseWheel -= 0.001;
+		m_lMouseWheel -= (long)0.001;
 	if (m_lMouseWheel < 0)
-		m_lMouseWheel += 0.001;
+		m_lMouseWheel += (long)0.001;
 
-	if (m_lMouseWheel += (pGameInstance->Get_DIMMoveState(DIMM_WHEEL)*0.05))
+	if (m_lMouseWheel += (long)(pGameInstance->Get_DIMMoveState(DIMM_WHEEL)*0.05))
 	{
 		m_vDistance.y -= _float(fTimeDelta*m_lMouseWheel*0.01f);
 		m_vDistance.z += _float(fTimeDelta*m_lMouseWheel*0.01f);

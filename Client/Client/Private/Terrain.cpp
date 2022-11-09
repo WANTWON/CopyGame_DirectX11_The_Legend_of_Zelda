@@ -46,14 +46,15 @@ HRESULT CTerrain::Render()
 		nullptr == m_pVIBufferCom)
 		return E_FAIL;
 
-	if (FAILED(SetUp_ShaderResources()))
-		return E_FAIL;
+	//if (FAILED(SetUp_ShaderResources()))
+		//return E_FAIL;
 
 	
-	m_pShaderCom->Begin(0);
+	//m_pShaderCom->Begin(0);
 
-
-
+#ifdef _DEBUG
+	m_pNavigationCom->Render_Navigation();
+#endif
 	m_pVIBufferCom->Render();
 
 	return S_OK;
@@ -96,6 +97,11 @@ HRESULT CTerrain::Ready_Components(void* pArg)
 
 	if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"), (CComponent**)&m_pVIBufferCom, &TerrainDesc)))
 		return E_FAIL;
+
+	/* For.Com_Navigation */
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"), (CComponent**)&m_pNavigationCom)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -280,7 +286,7 @@ void CTerrain::Free()
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
-
+	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pFilterTexture);
 
 	for (_uint i = 0; i < TYPE_END; ++i)

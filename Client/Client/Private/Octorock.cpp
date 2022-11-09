@@ -2,6 +2,7 @@
 #include "..\Public\Octorock.h"
 #include "Player.h"
 #include "MonsterBullet.h"
+#include "Navigation.h"
 
 COctorock::COctorock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -290,8 +291,8 @@ void COctorock::Patrol(_float fTimeDelta)
 			m_eState = STATE::WALK;
 			m_dwWalkTime = GetTickCount();
 
-			m_eDir[DIR_X] = rand() % 3 - 1;
-			m_eDir[DIR_Z] = m_eDir[DIR_X] == 0 ? rand() % 3 - 1 : 0;
+			m_eDir[DIR_X] = rand() % 3 - 1.f;
+			m_eDir[DIR_Z] = m_eDir[DIR_X] == 0 ? rand() % 3 - 1.f : 0.f;
 		
 		}
 	}

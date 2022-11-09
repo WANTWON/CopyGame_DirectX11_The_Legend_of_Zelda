@@ -380,8 +380,8 @@ void CMoblinSword::Patrol(_float fTimeDelta)
 			m_eState = STATE::WALK;
 			m_dwWalkTime = GetTickCount();
 
-			m_eDir[DIR_X] = rand() % 3 - 1;
-			m_eDir[DIR_Z] = m_eDir[DIR_X] == 0 ? rand() % 3 - 1 : 0;
+			m_eDir[DIR_X] = rand() % 3 - 1.f;
+			m_eDir[DIR_Z] = m_eDir[DIR_X] == 0 ? rand() % 3 - 1.f : 0.f;
 
 		}
 	}

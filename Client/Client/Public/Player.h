@@ -5,6 +5,7 @@
 
 BEGIN(Engine)
 class CModel;
+class CNavigation;
 END
 
 
@@ -65,7 +66,7 @@ private:
 
 private:
 	vector<class CGameObject*>			m_Parts;
-
+	CNavigation*			m_pNavigationCom = nullptr;
 private:
 	OBJINFO					m_tInfo;
 

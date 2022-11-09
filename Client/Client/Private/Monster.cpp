@@ -136,7 +136,7 @@ _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageC
 	if (fDamage <= 0 || m_bDead)
 		return 0;
 
-	m_tInfo.iCurrentHp -= fDamage;
+	m_tInfo.iCurrentHp -= (int)fDamage;
 
 	if (m_tInfo.iCurrentHp <= 0)
 	{

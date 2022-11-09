@@ -7,8 +7,6 @@
 #include "Renderer.h"
 #include "Transform.h"
 #include "VIBuffer_Rect.h"
-
-#include "VIBuffer_Navigation.h"
 #include "Navigation.h"
 
 //#include "VIBuffer_Cube.h"

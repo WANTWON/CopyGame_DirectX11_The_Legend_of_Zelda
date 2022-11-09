@@ -25,13 +25,14 @@ public:
 	}
 
 
-
 public:
 	HRESULT Initialize(const _float3* pPoints, _int iIndex);
 	_bool Compare_Points(const _float3* pSourPoint, const _float3* pDestPoint);
 	_bool isIn(_fvector vPosition, _int* pNeighborIndex);
 	void Set_CellType(CELLTYPE eType) { m_eCellType = eType; }
 	CELLTYPE Get_CellType() { return m_eCellType; }
+
+
 #ifdef _DEBUG
 public:
 	HRESULT Render();
@@ -49,12 +50,10 @@ private:
 	_float3					m_vNormals[LINE_END];
 	_int					m_iNeighborIndices[LINE_END] = { -1, -1, -1 };
 	CELLTYPE				m_eCellType = ACCESSIBLE;
-
-#ifdef _DEBUG
 private:
+#ifdef _DEBUG
 	class CVIBuffer_Navigation*		m_pVIBuffer = nullptr;
 #endif // _DEBUG
-
 public:
 	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _int iIndex);
 	virtual void Free() override;

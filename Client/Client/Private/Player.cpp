@@ -29,9 +29,12 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(Ready_Parts()))
 		return E_FAIL;
 
+	m_fWalkingHeight = m_pNavigationCom->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), (Get_Scale().y * 0.5f));
+	m_fStartHeight = m_fWalkingHeight;
+	m_fEndHeight = m_fWalkingHeight;
 
 	//Set_Scale(_float3(0.5, 0.5, 0.5));
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, m_fStartHeight, 10.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(3.9f, m_fStartHeight, -1.33f, 1.f));
 
 	m_tInfo.iMaxHp = 50;
 	m_tInfo.iDamage = 20;
@@ -77,7 +80,10 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_BOW]);
 	}
-		
+	
+	m_fWalkingHeight = m_pNavigationCom->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 0.f);
+	m_fStartHeight = m_fWalkingHeight;
+	m_fEndHeight = m_fWalkingHeight;
 }
 
 HRESULT CPlayer::Render()
@@ -113,6 +119,7 @@ HRESULT CPlayer::Render()
 #ifdef _DEBUG
 	//m_pAABBCom->Render();
 	m_pOBBCom->Render();
+	m_pNavigationCom->Render_Navigation();
 	//m_pSPHERECom->Render();
 #endif
 
@@ -129,7 +136,7 @@ _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 	if (fDamage <= 0 || m_bDead)
 		return 0;
 
-	m_tInfo.iCurrentHp -= fDamage;
+	m_tInfo.iCurrentHp -= (int)fDamage;
 
 	if (m_tInfo.iCurrentHp <= 0)
 		m_tInfo.iCurrentHp = 0;
@@ -368,7 +375,7 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 
 	/* For.Com_OBB*/
 	CCollider::COLLIDERDESC		ColliderDesc;
-	ColliderDesc.vScale = _float3(1.f, 2.f, 1.f);
+	ColliderDesc.vScale = _float3(1.f, 1.5f, 1.f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
@@ -380,6 +387,16 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	//if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		//return E_FAIL;
+
+		/* For.Com_Navigation */
+	CNavigation::NAVIDESC			NaviDesc;
+	ZeroMemory(&NaviDesc, sizeof NaviDesc);
+
+	NaviDesc.iCurrentCellIndex = 0;
+
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -463,7 +480,7 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 		}
 			
 	
-		m_pTransformCom->Go_Straight(fTimeDelta);
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
 	}
 
 }

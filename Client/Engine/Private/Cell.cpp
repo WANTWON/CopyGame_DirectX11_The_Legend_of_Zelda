@@ -81,6 +81,7 @@ _bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex)
 	return true;
 }
 
+
 #ifdef _DEBUG
 HRESULT CCell::Render()
 {

@@ -1,4 +1,5 @@
 #include "..\Public\Transform.h"
+#include "..\Public\Navigation.h"
 
 CTransform::CTransform(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
@@ -39,14 +40,18 @@ HRESULT CTransform::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CTransform::Go_Straight(_float fTimeDelta)
+void CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);
 
 	vPosition += XMVector3Normalize(vLook) * m_TransformDesc.fSpeedPerSec * fTimeDelta;
 
-	Set_State(CTransform::STATE_POSITION, vPosition);
+	if (nullptr == pNavigation)
+		Set_State(CTransform::STATE_POSITION, vPosition);
+
+	else if (true == pNavigation->isMove(vPosition))
+		Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
 void CTransform::Go_Backward(_float fTimeDelta)
@@ -82,7 +87,7 @@ void CTransform::Go_Right(_float fTimeDelta)
 void CTransform::Jump(_float fTimeDelta, _float fVelocity, _float fGravity, _float fStartiHeight, _float fEndiHeight)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
-	float fSpeed = fStartiHeight + fVelocity * fTimeDelta - (0.5*fGravity*fTimeDelta*fTimeDelta);
+	float fSpeed = fStartiHeight + fVelocity * fTimeDelta - (0.5f*fGravity*fTimeDelta*fTimeDelta);
 
 	vPosition = XMVectorSetY(vPosition, fSpeed);
 

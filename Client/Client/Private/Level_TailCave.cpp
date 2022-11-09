@@ -111,7 +111,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Player(const _tchar * pLayerTag)
 
 	CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
-	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.f, 0.1, 3.f, 1.f));
+	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.f, 0.1f, 3.f, 1.f));
 	pPlayer->Set_JumpingHeight(0.1f);
 			
 	Safe_Release(pGameInstance);

@@ -179,7 +179,7 @@ HRESULT CModel::Set_AnimationReset()
 
 _bool CModel::Picking(CTransform * pTransform, _float3 * pOut)
 {
-	for (int i = 0; i < m_iNumMeshes; ++i)
+	for (_uint i = 0; i < m_iNumMeshes; ++i)
 	{
 		if (m_Meshes[i]->Picking(pTransform, pOut))
 			return true;

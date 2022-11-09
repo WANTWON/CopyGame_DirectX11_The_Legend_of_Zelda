@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\BaseObj.h"
 #include "GameInstance.h"
+#include "VIBuffer_Navigation.h"
 
 CBaseObj::CBaseObj(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CGameObject(pDevice, pContext)
@@ -63,7 +64,6 @@ void CBaseObj::Update_Collider()
 	if (m_pSPHERECom != nullptr)
 		m_pSPHERECom->Update(m_pTransformCom->Get_WorldMatrix());
 }
-
 
 
 _vector CBaseObj::Get_TransformState(CTransform::STATE eState)
