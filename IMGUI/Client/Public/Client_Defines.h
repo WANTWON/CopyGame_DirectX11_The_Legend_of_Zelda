@@ -22,3 +22,5 @@ extern HINSTANCE	g_hInst;
 
 using namespace Client;
 using namespace std;
+
+#define MAX_NUM 9999

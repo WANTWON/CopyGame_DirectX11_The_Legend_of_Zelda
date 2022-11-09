@@ -18,10 +18,14 @@ public:
 	virtual ~CNavigation_Manager() = default;
 
 public:
+	HRESULT Add_Cell(_float3* vPoss, _bool bCheckOverlap = false);
 	void Click_Position(_vector vPosition);
 	void Clear_ClickedPosition();
-	HRESULT Add_Cell(_float3* vPoss, _bool bCheckOverlap = false);
 	void Clear_Cells();
+
+public:
+	CCell* Find_PickingCell();
+	_float3 Find_MinDistance(_vector vPosition);
 
 public:
 	HRESULT Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -30,18 +34,20 @@ public:
 private:
 	_uint		m_iClickedCellIndex = 0;
 	_float3		m_vClickedPos;
+	_float		m_fMinDistance = MAX_NUM;
 
 	vector<class CCell*>			m_Cells;
 	typedef vector<class CCell*>	CELLS;
 
-	map<_float, _float3*> m_TempCells;
-	vector<_float3> m_fvClickedPoss;
+	map<_float, _float3*>	m_TempCells;
+	vector<_float3>			m_vClickedPoints;
 
 	_bool	m_bClickVertexModel = false;
 
-private:
-	ID3D11Device* m_pDevice;
-	ID3D11DeviceContext* m_pContext;
+
+private:  /*For Render */
+	ID3D11Device*			m_pDevice;
+	ID3D11DeviceContext*	m_pContext;
 	class CShader*			m_pShader = nullptr;
 
 public:

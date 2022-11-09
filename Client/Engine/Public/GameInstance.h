@@ -85,6 +85,10 @@ public: /* For.Font_Manager */
 	HRESULT Add_Fonts(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontTag, const _tchar* pFontFilePath);
 	HRESULT Render_Font(const _tchar* pFontTag, const _tchar* pText, _fvector vPos, _fvector vColor, _float fScale = 1.f);
 
+public: /* For Picking */
+	_vector Get_RayPos();
+	_vector Get_RayDir();
+
 public:
 	static void Release_Engine();
 

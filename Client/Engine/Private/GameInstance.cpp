@@ -405,6 +405,22 @@ HRESULT CGameInstance::Render_Font(const _tchar * pFontTag, const _tchar * pText
 	return m_pFont_Manager->Render_Font(pFontTag, pText, vPos, vColor, fScale);
 }
 
+_vector CGameInstance::Get_RayPos()
+{
+	if(nullptr == m_pPicking)
+		return _vector();
+
+	return m_pPicking->Get_RayPos();
+}
+
+_vector CGameInstance::Get_RayDir()
+{
+	if (nullptr == m_pPicking)
+		return _vector();
+
+	return m_pPicking->Get_RayDir();
+}
+
 
 void CGameInstance::Release_Engine()
 {

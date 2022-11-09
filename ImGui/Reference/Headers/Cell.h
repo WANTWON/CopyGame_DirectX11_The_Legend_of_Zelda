@@ -14,9 +14,8 @@ private:
 	virtual ~CCell() = default;
 
 public:
-	const _float3* Get_Point(POINT ePoint) {
-		return &m_vPoints[ePoint];
-	}
+	const _float3* Get_Point(POINT ePoint) { return &m_vPoints[ePoint];}
+	_float3 Get_PointValue(POINT ePoint) const  { return m_vPoints[ePoint]; }
 
 	void SetUp_Neighbor(LINE eLine, const CCell* pCell)
 	{
