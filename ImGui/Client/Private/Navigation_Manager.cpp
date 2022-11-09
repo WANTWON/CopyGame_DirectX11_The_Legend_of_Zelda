@@ -49,6 +49,11 @@ void CNavigation_Manager::Click_Position(_vector vPosition)
 	if (2 < m_vClickedPoints.size())
 		return;
 
+	if (0 == m_vClickedPoints.size())
+		Add_ClickedSymbol(vClickPosition, SYMBOL1);
+	else if (1 == m_vClickedPoints.size())
+		Add_ClickedSymbol(vClickPosition, SYMBOL2);
+
 	m_vClickedPoints.push_back(vClickPosition);
 
 	//찍은 점의 개수가 3개가 된다면. 삼각형이 그려지니 Cell에 추가한다.
@@ -65,8 +70,33 @@ void CNavigation_Manager::Click_Position(_vector vPosition)
 
 void CNavigation_Manager::Clear_ClickedPosition()
 {
+	
+	CGameInstance::Get_Instance()->Clear_Layer(LEVEL_GAMEPLAY, TEXT("Layer_PickingSymbol"));
+
 	m_vClickedPoints.clear();
 	m_fMinDistance = MAX_NUM;
+}
+
+HRESULT CNavigation_Manager::Add_ClickedSymbol(_float3 vClickPos, SYMBOL Symboltype)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CNonAnim::NONANIMDESC NonAnimDesc;
+	char cModelTag[MAX_PATH] = "";
+	WideCharToMultiByte(CP_ACP, 0, TEXT("Picking_Symbol"), MAX_PATH, cModelTag, MAX_PATH, NULL, NULL);
+	strcpy(NonAnimDesc.pModeltag, cModelTag);
+	NonAnimDesc.vPosition = vClickPos;
+	NonAnimDesc.vPosition.y += 0.5f;
+	NonAnimDesc.vScale = _float3(0.5, 0.5, 0.5);
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), LEVEL_GAMEPLAY, TEXT("Layer_PickingSymbol"), &NonAnimDesc)))
+		return E_FAIL;
+
+	m_pClickedSymbol[Symboltype] = dynamic_cast<CNonAnim*>(pGameInstance->Get_Object(LEVEL_GAMEPLAY, TEXT("Layer_PickingSymbol"), Symboltype));
+	m_pClickedSymbol[Symboltype]->Setting_PickingSymbol(Symboltype);
+
+	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
 }
 
 HRESULT CNavigation_Manager::Add_Cell(_float3 * vPoss, _bool bCheckOverlap)
@@ -93,6 +123,15 @@ void CNavigation_Manager::Clear_Cells()
 	for (auto& pCell : m_Cells)
 		Safe_Release(pCell);
 	m_Cells.clear();
+}
+
+void CNavigation_Manager::Cancle_Cell()
+{
+	if (m_Cells.size() == 0)
+		return;
+
+	Safe_Release(m_Cells.back());
+	m_Cells.pop_back();
 }
 
 CCell * CNavigation_Manager::Find_PickingCell()
@@ -220,16 +259,18 @@ _float3 CNavigation_Manager::Find_MinDistance(_vector vPosition)
 
 void CNavigation_Manager::Sort_CellByPosition(_float3 * vPoss)
 {
+	//Position 기준으로 1단계로 시계방향으로 정리한다 
 	_float3 vTempPoss[3];
 
 	memcpy(vTempPoss, vPoss, sizeof(_float3) * 3);
 
-	// 정렬
+	//3개의 점을 순회해서 x 좌표가 가장 적은 인덱스를 찾는다.
 	for (_uint i = 0; i < 2; ++i)
 	{
 		_uint iMinIndex = i;
 		for (_uint j = i + 1; j < 3; ++j)
 		{
+			
 			if (vTempPoss[iMinIndex].x > vTempPoss[j].x)
 			{
 				iMinIndex = j;
@@ -261,6 +302,7 @@ void CNavigation_Manager::Sort_CellByPosition(_float3 * vPoss)
 
 void CNavigation_Manager::Sort_CellByDot(_float3 * vPoss)
 {
+	//각 선분을 외적해서 면이 바라보는 방향벡터를 구한다.
 	_vector vABDir = XMLoadFloat3(&vPoss[1]) - XMLoadFloat3(&vPoss[0]);
 	_vector vBCDir = XMLoadFloat3(&vPoss[2]) - XMLoadFloat3(&vPoss[1]);
 	_vector vCloss = XMVector3Cross(vABDir, vBCDir);
@@ -271,6 +313,8 @@ void CNavigation_Manager::Sort_CellByDot(_float3 * vPoss)
 	vCloss = XMVector3Normalize(vCloss);
 	vMouseDir = XMVector3Normalize(vMouseDir);
 
+	// 면의 방향벡터와 마우스의 방향벡터를 뒤집은 벡터를 내적
+	// 양수면 뒤집어준다.
 	if (0.f > XMVectorGetX(XMVector3Dot(vCloss, vMouseDir)))
 	{
 		_float3 vTemp = vPoss[0];
@@ -333,13 +377,47 @@ HRESULT CNavigation_Manager::Render()
 		{
 
 			m_pShader->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4));
-			m_pShader->Set_RawValue("g_vColor", &_float4(1.f, 0.f, 0.f, 1.f), sizeof(_float4));
+
+			CCell::CELLTYPE eType = pCell->Get_CellType();
+			
+			switch (eType)
+			{
+			case Engine::CCell::ACCESSIBLE:
+				m_pShader->Set_RawValue("g_vColor", &_float4(1.f, 0.f, 0.f, 1.f), sizeof(_float4));
+				break;
+			case Engine::CCell::ONLYJUMP:
+				m_pShader->Set_RawValue("g_vColor", &_float4(0.f, 0.f, 1.f, 1.f), sizeof(_float4));
+				break;
+			case Engine::CCell::DROP:
+				m_pShader->Set_RawValue("g_vColor", &_float4(0.7f, 0.f, 1.f, 1.f), sizeof(_float4));
+				break;
+			default:
+				break;
+			}
+
+			
 			m_pShader->Begin(0);
 			pCell->Render();
 		}
 
 	}
 	return S_OK;
+}
+
+CCell * CNavigation_Manager::Get_Cell()
+{
+	if (m_Cells.size() == 0 || m_iClickedCellIndex >= m_Cells.size())
+		return nullptr;
+
+	return m_Cells[m_iClickedCellIndex];
+}
+
+CCell * CNavigation_Manager::Get_Cell(_uint iIndex)
+{
+	if (m_Cells.size() == 0 || iIndex >= m_Cells.size())
+		return nullptr;
+
+	return m_Cells[iIndex];
 }
 
 void CNavigation_Manager::Free()

@@ -56,8 +56,9 @@ public:
 	void Set_Macro();
 
 	/* For Navigation Tool */
-	void Navigation();
-
+	void Set_Navigation();
+	void Save_Navigation();
+	void Load_Navigation();
 
 public:
 	void Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag, _bool bCreatePrototype = false);
@@ -76,35 +77,35 @@ private:
 	LEVEL m_iCurrentLevel = LEVEL_GAMEPLAY;
 private:
 	/* For Terrain Manager */
-	CTerrain_Manager* m_pTerrain_Manager = nullptr;
-	CTerrain_Manager::TERRAINDESC  m_TerrainDesc;
-	CTerrain_Manager::TERRAINSHAPEDESC  m_TerrainShapeDesc;
-	_bool m_bTerrain_Show = true;
+	CTerrain_Manager*						m_pTerrain_Manager = nullptr;
+	CTerrain_Manager::TERRAINDESC			m_TerrainDesc;
+	CTerrain_Manager::TERRAINSHAPEDESC		m_TerrainShapeDesc;
+	_bool									m_bTerrain_Show = true;
 
 	/* For Object */
-	_tchar m_pFilePath[MAX_PATH] = L"../../../Bin/Resources/Meshes/";
-	CModelManager* m_pModel_Manager = nullptr;
-	vector<string> m_stLayerTags;
-	vector<const _tchar*> m_TempLayerTags;
-	CNonAnim::NONANIMDESC  m_InitDesc;
-	_int m_iCreatedSelected = 0;
-	_int m_iSeletecLayerNum = 0;
+	_tchar									m_pFilePath[MAX_PATH] = L"../../../Bin/Resources/Meshes/";
+	CModelManager*							m_pModel_Manager = nullptr;
+	vector<string>							m_stLayerTags;
+	vector<const _tchar*>					m_TempLayerTags;
+	CNonAnim::NONANIMDESC					m_InitDesc;
+	_int									m_iCreatedSelected = 0;
+	_int									m_iSeletecLayerNum = 0;
 
-	OBJID m_eObjID = OBJ_END;
-	_int m_iObjectList = 0;
-	_float m_fDist = 1.f;
+	OBJID									m_eObjID = OBJ_END;
+	_int									m_iObjectList = 0;
+	_float									m_fDist = 1.f;
 
 
 	/* For Picking */
-	_float3 m_vPickedObjPos = _float3(1.f, 1.f, 1.f);
-	_float3 m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
-	_bool m_bPickingMode = false;
-	_int m_PickingType = 0;
+	_float3									m_vPickedObjPos = _float3(1.f, 1.f, 1.f);
+	_float3									m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
+	_bool									m_bPickingMode = false;
+	_int									m_PickingType = 0;
 
 	/*For Navigation*/
-	CNavigation_Manager* m_pNavigation_Manager = nullptr;
-
-
+	CNavigation_Manager*					m_pNavigation_Manager = nullptr;
+	_int									m_iCellIndex = 0;
+	_int									m_iCellType = 0;
 	
 
 public:

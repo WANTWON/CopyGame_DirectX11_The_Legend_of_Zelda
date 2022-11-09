@@ -84,8 +84,19 @@ HRESULT CNonAnim::Render()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
-			return E_FAIL;
+		if (m_iSymbolType != -1)
+		{
+			if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, m_iSymbolType)))
+				return E_FAIL;
+
+			m_eShaderID = SHADER_SYMBOL;
+		}
+		else
+		{
+			if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
+				return E_FAIL;
+		}
+		
 
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_OcculsionTexture", i, aiTextureType_SPECULAR)))
 			return E_FAIL;

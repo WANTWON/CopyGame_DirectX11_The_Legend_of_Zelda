@@ -36,6 +36,9 @@ public:
 	virtual HRESULT Render();
 
 public:
+	void Setting_PickingSymbol(_int i) { m_iSymbolType = i; }
+
+public:
 	virtual _bool Picking(_float3* PickingPoint) override;
 	virtual void PickingTrue();
 	void Set_Picked();
@@ -45,6 +48,7 @@ public:
 private:
 	CModel*					m_pModelCom = nullptr;
 	NONANIMDESC				m_ModelDesc;
+	_int					m_iSymbolType = -1;
 
 
 private:

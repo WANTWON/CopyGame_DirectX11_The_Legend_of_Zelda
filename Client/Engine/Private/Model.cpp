@@ -100,7 +100,7 @@ HRESULT CModel::Initialize(void * pArg)
 	return S_OK;
 }
 
-HRESULT CModel::SetUp_Material(CShader * pShader, const char * pConstantName, _uint iMeshIndex, aiTextureType eType)
+HRESULT CModel::SetUp_Material(CShader * pShader, const char * pConstantName, _uint iMeshIndex, aiTextureType eType, _uint TextureNum)
 {
 	if (iMeshIndex >= m_iNumMeshes)
 		return E_FAIL;
@@ -109,7 +109,7 @@ HRESULT CModel::SetUp_Material(CShader * pShader, const char * pConstantName, _u
 		return S_OK;
 
 
-	return pShader->Set_ShaderResourceView(pConstantName, m_Materials[m_Meshes[iMeshIndex]->Get_MaterialIndex()].pMaterials[eType]->Get_SRV());
+	return pShader->Set_ShaderResourceView(pConstantName, m_Materials[m_Meshes[iMeshIndex]->Get_MaterialIndex()].pMaterials[eType]->Get_SRV(TextureNum));
 }
 
 _bool CModel::Play_Animation(_float fTimeDelta, _bool isLoop)
