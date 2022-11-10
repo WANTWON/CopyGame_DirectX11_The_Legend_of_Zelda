@@ -210,7 +210,7 @@ void CGraphic_Device::Free()
 //	}
 //	if (d3dDebug != nullptr)            d3dDebug->Release();
 //#endif
-
+//
 
 	Safe_Release(m_pDevice);
 }

@@ -2,6 +2,7 @@
 #include "..\Public\DgnKey.h"
 #include "GameInstance.h"
 #include "Player.h"
+#include "UI_Manager.h"
 
 CDgnKey::CDgnKey(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -52,6 +53,23 @@ int CDgnKey::Tick(_float fTimeDelta)
 	}
 		
 
+	if (m_bGet)
+	{
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+		_vector pPlayerPostion = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
+		pPlayerPostion = XMVectorSetY(pPlayerPostion, XMVectorGetY(pPlayerPostion) + 3.f );
+		m_pTransformCom->Go_PosTarget(fTimeDelta, pPlayerPostion);
+
+		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
+		{
+			m_bDead = true;
+			CUI_Manager::Get_Instance()->Close_Message();
+			CUI_Manager::Get_Instance()->Get_Key();
+		}
+			
+	}
+
+
 	return OBJ_NOEVENT;
 }
 
@@ -64,7 +82,7 @@ void CDgnKey::Late_Tick(_float fTimeDelta)
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-	if (m_pOBBCom->Collision(pTarget->Get_Collider()))
+	if (m_pOBBCom != nullptr && m_pOBBCom->Collision(pTarget->Get_Collider()))
 	{
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -1.f, 0.f, 0.f));
 
@@ -73,13 +91,16 @@ void CDgnKey::Late_Tick(_float fTimeDelta)
 		{
 			vPostion = XMVectorSetY(vPostion, 0.5f);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPostion);
+			Safe_Release(m_pOBBCom);
+			m_pOBBCom = nullptr;
 		}
 			
 	}
 
 	if (m_pSPHERECom->Collision(pTarget->Get_Collider()))
 	{
-		m_bDead = true;
+		m_bGet = true;
+		CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::DGNKEY);
 		dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
 	}
 
@@ -112,7 +133,8 @@ HRESULT CDgnKey::Render()
 
 #ifdef _DEBUG
 	//m_pAABBCom->Render();
-	m_pOBBCom->Render();
+	if(m_pOBBCom != nullptr)
+			m_pOBBCom->Render();
 	m_pSPHERECom->Render();
 #endif
 
@@ -225,4 +247,13 @@ CGameObject * CDgnKey::Clone(void * pArg)
 void CDgnKey::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pAABBCom);
+	Safe_Release(m_pOBBCom);
+	Safe_Release(m_pSPHERECom);
+
+	Safe_Release(m_pTransformCom);
+	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pRendererCom);
+	Safe_Release(m_pModelCom);
 }

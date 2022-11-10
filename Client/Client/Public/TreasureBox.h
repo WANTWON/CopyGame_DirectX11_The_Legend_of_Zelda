@@ -12,6 +12,7 @@ class CTreasureBox final : public CBaseObj
 {
 public:
 	enum STATE { APPEAR, CLOSE, CLOSE_WAIT, NOT_OPEN, OPEN, OPEN_WAIT };
+	enum ITEMTYPE { COMPASS };
 
 private:
 	CTreasureBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

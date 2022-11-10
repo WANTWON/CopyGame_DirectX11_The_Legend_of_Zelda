@@ -11,13 +11,15 @@
 #include "NonAnim.h"
 #include "Player.h"
 #include "Level_Loading.h"
-#include "Collision_Manger.h"
+#include "CameraManager.h"
 
 _bool g_bUIMadefirst = false;
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
+	, m_pCollision_Manager(CCollision_Manager::Get_Instance())
 {
+	Safe_AddRef(m_pCollision_Manager);
 }
 
 HRESULT CLevel_GamePlay::Initialize()
@@ -52,7 +54,7 @@ HRESULT CLevel_GamePlay::Initialize()
 		g_bUIMadefirst = true;
 	}
 	
-	
+	CCameraManager::Get_Instance()->Ready_Camera(LEVEL::LEVEL_GAMEPLAY);
 	return S_OK;
 }
 
@@ -60,14 +62,14 @@ void CLevel_GamePlay::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);	
 
-	CUI_Manager::Get_Instance()->Tick_PlayerState();
+	CUI_Manager::Get_Instance()->Tick_UI();
 
 	if (GetKeyState(VK_SPACE) & 0x8000)
 	{
 		CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
 		Safe_AddRef(pGameInstance);
 
-		CCollision_Manager::Get_Instance()->Clear_CollisionGroup(CCollision_Manager::COLLISION_MONSTER);
+		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_MONSTER);
 		pGameInstance->Set_DestinationLevel(LEVEL_TAILCAVE);
 		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TAILCAVE))))
 			return;
@@ -85,8 +87,8 @@ void CLevel_GamePlay::Late_Tick(_float fTimeDelta)
 	//SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
 	SetWindowText(g_hWnd, TEXT("GamePlaye Level."));
 
-	CCollision_Manager::Get_Instance()->Update_Collider();
-	CCollision_Manager::Get_Instance()->CollisionwithBullet();
+	m_pCollision_Manager->Update_Collider();
+	m_pCollision_Manager->CollisionwithBullet();
 }
 
 HRESULT CLevel_GamePlay::Ready_Lights()
@@ -286,6 +288,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 		return E_FAIL;
 	
 
+	ButtonDesc.eButtonType = CUIButton::BTN_OPEN;
+	ButtonDesc.eState = CUIButton::BTN_A;
+	ButtonDesc.vPosition = _float2(0, 0);
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, pLayerTag, &ButtonDesc)))
+		return E_FAIL;
+
+
 
 	for (_int i = 0; i < 3; ++i)
 	{
@@ -374,7 +383,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 			return E_FAIL;
 	}
 
-
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), nullptr)))
+		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -439,5 +449,6 @@ void CLevel_GamePlay::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pCollision_Manager);
 
 }

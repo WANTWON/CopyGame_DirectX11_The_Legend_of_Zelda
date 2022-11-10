@@ -21,7 +21,7 @@ void CUI_Manager::Initialize_PlayerState()
 		StateDesc.m_eType = CPlayerState::KEY;
 		StateDesc.fPosition = _float2(30.f + (i % 8) * 30.f, 90.f);
 
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Hp"), LEVEL_STATIC, TEXT("Layer_Hp"), &StateDesc)))
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerState"), LEVEL_STATIC, TEXT("Layer_State"), &StateDesc)))
 			return;
 
 	}
@@ -116,9 +116,9 @@ void CUI_Manager::Tick_PlayerState()
 		{
 			CPlayerState::STATEDESC StateDesc;
 			StateDesc.m_eType = CPlayerState::HP;
-			StateDesc.fPosition = _float2(30.f + (i % 8) * 30.f, 30.f + iCol * 20.f);
+			StateDesc.fPosition = _float2(30.f + (i % 8) * 30.f, 30.f + iCol * 30.f);
 
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Hp"), LEVEL_STATIC, TEXT("Layer_Hp"), &StateDesc)))
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerState"), LEVEL_STATIC, TEXT("Layer_Hp"), &StateDesc)))
 				return;
 
 			if (i % 8 == 7)
@@ -147,6 +147,15 @@ void CUI_Manager::Tick_PlayerState()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CUI_Manager::Tick_Message()
+{
+}
+
+void CUI_Manager::Tick_UI()
+{
+	Tick_PlayerState();
+}
+
 void CUI_Manager::Set_UI_Open()
 {
 	m_bUIOpen = !m_bUIOpen;
@@ -171,7 +180,7 @@ void CUI_Manager::Get_Key()
 	StateDesc.m_eType = CPlayerState::KEY;
 	StateDesc.fPosition = _float2(30.f + (m_KeyList.size() % 8) * 30.f, 70.f);
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Hp"), LEVEL_STATIC, TEXT("Layer_Hp"), &StateDesc)))
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerState"), LEVEL_STATIC, TEXT("Layer_State"), &StateDesc)))
 		return;
 
 	RELEASE_INSTANCE(CGameInstance);

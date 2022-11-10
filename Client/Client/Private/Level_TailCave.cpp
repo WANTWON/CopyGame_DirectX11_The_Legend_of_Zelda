@@ -50,7 +50,7 @@ void CLevel_TailCave::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);	
 
-	CUI_Manager::Get_Instance()->Tick_PlayerState();
+	CUI_Manager::Get_Instance()->Tick_UI();
 
 	
 

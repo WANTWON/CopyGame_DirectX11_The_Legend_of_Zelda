@@ -3,14 +3,19 @@
 
 #include "GameInstance.h"
 #include "Level_Loading.h"
+#include "CameraManager.h"
 #include <time.h>
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
 	, m_pUI_Manager(CUI_Manager::Get_Instance())
+	, m_pCollisionManager(CCollision_Manager::Get_Instance())
+	, m_pDataManager(CData_Manager::Get_Instance())
 {
 	Safe_AddRef(m_pUI_Manager);
 	Safe_AddRef(m_pGameInstance);
+	Safe_AddRef(m_pCollisionManager);
+	Safe_AddRef(m_pDataManager);
 }
 
 HRESULT CMainApp::Initialize()
@@ -147,9 +152,16 @@ void CMainApp::Free()
 	Safe_Release(m_pContext);
 
 	Safe_Release(m_pGameInstance);
-	Safe_Release(m_pUI_Manager);
-
-	CUI_Manager::Get_Instance()->Destroy_Instance();
 	CGameInstance::Release_Engine();
+
+
+	Safe_Release(m_pUI_Manager);
+	Safe_Release(m_pCollisionManager);
+	Safe_Release(m_pDataManager);
+
+	CCollision_Manager::Get_Instance()->Destroy_Instance();
+	CData_Manager::Get_Instance()->Destroy_Instance();
+	CUI_Manager::Get_Instance()->Destroy_Instance();
+	CCameraManager::Get_Instance()->Destroy_Instance();
 }
 

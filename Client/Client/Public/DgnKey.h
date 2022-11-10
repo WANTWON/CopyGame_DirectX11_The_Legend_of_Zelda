@@ -36,7 +36,7 @@ public:
 private:
 	CModel*					m_pModelCom = nullptr;
 	DGNKEYDESC				m_eKeyDesc;
-
+	_bool					m_bGet = false;
 
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;

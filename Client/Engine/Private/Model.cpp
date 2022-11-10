@@ -386,7 +386,6 @@ void CModel::Free()
 		
 
 
-
 	m_Importer.FreeScene();
 
 }

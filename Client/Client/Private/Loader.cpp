@@ -3,7 +3,7 @@
 
 #include "GameInstance.h"
 #include "Camera_Dynamic.h"
-
+#include "Data_Manager.h"
 #include "Level_Manager.h"
 
 //for Player
@@ -24,6 +24,7 @@
 #include "UIButton.h"
 #include "InvenItem.h"
 #include "PlayerState.h"
+#include "MessageBox.h"
 
 //for Object 
 #include "Terrain.h"
@@ -226,7 +227,8 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 
 
-
+	/* ¸ðµ¨ ·Îµù Áß. */
+	lstrcpy(m_szLoadingText, TEXT("¸ðµ¨ »ý¼º Áß."));
 	_matrix			PivotMatrix = XMMatrixIdentity();
 
 	for (int i = 1; i < 17; ++i)
@@ -252,6 +254,7 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 			}
 			Safe_Delete(szFilePath);
 			Safe_Delete(FilePath);
+			CData_Manager::Get_Instance()->Add_ModelTag(pModeltag);
 		}
 	}
 
@@ -341,6 +344,7 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 			}
 			Safe_Delete(szFilePath);
 			Safe_Delete(FilePath);
+			CData_Manager::Get_Instance()->Add_ModelTag(pModeltag);
 
 		}
 
@@ -428,9 +432,14 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 		CNonAnim::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hp"),
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_PlayerState"),
 		CPlayerState::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MessageBox"),
+		CMessageBox::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 
 
 	/*For.Prototype_GameObject_Player */
@@ -492,6 +501,11 @@ HRESULT CLoader::Loading_For_UITexture()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_GetMessage"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/MesGetFrame_%02d.dds"), 2))))
+		return E_FAIL;
+
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreen_UI"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/LoadingScreen.dds"), 1))))
 		return E_FAIL;
@@ -518,6 +532,10 @@ HRESULT CLoader::Loading_For_UITexture()
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_ButtonY"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Button/BtnY_%02d.png"), 3))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Open"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Button/Open.png"), 1))))
 		return E_FAIL;
 	
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_EquipItem"),

@@ -106,12 +106,19 @@ void CTransform::Go_PosTarget(_float fTimeDelta, _vector TargetPos, _vector dist
 	_vector vPos = Get_State(CTransform::STATE_POSITION);
 	_vector vNewPos = TargetPos + distance;
 	_vector vDir = vNewPos - vPos;
-
+	_float fLength =  XMVectorGetX(XMVector3Length(vDir));
 	vDir = XMVector3Normalize(vDir);
 
-	vPos += vDir*fTimeDelta*m_TransformDesc.fSpeedPerSec;
-
-	Set_State(CTransform::STATE_POSITION, vPos);
+	if (fLength < 0.5f)
+	{
+		Set_State(CTransform::STATE_POSITION, vNewPos);
+	}
+	else
+	{
+		vPos += vDir*fTimeDelta*m_TransformDesc.fSpeedPerSec;
+		Set_State(CTransform::STATE_POSITION, vPos);
+	}
+	
 }
 
 void CTransform::Go_PosDir(_float fTimeDelta, _vector vecDir, CNavigation* pNavigation)

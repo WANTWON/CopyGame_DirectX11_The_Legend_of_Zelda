@@ -40,6 +40,7 @@ public:
 	OBJID Get_ObjectID() { return m_eObjectID; }
 	_float3 Get_Scale() { return m_vScale; };
 	_vector Get_TransformState(CTransform::STATE eState);
+	_float2 Get_ProjPosition();
 	void Set_State(CTransform::STATE eState, _fvector vState);
 	void Set_Scale(_float3 vScale);
 	CCollider*	Get_Collider();

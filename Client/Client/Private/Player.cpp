@@ -5,6 +5,7 @@
 #include "MonsterBullet.h"
 #include "Weapon.h"
 #include "PipeLine.h"
+#include "Cell.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -55,14 +56,12 @@ int CPlayer::Tick(_float fTimeDelta)
 	{
 		Key_Input(fTimeDelta);
 		Change_Direction(fTimeDelta);
+		Check_Navigation(fTimeDelta);
+		Get_ProjPosition();
 	}
-
-	
-
 
 	if (m_eState != m_ePreState)
 	{
-		//m_pModelCom->Set_AnimationReset();
 		m_pModelCom->Set_NextAnimIndex(m_eState);
 		m_ePreState = m_eState;
 	}
@@ -90,12 +89,6 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_BOW]);
 	}
-	
-	m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 0.f);
-	m_fStartHeight = m_fWalkingHeight;
-	m_fEndHeight = m_fWalkingHeight;
-
-
 
 }
 
@@ -188,7 +181,8 @@ _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 void CPlayer::Key_Input(_float fTimeDelta)
 {
 
-	if (m_eState == DMG_B || m_eState == DMG_F)
+	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == FALL_FROMTOP ||
+		m_eState == FALL_HOLE || m_eState == FALL_ANTLION)
 		return;
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -202,7 +196,11 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 
 	if (m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP)
+	{
+		RELEASE_INSTANCE(CGameInstance);
 		return;
+	}
+		
 
 	/* Move Left and Right*/
 	if (pGameInstance->Key_Down(DIK_LEFT))
@@ -451,7 +449,8 @@ void CPlayer::Render_Model(MESH_NAME eMeshName)
 void CPlayer::Change_Direction(_float fTimeDelta)
 {
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE ||
-		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP)
+		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP || m_eState == FALL_FROMTOP || m_eState == FALL_HOLE ||
+		m_eState == FALL_ANTLION)
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
@@ -501,7 +500,7 @@ void CPlayer::SetDirection_byPosition(_float fTimeDelta)
 {
 
 	CTransform::TRANSFORMDESC TransformDesc = m_pTransformCom->Get_TransformDesc();
-	TransformDesc.fSpeedPerSec = 1.5f;
+	TransformDesc.fSpeedPerSec = 2.f;
 	m_pTransformCom->Set_TransformDesc(TransformDesc);
 
 	///////////////// 이 부분에서 나의 룩벡터와 Direction Vector를 통해 각도로 방향 세팅 예정
@@ -678,6 +677,26 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = IDLE;
 		break;
+	case Client::CPlayer::FALL_HOLE:
+	case Client::CPlayer::FALL_ANTLION:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		//m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -0.1f, 0.f, 0.f), m_pNavigationCom[m_iCurrentLevel]);
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			m_eState = FALL_FROMTOP;
+			m_pTransformCom->Go_Backward(fTimeDelta * 20, m_pNavigationCom[m_iCurrentLevel]);
+		}	
+		break;
+	case Client::CPlayer::FALL_FROMTOP:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			m_eState = IDLE;
+
+		}
+		break;
 	default:
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
@@ -687,8 +706,27 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	m_eAnimSpeed = 1.f;
 }
 
-void CPlayer::Check_Navigation()
+void CPlayer::Check_Navigation(_float fTimeDelta)
 {
+	if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::DROP)
+	{
+		if(m_eState != FALL_ANTLION)
+			m_pTransformCom->Go_Straight(fTimeDelta*10, m_pNavigationCom[m_iCurrentLevel]);
+		m_eState = FALL_ANTLION;
+	}	
+	else if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::ACCESSIBLE)
+	{
+		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(vPosition, 0.f);
+		m_fStartHeight = m_fWalkingHeight;
+		m_fEndHeight = m_fWalkingHeight;
+
+		if (m_fWalkingHeight > XMVectorGetY(vPosition))
+		{
+			vPosition = XMVectorSetY(vPosition, m_fWalkingHeight);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+		}
+	}
 }
 
 CPlayer * CPlayer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -722,6 +760,13 @@ void CPlayer::Free()
 {
 	__super::Free();
 
+
+	for (auto& iter : m_Parts)
+		Safe_Release(iter);
+
+	m_Parts.clear();
+
+
 	Safe_Release(m_pAABBCom);
 	Safe_Release(m_pOBBCom);
 	Safe_Release(m_pSPHERECom);
@@ -730,8 +775,11 @@ void CPlayer::Free()
 	{
 		Safe_Release(m_pNavigationCom[i]);
 	}
+
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pModelCom);
+
+	
 }

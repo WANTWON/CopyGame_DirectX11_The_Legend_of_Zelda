@@ -212,4 +212,6 @@ CGameObject * CFootSwitch::Clone(void * pArg)
 void CFootSwitch::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pModelCom);
 }

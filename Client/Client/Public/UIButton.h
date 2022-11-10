@@ -6,9 +6,9 @@ BEGIN(Client)
 class CUIButton final : public CObj_UI
 {
 public:
-	enum BUTTON_TYPE { BTN_FIX, BTN_INVEN };
+	enum BUTTON_TYPE { BTN_FIX, BTN_INVEN, BTN_OPEN };
 	enum BUTTON_COLOR { BTN_BLACK, BTN_GREEN, BTN_WHITE };
-	enum BUTTON_KEY { BTN_X, BTN_Y };
+	enum BUTTON_KEY { BTN_X, BTN_Y, BTN_A };
 
 	typedef struct InvenTiletag
 	{
@@ -31,6 +31,7 @@ public:
 	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
+	void Set_Visible(_bool type) { m_bShow = type; }
 
 private:
 	virtual HRESULT Ready_Components(void * pArg = nullptr) override;
@@ -38,7 +39,8 @@ private:
 	
 private:
 	BUTTONDESC  m_ButtonDesc;
-
+	_bool		m_bShow = true;
+	_float		m_fAlpha = 0.0f;
 public:
 	static CUIButton* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

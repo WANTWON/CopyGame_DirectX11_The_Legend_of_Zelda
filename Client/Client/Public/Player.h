@@ -19,7 +19,7 @@ public:
 		IDLE, RUN, WALK, D_FALL, D_JUMP, D_LAND, JUMP, LAND, S_SLASH, SLASH, SLASH_HOLD_B, SLASH_HOLD_ED, SLASH_HOLD_F,
 		SLASH_HOLD_L, SLASH_HOLD_LP, SLASH_HOLD_R, SLASH_HOLD_ST, SHIELD_ED, SHIELD_LP, SHIELD_ST, SHIELD_HIT,
 		BOW_ED, BOW_ST, DASH_ED, DASH_LP, DASH_ST, DMG_B, DMG_F, DMG_PRESS, DMG_QUAKE, ITEM_GET_ED, ITEM_GET_LP, ITEM_GET_ST,
-		KEY_OPEN
+		KEY_OPEN, FALL_ANTLION, FALL_FROMTOP, FALL_HOLE
 	};
 
 	enum MESH_NAME {
@@ -53,7 +53,7 @@ private:
 	void Key_Input(_float fTimeDelta);
 	void Change_Direction(_float fTimeDelta);
 	void Change_Animation(_float fTimeDelta);
-	void Check_Navigation();
+	void Check_Navigation(_float fTimeDelta);
 	void Render_Model(MESH_NAME eMeshName);
 
 private:

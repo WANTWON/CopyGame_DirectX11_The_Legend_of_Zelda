@@ -2,6 +2,7 @@
 #include "..\Public\TreasureBox.h"
 #include "GameInstance.h"
 #include "Player.h"
+#include "UIButton.h"
 
 CTreasureBox::CTreasureBox(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -55,18 +56,25 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-
+	CUIButton* pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
 	if (m_pOBBCom->Collision(pTarget->Get_Collider()))
 	{
+		pButton->Set_Visible(true);
+		_float2 fPosition = pTarget->Get_ProjPosition();
+		fPosition.x += 50.f;
+		fPosition.y += 20.f;
+		pButton->Set_Position(fPosition);
 		if (pGameInstance->Key_Down(DIK_A))
 		{
+			pButton->Set_Visible(false);
 			if(m_eState == CLOSE_WAIT)
 				m_eState = OPEN;
 			else if(m_eState == OPEN_WAIT)
 				m_eState = CLOSE;
 		}
 	}
-
+	else
+		pButton->Set_Visible(false);
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -95,7 +103,7 @@ HRESULT CTreasureBox::Render()
 #ifdef _DEBUG
 	//m_pAABBCom->Render();
 	m_pOBBCom->Render();
-	/*m_pSPHERECom->Render();*/
+	//m_pSPHERECom->Render();
 #endif
 
 	return S_OK;
@@ -174,7 +182,6 @@ HRESULT CTreasureBox::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
-
 	return S_OK;
 }
 
@@ -228,4 +235,5 @@ CGameObject * CTreasureBox::Clone(void * pArg)
 void CTreasureBox::Free()
 {
 	__super::Free();
+	Safe_Release(m_pModelCom);
 }

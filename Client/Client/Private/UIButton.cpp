@@ -23,10 +23,19 @@ HRESULT CUIButton::Initialize(void * pArg)
 	if (pArg != nullptr)
 		memcpy(&m_ButtonDesc, pArg, sizeof(BUTTONDESC));
 
-	
-	m_fSize.x = 30;
-	m_fSize.y = 30;
-		
+	if (m_ButtonDesc.eState == BTN_A)
+	{
+		m_fSize.x = 96;
+		m_fSize.y = 48;
+		m_eShaderID = UI_ALPHASET;
+		m_bShow = false;
+	}
+	else
+	{
+		m_fSize.x = 30;
+		m_fSize.y = 30;
+		m_eShaderID = UI_ALPHABLEND;
+	}
 
 	m_fPosition.x = m_ButtonDesc.vPosition.x;
 	m_fPosition.y = m_ButtonDesc.vPosition.y;
@@ -34,7 +43,8 @@ HRESULT CUIButton::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_eShaderID = UI_ALPHABLEND;
+	if (m_ButtonDesc.eState == BTN_A)
+		CUI_Manager::Get_Instance()->Add_Button(this);
 
 	return S_OK;
 }
@@ -42,16 +52,6 @@ HRESULT CUIButton::Initialize(void * pArg)
 int CUIButton::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-
-	return OBJ_NOEVENT;
-}
-
-void CUIButton::Late_Tick(_float fTimeDelta)
-{
-	//__super::Late_Tick(fTimeDelta);
-
-	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 
 	if (m_ButtonDesc.eButtonType == BTN_INVEN)
 	{
@@ -67,10 +67,38 @@ void CUIButton::Late_Tick(_float fTimeDelta)
 
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fPosition.x - g_iWinSizeX * 0.5f, -m_fPosition.y + g_iWinSizeY * 0.5f, 0.f, 1.f));
 	}
+
+
+	return OBJ_NOEVENT;
+}
+
+void CUIButton::Late_Tick(_float fTimeDelta)
+{
+	//__super::Late_Tick(fTimeDelta);
+
+	if (nullptr != m_pRendererCom)
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+
+	if (m_bShow)
+	{
+		m_fAlpha += 0.1f;
+		if (m_fAlpha >= 1.f)
+			m_fAlpha = 1.f;
+	}
+	else
+	{
+		m_fAlpha -= 0.1f;
+		if (m_fAlpha <= 0.f)
+			m_fAlpha = 0.f;
+	}
+
 }
 
 HRESULT CUIButton::Render()
 {
+	if (!m_bShow && m_fAlpha <= 0)
+		return E_FAIL;
+
 	if (!CUI_Manager::Get_Instance()->Get_UI_Open() && m_ButtonDesc.eButtonType == BTN_INVEN)
 		return E_FAIL;
 
@@ -96,6 +124,9 @@ HRESULT CUIButton::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_UI"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
+	
+
+
 	switch (m_ButtonDesc.eState)
 	{
 	case BTN_X:
@@ -106,6 +137,11 @@ HRESULT CUIButton::Ready_Components(void * pArg)
 	case BTN_Y:
 		/* For.Com_Texture */
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_ButtonY"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case BTN_A:
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Open"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
 	}
@@ -137,6 +173,11 @@ HRESULT CUIButton::SetUp_ShaderResources()
 			m_ButtonDesc.eColor = BTN_BLACK;
 	}
 
+	if (m_ButtonDesc.eButtonType == BTN_OPEN)
+	{
+		if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+			return E_FAIL;
+	}
 
 	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_ButtonDesc.eColor))))
 		return E_FAIL;

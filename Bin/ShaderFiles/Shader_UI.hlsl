@@ -3,7 +3,7 @@
 
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D		g_DiffuseTexture;
-
+float			g_fAlpha = 1.f;
 
 
 struct VS_IN
@@ -61,14 +61,22 @@ struct PS_OUT
 /* 이렇게 만들어진 픽셀을 PS_MAIN함수의 인자로 던진다. */
 /* 리턴하는 색은 Target0 == 장치에 0번째에 바인딩되어있는 렌더타겟(일반적으로 백버퍼)에 그린다. */
 /* 그래서 백버퍼에 색이 그려진다. */
+
 PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
 	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 
-	if (Out.vColor.a < 0.1f)
-		discard;
+	return Out;
+}
+
+PS_OUT PS_ALPHA(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vColor.a *= g_fAlpha;
 
 	return Out;
 }
@@ -80,9 +88,6 @@ PS_OUT PS_PICKED(PS_IN In)
 	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vColor.rgb += 0.1f;
 	Out.vColor.rg += 0.1f;
-
-	if (Out.vColor.a < 0.1f)
-		discard;
 
 	return Out;
 }
@@ -125,4 +130,17 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_PICKED();
 	}
 
+	pass Alpha_Set
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_ALPHA();
+	}
+
 }
+
+

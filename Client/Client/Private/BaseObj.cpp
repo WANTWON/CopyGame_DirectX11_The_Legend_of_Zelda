@@ -2,6 +2,7 @@
 #include "..\Public\BaseObj.h"
 #include "GameInstance.h"
 #include "VIBuffer_Navigation.h"
+#include "PipeLine.h"
 
 CBaseObj::CBaseObj(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CGameObject(pDevice, pContext)
@@ -75,6 +76,25 @@ _vector CBaseObj::Get_TransformState(CTransform::STATE eState)
 	return m_pTransformCom->Get_State(eState);
 }
 
+_float2 CBaseObj::Get_ProjPosition()
+{
+	_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	_matrix ViewMatrix =  pGameInstance->Get_TransformMatrix(CPipeLine::D3DTS_VIEW);
+	_matrix ProjMatrix = pGameInstance->Get_TransformMatrix(CPipeLine::D3DTS_PROJ);
+
+	vPosition = XMVector3TransformCoord(vPosition, ViewMatrix);
+	vPosition = XMVector3TransformCoord(vPosition, ProjMatrix);
+
+	_float ScreenX = XMVectorGetX(vPosition)* (g_iWinSizeX / 2) + (g_iWinSizeX / 2);
+	_float ScreenY = XMVectorGetY(vPosition) * (g_iWinSizeY / 2) + (g_iWinSizeY / 2);
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return _float2( ScreenX, ScreenY);
+}
+
 void CBaseObj::Set_State(CTransform::STATE eState, _fvector vState)
 {
 	if (m_pTransformCom == nullptr)
@@ -108,4 +128,12 @@ CCollider * CBaseObj::Get_Collider()
 void CBaseObj::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pAABBCom);
+	Safe_Release(m_pOBBCom);
+	Safe_Release(m_pSPHERECom);
+
+	Safe_Release(m_pTransformCom);
+	Safe_Release(m_pRendererCom);
+	Safe_Release(m_pShaderCom);
 }

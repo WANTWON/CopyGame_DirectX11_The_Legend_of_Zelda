@@ -38,9 +38,6 @@ private:
 private:
 	_bool m_bDoorOpen = true;
 	vector<_bool>					m_vecIsSolved = { false };
-	vector<CCollider*>				m_pAABBCom = { nullptr };
-	vector<CCollider*>				m_pOBBCom = { nullptr };
-	vector<CCollider*>				m_pSPHERECom = { nullptr };
 
 public:
 	static CLevel_TailCave* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
