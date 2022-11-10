@@ -28,7 +28,7 @@ public:
 
 public:
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser);
-	void Check_Navigation();
+	virtual void Check_Navigation();
 
 protected:
 	virtual HRESULT Ready_Components(void* pArg = nullptr) = 0;

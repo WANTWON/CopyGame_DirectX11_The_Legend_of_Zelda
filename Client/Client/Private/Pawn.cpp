@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Pawn.h"
 #include "Player.h"
-
+#include "Cell.h"
 
 CPawn::CPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -21,7 +21,7 @@ HRESULT CPawn::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_tInfo.iMaxHp = 3;
+	m_tInfo.iMaxHp = 10;
 	m_tInfo.iDamage = 4;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
@@ -44,6 +44,8 @@ int CPawn::Tick(_float fTimeDelta)
 
 
 	AI_Behaviour(fTimeDelta);
+	Check_Navigation();
+
 	m_pModelCom->Set_NextAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
 
@@ -55,6 +57,7 @@ void CPawn::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
+	
 }
 
 HRESULT CPawn::Render()
@@ -69,6 +72,12 @@ HRESULT CPawn::Render()
 #endif
 
 	return S_OK;
+}
+
+void CPawn::Check_Navigation()
+{
+	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
+		m_eState = DEADFALL;
 }
 
 void CPawn::Change_Animation(_float fTimeDelta)
@@ -90,8 +99,8 @@ void CPawn::Change_Animation(_float fTimeDelta)
 	{
 		m_fAnimSpeed = 2.f;
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
-		m_pTransformCom->Go_Backward(fTimeDelta);
-		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
+		m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
+		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -0.1f, 0.f, 0.f), m_pNavigationCom);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
@@ -103,7 +112,7 @@ void CPawn::Change_Animation(_float fTimeDelta)
 	{
 		m_fAnimSpeed = 3.f;
 		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
-		m_pTransformCom->Go_PosDir(fTimeDelta, vDir);
+		m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_eState = STUN;
@@ -153,6 +162,14 @@ HRESULT CPawn::Ready_Components(void * pArg)
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		return E_FAIL;
+
+	/* For.Com_Navigation */
+	CNavigation::NAVIDESC			NaviDesc;
+	ZeroMemory(&NaviDesc, sizeof NaviDesc);
+	NaviDesc.iCurrentCellIndex = 34;
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_TailCave"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -235,7 +252,7 @@ void CPawn::Follow_Target(_float fTimeDelta)
 	_vector vTargetPos = (m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
 
 	m_pTransformCom->LookAt(vTargetPos);
-	m_pTransformCom->Go_Straight(fTimeDelta);
+	m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
 
 	m_bIsAttacking = false;
 }

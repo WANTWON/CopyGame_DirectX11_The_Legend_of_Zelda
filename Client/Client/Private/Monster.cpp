@@ -147,6 +147,12 @@ _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageC
 	return m_tInfo.iCurrentHp;
 }
 
+void CMonster::Check_Navigation()
+{
+	if (m_pNavigationCom == nullptr)
+		return;
+}
+
 
 void CMonster::Free()
 {
@@ -155,6 +161,7 @@ void CMonster::Free()
 
 	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
 
+	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pShaderCom);

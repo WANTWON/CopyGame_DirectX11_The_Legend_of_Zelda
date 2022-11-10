@@ -26,11 +26,12 @@ public:
 
 
 public:
-	HRESULT Initialize(const _float3* pPoints, _int iIndex);
-	_bool Compare_Points(const _float3* pSourPoint, const _float3* pDestPoint);
-	_bool isIn(_fvector vPosition, _int* pNeighborIndex);
-	void Set_CellType(CELLTYPE eType) { m_eCellType = eType; }
-	CELLTYPE Get_CellType() { return m_eCellType; }
+	HRESULT		Initialize(const _float3* pPoints, _int iIndex);
+	_bool		Compare_Points(const _float3* pSourPoint, const _float3* pDestPoint);
+	_bool		isIn(_fvector vPosition, _int* pNeighborIndex);
+	void		Set_CellType(CELLTYPE eType) { m_eCellType = eType; }
+	CELLTYPE	Get_CellType() { return m_eCellType; }
+
 
 
 #ifdef _DEBUG

@@ -95,6 +95,9 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 	m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 0.f);
 	m_fStartHeight = m_fWalkingHeight;
 	m_fEndHeight = m_fWalkingHeight;
+
+
+
 }
 
 HRESULT CPlayer::Render()
@@ -694,6 +697,10 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	m_eAnimSpeed = 1.f;
 }
 
+void CPlayer::Check_Navigation()
+{
+}
+
 CPlayer * CPlayer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CPlayer*	pInstance = new CPlayer(pDevice, pContext);
@@ -729,6 +736,10 @@ void CPlayer::Free()
 	Safe_Release(m_pOBBCom);
 	Safe_Release(m_pSPHERECom);
 
+	for (int i = 0; i < LEVEL_END; ++i)
+	{
+		Safe_Release(m_pNavigationCom[i]);
+	}
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);

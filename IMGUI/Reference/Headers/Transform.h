@@ -51,12 +51,12 @@ public:
 
 public:
 	void Go_Straight(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
-	void Go_Backward(_float fTimeDelta);
+	void Go_Backward(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);	
 	void Jump(_float fTimeDelta, _float fVelocity, _float fGravity, _float fStartiHeight, _float fEndiHeight);
 	void Go_PosTarget(_float fTimeDelta, _vector TargetPos, _vector distance = XMVectorSet(0.f,0.f,0.f,0.f));
-	void Go_PosDir(_float fTimeDelta, _vector vecDir);
+	void Go_PosDir(_float fTimeDelta, _vector vecDir, class CNavigation* pNavigation = nullptr);
 
 
 public:

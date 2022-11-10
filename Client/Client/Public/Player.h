@@ -53,6 +53,7 @@ private:
 	void Key_Input(_float fTimeDelta);
 	void Change_Direction(_float fTimeDelta);
 	void Change_Animation(_float fTimeDelta);
+	void Check_Navigation();
 	void Render_Model(MESH_NAME eMeshName);
 
 private:
