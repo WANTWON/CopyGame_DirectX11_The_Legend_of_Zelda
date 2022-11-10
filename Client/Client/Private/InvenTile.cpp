@@ -112,6 +112,7 @@ HRESULT CInvenTile::Render()
 	if (!CUI_Manager::Get_Instance()->Get_UI_Open() && m_InvenDesc.eTileType != EQUIP_TILE)
 		return E_FAIL;
 		
+
 	__super::Render();
 
 	return S_OK;

@@ -341,7 +341,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	{
 		CInvenItem::ITEMDESC ItemDesc;
 		ItemDesc.eItemType = CInvenItem::ITEM_QUEST;
-		ItemDesc.m_iTextureNum = (CInvenItem::QUEST_TEXLIST)(0);
+		ItemDesc.m_iTextureNum = (CInvenItem::PRIZE_TEXLIST)(0);
 		ItemDesc.vPosition = _float2(645.f, 245.f + 70 * i);
 
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_EquipItem"), &ItemDesc)))

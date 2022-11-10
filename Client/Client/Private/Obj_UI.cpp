@@ -50,6 +50,9 @@ void CObj_UI::Late_Tick(_float fTimeDelta)
 HRESULT CObj_UI::Render()
 {
 
+	if (CGameInstance::Get_Instance()->Get_CurrentLevelIndex() == LEVEL_LOADING)
+		return E_FAIL;
+
 	if (nullptr == m_pShaderCom ||
 		nullptr == m_pVIBufferCom)
 		return E_FAIL;

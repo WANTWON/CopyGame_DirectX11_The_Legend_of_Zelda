@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "Player.h"
 #include "UIButton.h"
+#include "InvenItem.h"
 
 CTreasureBox::CTreasureBox(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -16,6 +17,8 @@ HRESULT CTreasureBox::Initialize_Prototype()
 
 HRESULT CTreasureBox::Initialize(void * pArg)
 {
+	if (pArg != nullptr)
+		memcpy(&m_eTreasureBoxDesc, pArg, sizeof(BOXTAG));
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -24,9 +27,9 @@ HRESULT CTreasureBox::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_eObjectID = OBJID::OBJ_BLOCK;
-	//Set_Scale(_float3(0.5, 0.5, 0.5));
+	Set_Scale(_float3(1.2, 1.2, 1.2));
 
-	_vector vecPostion = XMLoadFloat3((_float3*)pArg);
+	_vector vecPostion = XMLoadFloat3(&m_eTreasureBoxDesc.vPosition);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 
@@ -54,9 +57,12 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	SetUp_ShaderID();
 
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-	CUIButton* pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
+	CGameInstance*  pGameInstance = GET_INSTANCE(CGameInstance);
+	CBaseObj*		pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
+	LEVEL			iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
+
+
 	if (m_pOBBCom->Collision(pTarget->Get_Collider()))
 	{
 		pButton->Set_Visible(true);
@@ -75,6 +81,18 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 	}
 	else
 		pButton->Set_Visible(false);
+
+
+	if (m_bGet)
+	{
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
+		{
+			CUI_Manager::Get_Instance()->Close_Message();
+			pGameInstance->Clear_Layer(iLevel, TEXT("PrizeItem"));
+		}	
+	}
+
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -133,10 +151,8 @@ void CTreasureBox::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
 			m_eState = OPEN_WAIT;
-			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-			CPlayer* pPlayer = dynamic_cast<CPlayer*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-			pPlayer->Set_AnimState(CPlayer::ITEM_GET_ST);
-			RELEASE_INSTANCE(CGameInstance);
+			m_bGet = true;
+			OpenBox();
 		}
 			
 		break;
@@ -176,7 +192,7 @@ HRESULT CTreasureBox::Ready_Components(void * pArg)
 
 
 	/* For.Com_OBB*/
-	ColliderDesc.vScale = _float3(2.f, 2.f, 2.f);
+	ColliderDesc.vScale = _float3(1.8f, 1.8f, 1.8f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.0f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
@@ -204,6 +220,47 @@ HRESULT CTreasureBox::SetUp_ShaderResources()
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
+}
+
+void CTreasureBox::OpenBox()
+{
+	
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	pPlayer->Set_AnimState(CPlayer::ITEM_GET_ST);
+	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
+
+	CInvenItem::ITEMDESC ItemDesc;
+	ItemDesc.eItemType = CInvenItem::ITEM_PRIZE;
+	ItemDesc.m_iTextureNum = CInvenItem::COMPASS;
+	ItemDesc.vPosition = pPlayer->Get_ProjPosition();
+	ItemDesc.vPosition.y -= 100.f;
+
+	switch (m_eTreasureBoxDesc.eItemType)
+	{
+	case COMPASS:
+		ItemDesc.m_iTextureNum = CInvenItem::COMPASS;
+		CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::COMPOSS);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
+		break;
+	case MAP:
+		ItemDesc.m_iTextureNum = CInvenItem::DGN_MAP;
+		CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::DGN_MAP);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
+		break;
+	case DGN_KEY:
+		ItemDesc.m_iTextureNum = CInvenItem::DGN_KEY;
+		CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::DGN_KEY);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
+		break;
+	default:
+		break;
+	}
+	
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
 }
 
 CTreasureBox * CTreasureBox::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

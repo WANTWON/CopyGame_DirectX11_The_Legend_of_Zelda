@@ -2,6 +2,7 @@
 #include "..\Public\FootSwitch.h"
 #include "GameInstance.h"
 #include "Player.h"
+#include "TreasureBox.h"
 
 CFootSwitch::CFootSwitch(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -109,7 +110,10 @@ void CFootSwitch::Change_Animation(_float fTimeDelta)
 		{
 			if (!m_bMadeBox)
 			{
-				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_TAILCAVE, TEXT("Layer_Object"), &_float3(49.5f, 0.1f, 24.7f));
+				CTreasureBox::TreasureBoxTag Boxtag;
+				Boxtag.eItemType = CTreasureBox::MAP;
+				Boxtag.vPosition = _float3(58.71f, 0.1f, 23.52f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_TAILCAVE, TEXT("Layer_Object"), &Boxtag);
 				m_bMadeBox = true;
 			}
 		

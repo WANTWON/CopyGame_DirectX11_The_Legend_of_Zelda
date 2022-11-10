@@ -100,7 +100,7 @@ void CDgnKey::Late_Tick(_float fTimeDelta)
 	if (m_pSPHERECom->Collision(pTarget->Get_Collider()))
 	{
 		m_bGet = true;
-		CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::DGNKEY);
+		CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::DGN_KEY);
 		dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
 	}
 

@@ -36,6 +36,7 @@ HRESULT CInvenItem::Initialize(void * pArg)
 
 	switch (m_ItemDesc.eItemType)
 	{
+	case ITEM_PRIZE:
 	case ITEM_EQUIP:
 	case ITEM_QUEST:
 		m_fSize = _float2(70, 70);
@@ -68,7 +69,7 @@ void CInvenItem::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 
-	if (m_ItemDesc.eItemType != ITEM_USABLE)
+	if (m_ItemDesc.eItemType != ITEM_USABLE && m_ItemDesc.eItemType != ITEM_PRIZE)
 		m_bShow = CUI_Manager::Get_Instance()->Get_UI_Open();
 }
 
@@ -121,6 +122,11 @@ HRESULT CInvenItem::Ready_Components(void * pArg)
 	case ITEM_QUEST:
 		/* For.Com_Texture */
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_QuestItem"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case ITEM_PRIZE:
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_PrizeItem"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
 	}

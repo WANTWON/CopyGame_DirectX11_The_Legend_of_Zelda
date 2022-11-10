@@ -9,7 +9,7 @@ class CUI_Manager final : public CBase
 {
 	DECLARE_SINGLETON(CUI_Manager)
 public:
-	enum MESSAGETYPE { DGNKEY, COMPOSS,  MSG_END };
+	enum MESSAGETYPE { DGN_KEY, COMPOSS, DGN_MAP, MSG_END };
 	enum UITYPE { UI_INVEN, UI_MAP, UI_OPTION, UI_END};
 	enum EQUIP_BT { EQUIP_X, EQUIP_Y, EQUIP_END };
 
@@ -45,7 +45,7 @@ public:
 private:
 	_bool m_bUIOpen = false;
 	_bool m_bOpenMessage = false;
-	MESSAGETYPE m_eMessageType = DGNKEY;
+	MESSAGETYPE m_eMessageType = DGN_KEY;
 	
 	/*For Inventory*/
 	_int m_iPickedIndex = 0;

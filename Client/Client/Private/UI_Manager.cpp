@@ -178,7 +178,7 @@ void CUI_Manager::Get_Key()
 
 	CPlayerState::STATEDESC StateDesc;
 	StateDesc.m_eType = CPlayerState::KEY;
-	StateDesc.fPosition = _float2(30.f + (m_KeyList.size() % 8) * 30.f, 70.f);
+	StateDesc.fPosition = _float2(30.f + (m_KeyList.size() % 8) * 30.f, 90.f);
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerState"), LEVEL_STATIC, TEXT("Layer_State"), &StateDesc)))
 		return;

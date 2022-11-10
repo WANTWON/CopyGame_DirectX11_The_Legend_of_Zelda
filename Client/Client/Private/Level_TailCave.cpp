@@ -2,17 +2,20 @@
 #include "..\Public\Level_TailCave.h"
 
 #include "GameInstance.h"
-#include "Camera_Dynamic.h"
+#include "Level_Loading.h"
+#include "CameraManager.h"
+
 #include "UI_Manager.h"
-#include "InvenTile.h"
 #include "UIButton.h"
+#include "InvenTile.h"
 #include "InvenItem.h"
+
 #include "BackGround.h"
 #include "NonAnim.h"
 #include "Player.h"
-#include "Level_Loading.h"
-#include "CameraManager.h"
+
 #include "DgnKey.h"
+#include "TreasureBox.h"
 
 CLevel_TailCave::CLevel_TailCave(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -249,7 +252,10 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_TAILCAVE, pLayerTag, &_float3(12.5, 0.1f, 10.1f))))
+	CTreasureBox::TreasureBoxTag Boxtag;
+	Boxtag.eItemType = CTreasureBox::COMPASS;
+	Boxtag.vPosition = _float3(15.09, 0.1f, 6.66f);
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_TAILCAVE, pLayerTag, &Boxtag)))
 		return E_FAIL;
 
 	HANDLE hFile = 0;

@@ -502,7 +502,7 @@ HRESULT CLoader::Loading_For_UITexture()
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_GetMessage"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/MesGetFrame_%02d.dds"), 2))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/MesGetFrame_%02d.dds"), 3))))
 		return E_FAIL;
 
 
@@ -555,9 +555,12 @@ HRESULT CLoader::Loading_For_UITexture()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Item/CollectItem_%d.png"), 9))))
 		return E_FAIL;
 
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_QuestItem"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Item/QuestItem_%d.png"), 2))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Item/QuestItem_%d.png"), 3))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_PrizeItem"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Item/DgnItem_%d.png"), 3))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Hp"),
