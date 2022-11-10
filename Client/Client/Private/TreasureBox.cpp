@@ -63,7 +63,7 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 	LEVEL			iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
 
 
-	if (m_pOBBCom->Collision(pTarget->Get_Collider()))
+	if (!m_bGet && m_pOBBCom->Collision(pTarget->Get_Collider()))
 	{
 		pButton->Set_Visible(true);
 		_float2 fPosition = pTarget->Get_ProjPosition();

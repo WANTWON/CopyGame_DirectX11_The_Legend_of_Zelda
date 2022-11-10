@@ -124,6 +124,9 @@
     <Filter Include="02.GameObjects\05.Object\02.PrizeItem">
       <UniqueIdentifier>{8256b22e-39db-45e8-8030-335a6f571752}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\03.Monster\04.Zol">
+      <UniqueIdentifier>{a8622992-5935-4f83-809f-1d164b6b78bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -249,6 +252,7 @@
     <ClInclude Include="..\Public\PrizeItem.h">
       <Filter>02.GameObjects\05.Object\02.PrizeItem</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Zol.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -359,6 +363,7 @@
     <ClCompile Include="..\Private\PrizeItem.cpp">
       <Filter>02.GameObjects\05.Object\02.PrizeItem</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Zol.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
