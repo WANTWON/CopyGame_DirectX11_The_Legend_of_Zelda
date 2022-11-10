@@ -94,6 +94,26 @@ _float CNavigation::Compute_Height(_vector vPosition, _float foffset)
 	return fHeight;
 }
 
+void CNavigation::Compute_CurrentIndex(_vector vPosition)
+{
+	int	iIndexNum = 0;
+	_float fMinDistance = 9999;
+	_float fDistance;
+
+	for (int i =0; i< m_Cells.size(); ++i)
+	{
+		fDistance =  XMVectorGetX(XMVector3Length(vPosition - m_Cells[i]->Get_Center()));
+
+		if (fMinDistance > fDistance)
+		{
+			fMinDistance = fDistance;
+			iIndexNum = i;
+		}	
+	}
+
+	m_NaviDesc.iCurrentCellIndex = iIndexNum;
+}
+
 _bool CNavigation::isMove(_fvector vPosition)
 {
 	_int		iNeighborIndex = -1;

@@ -19,7 +19,7 @@ public:
 	virtual HRESULT Initialize_Prototype(const _tchar* pNavigationData);
 	virtual HRESULT Initialize(void* pArg);
 	_float Compute_Height(_vector vPosition, _float foffset);
-	//void Set_CellIndex
+	void Compute_CurrentIndex(_vector vPosition);
 
 public:
 	_bool isMove(_fvector vPosition);

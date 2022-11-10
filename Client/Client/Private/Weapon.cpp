@@ -49,15 +49,14 @@ int CWeapon::Tick(_float fTimeDelta)
 
 
 	XMStoreFloat4x4(&m_CombinedWorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix);
-
 	m_pOBBCom->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
+
 	return S_OK;
 }
 
 void CWeapon::Late_Tick(_float fTimeDelta)
 {
 
-	
 }
 
 HRESULT CWeapon::Render()

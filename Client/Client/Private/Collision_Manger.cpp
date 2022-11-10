@@ -63,7 +63,7 @@ _bool CCollision_Manager::CollisionwithGroup(COLLSIONGROUP SourGroup, COLLSIONGR
 		for (auto& Dest : m_GameObjects[DestGroup])
 		{
 			CCollider* pDestCollider = Dest->Get_Collider();
-			if (Dest == nullptr)
+			if (pDestCollider == nullptr)
 				continue;
 
 			if (pDestCollider->Collision(pSourCollider))

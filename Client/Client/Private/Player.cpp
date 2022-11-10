@@ -26,10 +26,6 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Parts()))
-		return E_FAIL;
-
-	
 	m_fWalkingHeight = m_pNavigationCom[CLevel_Manager::Get_Instance()->Get_DestinationLevelIndex()]->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), (Get_Scale().y * 0.5f));
 	m_fStartHeight = m_fWalkingHeight;
 	m_fEndHeight = m_fWalkingHeight;
@@ -40,6 +36,9 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_tInfo.iMaxHp = 50;
 	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
+
+	if (FAILED(Ready_Parts()))
+		return E_FAIL;
 
 	m_pModelCom->Set_CurrentAnimIndex(m_eState);
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PLAYER, this);
@@ -271,15 +270,6 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			case Client::CPlayer::MESH_SWORD2:
 			{
 				m_eState = SLASH;
-				CPlayerBullet::BULLETDESC BulletDesc;
-				BulletDesc.eBulletType = CPlayerBullet::SWORD;
-				BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
-				BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
-				BulletDesc.vInitPositon += BulletDesc.vLook;
-				BulletDesc.fDeadTime = 0.5f;
-				if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_Bullet"), &BulletDesc)))
-					break;
-
 				break;
 			}
 			case Client::CPlayer::MESH_WAND:

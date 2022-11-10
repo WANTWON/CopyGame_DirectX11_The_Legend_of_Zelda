@@ -30,7 +30,11 @@ HRESULT CPawn::Initialize(void * pArg)
 
 	_vector vecPostion = XMLoadFloat3((_float3*)pArg);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
+
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
+	
+	m_pNavigationCom->Compute_CurrentIndex(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
 
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
 
@@ -78,6 +82,18 @@ void CPawn::Check_Navigation()
 {
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
 		m_eState = DEADFALL;
+	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
+	{
+		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float fHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
+		if (fHeight > XMVectorGetY(vPosition))
+		{
+			vPosition = XMVectorSetY(vPosition, fHeight);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+		}
+			
+	}
+		
 }
 
 void CPawn::Change_Animation(_float fTimeDelta)
@@ -97,10 +113,10 @@ void CPawn::Change_Animation(_float fTimeDelta)
 	case Client::CPawn::DEAD:
 	case Client::CPawn::DEADFALL:
 	{
-		m_fAnimSpeed = 2.f;
+		m_fAnimSpeed = 1.f;
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
-		m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
-		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -0.1f, 0.f, 0.f), m_pNavigationCom);
+		m_pTransformCom->Go_Backward(fTimeDelta*2, m_pNavigationCom);
+		m_pTransformCom->Go_PosDir(fTimeDelta*2, XMVectorSet(0.f, -0.1f, 0.f, 0.f), m_pNavigationCom);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
@@ -112,7 +128,7 @@ void CPawn::Change_Animation(_float fTimeDelta)
 	{
 		m_fAnimSpeed = 3.f;
 		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
-		m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom);
+		m_pTransformCom->Go_PosDir(fTimeDelta*2, vDir, m_pNavigationCom);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_eState = STUN;
@@ -166,7 +182,7 @@ HRESULT CPawn::Ready_Components(void * pArg)
 	/* For.Com_Navigation */
 	CNavigation::NAVIDESC			NaviDesc;
 	ZeroMemory(&NaviDesc, sizeof NaviDesc);
-	NaviDesc.iCurrentCellIndex = 34;
+	NaviDesc.iCurrentCellIndex = 0;
 	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_TailCave"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
 		return E_FAIL;
 

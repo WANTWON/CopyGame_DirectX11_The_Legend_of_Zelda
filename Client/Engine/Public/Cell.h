@@ -30,7 +30,8 @@ public:
 	_bool		Compare_Points(const _float3* pSourPoint, const _float3* pDestPoint);
 	_bool		isIn(_fvector vPosition, _int* pNeighborIndex);
 	void		Set_CellType(CELLTYPE eType) { m_eCellType = eType; }
-	CELLTYPE	Get_CellType() { return m_eCellType; }
+	CELLTYPE	Get_CellType() { return m_eCellType;}
+	_vector		Get_Center();
 
 
 
