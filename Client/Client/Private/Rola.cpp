@@ -34,6 +34,10 @@ HRESULT CRola::Initialize(void * pArg)
 	_vector vecPostion = XMLoadFloat3((_float3*)pArg);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
+
+	m_pNavigationCom->Compute_CurrentIndex(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+
 	return S_OK;
 }
 
@@ -45,6 +49,7 @@ int CRola::Tick(_float fTimeDelta)
 
 
 	AI_Behaviour(fTimeDelta);
+	Check_Navigation();
 	if (m_eState != m_ePreState)
 	{
 		m_pModelCom->Set_NextAnimIndex(m_eState);
@@ -226,6 +231,13 @@ HRESULT CRola::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
+	/* For.Com_Navigation */
+	CNavigation::NAVIDESC			NaviDesc;
+	ZeroMemory(&NaviDesc, sizeof NaviDesc);
+	NaviDesc.iCurrentCellIndex = 0;
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_TailCave"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -305,7 +317,7 @@ void CRola::Follow_Target(_float fTimeDelta)
 
 	_vector vTargetPos =m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
 	m_pTransformCom->LookAt(vTargetPos);
-	m_pTransformCom->Go_Straight(fTimeDelta*1.5f);
+	m_pTransformCom->Go_Straight(fTimeDelta*1.5f, m_pNavigationCom);
 }
 
 void CRola::AI_Behaviour(_float fTimeDelta)
@@ -322,7 +334,7 @@ void CRola::AI_Behaviour(_float fTimeDelta)
 			m_bBackStep = false;
 
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
-		m_pTransformCom->Go_Backward(fTimeDelta*3);
+		m_pTransformCom->Go_Backward(fTimeDelta*3, m_pNavigationCom);
 	}
 
 	if (m_iDmgCount % 4 == 3 && m_fDistanceToTarget < m_fPatrolRadius)
@@ -441,6 +453,22 @@ _bool CRola::Moving_AttackPosition(_float fTimeDelta)
 		}
 	}
 	return false;
+}
+
+void CRola::Check_Navigation()
+{
+		if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
+			m_eState = IDLE;
+		else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
+		{
+			_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float fHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
+			if (fHeight > XMVectorGetY(vPosition))
+			{
+				vPosition = XMVectorSetY(vPosition, fHeight);
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+			}
+		}
 }
 
 _uint CRola::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)

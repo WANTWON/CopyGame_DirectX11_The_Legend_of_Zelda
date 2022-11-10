@@ -37,6 +37,7 @@ private:
 	virtual void AI_Behaviour(_float fTimeDelta) override;
 	void Patrol(_float fTimeDelta);
 	_bool Moving_AttackPosition(_float fTimeDelta);
+	virtual void Check_Navigation();
 	
 private:
 	STATE m_eState = IDLE;
@@ -47,8 +48,8 @@ private:
 	_bool m_bBackStep = false;
 	_int  m_iDmgCount = 0;
 
-	_float4 m_fLAttackPos = _float4(85.4f, 0.f, 32.9f, 1.f);
-	_float4 m_fRAttackPos = _float4(91.5f, 0.f, 32.9f, 1.f);
+	_float4 m_fLAttackPos = _float4(102.f, 0.f, 33.75f, 1.f);
+	_float4 m_fRAttackPos = _float4(109.7f, 0.f, 33.75f, 1.f);
 	DIR		m_eAttackDir = LEFT;
 
 public:

@@ -121,9 +121,6 @@
     <Filter Include="95.UI\05. MessageBox">
       <UniqueIdentifier>{be2b1e41-6c34-430d-9f63-a569e70b4a20}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\05.Object\02.PrizeItem">
-      <UniqueIdentifier>{8256b22e-39db-45e8-8030-335a6f571752}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\03.Monster\04.Zol">
       <UniqueIdentifier>{a8622992-5935-4f83-809f-1d164b6b78bd}</UniqueIdentifier>
     </Filter>
@@ -249,10 +246,9 @@
     <ClInclude Include="..\Public\MessageBox.h">
       <Filter>95.UI\05. MessageBox</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\PrizeItem.h">
-      <Filter>02.GameObjects\05.Object\02.PrizeItem</Filter>
+    <ClInclude Include="..\Public\Zol.h">
+      <Filter>02.GameObjects\03.Monster\04.Zol</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Zol.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -360,10 +356,9 @@
     <ClCompile Include="..\Private\MessageBox.cpp">
       <Filter>95.UI\05. MessageBox</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\PrizeItem.cpp">
-      <Filter>02.GameObjects\05.Object\02.PrizeItem</Filter>
+    <ClCompile Include="..\Private\Zol.cpp">
+      <Filter>02.GameObjects\03.Monster\04.Zol</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Zol.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

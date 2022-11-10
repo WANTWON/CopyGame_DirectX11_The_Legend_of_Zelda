@@ -198,7 +198,6 @@
     <ClInclude Include="..\Public\Pawn.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerBullet.h" />
-    <ClInclude Include="..\Public\PrizeItem.h" />
     <ClInclude Include="..\Public\Rola.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TreasureBox.h" />
@@ -239,7 +238,6 @@
     <ClCompile Include="..\Private\Pawn.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerBullet.cpp" />
-    <ClCompile Include="..\Private\PrizeItem.cpp" />
     <ClCompile Include="..\Private\Rola.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TreasureBox.cpp" />
