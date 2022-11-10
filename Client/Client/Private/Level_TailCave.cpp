@@ -111,7 +111,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Player(const _tchar * pLayerTag)
 
 	CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
-	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.f, 0.1f, 3.f, 1.f));
+	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(54.f, 0.1f, 2.8f, 1.f));
 	pPlayer->Set_JumpingHeight(0.1f);
 			
 	Safe_Release(pGameInstance);
@@ -125,6 +125,11 @@ HRESULT CLevel_TailCave::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
+
+
+	LEVEL eLevel = LEVEL_TAILCAVE;
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_TAILCAVE, TEXT("Layer_Terrain"), &eLevel)))
+		return E_FAIL;
 
 	HANDLE hFile = 0;
 	_ulong dwByte = 0;
@@ -244,18 +249,46 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	CDgnKey::DGNKEYDESC DgnKeyDesc;
-	DgnKeyDesc.eType = CDgnKey::SMALL_KEY;
-	DgnKeyDesc.vPosition = _float3(25.75f, 15.3f, 10.28f);
-
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_DgnKey"), LEVEL_TAILCAVE, pLayerTag, &DgnKeyDesc)))
-		return E_FAIL;
-
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_TAILCAVE, pLayerTag, &_float3(12.5, 0.1f, 10.1f))))
 		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FootSwitch"), LEVEL_TAILCAVE, pLayerTag, &_float3(44.f, 0.1f, 22.f))))
+	HANDLE hFile = 0;
+	_ulong dwByte = 0;
+	CNonAnim::NONANIMDESC  ModelDesc;
+	_uint iNum = 0;
+
+	hFile = CreateFile(TEXT("../../../Bin/Data/TailCave_Object.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
 		return E_FAIL;
+
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+	for (_uint i = 0; i < iNum; ++i)
+	{
+		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+		_tchar pModeltag[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, MAX_PATH, pModeltag, MAX_PATH);
+		if (!wcscmp(pModeltag, TEXT("SmallKey.fbx")))
+		{
+
+			CDgnKey::DGNKEYDESC DgnKeyDesc;
+			DgnKeyDesc.eType = CDgnKey::SMALL_KEY;
+			DgnKeyDesc.vPosition = ModelDesc.vPosition;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_DgnKey"), LEVEL_TAILCAVE, pLayerTag, &DgnKeyDesc)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("FootSwitch.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FootSwitch"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
+		}
+
+	}
+
+	CloseHandle(hFile);
+
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;

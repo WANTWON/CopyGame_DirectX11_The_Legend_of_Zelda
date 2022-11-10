@@ -29,7 +29,8 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(Ready_Parts()))
 		return E_FAIL;
 
-	m_fWalkingHeight = m_pNavigationCom->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), (Get_Scale().y * 0.5f));
+	
+	m_fWalkingHeight = m_pNavigationCom[CLevel_Manager::Get_Instance()->Get_DestinationLevelIndex()]->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), (Get_Scale().y * 0.5f));
 	m_fStartHeight = m_fWalkingHeight;
 	m_fEndHeight = m_fWalkingHeight;
 
@@ -47,11 +48,17 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 int CPlayer::Tick(_float fTimeDelta)
 {
+	m_iCurrentLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_CurrentLevelIndex();
+	if (m_iCurrentLevel == LEVEL_LOADING)
+		return OBJ_NOEVENT;
+
 	if (CUI_Manager::Get_Instance()->Get_UI_Open() != true)
 	{
 		Key_Input(fTimeDelta);
 		Change_Direction(fTimeDelta);
 	}
+
+	
 
 
 	if (m_eState != m_ePreState)
@@ -71,6 +78,10 @@ int CPlayer::Tick(_float fTimeDelta)
 
 void CPlayer::Late_Tick(_float fTimeDelta)
 {
+	if (m_iCurrentLevel == LEVEL_LOADING)
+		return;
+
+
 	for (auto& pParts : m_Parts)
 		pParts->Late_Tick(fTimeDelta);
 
@@ -81,13 +92,16 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_BOW]);
 	}
 	
-	m_fWalkingHeight = m_pNavigationCom->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 0.f);
+	m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 0.f);
 	m_fStartHeight = m_fWalkingHeight;
 	m_fEndHeight = m_fWalkingHeight;
 }
 
 HRESULT CPlayer::Render()
 {
+	if (m_iCurrentLevel == LEVEL_LOADING)
+		return E_FAIL;
+
 	if (nullptr == m_pShaderCom ||
 		nullptr == m_pModelCom)
 		return E_FAIL;
@@ -119,7 +133,7 @@ HRESULT CPlayer::Render()
 #ifdef _DEBUG
 	//m_pAABBCom->Render();
 	m_pOBBCom->Render();
-	m_pNavigationCom->Render_Navigation();
+	m_pNavigationCom[m_iCurrentLevel]->Render_Navigation();
 	//m_pSPHERECom->Render();
 #endif
 
@@ -299,7 +313,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		{
 			m_eState = ANIM::D_JUMP;
 			m_fTime = 0.f;
-			m_fStartHeight = XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			m_fDoubleHeight = XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		}
 
 		if (m_eState != JUMP && m_eState != D_JUMP && m_eState != D_FALL)
@@ -323,6 +337,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 	RELEASE_INSTANCE(CGameInstance);
 }
+
 
 HRESULT CPlayer::Ready_Parts()
 {
@@ -394,7 +409,11 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 
 	NaviDesc.iCurrentCellIndex = 0;
 
-	if (FAILED(__super::Add_Components(TEXT("Com_Navigation"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Field"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Field"), (CComponent**)&m_pNavigationCom[LEVEL_GAMEPLAY], &NaviDesc)))
+		return E_FAIL;
+
+
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_TailCave"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"), (CComponent**)&m_pNavigationCom[LEVEL_TAILCAVE], &NaviDesc)))
 		return E_FAIL;
 
 
@@ -480,7 +499,7 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 		}
 			
 	
-		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
 	}
 
 }
@@ -548,7 +567,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		m_fTime += 0.1f;
-		m_pTransformCom->Jump(m_fTime, 3.f, 2.0f, m_fStartHeight, m_fEndHeight);
+		m_pTransformCom->Jump(m_fTime, 3.f, 2.0f, m_fDoubleHeight, m_fEndHeight);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = D_FALL;
 		break;

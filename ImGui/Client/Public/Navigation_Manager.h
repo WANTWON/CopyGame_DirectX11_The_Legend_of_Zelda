@@ -31,13 +31,14 @@ public:
 	_uint Get_CellsSize() { return m_Cells.size(); }
 	CCell* Get_Cell();
 	CCell* Get_Cell(_uint iIndex);
+	_float3 Get_ClickedPos() { return m_vClickedPos; }
 	void Set_CilckedCellIndex(_uint iIndex) { m_iClickedCellIndex = iIndex; }
-	void Set_CellType(CCell::CELLTYPE eType) { m_Cells[m_iClickedCellIndex]->Set_CellType(eType); }
+	void Set_CellType(CCell::CELLTYPE eType);
 	CCell::CELLTYPE Get_SellType() { return m_Cells[m_iClickedCellIndex]->Get_CellType(); }
 
 public:
 	HRESULT Add_ClickedSymbol(_float3 vClickPos, SYMBOL Symboltype);
-	HRESULT Add_Cell(_float3* vPoss, _bool bCheckOverlap = false);
+	HRESULT Add_Cell(_float3* vPoss, CCell::CELLTYPE eType, _bool bCheckOverlap = false);
 	void Click_Position(_vector vPosition);
 	void Clear_ClickedPosition();
 	void Update_ClickedPosition(_float3 position);
@@ -52,9 +53,10 @@ private:
 	_bool Check_Sell(_float3 * vPoss);
 
 private:
-	_uint		m_iClickedCellIndex = 0;
-	_float3		m_vClickedPos;
-	_float		m_fMinDistance = MAX_NUM;
+	_uint				m_iClickedCellIndex = 0;
+	_float3				m_vClickedPos;
+	_float				m_fMinDistance = MAX_NUM;
+	CCell::CELLTYPE		m_eCellType = CCell::ACCESSIBLE;
 
 private:
 	vector<class CCell*>			m_Cells;

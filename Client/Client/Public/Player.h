@@ -66,7 +66,9 @@ private:
 
 private:
 	vector<class CGameObject*>			m_Parts;
-	CNavigation*			m_pNavigationCom = nullptr;
+	CNavigation*			m_pNavigationCom[LEVEL_END] = { nullptr };
+	
+
 private:
 	OBJINFO					m_tInfo;
 
@@ -85,6 +87,7 @@ private:
 
 	_float					m_fTime = 0.f;
 	_float					m_fStartHeight = 2.2f;
+	_float					m_fDoubleHeight = 2.2f;
 	_float					m_fEndHeight = 2.2f;
 	_float					m_fPressedScale = 1.f;
 

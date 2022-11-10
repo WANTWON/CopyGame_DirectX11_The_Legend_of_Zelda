@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Component.h"
-
 BEGIN(Engine)
 
 class ENGINE_DLL CNavigation final : public CComponent
@@ -20,9 +19,11 @@ public:
 	virtual HRESULT Initialize_Prototype(const _tchar* pNavigationData);
 	virtual HRESULT Initialize(void* pArg);
 	_float Compute_Height(_vector vPosition, _float foffset);
+	//void Set_CellIndex
 
 public:
 	_bool isMove(_fvector vPosition);
+	_uint Get_CurrentCelltype();
 
 #ifdef _DEBUG
 public:

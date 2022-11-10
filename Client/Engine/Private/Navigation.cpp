@@ -30,6 +30,7 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar * pNavigationData)
 	if (0 == hFile)
 		return E_FAIL;	
 	_uint iNum = 0;
+	CCell::CELLTYPE eCelltype;
 	_float3		vPoints[3];
 
 	/* 타일의 개수 받아오기 */
@@ -38,6 +39,7 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar * pNavigationData)
 	for (_uint i = 0; i< iNum; ++i)
 	{
 		ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
+		ReadFile(hFile, &eCelltype, sizeof(CCell::CELLTYPE), &dwByte, nullptr);
 		if (0 == dwByte)
 			break;
 
@@ -45,7 +47,8 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar * pNavigationData)
 		if (nullptr == pCell)
 			return E_FAIL;
 
-		m_Cells.push_back(pCell);		
+		m_Cells.push_back(pCell);	
+		m_Cells.back()->Set_CellType(eCelltype);
 	}
 
 	CloseHandle(hFile);
@@ -132,6 +135,11 @@ _bool CNavigation::isMove(_fvector vPosition)
 	return false;
 }
 
+_uint CNavigation::Get_CurrentCelltype()
+{
+	return (_uint)m_Cells[m_NaviDesc.iCurrentCellIndex]->Get_CellType();
+}
+
 #ifdef _DEBUG
 HRESULT CNavigation::Render_Navigation()
 {
@@ -149,13 +157,27 @@ HRESULT CNavigation::Render_Navigation()
 	if (-1 == m_NaviDesc.iCurrentCellIndex)
 	{
 		m_pShader->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4));
-		m_pShader->Set_RawValue("g_vColor", &_float4(0.f, 1.f, 0.f, 1.f), sizeof(_float4));
-		m_pShader->Begin(0);
+		
 
 		for (auto& pCell : m_Cells)
 		{
 			if (nullptr != pCell)
 			{
+				switch (pCell->Get_CellType())
+				{
+				case Engine::CCell::ACCESSIBLE:
+					m_pShader->Set_RawValue("g_vColor", &_float4(1.f, 0.f, 0.f, 1.f), sizeof(_float4));
+					break;
+				case Engine::CCell::ONLYJUMP:
+					m_pShader->Set_RawValue("g_vColor", &_float4(0.f, 0.f, 1.f, 1.f), sizeof(_float4));
+					break;
+				case Engine::CCell::DROP:
+					m_pShader->Set_RawValue("g_vColor", &_float4(0.7f, 0.f, 1.f, 1.f), sizeof(_float4));
+					break;
+				default:
+					break;
+				}
+				m_pShader->Begin(0);
 				pCell->Render();
 			}
 		}
@@ -165,7 +187,7 @@ HRESULT CNavigation::Render_Navigation()
 	{
 		WorldMatrix._24 = 0.1f;
 		m_pShader->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4));
-		m_pShader->Set_RawValue("g_vColor", &_float4(1.f, 0.f, 0.f, 1.f), sizeof(_float4));
+		m_pShader->Set_RawValue("g_vColor", &_float4(1.f, 1.f, 1.f, 1.f), sizeof(_float4));
 
 		m_pShader->Begin(0);
 		m_Cells[m_NaviDesc.iCurrentCellIndex]->Render();

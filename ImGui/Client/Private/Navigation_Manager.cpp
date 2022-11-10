@@ -42,7 +42,7 @@ void CNavigation_Manager::Click_Position(_vector vPosition)
 	vClickPosition = Find_MinDistance(vPosition);
 
 	//만약 순회해서 찾은 셀의 점이 거리가 멀다면 그냥 기존에 찍은 점을 pushback하게 한다.
-	if (m_fMinDistance > 2.f)
+	if (m_fMinDistance > 0.7f)
 		XMStoreFloat3(&vClickPosition, vPosition);
 
 	m_fMinDistance = MAX_NUM;
@@ -55,6 +55,7 @@ void CNavigation_Manager::Click_Position(_vector vPosition)
 		Add_ClickedSymbol(vClickPosition, SYMBOL2);
 
 	m_vClickedPoints.push_back(vClickPosition);
+	m_vClickedPos = vClickPosition;
 
 	//찍은 점의 개수가 3개가 된다면. 삼각형이 그려지니 Cell에 추가한다.
 	if (3 == m_vClickedPoints.size())
@@ -63,7 +64,7 @@ void CNavigation_Manager::Click_Position(_vector vPosition)
 		for (_int i = 0; i < 3; ++i)
 			vPoss[i] = m_vClickedPoints[i];
 
-		Add_Cell(vPoss, true);
+		Add_Cell(vPoss, m_eCellType, true);
 		Clear_ClickedPosition();
 	}
 }
@@ -98,7 +99,6 @@ HRESULT CNavigation_Manager::Add_ClickedSymbol(_float3 vClickPos, SYMBOL Symbolt
 	WideCharToMultiByte(CP_ACP, 0, TEXT("Picking_Symbol"), MAX_PATH, cModelTag, MAX_PATH, NULL, NULL);
 	strcpy(NonAnimDesc.pModeltag, cModelTag);
 	NonAnimDesc.vPosition = vClickPos;
-	NonAnimDesc.vPosition.y += 0.5f;
 	NonAnimDesc.vScale = _float3(0.5, 0.5, 0.5);
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), LEVEL_GAMEPLAY, TEXT("Layer_PickingSymbol"), &NonAnimDesc)))
@@ -111,7 +111,7 @@ HRESULT CNavigation_Manager::Add_ClickedSymbol(_float3 vClickPos, SYMBOL Symbolt
 	return S_OK;
 }
 
-HRESULT CNavigation_Manager::Add_Cell(_float3 * vPoss, _bool bCheckOverlap)
+HRESULT CNavigation_Manager::Add_Cell(_float3 * vPoss, CCell::CELLTYPE eType, _bool bCheckOverlap)
 {
 	// 시계 방향으로 정리한다 0 1 2
 	Sort_CellByPosition(vPoss);
@@ -126,7 +126,7 @@ HRESULT CNavigation_Manager::Add_Cell(_float3 * vPoss, _bool bCheckOverlap)
 	if (nullptr == pCell)
 		return E_FAIL;
 	m_Cells.push_back(pCell);
-
+	m_Cells.back()->Set_CellType(eType);
 	return S_OK;
 }
 
@@ -430,6 +430,13 @@ CCell * CNavigation_Manager::Get_Cell(_uint iIndex)
 		return nullptr;
 
 	return m_Cells[iIndex];
+}
+
+void CNavigation_Manager::Set_CellType(CCell::CELLTYPE eType)
+{
+	if(m_Cells.size() != 0)
+		m_Cells[m_iClickedCellIndex]->Set_CellType(eType);  
+	m_eCellType = eType; 
 }
 
 void CNavigation_Manager::Free()

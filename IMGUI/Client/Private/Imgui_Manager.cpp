@@ -480,15 +480,13 @@ void CImgui_Manager::Set_Navigation()
 		{
 			for (int i = 0; i < m_pNavigation_Manager->Get_CellsSize();)
 			{
-				char label[MAX_PATH] = "";
-				char szLayertag[MAX_PATH] = "";
+				//char label[MAX_PATH] = "";
+				char szLayertag[MAX_PATH] = "Cell";
 
-				string  ModelTag = "Cell";
-				ModelTag = ModelTag + to_string(i);
-				_tchar* RealModelTag = StringToTCHAR(ModelTag);
-				WideCharToMultiByte(CP_ACP, 0, RealModelTag, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
-				strcpy(label, szLayertag);
-				delete(RealModelTag);
+				char label[MAX_PATH] = "Cell ";
+				char buffer[MAX_PATH];
+				sprintf(buffer, "%d", i);
+				strcat(label, buffer);
 				if (ImGui::Selectable(label, m_iCellIndex == i))
 				{
 					m_iCellIndex = i;
@@ -541,7 +539,7 @@ void CImgui_Manager::Set_Navigation()
 		ImGui::Text("PointB :"); ImGui::SameLine(); ImGui::InputFloat3("##PointB", fPointB);
 		ImGui::Text("PointC :"); ImGui::SameLine(); ImGui::InputFloat3("##PointC", fPointC);
 
-		ImGui::Text("ClickPointXYZ :"); ImGui::SameLine(); ImGui::DragFloat3("##ClickPointXYZ", fClickedPosition);
+		ImGui::Text("ClickPointXYZ :"); ImGui::SameLine(); ImGui::DragFloat3("##ClickPointXYZ", fClickedPosition, 0.01f);
 		m_fClickPoint = _float3(fClickedPosition[0], fClickedPosition[1], fClickedPosition[2]);
 		m_pNavigation_Manager->Update_ClickedPosition(m_fClickPoint);
 
@@ -596,10 +594,11 @@ void CImgui_Manager::Set_Navigation()
 	{
 		if (CPickingMgr::Get_Instance()->Picking())
 		{
-			_vector Position = XMLoadFloat3(&CPickingMgr::Get_Instance()->Get_PickingPos());
-			Position = XMVectorSetW(Position, 1.f);
-			m_fClickPoint = CPickingMgr::Get_Instance()->Get_PickingPos();
-			m_pNavigation_Manager->Click_Position(Position);
+			_float3 fPosition = CPickingMgr::Get_Instance()->Get_PickingPos();
+			_vector vPosition = XMLoadFloat3(&fPosition);
+			vPosition = XMVectorSetW(vPosition, 1.f);
+			m_pNavigation_Manager->Click_Position(vPosition);
+			m_fClickPoint = m_pNavigation_Manager->Get_ClickedPos();
 		}
 
 	}
@@ -632,6 +631,7 @@ void CImgui_Manager::Save_Navigation()
 		_ulong dwByte = 0;
 		_uint iNum = 0;
 		_float3	 vPoints[3];
+		CCell::CELLTYPE eCelltype;
 		m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
 
 
@@ -650,9 +650,10 @@ void CImgui_Manager::Save_Navigation()
 			vPoints[0] = pCell->Get_PointValue(CCell::POINT_A);
 			vPoints[1] = pCell->Get_PointValue(CCell::POINT_B);
 			vPoints[2] = pCell->Get_PointValue(CCell::POINT_C);
+			eCelltype = pCell->Get_CellType();
 
 			WriteFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
-
+			WriteFile(hFile, &eCelltype, sizeof(CCell::CELLTYPE), &dwByte, nullptr);
 		}
 
 		CloseHandle(hFile);
@@ -686,14 +687,14 @@ void CImgui_Manager::Load_Navigation()
 		HANDLE hFile = 0;
 		_ulong dwByte = 0;
 		_uint iNum = 0;
-		LEVEL iLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
-		_matrix			PivotMatrix = XMMatrixIdentity();
+		CCell::CELLTYPE eCelltype;
+		_float3		vPoints[3];
 
 		hFile = CreateFile(OFN.lpstrFile, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 		if (0 == hFile)
 			return;
 
-		_float3		vPoints[3];
+		
 
 		/* 타일의 개수 받아오기 */
 		ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
@@ -701,10 +702,11 @@ void CImgui_Manager::Load_Navigation()
 		for(int i =0; i< iNum; ++i)
 		{
 			ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
+			ReadFile(hFile, &eCelltype, sizeof(CCell::CELLTYPE), &dwByte, nullptr);
 			if (0 == dwByte)
 				break;
 
-			m_pNavigation_Manager->Add_Cell(vPoints);
+			m_pNavigation_Manager->Add_Cell(vPoints, eCelltype);
 		}
 		CloseHandle(hFile);
 

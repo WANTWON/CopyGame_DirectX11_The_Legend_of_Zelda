@@ -55,7 +55,7 @@ HRESULT CTerrain::Render()
 #ifdef _DEBUG
 	m_pNavigationCom->Render_Navigation();
 #endif
-	m_pVIBufferCom->Render();
+	//m_pVIBufferCom->Render();
 
 	return S_OK;
 }
@@ -75,16 +75,8 @@ HRESULT CTerrain::Ready_Components(void* pArg)
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Terrain"), (CComponent**)&m_pTextureCom[TYPE_DIFFUSE])))
+	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain"), (CComponent**)&m_pTextureCom[TYPE_DIFFUSE])))
 		return E_FAIL;
-
-	/* For.Com_Brush */
-	if (FAILED(__super::Add_Components(TEXT("Com_Brush"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Brush"), (CComponent**)&m_pTextureCom[TYPE_BRUSH])))
-		return E_FAIL;
-
-	/* For.Com_Filter */
-	if (FAILED(__super::Add_Components(TEXT("Com_Filter"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Filter"), (CComponent**)&m_pTextureCom[TYPE_FILTER])))
-		return E_FAIL;	
 
 	/* For.Com_VIBuffer */
 	CVIBuffer_Terrain::TERRAINDESC TerrainDesc;
@@ -95,12 +87,22 @@ HRESULT CTerrain::Ready_Components(void* pArg)
 	TerrainDesc.m_iVerticeNumZ = 30;
 	TerrainDesc. m_fHeight = -0.01f;
 
-	if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"), (CComponent**)&m_pVIBufferCom, &TerrainDesc)))
+	if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Terrain"), (CComponent**)&m_pVIBufferCom, &TerrainDesc)))
 		return E_FAIL;
 
-	/* For.Com_Navigation */
-	if (FAILED(__super::Add_Components(TEXT("Com_Navigation"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"), (CComponent**)&m_pNavigationCom)))
-		return E_FAIL;
+	if (*(LEVEL*)pArg == LEVEL_GAMEPLAY)
+	{
+		/* For.Com_Navigation */
+		if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Field"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Field"), (CComponent**)&m_pNavigationCom)))
+			return E_FAIL;
+	}
+	else if (*(LEVEL*)pArg == LEVEL_TAILCAVE)
+	{
+		/* For.Com_Navigation */
+		if (FAILED(__super::Add_Components(TEXT("Com_Navigation_TailCave"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"), (CComponent**)&m_pNavigationCom)))
+			return E_FAIL;
+	}
+	
 
 
 	return S_OK;

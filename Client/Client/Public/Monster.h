@@ -28,7 +28,7 @@ public:
 
 public:
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser);
-
+	void Check_Navigation();
 
 protected:
 	virtual HRESULT Ready_Components(void* pArg = nullptr) = 0;
@@ -52,16 +52,17 @@ protected:
 	virtual _bool IsDead() = 0;
 
 protected:
-	CBaseObj* m_pTarget = nullptr;
-	_float m_fAttackRadius = .5f;
-	_float m_fDistanceToTarget = 0.f;
-	_float m_fPatrolRadius = 3.f;
-	_float3 m_fPatrolPosition = _float3(0.f, 0.f, 0.f);
+	CNavigation*			m_pNavigationCom = nullptr;
+	CBaseObj*				m_pTarget = nullptr;
+	_float					m_fAttackRadius = .5f;
+	_float					m_fDistanceToTarget = 0.f;
+	_float					m_fPatrolRadius = 3.f;
+	_float3					m_fPatrolPosition = _float3(0.f, 0.f, 0.f);
 
-	_bool m_bAggro = false;
-	_bool m_bIsAttacking = false;
-	_bool m_bHit = false;
-	_bool m_bMove = true;
+	_bool					m_bAggro = false;
+	_bool					m_bIsAttacking = false;
+	_bool					m_bHit = false;
+	_bool					m_bMove = true;
 
 
 	//For Move Time

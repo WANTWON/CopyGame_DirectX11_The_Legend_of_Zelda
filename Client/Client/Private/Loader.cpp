@@ -118,7 +118,34 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	if (nullptr == pGameInstance)
 		return E_FAIL;
 
-	
+
+	/* 텍스쳐 로딩 중. */
+	lstrcpy(m_szLoadingText, TEXT("텍스쳐 로딩 중."));
+	/*For.Prototype_Component_Texture_Terrain*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Terrain/Grass_%d.dds"), 2))))
+		return E_FAIL;
+
+	/* 모델 로딩 중. */
+	lstrcpy(m_szLoadingText, TEXT("모델 생성 중."));
+	/*For.Prototype_Component_VIBuffer_Terrain*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Terrain"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 30, 30, -0.01f))))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
+	/* For.Prototype_Component_Navigation */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Field"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Navi_test.dat")))))
+		return E_FAIL;
+
+
+	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
+	/* For.Prototype_Component_Navigation */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/TailCave_Navi.dat")))))
+		return E_FAIL;
+
 
 	/*For.Prototype_Component_Model_Link*/
 	_matrix			PivotMatrix = XMMatrixIdentity();
@@ -197,38 +224,8 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	if (nullptr == pGameInstance)
 		return E_FAIL;
 
-	/* 텍스쳐 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("텍스쳐 로딩 중."));
-	/*For.Prototype_Component_Texture_Terrain*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Terrain"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Terrain/Grass_%d.dds"), 2))))
-		return E_FAIL;
-
-	/*For.Prototype_Component_Texture_Brush */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Brush"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Terrain/Brush.png"), 1))))
-		return E_FAIL;
-
-	/*For.Prototype_Component_Texture_Filter */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Filter"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Terrain/Filter.bmp"), 1))))
-		return E_FAIL;
 
 
-	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
-	/* For.Prototype_Component_Navigation */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"),
-		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Navi_test.dat")))))
-		return E_FAIL;
-
-
-
-	/* 모델 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("모델 생성 중."));
-	/*For.Prototype_Component_VIBuffer_Terrain*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 30,30, -0.01f))))
-		return E_FAIL;
 
 	_matrix			PivotMatrix = XMMatrixIdentity();
 
@@ -367,6 +364,7 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Pawn/Pawn.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	
 
 	/* 콜라이더 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("콜라이더 생성 중."));
