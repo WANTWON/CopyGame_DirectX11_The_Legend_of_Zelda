@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#include "..\Public\Zol.h"
+#include "..\Public\BuzzBlob.h"
 #include "Player.h"
 
-CZol::CZol(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBuzzBlob::CBuzzBlob(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
 {
 }
 
-HRESULT CZol::Initialize_Prototype()
+HRESULT CBuzzBlob::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
@@ -15,7 +15,7 @@ HRESULT CZol::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CZol::Initialize(void * pArg)
+HRESULT CBuzzBlob::Initialize(void * pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -40,7 +40,7 @@ HRESULT CZol::Initialize(void * pArg)
 	return S_OK;
 }
 
-int CZol::Tick(_float fTimeDelta)
+int CBuzzBlob::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
@@ -56,14 +56,14 @@ int CZol::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CZol::Late_Tick(_float fTimeDelta)
+void CBuzzBlob::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
 
 }
 
-HRESULT CZol::Render()
+HRESULT CBuzzBlob::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
@@ -77,7 +77,7 @@ HRESULT CZol::Render()
 	return S_OK;
 }
 
-void CZol::Check_Navigation()
+void CBuzzBlob::Check_Navigation()
 {
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
 		m_eState = DEAD;
@@ -95,42 +95,58 @@ void CZol::Check_Navigation()
 
 }
 
-void CZol::Change_Animation(_float fTimeDelta)
+void CBuzzBlob::Change_Animation(_float fTimeDelta)
 {
 	switch (m_eState)
 	{
-	case Client::CZol::DEAD:
+	case Client::CBuzzBlob::BIRIBIRI_LP:
 		break;
-	case Client::CZol::DEAF_FIRE:
+	case Client::CBuzzBlob::BIRIBIRI_ST:
 		break;
-	case Client::CZol::DEPOP:
+	case Client::CBuzzBlob::DAMAGE:
+	{
+		m_fAnimSpeed = 3.f;
+		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		m_pTransformCom->Go_PosDir(fTimeDelta * 2, vDir, m_pNavigationCom);
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+			m_eState = WALK;
 		break;
-	case Client::CZol::FALL:
+	}
+	case Client::CBuzzBlob::DEAD:
+	case Client::CBuzzBlob::DEAD_FIRE:
+	{
+		m_fAnimSpeed = 1.f;
+		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
+		m_pTransformCom->Go_Backward(fTimeDelta * 2, m_pNavigationCom);
+		m_pTransformCom->Go_PosDir(fTimeDelta * 2, XMVectorSet(0.f, -0.1f, 0.f, 0.f), m_pNavigationCom);
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+		{
+			m_bDead = true;
+		}
 		break;
-	case Client::CZol::JUMP:
+	}
+	case Client::CBuzzBlob::JITABATA:
 		break;
-	case Client::CZol::JUMP_ED:
+	case Client::CBuzzBlob::STUN:
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
 		break;
-	case Client::CZol::JUMP_SIGN:
+	case Client::CBuzzBlob::TRANSFORM:
 		break;
-	case Client::CZol::JUMP_ST:
-		break;
-	case Client::CZol::PIYO:
-		break;
-	case Client::CZol::POP:
-		break;
-	case Client::CZol::UNDER_WAIT:
-		break;
-	case Client::CZol::IDLE:
-		break;
-	case Client::CZol::WALK:
+	case Client::CBuzzBlob::IDLE:
+	case Client::CBuzzBlob::WALK:
+		m_fAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;
 	default:
 		break;
 	}
 }
 
-HRESULT CZol::Ready_Components(void * pArg)
+HRESULT CBuzzBlob::Ready_Components(void * pArg)
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))
@@ -150,7 +166,7 @@ HRESULT CZol::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Pawn"), (CComponent**)&m_pModelCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_BuzzBlob"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
 	/* For.Com_OBB*/
@@ -179,7 +195,7 @@ HRESULT CZol::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CZol::SetUp_ShaderResources()
+HRESULT CBuzzBlob::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -200,7 +216,7 @@ HRESULT CZol::SetUp_ShaderResources()
 	return S_OK;
 }
 
-_bool CZol::IsDead()
+_bool CBuzzBlob::IsDead()
 {
 	if (m_bDead && m_eState == STATE::DEAD)//&& m_dwDeathTime + 1000 < GetTickCount())
 		return true;
@@ -213,7 +229,7 @@ _bool CZol::IsDead()
 	return false;
 }
 
-void CZol::Find_Target()
+void CBuzzBlob::Find_Target()
 {
 	if (!m_bIsAttacking && !m_bHit && !m_bDead)
 	{
@@ -247,7 +263,7 @@ void CZol::Find_Target()
 	}
 }
 
-void CZol::Follow_Target(_float fTimeDelta)
+void CBuzzBlob::Follow_Target(_float fTimeDelta)
 {
 	if (m_pTarget == nullptr)
 		return;
@@ -262,7 +278,7 @@ void CZol::Follow_Target(_float fTimeDelta)
 	m_bIsAttacking = false;
 }
 
-void CZol::AI_Behaviour(_float fTimeDelta)
+void CBuzzBlob::AI_Behaviour(_float fTimeDelta)
 {
 	if (!m_bMove || m_eState == DEAD)
 		return;
@@ -277,7 +293,7 @@ void CZol::AI_Behaviour(_float fTimeDelta)
 		if (m_fDistanceToTarget < m_fAttackRadius)
 		{
 			m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
-			m_eState = STATE::PIYO;
+			m_eState = STATE::DAMAGE;
 			m_bIsAttacking = true;
 
 		}
@@ -296,7 +312,7 @@ void CZol::AI_Behaviour(_float fTimeDelta)
 
 
 
-_uint CZol::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
+_uint CBuzzBlob::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
 	if (m_eState == DEAD)
 		return 0;
@@ -308,7 +324,7 @@ _uint CZol::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCause
 		if (!m_bDead)
 		{
 			m_bHit = true;
-			m_eState = STATE::PIYO;
+			m_eState = STATE::DAMAGE;
 			m_bMove = true;
 		}
 
@@ -324,9 +340,9 @@ _uint CZol::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCause
 	return 0;
 }
 
-CZol * CZol::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CBuzzBlob * CBuzzBlob::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CZol*	pInstance = new CZol(pDevice, pContext);
+	CBuzzBlob*	pInstance = new CBuzzBlob(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
@@ -337,9 +353,9 @@ CZol * CZol::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	return pInstance;
 }
 
-CGameObject * CZol::Clone(void * pArg)
+CGameObject * CBuzzBlob::Clone(void * pArg)
 {
-	CZol*	pInstance = new CZol(*this);
+	CBuzzBlob*	pInstance = new CBuzzBlob(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
@@ -349,7 +365,7 @@ CGameObject * CZol::Clone(void * pArg)
 	return pInstance;
 }
 
-void CZol::Free()
+void CBuzzBlob::Free()
 {
 	__super::Free();
 }

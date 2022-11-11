@@ -11,10 +11,11 @@ BEGIN(Client)
 class CCamera_Dynamic final : public CCamera
 {
 public:
-	enum CAMERAMODE {CAM_PLAYER, CAM_SHAKING};
+	enum CAMERAMODE {CAM_PLAYER, CAM_SHAKING, CAM_TERRAIN, CAM_END };
 
 	typedef struct tagCameraDesc_Derived
 	{
+		_float4						InitPostion = _float4(0.f, 0.f, 0.f, 1.f);
 		_uint						iTest;
 		CCamera::CAMERADESC			CameraDesc;
 	}CAMERADESC_DERIVED;
@@ -27,9 +28,15 @@ private:
 public:
 	void Set_CamMode(CAMERAMODE _eCamMode, _float fPower, _float fVelocity, _float fMinusVelocity)
 	{
-		m_eCamMode = _eCamMode; m_fPower = fPower; m_fVelocity = fVelocity; m_fMinusVelocity = fMinusVelocity;
-	}
+		if (m_eCamMode == CAM_PLAYER)
+			m_ePreCamMode = CAM_PLAYER;
+		if (m_eCamMode == CAM_TERRAIN)
+			m_ePreCamMode = CAM_TERRAIN;
 
+		m_eCamMode = _eCamMode; m_fPower = fPower; m_fVelocity = fVelocity; m_fMinusVelocity = fMinusVelocity;
+	
+	}
+	void Set_CamMode(CAMERAMODE _eCamMode) { m_eCamMode = _eCamMode; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -41,12 +48,14 @@ public:
 public:
 	void Player_Camera(_float fTimeDelta);
 	void Shaking_Camera(_float fTimeDelta, _float fPower);
+	void Terrain_Camera(_float fTimeDelta);
 
 private:
+	CAMERAMODE		m_ePreCamMode = CAM_PLAYER;
 	CAMERAMODE		m_eCamMode = CAM_PLAYER;
 	_float4			m_vDistance = _float4(0, 10, -10, 0.f);
 	_long			m_lMouseWheel = 0;
-
+	_float4			m_fTargetPos = _float4(0.f, 0.f, 0.f, 1.f);
 
 	/* For Shaking Camera */
 	_float m_fPower = 0.f;

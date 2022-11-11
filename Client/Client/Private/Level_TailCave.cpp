@@ -45,7 +45,13 @@ HRESULT CLevel_TailCave::Initialize()
 	if (FAILED(Ready_Layer_Object(TEXT("Layer_Object"))))
 		return E_FAIL;
 	
-	CCameraManager::Get_Instance()->Ready_Camera(LEVEL::LEVEL_TAILCAVE);
+	CCameraManager* pCameraManager = CCameraManager::Get_Instance();
+
+	pCameraManager->Ready_Camera(LEVEL::LEVEL_TAILCAVE);
+
+	CCamera* pCamera = pCameraManager->Get_CurrentCamera();
+	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TERRAIN);
+	
 	return S_OK;
 }
 
@@ -186,8 +192,9 @@ HRESULT CLevel_TailCave::Ready_Layer_Camera(const _tchar * pLayerTag)
 
 	CameraDesc.iTest = 10;
 
-	CameraDesc.CameraDesc.vEye = _float4(0.f, 9.8f, -4.5f, 1.f);
+	CameraDesc.CameraDesc.vEye = _float4(0.f, 11.8f, -3.5f, 1.f);
 	CameraDesc.CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CameraDesc.InitPostion = _float4(54.f, 10.1f, 2.8f, 1.f);
 
 	CameraDesc.CameraDesc.fFovy = XMConvertToRadians(60.0f);
 	CameraDesc.CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
@@ -236,6 +243,46 @@ HRESULT CLevel_TailCave::Ready_Layer_Monster(const _tchar * pLayerTag)
 		else if (!wcscmp(pModeltag, TEXT("Rola.fbx")))
 		{
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Rola"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("BuzzBlob.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BuzzBlob"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
+		}
+
+	}
+
+	CloseHandle(hFile);
+
+
+
+	hFile = CreateFile(TEXT("../../../Bin/Data/TailCave_Monster2.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
+		return E_FAIL;
+
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+	for (_uint i = 0; i < iNum; ++i)
+	{
+		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+		_tchar pModeltag[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, MAX_PATH, pModeltag, MAX_PATH);
+		if (!wcscmp(pModeltag, TEXT("Pawn.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Pawn"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("Rola.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Rola"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("BuzzBlob.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BuzzBlob"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
 				return E_FAIL;
 		}
 	

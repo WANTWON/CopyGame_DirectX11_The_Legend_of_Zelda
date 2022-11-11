@@ -169,6 +169,10 @@ void CRola::Change_Animation(_float fTimeDelta)
 	case Client::CRola::JUMP:
 		m_fAnimSpeed = 2.0f;
 		m_bIsLoop = false;
+		// Movement
+		if (m_iDmgCount % 4 != 3 && m_fDistanceToTarget > m_fAttackRadius)
+			Follow_Target(fTimeDelta*2);
+
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_eState = JUMP_ED;
@@ -372,12 +376,7 @@ void CRola::Patrol(_float fTimeDelta)
 		m_bJump = true;
 		m_eState = STATE::JUMP_ST;	
 	}
-	
-	// Movement
-	if (m_bJump && m_fDistanceToTarget > m_fAttackRadius)
-	{
-		Follow_Target(fTimeDelta);
-	}
+
 }
 
 _bool CRola::Moving_AttackPosition(_float fTimeDelta)

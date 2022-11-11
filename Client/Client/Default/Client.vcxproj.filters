@@ -246,7 +246,7 @@
     <ClInclude Include="..\Public\MessageBox.h">
       <Filter>95.UI\05. MessageBox</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Zol.h">
+    <ClInclude Include="..\Public\BuzzBlob.h">
       <Filter>02.GameObjects\03.Monster\04.Zol</Filter>
     </ClInclude>
   </ItemGroup>
@@ -356,7 +356,7 @@
     <ClCompile Include="..\Private\MessageBox.cpp">
       <Filter>95.UI\05. MessageBox</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Zol.cpp">
+    <ClCompile Include="..\Private\BuzzBlob.cpp">
       <Filter>02.GameObjects\03.Monster\04.Zol</Filter>
     </ClCompile>
   </ItemGroup>

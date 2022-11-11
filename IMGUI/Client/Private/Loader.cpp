@@ -333,6 +333,12 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::TYPE_NONANIM, "../Bin/Resources/Picking_Symbol/Picking_Symbol.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_BuzzBlob*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("BuzzBlob.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/BuzzBlob/BuzzBlob.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }

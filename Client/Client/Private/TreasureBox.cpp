@@ -67,8 +67,9 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 	{
 		pButton->Set_Visible(true);
 		_float2 fPosition = pTarget->Get_ProjPosition();
+		fPosition.y = g_iWinSizeY - fPosition.y;
 		fPosition.x += 50.f;
-		fPosition.y += 20.f;
+		fPosition.y -= 30.f;
 		pButton->Set_Position(fPosition);
 		if (pGameInstance->Key_Down(DIK_A))
 		{
@@ -234,6 +235,7 @@ void CTreasureBox::OpenBox()
 	ItemDesc.eItemType = CInvenItem::ITEM_PRIZE;
 	ItemDesc.m_iTextureNum = CInvenItem::COMPASS;
 	ItemDesc.vPosition = pPlayer->Get_ProjPosition();
+	ItemDesc.vPosition.y = g_iWinSizeY - ItemDesc.vPosition.y; 
 	ItemDesc.vPosition.y -= 100.f;
 
 	switch (m_eTreasureBoxDesc.eItemType)
