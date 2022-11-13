@@ -40,7 +40,7 @@ HRESULT CTransform::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
+bool CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);
@@ -52,6 +52,10 @@ void CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
 
 	else if (true == pNavigation->isMove(vPosition))
 		Set_State(CTransform::STATE_POSITION, vPosition);
+	else
+		return false;
+		
+	return true;
 }
 
 void CTransform::Go_Backward(_float fTimeDelta, CNavigation* pNavigation)
@@ -171,7 +175,6 @@ void CTransform::LookAt(_fvector vAt)
 	_vector		vLook = vAt - vPosition;
 	_vector		vMyOriginalLook = Get_State(CTransform::STATE_LOOK);
 
-
 	_vector		vAxisY = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 	_vector		vRight = XMVector3Cross(vAxisY, vLook);
 	_vector		vUp = XMVector3Cross(vLook, vRight);
@@ -214,6 +217,19 @@ void CTransform::Change_Direction(_float UpDown, _float RightLeft)
 	Set_State(STATE_UP, XMVector3Normalize(vUp) * Get_Scale(CTransform::STATE_UP));
 	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * Get_Scale(CTransform::STATE_LOOK));
 
+}
+
+void CTransform::Fix_Look_byFloor(_fvector vAxis)
+{
+	_vector		vUp = vAxis;
+	_vector		vLook = Get_State(CTransform::STATE_LOOK);
+	_vector		vRight = XMVector3Cross(vUp, vLook);
+
+	_vector		vNewLook = XMVector3Cross(vRight, vUp);
+
+	Set_State(STATE_RIGHT, XMVector3Normalize(vRight) * Get_Scale(CTransform::STATE_RIGHT));
+	Set_State(STATE_UP, XMVector3Normalize(vUp) * Get_Scale(CTransform::STATE_UP));
+	Set_State(STATE_LOOK, XMVector3Normalize(vNewLook) * Get_Scale(CTransform::STATE_LOOK));
 }
 
 CTransform * CTransform::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

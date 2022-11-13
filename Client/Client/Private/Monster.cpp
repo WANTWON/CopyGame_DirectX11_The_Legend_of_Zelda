@@ -131,6 +131,37 @@ _vector CMonster::Calculate_PosDirction()
 	return vTargetPos - vMyPos;
 }
 
+void CMonster::Find_Target()
+{
+	if (!m_bIsAttacking && !m_bHit && !m_bDead)
+	{
+		CGameInstance* pGameInstance = CGameInstance::Get_Instance();
+		CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+
+		if (pPlayer)
+		{
+			if (pPlayer->Get_Dead())
+			{
+				
+				m_pTarget = nullptr;
+				m_bAggro = false;
+				return;
+			}
+
+			if (pTarget)
+			{
+				CTransform* PlayerTransform = (CTransform*)pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Transform"));
+				_vector vTargetPos = PlayerTransform->Get_State(CTransform::STATE_POSITION);
+				m_fDistanceToTarget = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
+				m_pTarget = dynamic_cast<CBaseObj*>(pTarget);
+			}
+			else
+				m_pTarget = nullptr;
+		}
+	}
+}
+
 _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
 	if (fDamage <= 0 || m_bDead)

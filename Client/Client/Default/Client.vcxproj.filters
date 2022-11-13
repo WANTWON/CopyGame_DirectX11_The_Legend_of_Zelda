@@ -124,6 +124,12 @@
     <Filter Include="02.GameObjects\03.Monster\04.Zol">
       <UniqueIdentifier>{a8622992-5935-4f83-809f-1d164b6b78bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\03.Monster\05.TailBoss">
+      <UniqueIdentifier>{c02f26b0-f6e7-4339-ba1b-7894cfbe7b3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.NonAnim\03.CollapseTile">
+      <UniqueIdentifier>{2f24d655-b332-4ef9-9eeb-ad3bf5355fa5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -249,6 +255,12 @@
     <ClInclude Include="..\Public\BuzzBlob.h">
       <Filter>02.GameObjects\03.Monster\04.Zol</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TailBoss.h">
+      <Filter>02.GameObjects\03.Monster\05.TailBoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CollapseTile.h">
+      <Filter>02.GameObjects\01.NonAnim\03.CollapseTile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -358,6 +370,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\BuzzBlob.cpp">
       <Filter>02.GameObjects\03.Monster\04.Zol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TailBoss.cpp">
+      <Filter>02.GameObjects\03.Monster\05.TailBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CollapseTile.cpp">
+      <Filter>02.GameObjects\01.NonAnim\03.CollapseTile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

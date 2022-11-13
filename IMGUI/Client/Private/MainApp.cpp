@@ -168,9 +168,10 @@ void CMainApp::Free()
 
 	Safe_Release(m_pGameInstance);
 	
+	CGameInstance::Release_Engine();
 	CModelManager::Get_Instance()->Destroy_Instance();
 	CPickingMgr::Get_Instance()->Destroy_Instance();
 	CImgui_Manager::Get_Instance()->Destroy_Instance();
-	CGameInstance::Release_Engine();
+	
 }
 

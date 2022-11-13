@@ -23,7 +23,7 @@ HRESULT CRola::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_tInfo.iMaxHp = 20;
+	m_tInfo.iMaxHp = 5;
 	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 

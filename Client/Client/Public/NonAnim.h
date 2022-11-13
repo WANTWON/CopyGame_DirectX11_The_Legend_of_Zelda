@@ -42,7 +42,7 @@ public:
 private:
 	CModel*					m_pModelCom = nullptr;
 	NONANIMDESC				m_ModelDesc;
-
+	_float					m_fAlpha = 1.f;
 
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;

@@ -70,6 +70,7 @@ protected:
 	_float			m_eDir[DIR_END] = { 0 };
 	_int			m_ePreDir[DIR_END] = { 0 };
 	_float			m_fWalkingHeight = 0.f;
+	_float			m_fAlpha = 1.f;
 
 public:
 	virtual void Free() override;

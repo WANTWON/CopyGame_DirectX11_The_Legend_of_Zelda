@@ -18,6 +18,7 @@
 #include "MonsterBullet.h"
 #include "Pawn.h"
 #include "BuzzBlob.h"
+#include "TailBoss.h"
 
 //for UI
 #include "BackGround.h"
@@ -33,6 +34,7 @@
 #include "DgnKey.h"
 #include "TreasureBox.h"
 #include "FootSwitch.h"
+#include "CollapseTile.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -361,7 +363,7 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 
 	/*For.Prototype_Component_Model_RolaBullet*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_RolaBullet"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Bullet/RollingSpike/RollingSpike.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Bullet/RollingSpike/RollingSpike.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_Pawn*/
@@ -373,6 +375,25 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_BuzzBlob"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/BuzzBlob/BuzzBlob.fbx", PivotMatrix))))
 		return E_FAIL;
+
+	/*For.Prototype_Component_Model_TailBoss*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_TailBoss1"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/TailBoss/TailBoss1.fbx", PivotMatrix))))
+		return E_FAIL;
+	/*For.Prototype_Component_Model_TailBoss*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_TailBoss2"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/TailBoss/TailBoss2.fbx", PivotMatrix))))
+		return E_FAIL;
+	/*For.Prototype_Component_Model_TailBoss*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_TailBoss3"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/TailBoss/TailBoss3.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Model_CollapseTile */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_CollapseTile"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/CollapseTile/CollapseTile.fbx", PivotMatrix))))
+		return E_FAIL;
+
 
 	/* 콜라이더 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("콜라이더 생성 중."));
@@ -392,6 +413,8 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
 		return E_FAIL;
 
+	
+
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -405,7 +428,17 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	/*For.Prototype_GameObject_Terrain*/
+	/*For.Prototype_GameObject_CollapseTile*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CollapeTile"),
+		CCollapseTile::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_TailBoss*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TailBoss"),
+		CTailBoss::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_BuzzBlob*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BuzzBlob"),
 		CBuzzBlob::Create(m_pDevice, m_pContext))))
 		return E_FAIL;

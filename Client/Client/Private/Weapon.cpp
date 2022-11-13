@@ -112,6 +112,9 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Bow"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
+	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+		return E_FAIL;
+
 	CCollider::COLLIDERDESC		ColliderDesc;
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));

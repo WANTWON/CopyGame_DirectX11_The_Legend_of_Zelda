@@ -7,6 +7,7 @@ vector			g_vCamPosition;
 
 matrix			g_BoneMatrices[256];
 
+float			g_fAlpha = 1.f;
 
 texture2D		g_DiffuseTexture;
 texture2D		g_OcculsionTexture;
@@ -109,9 +110,8 @@ PS_OUT PS_MAIN(PS_IN In)
 	//Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) *saturate(fShade + g_vLightAmbient * g_vMtrlAmbient)
 		//+ (g_vLightSpecular * vMtrlOcculsion) * fSpecular ;
 
-
-	if (Out.vColor.a <= 0.3f)
-		discard;
+	Out.vColor.a = g_fAlpha;
+	
 
 	return Out;
 }

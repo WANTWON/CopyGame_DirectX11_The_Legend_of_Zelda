@@ -12,7 +12,7 @@ BEGIN(Client)
 class CMonster abstract : public CBaseObj
 {
 public:
-	enum MONSTER_ID { MONSTER_OCTOROCK, MONSTER_MOBLINSWORD, MONSTER_ROLA, MONSTER_PAWN, MONSTER_END };
+	enum MONSTER_ID { MONSTER_OCTOROCK, MONSTER_MOBLINSWORD, MONSTER_ROLA, MONSTER_PAWN, MONSTER_TAIL, MONSTER_END };
 	enum DMG_DIRECTION {FRONT, BACK};
 
 protected:
@@ -47,7 +47,7 @@ protected:
 	DMG_DIRECTION Calculate_Direction();
 	_vector Calculate_PosDirction();
 	virtual void AI_Behaviour(_float fTimeDelta) { };
-	virtual void Find_Target() { };
+	virtual void Find_Target();
 	virtual void Follow_Target(_float fTimeDelta) { };
 	virtual HRESULT Drop_Items() { return S_OK; };
 	virtual _bool IsDead() = 0;

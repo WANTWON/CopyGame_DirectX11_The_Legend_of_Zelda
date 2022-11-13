@@ -239,8 +239,6 @@ void CImgui_Manager::Show_GuiTick()
 void CImgui_Manager::BrowseForFolder()
 {
 
-	_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
-
 	if (m_bSave)
 	{
 		OPENFILENAME OFN;
@@ -266,6 +264,8 @@ void CImgui_Manager::BrowseForFolder()
 			_ulong dwByte = 0;
 			CNonAnim::NONANIMDESC  ModelDesc;
 			_uint iNum = 0;
+			_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+			m_TempLayerTags.push_back(LayerTag);
 			m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
 			list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, LayerTag);
 			if (nullptr == plistClone)
@@ -326,6 +326,9 @@ void CImgui_Manager::BrowseForFolder()
 			LEVEL iLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
 			_matrix			PivotMatrix = XMMatrixIdentity();
 
+			_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+			m_TempLayerTags.push_back(LayerTag);
+
 			hFile = CreateFile(OFN.lpstrFile, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 			if (0 == hFile)
 				return;
@@ -346,8 +349,6 @@ void CImgui_Manager::BrowseForFolder()
 
 		m_bLoad = false;
 	}
-
-	delete LayerTag;
 }
 
 void CImgui_Manager::Set_FilePath()
@@ -532,6 +533,8 @@ void CImgui_Manager::Set_Navigation()
 			fPointC[0] = pCurrentCell->Get_PointValue(CCell::POINT_C).x;
 			fPointC[1] = pCurrentCell->Get_PointValue(CCell::POINT_C).y;
 			fPointC[2] = pCurrentCell->Get_PointValue(CCell::POINT_C).z;
+
+			m_iCellType = pCurrentCell->Get_CellType();
 		}
 
 
@@ -566,7 +569,7 @@ void CImgui_Manager::Set_Navigation()
 		ImGui::TextColored(ImVec4(0.7f, 0.0f, 1.0f, 1.0f), "Drop"); ImGui::SameLine();
 		if (ImGui::RadioButton("##Drop", &m_iCellType, 2))
 			m_pNavigation_Manager->Set_CellType((CCell::CELLTYPE)m_iCellType);
-
+		
 
 
 		if (ImGui::Button("Save Navigation"))
@@ -1177,15 +1180,15 @@ void CImgui_Manager::ShowPickedObj()
 	ImGui::BulletText("Position");
 	ImGui::Text("Position X");
 	ImGui::SameLine();
-	ImGui::DragFloat("##PositionX", &m_vPickedObjPos.x);
+	ImGui::DragFloat("##PositionX", &m_vPickedObjPos.x, 0.01f);
 
 	ImGui::Text("Position Z");
 	ImGui::SameLine();
-	ImGui::DragFloat("##PositionZ", &m_vPickedObjPos.z);
+	ImGui::DragFloat("##PositionZ", &m_vPickedObjPos.z, 0.01f);
 
 	ImGui::Text("Position Y");
 	ImGui::SameLine();
-	ImGui::DragFloat("##PositionY", &m_vPickedObjPos.y, 1.f, -10, 10);
+	ImGui::DragFloat("##PositionY", &m_vPickedObjPos.y, 0.01f, -10, 10);
 
 	ImGui::NewLine();
 

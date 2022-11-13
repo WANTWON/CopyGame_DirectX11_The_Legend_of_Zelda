@@ -1,41 +1,38 @@
 #include "stdafx.h"
-#include "..\Public\DgnKey.h"
+#include "..\Public\CollapseTile.h"
 #include "GameInstance.h"
 #include "Player.h"
 #include "UI_Manager.h"
 
-CDgnKey::CDgnKey(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CCollapseTile::CCollapseTile(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
 {
 }
 
-CDgnKey::CDgnKey(const CDgnKey & rhs)
+CCollapseTile::CCollapseTile(const CCollapseTile & rhs)
 	: CBaseObj(rhs)
 {
 }
 
-HRESULT CDgnKey::Initialize_Prototype()
+HRESULT CCollapseTile::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CDgnKey::Initialize(void * pArg)
+HRESULT CCollapseTile::Initialize(void * pArg)
 {
-	if (pArg != nullptr)
-		memcpy(&m_eKeyDesc, pArg, sizeof(DGNKEYDESC));
-
+	
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	//CPickingMgr::Get_Instance()->Add_PickingGroup(this);
 
 	m_eObjectID = OBJ_KEY;
 
 	if (pArg != nullptr)
 	{
-		_vector vPosition = XMLoadFloat3(&m_eKeyDesc.vPosition);
-		vPosition = XMVectorSetW(vPosition, 1.f);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+		_vector vecPostion = XMLoadFloat3((_float3*)pArg);
+		vecPostion = XMVectorSetW(vecPostion, 1.f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	}
 
 	Set_Scale(_float3(3.f, 3.f, 3.f));
@@ -44,36 +41,20 @@ HRESULT CDgnKey::Initialize(void * pArg)
 	return S_OK;
 }
 
-int CDgnKey::Tick(_float fTimeDelta)
+int CCollapseTile::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
 		return OBJ_DEAD;
 	}
-		
-
-	if (m_bGet)
-	{
-		CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-		_vector pPlayerPostion = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
-		pPlayerPostion = XMVectorSetY(pPlayerPostion, XMVectorGetY(pPlayerPostion) + 3.f );
-		m_pTransformCom->Go_PosTarget(fTimeDelta, pPlayerPostion);
-
-		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
-		{
-			m_bDead = true;
-			CUI_Manager::Get_Instance()->Close_Message();
-			CUI_Manager::Get_Instance()->Get_Key();
-		}
-			
-	}
+	
 
 
 	return OBJ_NOEVENT;
 }
 
-void CDgnKey::Late_Tick(_float fTimeDelta)
+void CCollapseTile::Late_Tick(_float fTimeDelta)
 {
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -84,30 +65,17 @@ void CDgnKey::Late_Tick(_float fTimeDelta)
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	if (m_pOBBCom != nullptr && m_pOBBCom->Collision(pTarget->Get_Collider()))
 	{
-		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -1.f, 0.f, 0.f));
+		m_fAlpha -= 0.1f;
 
-		_vector vPostion = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		if (XMVectorGetY(vPostion) < 0.5f)
-		{
-			vPostion = XMVectorSetY(vPostion, 0.5f);
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPostion);
-			Safe_Release(m_pOBBCom);
-			m_pOBBCom = nullptr;
-		}
-			
+		if (m_fAlpha <= 0.f)
+			m_bDead = true;	
 	}
 
-	if (m_pSPHERECom->Collision(pTarget->Get_Collider()))
-	{
-		m_bGet = true;
-		CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::DGN_KEY);
-		dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
-	}
 
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-HRESULT CDgnKey::Render()
+HRESULT CCollapseTile::Render()
 {
 	if (nullptr == m_pShaderCom ||
 		nullptr == m_pModelCom)
@@ -135,14 +103,13 @@ HRESULT CDgnKey::Render()
 	//m_pAABBCom->Render();
 	if(m_pOBBCom != nullptr)
 			m_pOBBCom->Render();
-	m_pSPHERECom->Render();
 #endif
 
 	return S_OK;
 
 }
 
-HRESULT CDgnKey::Ready_Components(void * pArg)
+HRESULT CCollapseTile::Ready_Components(void * pArg)
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))
@@ -162,37 +129,23 @@ HRESULT CDgnKey::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_SmallKey"), (CComponent**)&m_pModelCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_CollapseTile"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
 	CCollider::COLLIDERDESC		ColliderDesc;
 
-	///* For.Com_AABB */
-	//ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
-
-	//ColliderDesc.vScale = _float3(0.7f, 0.7f, 0.7f);
-	//ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
-	//if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
-	//	return E_FAIL;
-
 	/* For.Com_OBB*/
-	ColliderDesc.vScale = _float3(0.5f, 20.f, 0.5f);
+	ColliderDesc.vScale = _float3(0.5f, 0.2f, 0.5f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
-	ColliderDesc.vPosition = _float3(0.f, -0.3f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
-	/* For.Com_SPHERE */
-	ColliderDesc.vScale = _float3(0.1f, 0.1f, 0.1f);
-	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
-		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CDgnKey::SetUp_ShaderResources()
+HRESULT CCollapseTile::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -216,38 +169,38 @@ HRESULT CDgnKey::SetUp_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CDgnKey::SetUp_ShaderID()
+HRESULT CCollapseTile::SetUp_ShaderID()
 {
 	return S_OK;
 }
 
-CDgnKey * CDgnKey::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CCollapseTile * CCollapseTile::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CDgnKey*	pInstance = new CDgnKey(pDevice, pContext);
+	CCollapseTile*	pInstance = new CCollapseTile(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		ERR_MSG(TEXT("Failed to Created : CDgnKey"));
+		ERR_MSG(TEXT("Failed to Created : CCollapseTile"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CDgnKey::Clone(void * pArg)
+CGameObject * CCollapseTile::Clone(void * pArg)
 {
-	CDgnKey*	pInstance = new CDgnKey(*this);
+	CCollapseTile*	pInstance = new CCollapseTile(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		ERR_MSG(TEXT("Failed to Cloned : CDgnKey"));
+		ERR_MSG(TEXT("Failed to Cloned : CCollapseTile"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CDgnKey::Free()
+void CCollapseTile::Free()
 {
 	__super::Free();
 

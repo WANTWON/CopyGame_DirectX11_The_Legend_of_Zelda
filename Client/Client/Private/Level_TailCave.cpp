@@ -16,6 +16,7 @@
 
 #include "DgnKey.h"
 #include "TreasureBox.h"
+#include "TailBoss.h"
 
 CLevel_TailCave::CLevel_TailCave(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -250,42 +251,17 @@ HRESULT CLevel_TailCave::Ready_Layer_Monster(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BuzzBlob"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
 				return E_FAIL;
 		}
-
-	}
-
-	CloseHandle(hFile);
-
-
-
-	hFile = CreateFile(TEXT("../../../Bin/Data/TailCave_Monster2.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
-		return E_FAIL;
-
-	/* 타일의 개수 받아오기 */
-	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
-
-	for (_uint i = 0; i < iNum; ++i)
-	{
-		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
-
-		_tchar pModeltag[MAX_PATH];
-		MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, MAX_PATH, pModeltag, MAX_PATH);
-		if (!wcscmp(pModeltag, TEXT("Pawn.fbx")))
+		else if (!wcscmp(pModeltag, TEXT("TailBoss1.fbx")))
 		{
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Pawn"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+			CTailBoss::TAILDESC TailDesc;
+			TailDesc.eTailType = CTailBoss::TAIL1;
+			TailDesc.InitPostion = XMLoadFloat3(&ModelDesc.vPosition);
+			TailDesc.InitPostion = XMVectorSetW(TailDesc.InitPostion, 1.f);
+			TailDesc.pParent = nullptr;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TailBoss"), LEVEL_TAILCAVE, pLayerTag, &TailDesc)))
 				return E_FAIL;
 		}
-		else if (!wcscmp(pModeltag, TEXT("Rola.fbx")))
-		{
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Rola"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
-				return E_FAIL;
-		}
-		else if (!wcscmp(pModeltag, TEXT("BuzzBlob.fbx")))
-		{
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BuzzBlob"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
-				return E_FAIL;
-		}
-	
+
 	}
 
 	CloseHandle(hFile);
@@ -335,6 +311,11 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 		else if (!wcscmp(pModeltag, TEXT("FootSwitch.fbx")))
 		{
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FootSwitch"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("CollapseTile.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CollapeTile"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
 				return E_FAIL;
 		}
 

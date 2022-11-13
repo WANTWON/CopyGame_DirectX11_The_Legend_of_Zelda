@@ -426,6 +426,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _tchar * pLayerTag)
 
 	}
 
+	
+
+
 	CloseHandle(hFile);
 
 	RELEASE_INSTANCE(CGameInstance);

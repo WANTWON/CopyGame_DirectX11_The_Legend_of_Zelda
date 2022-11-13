@@ -50,7 +50,7 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	void Go_Straight(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
+	bool Go_Straight(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 	void Go_Backward(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);	
@@ -67,6 +67,7 @@ public:
 	void LookAt(_fvector vAt);
 	void LookDir(_fvector vDir);
 	void Change_Direction(_float UpDown, _float RightLeft);
+	void Fix_Look_byFloor(_fvector vAxis);
 
 private:			
 	_float4x4				m_WorldMatrix;
