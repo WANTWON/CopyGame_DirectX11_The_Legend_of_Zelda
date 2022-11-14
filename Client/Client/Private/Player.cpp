@@ -193,7 +193,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 {
 
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == FALL_FROMTOP ||
-		m_eState == FALL_HOLE || m_eState == FALL_ANTLION)
+		m_eState == FALL_HOLE || m_eState == FALL_ANTLION || m_eState == KEY_OPEN)
 		return;
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -461,7 +461,7 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 {
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE ||
 		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP || m_eState == FALL_FROMTOP || m_eState == FALL_HOLE ||
-		m_eState == FALL_ANTLION)
+		m_eState == FALL_ANTLION || m_eState == KEY_OPEN)
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)

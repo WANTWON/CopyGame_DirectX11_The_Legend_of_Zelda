@@ -340,12 +340,21 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Door"), LEVEL_TAILCAVE, pLayerTag, &DoorDesc)))
 				return E_FAIL;
 		}
+		else if (!wcscmp(pModeltag, TEXT("LockDoor.fbx")))
+		{
+			CDoor::DOORDESC DoorDesc;
+			DoorDesc.eType = CDoor::DOOR_KEY;
+			DoorDesc.InitPosition = ModelDesc.vPosition;
+			DoorDesc.fAngle = ModelDesc.m_fAngle;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_Component_Model_LockDoor"), LEVEL_TAILCAVE, pLayerTag, &DoorDesc)))
+				return E_FAIL;
+		}
 
 	}
 
 	CloseHandle(hFile);
 
-
+	
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }

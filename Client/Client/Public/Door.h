@@ -12,8 +12,8 @@ class CDoor final : public CBaseObj
 {
 public:
 	enum DOORTYPE { DOOR_CLOSED, DOOR_KEY, DOOR_BOSS };
-	enum STATE { CLOSE, CLOSE2, OPEN, OPEN2, OPEN_WAIT, OPEN_WAIT2};
-
+	enum STATE_CLOSED { CLOSE_CD, CLOSE2_CD, OPEN_CD, OPEN2_CD, OPEN_WAIT_CD, OPEN_WAIT2_CD};
+	enum STATE_LOCK { CLOSE_LD, OPEN_LD, OPEN2_LD};
 	typedef struct DoorTag
 	{
 		DOORTYPE eType = DOOR_CLOSED;
@@ -38,12 +38,20 @@ private:
 	virtual HRESULT SetUp_ShaderResources() override;
 
 private:
+	void Tick_ClosedDoor(_float fTimeDelta);
+	void Tick_LockDoor(_float fTimeDelta);
+	void Tick_BossDoor(_float fTimeDelta);
+	void Change_Animation_ClosedDoor(_float fTimeDelta);
+	void Change_Animation_LockDDoor(_float fTimeDelta);
+	void Change_Animation_BossDoor(_float fTimeDelta);
+
+private:
 	CModel*					m_pModelCom = nullptr;
 	_bool					m_bOpen = false;
 	_bool					m_bPlay = false;
 
-	STATE m_eState = OPEN;
-	STATE m_ePreState = OPEN2;
+	_uint m_eState = OPEN_CD;
+	_uint m_ePreState = OPEN2_CD;
 
 	DOORDESC m_DoorDesc;
 

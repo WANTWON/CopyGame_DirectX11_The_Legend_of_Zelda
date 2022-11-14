@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "TreasureBox.h"
 #include "Level_TailCave.h"
+#include "UIButton.h"
 
 CDoor::CDoor(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -32,8 +33,6 @@ HRESULT CDoor::Initialize(void * pArg)
 	_vector vecPostion = XMLoadFloat3(&m_DoorDesc.InitPosition);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
-	
-
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(m_DoorDesc.fAngle));
 
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
@@ -42,33 +41,28 @@ HRESULT CDoor::Initialize(void * pArg)
 
 int CDoor::Tick(_float fTimeDelta)
 {
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	CLevel* pLevel = pGameInstance->Get_CurrentLevel();
-	m_bOpen = dynamic_cast<CLevel_TailCave*>(pLevel)->Get_OpenDoor();
-	if (m_bOpen)
+	if (m_bDead)
 	{
-		if (m_eState != OPEN_WAIT)
-		{
-			m_eState = OPEN;
-			
-			m_bPlay = true;
-		}
-			
-	}	
-	else
-		m_eState = CLOSE;
-
-	if (m_eState != m_ePreState)
-	{
-		m_pModelCom->Set_NextAnimIndex(m_eState);
-		m_ePreState = m_eState;
+		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+		return OBJ_DEAD;
 	}
 
-	if(m_bPlay)
-		Change_Animation(fTimeDelta);
+	switch (m_DoorDesc.eType)
+	{
+	case DOOR_CLOSED:
+		Tick_ClosedDoor(fTimeDelta);
+		break;
+	case DOOR_KEY:
+		Tick_LockDoor(fTimeDelta);
+		break;
+	case DOOR_BOSS:
+		Tick_BossDoor(fTimeDelta);
+		break;
+	default:
+		break;
+	}
 
-	RELEASE_INSTANCE(CGameInstance);
+	
 	return OBJ_NOEVENT;
 }
 
@@ -77,12 +71,6 @@ void CDoor::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	SetUp_ShaderID();
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-
-
-	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CDoor::Render()
@@ -117,37 +105,16 @@ HRESULT CDoor::Render()
 
 void CDoor::Change_Animation(_float fTimeDelta)
 {
-	switch (m_eState)
+	switch (m_DoorDesc.eType)
 	{
-	case Client::CDoor::CLOSE:
-	case Client::CDoor::CLOSE2:
-		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
-		{
-			if(m_bPlay)
-				CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
-			m_bPlay = false;
-		}	
+	case DOOR_CLOSED:
+		Change_Animation_ClosedDoor(fTimeDelta);
 		break;
-	case Client::CDoor::OPEN:
-	case Client::CDoor::OPEN2:
-		if (m_bOpen)
-		{
-			m_bIsLoop = false;
-			if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
-			{
-				CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
-				m_eState = OPEN_WAIT;
-			}
-				
-		}
+	case DOOR_KEY:
+		Change_Animation_LockDDoor(fTimeDelta);
 		break;
-	case Client::CDoor::OPEN_WAIT:
-	case Client::CDoor::OPEN_WAIT2:
-		m_bIsLoop = true;
-		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
-		break;
-	default:
+	case DOOR_BOSS:
+		Change_Animation_BossDoor(fTimeDelta);
 		break;
 	}
 }
@@ -179,6 +146,9 @@ HRESULT CDoor::Ready_Components(void * pArg)
 			return E_FAIL;
 		break;
 	case DOOR_KEY:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_LockDoor"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
 		break;
 	case DOOR_BOSS:
 		break;
@@ -219,6 +189,127 @@ HRESULT CDoor::SetUp_ShaderResources()
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
+}
+
+void CDoor::Tick_ClosedDoor(_float fTimeDelta)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CLevel* pLevel = pGameInstance->Get_CurrentLevel();
+	m_bOpen = dynamic_cast<CLevel_TailCave*>(pLevel)->Get_OpenDoor();
+	if (m_bOpen)
+	{
+		if (m_eState != OPEN_WAIT_CD)
+		{
+			m_eState = OPEN_CD;
+
+			m_bPlay = true;
+		}
+
+	}
+	else
+		m_eState = CLOSE_CD;
+
+	if (m_eState != m_ePreState)
+	{
+		m_pModelCom->Set_NextAnimIndex(m_eState);
+		m_ePreState = m_eState;
+	}
+
+	if (m_bPlay)
+		Change_Animation(fTimeDelta);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CDoor::Tick_LockDoor(_float fTimeDelta)
+{
+	CBaseObj* pPlayer = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pOBBCom, &pPlayer))
+	{
+		CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
+		pButton->Set_Visible(true);
+		_float2 fPosition = pPlayer->Get_ProjPosition();
+		fPosition.y = g_iWinSizeY - fPosition.y;
+		fPosition.x += 50.f;
+		fPosition.y -= 30.f;
+		pButton->Set_Position(fPosition);
+
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
+		{
+			pButton->Set_Visible(false);
+			dynamic_cast<CPlayer*>(pPlayer)->Set_AnimState(CPlayer::KEY_OPEN);
+			m_eState = OPEN_LD;
+		}
+		else
+			m_eState = CLOSE_LD;
+	}
+	else
+		m_eState = CLOSE_LD;
+}
+
+void CDoor::Tick_BossDoor(_float fTimeDelta)
+{
+}
+
+void CDoor::Change_Animation_ClosedDoor(_float fTimeDelta)
+{
+	switch (m_eState)
+	{
+	case Client::CDoor::CLOSE_CD:
+	case Client::CDoor::CLOSE2_CD:
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		{
+			if (m_bPlay)
+				CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+			m_bPlay = false;
+		}
+		break;
+	case Client::CDoor::OPEN_CD:
+	case Client::CDoor::OPEN2_CD:
+		if (m_bOpen)
+		{
+			m_bIsLoop = false;
+			if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+			{
+				CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+				m_eState = OPEN_WAIT_CD;
+			}
+
+		}
+		break;
+	case Client::CDoor::OPEN_WAIT_CD:
+	case Client::CDoor::OPEN_WAIT2_CD:
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
+		break;
+	default:
+		break;
+	}
+}
+
+void CDoor::Change_Animation_LockDDoor(_float fTimeDelta)
+{
+	switch (m_eState)
+	{
+	case Client::CDoor::CLOSE_LD:
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
+		break;
+	case Client::CDoor::OPEN_LD:
+	case Client::CDoor::OPEN2_LD:
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+			m_bDead = true;
+		break;
+	default:
+		break;
+	}
+}
+
+void CDoor::Change_Animation_BossDoor(_float fTimeDelta)
+{
 }
 
 CDoor * CDoor::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
