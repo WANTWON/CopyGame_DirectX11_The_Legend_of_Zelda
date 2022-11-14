@@ -39,7 +39,7 @@ HRESULT CNonAnim::Initialize(void * pArg)
 		Set_Scale(m_ModelDesc.vScale);
 
 		if(m_ModelDesc.m_fAngle != 0)
-			m_pTransformCom->Turn(XMLoadFloat3(&m_ModelDesc.vRotation), m_ModelDesc.m_fAngle);
+			m_pTransformCom->Rotation(XMVectorSet(0.f,1.f,0.f,0.f), XMConvertToRadians(m_ModelDesc.m_fAngle));
 	}
 	
 
@@ -157,6 +157,18 @@ void CNonAnim::Set_Picked()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CNonAnim::Turn(_float3 vAxis, _float fAngle)
+{
+
+	_float fInputAngle = fAngle;
+	if (fInputAngle > 180)
+		fInputAngle = 360 - fInputAngle;
+
+	m_pTransformCom->Rotation(XMLoadFloat3(&vAxis), XMConvertToRadians(fInputAngle));
+	m_ModelDesc.vRotation = vAxis;
+	m_ModelDesc.m_fAngle = fAngle;
+}
+
 HRESULT CNonAnim::Ready_Components(void* pArg)
 {
 	/* For.Com_Renderer */
@@ -164,7 +176,11 @@ HRESULT CNonAnim::Ready_Components(void* pArg)
 		return E_FAIL;
 
 	/* For.Com_Transform */
-	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom)))
+	CTransform::TRANSFORMDESC TransformDesc;
+	TransformDesc.fRotationPerSec = 1.f;
+	TransformDesc.fSpeedPerSec = 1.f;
+
+	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
 
 	/* For.Com_Shader */

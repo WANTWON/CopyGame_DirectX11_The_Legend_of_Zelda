@@ -17,6 +17,7 @@
 #include "DgnKey.h"
 #include "TreasureBox.h"
 #include "TailBoss.h"
+#include "Door.h"
 
 CLevel_TailCave::CLevel_TailCave(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -62,7 +63,7 @@ void CLevel_TailCave::Tick(_float fTimeDelta)
 
 	CUI_Manager::Get_Instance()->Tick_UI();
 
-	
+	Check_Solved_Puzzle();
 
 
 }
@@ -251,6 +252,11 @@ HRESULT CLevel_TailCave::Ready_Layer_Monster(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BuzzBlob"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
 				return E_FAIL;
 		}
+		else if (!wcscmp(pModeltag, TEXT("ZolRed.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_RedZol"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
+		}
 		else if (!wcscmp(pModeltag, TEXT("TailBoss1.fbx")))
 		{
 			CTailBoss::TAILDESC TailDesc;
@@ -280,6 +286,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 	Boxtag.vPosition = _float3(15.09, 0.1f, 6.66f);
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_TAILCAVE, pLayerTag, &Boxtag)))
 		return E_FAIL;
+
 
 	HANDLE hFile = 0;
 	_ulong dwByte = 0;
@@ -318,6 +325,15 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CollapeTile"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
 				return E_FAIL;
 		}
+		else if (!wcscmp(pModeltag, TEXT("ClosedDoor.fbx")))
+		{
+			CDoor::DOORDESC DoorDesc;
+			DoorDesc.eType = CDoor::DOOR_CLOSED;
+			DoorDesc.InitPosition = ModelDesc.vPosition;
+			DoorDesc.fAngle = ModelDesc.m_fAngle;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Door"), LEVEL_TAILCAVE, pLayerTag, &DoorDesc)))
+				return E_FAIL;
+		}
 
 	}
 
@@ -330,6 +346,8 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 
 void CLevel_TailCave::Check_Solved_Puzzle()
 {
+	if (CGameInstance::Get_Instance()->Key_Up(DIK_0))
+		m_bDoorOpen = !m_bDoorOpen;
 }
 
 CLevel_TailCave * CLevel_TailCave::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

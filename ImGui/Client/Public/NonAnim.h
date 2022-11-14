@@ -44,7 +44,8 @@ public:
 	void Set_Picked();
 	const char* Get_Modeltag() { return m_ModelDesc.pModeltag; }
 	const NONANIMDESC Get_ModelDesc() {return m_ModelDesc;}
-
+	void Set_ModelDesc(NONANIMDESC* NonAnimDesc) { memcpy(&m_ModelDesc, NonAnimDesc, sizeof(NONANIMDESC)); }
+	void Turn(_float3 vAxis, _float fAngle);
 private:
 	CModel*					m_pModelCom = nullptr;
 	NONANIMDESC				m_ModelDesc;

@@ -19,6 +19,7 @@
 #include "Pawn.h"
 #include "BuzzBlob.h"
 #include "TailBoss.h"
+#include "RedZol.h"
 
 //for UI
 #include "BackGround.h"
@@ -35,6 +36,7 @@
 #include "TreasureBox.h"
 #include "FootSwitch.h"
 #include "CollapseTile.h"
+#include "Door.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -394,6 +396,17 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/CollapseTile/CollapseTile.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_RedZol*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_RedZol"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/ZolRed/ZolRed.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_ClosedDoor*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_ClosedDoor"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Door/ClosedDoor/ClosedDoor.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	
 
 	/* 콜라이더 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("콜라이더 생성 중."));
@@ -427,6 +440,16 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/*For.Prototype_GameObject_RedZol*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_RedZol"),
+		CRedZol::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_Door*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Door"),
+		CDoor::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	/*For.Prototype_GameObject_CollapseTile*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CollapeTile"),

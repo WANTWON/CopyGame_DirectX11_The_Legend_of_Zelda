@@ -28,7 +28,7 @@ public:
 	void	Out_CollisionGroup(COLLSIONGROUP CollisionGroup, CBaseObj* pGameObject);
 	void	Clear_CollisionGroup(COLLSIONGROUP CollisionGroup);
 public:
-	_bool	CollisionwithGroup(COLLSIONGROUP CollisionGroup, CCollider* pCollider);
+	_bool	CollisionwithGroup(COLLSIONGROUP CollisionGroup, CCollider* pCollider, CBaseObj** pOut = nullptr);
 	_bool	CollisionwithGroup(COLLSIONGROUP SourGroup, COLLSIONGROUP DestGroup, CBaseObj** outSour, CBaseObj** outDest);
 	void	CollisionwithBullet();
 	void	Update_Collider();

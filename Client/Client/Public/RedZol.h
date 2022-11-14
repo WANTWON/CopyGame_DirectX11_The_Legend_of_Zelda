@@ -3,14 +3,14 @@
 
 
 BEGIN(Client)
-class CBuzzBlob final : public CMonster
+class CRedZol final : public CMonster
 {
 public:
-	enum STATE { DAMAGE, DEAD, IDLE, WALK};
+	enum STATE { DAMAGE, DEAD,IDLE, WALK };
 
 private:
-	CBuzzBlob(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual ~CBuzzBlob() = default;
+	CRedZol(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual ~CRedZol() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -40,7 +40,7 @@ private:
 	STATE m_eState = IDLE;
 
 public:
-	static CBuzzBlob* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CRedZol* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 

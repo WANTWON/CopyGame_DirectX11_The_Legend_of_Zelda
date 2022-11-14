@@ -36,6 +36,7 @@ public:
 	_vector Get_Position();
 	void Set_State(CTransform::STATE eState, _fvector vState);
 	void Set_Scale(_float3 vScale);
+	
 
 	
 

@@ -90,6 +90,17 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_BOW]);
 	}
 
+	CBaseObj* pCollisionBlock = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pOBBCom, &pCollisionBlock))
+	{
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionBlock->Get_TransformState(CTransform::STATE_POSITION);
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5, vDirection, m_pNavigationCom[m_iCurrentLevel]);
+	}
+
 }
 
 HRESULT CPlayer::Render()
@@ -316,7 +327,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	}
 
 
-	if (m_dwDashTime + 300 < GetTickCount())
+	if (m_dwDashTime + 150 < GetTickCount())
 	{
 		if (m_eState != DASH_ST && m_eState != DASH_LP && m_eState != DASH_ED)
 		{
@@ -490,7 +501,6 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 				m_eState = RUN;
 		}
 			
-	
 		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
 	}
 
@@ -514,9 +524,9 @@ void CPlayer::SetDirection_byPosition(_float fTimeDelta)
 	else if (m_eDir[DIR_Z] < 0)
 		m_eState = SLASH_HOLD_B;
 
-	
 	_vector vDirection = XMVectorSet((_float)m_eDir[DIR_X], 0.f, (_float)m_eDir[DIR_Z], 0.f);
 	m_pTransformCom->Go_PosDir(fTimeDelta, vDirection);
+		
 
 }
 

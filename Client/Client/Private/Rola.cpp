@@ -23,7 +23,7 @@ HRESULT CRola::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_tInfo.iMaxHp = 5;
+	m_tInfo.iMaxHp = 10;
 	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
@@ -34,7 +34,7 @@ HRESULT CRola::Initialize(void * pArg)
 	_vector vecPostion = XMLoadFloat3((_float3*)pArg);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
-
+	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
 	m_pNavigationCom->Compute_CurrentIndex(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 
@@ -46,7 +46,7 @@ int CRola::Tick(_float fTimeDelta)
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
 
-
+	
 
 	AI_Behaviour(fTimeDelta);
 	Check_Navigation();
@@ -171,7 +171,7 @@ void CRola::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = false;
 		// Movement
 		if (m_iDmgCount % 4 != 3 && m_fDistanceToTarget > m_fAttackRadius)
-			Follow_Target(fTimeDelta*2);
+			Follow_Target(fTimeDelta);
 
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
@@ -212,7 +212,7 @@ HRESULT CRola::Ready_Components(void * pArg)
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
-	TransformDesc.fSpeedPerSec = 1.0f;
+	TransformDesc.fSpeedPerSec = 2.0f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(3.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
@@ -229,7 +229,7 @@ HRESULT CRola::Ready_Components(void * pArg)
 
 
 	/* For.Com_OBB*/
-	ColliderDesc.vScale = _float3(2.f, 2.f, 2.f);
+	ColliderDesc.vScale = _float3(1.f, 1.0f, 1.0f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
@@ -331,6 +331,14 @@ void CRola::AI_Behaviour(_float fTimeDelta)
 
 	// Check for Target, AggroRadius
 	Find_Target();
+	if (m_fDistanceToTarget > 10.f)
+	{
+		m_eState = IDLE;
+		return;
+	}
+		
+
+
 
 	if (m_bBackStep)
 	{

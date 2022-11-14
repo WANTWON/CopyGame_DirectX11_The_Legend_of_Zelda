@@ -65,7 +65,7 @@ void CCollapseTile::Late_Tick(_float fTimeDelta)
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	if (m_pOBBCom != nullptr && m_pOBBCom->Collision(pTarget->Get_Collider()))
 	{
-		m_fAlpha -= 0.1f;
+		m_fAlpha -= 0.05f;
 
 		if (m_fAlpha <= 0.f)
 			m_bDead = true;	

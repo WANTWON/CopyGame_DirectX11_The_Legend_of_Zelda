@@ -119,12 +119,6 @@ void CImgui_Manager::Tick(_float fTimeDelta)
 	if (pGameInstance->Key_Up(DIK_DOWN))
 		TerrainDesc.TerrainDesc.m_iPositionZ -= m_pTerrain_Manager->Get_MoveOffset();
 
-	if (pGameInstance->Key_Up(DIK_SPACE))
-	{
-		if (FAILED(m_pTerrain_Manager->Create_Terrain(m_iCurrentLevel, TEXT("Layer_Terrain"))))
-			return;
-	}
-
 	m_pTerrain_Manager->Set_TerrainDesc(&TerrainDesc);
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -798,6 +792,11 @@ void CImgui_Manager::Set_Terrain_Map()
 		Safe_Release(*iter);
 		plistClone->erase(iter);
 	}
+	else if (CGameInstance::Get_Instance()->Key_Up(DIK_SPACE))
+	{
+		if (FAILED(m_pTerrain_Manager->Create_Terrain(m_iCurrentLevel, TEXT("Layer_Terrain"))))
+			return;
+	}
 
 }
 
@@ -1115,7 +1114,8 @@ void CImgui_Manager::ShowPickedObj()
 		iObjectID = dynamic_cast<CBaseObj*>(pPickedObj)->Get_ObjectID();
 		DirectX::XMStoreFloat3(&m_vPickedObjPos, dynamic_cast<CBaseObj*>(pPickedObj)->Get_Position());
 		m_vPickedObjScale = dynamic_cast<CBaseObj*>(pPickedObj)->Get_Scale();
-
+		m_vPickedRotAxis = dynamic_cast<CNonAnim*>(pPickedObj)->Get_ModelDesc().vRotation;
+		m_fRotAngle = dynamic_cast<CNonAnim*>(pPickedObj)->Get_ModelDesc().m_fAngle;
 	}
 	else
 	{
@@ -1204,13 +1204,25 @@ void CImgui_Manager::ShowPickedObj()
 	ImGui::InputFloat3("##SettingScale", Pos);
 	m_vPickedObjScale = _float3(Pos[0], Pos[1], Pos[2]);
 
+	ImGui::BulletText("Rotation");
+	static _float Rotation[3] = { m_vPickedRotAxis.x , m_vPickedRotAxis.y, m_vPickedRotAxis.z };
+	ImGui::Text("Rotation axis"); ImGui::SameLine();
+	ImGui::InputFloat3("##Setting RotAxis", Rotation);
+	m_vPickedRotAxis = _float3(Rotation[0], Rotation[1], Rotation[2]);
+
+	static _float RotAngle = { m_fRotAngle };
+	ImGui::Text("Rotaion Angle"); ImGui::SameLine();
+	ImGui::DragFloat("##Setting Rot", &RotAngle, 0.1f);
+	m_fRotAngle = RotAngle;
+
+
 	if (pPickedObj != nullptr)
 	{
 		_vector vSettingPosition = DirectX::XMLoadFloat3(&m_vPickedObjPos);
 		vSettingPosition = XMVectorSetW(vSettingPosition, 1.f);
 		dynamic_cast<CBaseObj*>(pPickedObj)->Set_State(CTransform::STATE_POSITION, vSettingPosition);
 		dynamic_cast<CBaseObj*>(pPickedObj)->Set_Scale(m_vPickedObjScale);
-
+		dynamic_cast<CNonAnim*>(pPickedObj)->Turn(m_vPickedRotAxis, m_fRotAngle);
 	}
 
 	if (ImGui::Button("Delete Object"))
@@ -1420,7 +1432,7 @@ void CImgui_Manager::Show_ModelList()
 			{
 				if (iter == nullptr)
 					continue;
-				char label[128];
+				char label[MAX_PATH];
 				char szLayertag[MAX_PATH] = "";
 				WideCharToMultiByte(CP_ACP, 0, iter, MAX_PATH, szLayertag, MAX_PATH, NULL, NULL);
 				sprintf(label, szLayertag);
@@ -1530,7 +1542,7 @@ void CImgui_Manager::Show_CurrentModelList()
 				if (iter == nullptr)
 					continue;
 
-				char label[128];
+				char label[MAX_PATH];
 				char szLayertag[MAX_PATH] = "";
 
 				string  ModelTag = iter->Get_Modeltag();
@@ -1558,7 +1570,11 @@ void CImgui_Manager::Show_CurrentModelList()
 		ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 		char szLayertag[MAX_PATH] = "";
 		if (vecCreatedModel.size() != 0)
-			strcpy_s(szLayertag, MAX_PATH, vecCreatedModel[m_iCreatedSelected]->Get_Modeltag());
+		{
+			if(vecCreatedModel[m_iCreatedSelected] != nullptr)
+				strcpy_s(szLayertag, MAX_PATH, vecCreatedModel[m_iCreatedSelected]->Get_Modeltag());
+		}
+			
 		ImGui::Text(szLayertag);
 		ImGui::Separator();
 		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))

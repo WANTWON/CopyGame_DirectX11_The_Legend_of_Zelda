@@ -121,14 +121,20 @@
     <Filter Include="95.UI\05. MessageBox">
       <UniqueIdentifier>{be2b1e41-6c34-430d-9f63-a569e70b4a20}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\03.Monster\04.Zol">
-      <UniqueIdentifier>{a8622992-5935-4f83-809f-1d164b6b78bd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\03.Monster\05.TailBoss">
       <UniqueIdentifier>{c02f26b0-f6e7-4339-ba1b-7894cfbe7b3a}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\01.NonAnim\03.CollapseTile">
       <UniqueIdentifier>{2f24d655-b332-4ef9-9eeb-ad3bf5355fa5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\05.Object\02.Door">
+      <UniqueIdentifier>{1fdb551f-2a8b-4a21-9bef-48e04789f46e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.Monster\04.BuzzBlob">
+      <UniqueIdentifier>{a8622992-5935-4f83-809f-1d164b6b78bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.Monster\06.RedZol">
+      <UniqueIdentifier>{a26cceaa-cd44-49cf-9e87-748752733c87}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -253,13 +259,19 @@
       <Filter>95.UI\05. MessageBox</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BuzzBlob.h">
-      <Filter>02.GameObjects\03.Monster\04.Zol</Filter>
+      <Filter>02.GameObjects\03.Monster\04.BuzzBlob</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TailBoss.h">
       <Filter>02.GameObjects\03.Monster\05.TailBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CollapseTile.h">
       <Filter>02.GameObjects\01.NonAnim\03.CollapseTile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Door.h">
+      <Filter>02.GameObjects\05.Object\02.Door</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RedZol.h">
+      <Filter>02.GameObjects\03.Monster\06.RedZol</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -369,13 +381,19 @@
       <Filter>95.UI\05. MessageBox</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BuzzBlob.cpp">
-      <Filter>02.GameObjects\03.Monster\04.Zol</Filter>
+      <Filter>02.GameObjects\03.Monster\04.BuzzBlob</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TailBoss.cpp">
       <Filter>02.GameObjects\03.Monster\05.TailBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CollapseTile.cpp">
       <Filter>02.GameObjects\01.NonAnim\03.CollapseTile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Door.cpp">
+      <Filter>02.GameObjects\05.Object\02.Door</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RedZol.cpp">
+      <Filter>02.GameObjects\03.Monster\06.RedZol</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

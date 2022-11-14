@@ -37,7 +37,7 @@ void CCollision_Manager::Clear_CollisionGroup(COLLSIONGROUP CollisionGroup)
 	m_GameObjects[CollisionGroup].clear();
 }
 
-_bool CCollision_Manager::CollisionwithGroup(COLLSIONGROUP CollisionGroup, CCollider* pCollider)
+_bool CCollision_Manager::CollisionwithGroup(COLLSIONGROUP CollisionGroup, CCollider* pCollider, CBaseObj** pOut)
 {
 	for (auto& iter : m_GameObjects[CollisionGroup])
 	{
@@ -46,7 +46,12 @@ _bool CCollision_Manager::CollisionwithGroup(COLLSIONGROUP CollisionGroup, CColl
 			continue;
 
 		if (pCollider->Collision(pTargetCollider))
+		{
+			if (pOut != nullptr)
+				*pOut = iter;
 			return true;
+		}
+			
 	}
 
 	return false;

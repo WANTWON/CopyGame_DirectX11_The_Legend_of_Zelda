@@ -102,7 +102,11 @@ HRESULT CNavigation_Manager::Add_ClickedSymbol(_float3 vClickPos, SYMBOL Symbolt
 	NonAnimDesc.vScale = _float3(0.5, 0.5, 0.5);
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), LEVEL_GAMEPLAY, TEXT("Layer_PickingSymbol"), &NonAnimDesc)))
+	{
+		RELEASE_INSTANCE(CGameInstance);
 		return E_FAIL;
+	}
+		
 
 	m_pClickedSymbol[Symboltype] = dynamic_cast<CNonAnim*>(pGameInstance->Get_Object(LEVEL_GAMEPLAY, TEXT("Layer_PickingSymbol"), Symboltype));
 	m_pClickedSymbol[Symboltype]->Setting_PickingSymbol(Symboltype);

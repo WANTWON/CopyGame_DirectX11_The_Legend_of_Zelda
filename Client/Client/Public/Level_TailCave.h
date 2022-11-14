@@ -31,12 +31,13 @@ private:
 	HRESULT Ready_Layer_Object(const _tchar* pLayerTag);
 
 
-private:
+public:
+	_bool Get_OpenDoor() { return m_bDoorOpen; }
 	void Check_Solved_Puzzle(); 
 
 
 private:
-	_bool m_bDoorOpen = true;
+	_bool m_bDoorOpen = false;
 	vector<_bool>					m_vecIsSolved = { false };
 
 public:

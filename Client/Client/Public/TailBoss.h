@@ -50,7 +50,7 @@ private:
 private:
 	TAILDESC m_TailDesc;
 	STATE m_eState = APPEAR;
-	_float m_fTurnAngle = 1.f;
+	_float m_fTurnAngle = 0.5f;
 	_bool m_bChangeDirection = false;
 	_bool m_bStart = false;
 

@@ -78,6 +78,20 @@ void CTailBoss::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
+	CBaseObj* pCollisionBlock = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pSPHERECom, &pCollisionBlock))
+	{
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionBlock->Get_TransformState(CTransform::STATE_POSITION);
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5, vDirection);
+
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
+		m_fTurnAngle = (rand() % 2000) * 0.001f + 0.1f;
+		m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
+	}
 
 }
 
@@ -100,6 +114,7 @@ void CTailBoss::Check_Navigation()
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
 	{
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
+		m_fTurnAngle = (rand() % 2000) * 0.001f + 0.1f;
 		m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
 	}
 	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
@@ -110,6 +125,7 @@ void CTailBoss::Check_Navigation()
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 
 	}
+
 
 }
 

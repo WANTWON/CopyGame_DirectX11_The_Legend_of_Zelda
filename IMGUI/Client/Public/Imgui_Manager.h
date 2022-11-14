@@ -101,6 +101,9 @@ private:
 	_float3									m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
 	_bool									m_bPickingMode = false;
 	_int									m_PickingType = 0;
+	_float3									m_vPickedRotAxis = _float3(0.f, 1.f, 0.f);
+	_float									m_fRotAngle = 0.f;
+
 
 	/*For Navigation*/
 	CNavigation_Manager*					m_pNavigation_Manager = nullptr;
