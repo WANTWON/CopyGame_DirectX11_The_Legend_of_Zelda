@@ -20,6 +20,7 @@
 #include "BuzzBlob.h"
 #include "TailBoss.h"
 #include "RedZol.h"
+#include "Keese.h"
 
 //for UI
 #include "BackGround.h"
@@ -373,6 +374,12 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Pawn/Pawn.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_Keese*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Keese"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Keese/Keese.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
 	/*For.Prototype_Component_Model_BuzzBlob*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_BuzzBlob"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/BuzzBlob/BuzzBlob.fbx", PivotMatrix))))
@@ -406,8 +413,6 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Door/ClosedDoor/ClosedDoor.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	
-
 	/* 콜라이더 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("콜라이더 생성 중."));
 
@@ -440,6 +445,11 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/*For.Prototype_GameObject_Keese*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Keese"),
+		CKeese::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	/*For.Prototype_GameObject_RedZol*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_RedZol"),

@@ -178,7 +178,7 @@ _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageC
 	return m_tInfo.iCurrentHp;
 }
 
-void CMonster::Check_Navigation()
+void CMonster::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom == nullptr)
 		return;

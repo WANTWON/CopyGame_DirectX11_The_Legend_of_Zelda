@@ -1,13 +1,13 @@
 #include "stdafx.h"
-#include "..\Public\Pawn.h"
+#include "..\Public\Keese.h"
 #include "Player.h"
 
-CPawn::CPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CKeese::CKeese(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
 {
 }
 
-HRESULT CPawn::Initialize_Prototype()
+HRESULT CKeese::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
@@ -15,12 +15,12 @@ HRESULT CPawn::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CPawn::Initialize(void * pArg)
+HRESULT CKeese::Initialize(void * pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_tInfo.iMaxHp = 10;
+	m_tInfo.iMaxHp = 2;
 	m_tInfo.iDamage = 4;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
@@ -31,16 +31,16 @@ HRESULT CPawn::Initialize(void * pArg)
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
-	
+	Set_Scale(_float3(1.f, 1.f, 1.f));
 	m_pNavigationCom->Compute_CurrentIndex(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-
-
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
+
+	
 
 	return S_OK;
 }
 
-int CPawn::Tick(_float fTimeDelta)
+int CKeese::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
@@ -56,14 +56,23 @@ int CPawn::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CPawn::Late_Tick(_float fTimeDelta)
+void CKeese::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	
+	CBaseObj* pCollisionBlock = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pOBBCom, &pCollisionBlock))
+	{
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionBlock->Get_TransformState(CTransform::STATE_POSITION);
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5, vDirection, m_pNavigationCom);
+	}
 }
 
-HRESULT CPawn::Render()
+HRESULT CKeese::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
@@ -77,10 +86,17 @@ HRESULT CPawn::Render()
 	return S_OK;
 }
 
-void CPawn::Check_Navigation(_float fTimeDelta)
+void CKeese::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
-		m_eState = DEADFALL;
+	{
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pNavigationCom->Get_CurrentCellCenter();
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5, vDirection, m_pNavigationCom);
+	}
 	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -90,32 +106,35 @@ void CPawn::Check_Navigation(_float fTimeDelta)
 			vPosition = XMVectorSetY(vPosition, fHeight);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 		}
-			
+
 	}
-		
+	else
+	{
+
+	}
+
 }
 
-void CPawn::Change_Animation(_float fTimeDelta)
+void CKeese::Change_Animation(_float fTimeDelta)
 {
 	switch (m_eState)
 	{
-	case Client::CPawn::IDLE:
-	case Client::CPawn::WALK:
-		m_fAnimSpeed = 2.f;
-		m_bIsLoop = true;
-		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+	case Client::CKeese::PIYO:
+	{
+		m_fAnimSpeed = 3.f;
+		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom);
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+			m_eState = WALK;
 		break;
-	case Client::CPawn::STUN:
-		m_bIsLoop = true;
-		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
-		break;
-	case Client::CPawn::DEAD:
-	case Client::CPawn::DEADFALL:
+	}
+	case Client::CKeese::DEAD:
 	{
 		m_fAnimSpeed = 1.f;
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
-		m_pTransformCom->Go_Backward(fTimeDelta*2, m_pNavigationCom);
-		m_pTransformCom->Go_PosDir(fTimeDelta*2, XMVectorSet(0.f, -0.1f, 0.f, 0.f), m_pNavigationCom);
+		m_pTransformCom->Go_Backward(fTimeDelta * 2, m_pNavigationCom);
+		m_pTransformCom->Go_PosDir(fTimeDelta * 2, XMVectorSet(0.f, -0.1f, 0.f, 0.f), m_pNavigationCom);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
@@ -123,24 +142,23 @@ void CPawn::Change_Animation(_float fTimeDelta)
 		}
 		break;
 	}
-	case Client::CPawn::DAMAGE:
-	{
-		m_fAnimSpeed = 3.f;
-		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
-		m_pTransformCom->Go_PosDir(fTimeDelta*2, vDir, m_pNavigationCom);
-		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
-			m_eState = STUN;
-		break;
-	}
-	default:
+	case Client::CKeese::IDLE:
+		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
-		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
+		m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(180));
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		break;
+	case Client::CKeese::WALK:
+		m_fAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		break;
+	default:
 		break;
 	}
 }
 
-HRESULT CPawn::Ready_Components(void * pArg)
+HRESULT CKeese::Ready_Components(void * pArg)
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))
@@ -150,7 +168,7 @@ HRESULT CPawn::Ready_Components(void * pArg)
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
-	TransformDesc.fSpeedPerSec = 2.f;
+	TransformDesc.fSpeedPerSec = 3.f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
@@ -160,12 +178,12 @@ HRESULT CPawn::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Pawn"), (CComponent**)&m_pModelCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Keese"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
 	/* For.Com_OBB*/
 	CCollider::COLLIDERDESC		ColliderDesc;
-	ColliderDesc.vScale = _float3(1.5f, 1.5f, 1.5f);
+	ColliderDesc.vScale = _float3(1.5f, 2.f, 1.5f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.0f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
@@ -189,7 +207,7 @@ HRESULT CPawn::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CPawn::SetUp_ShaderResources()
+HRESULT CKeese::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -210,20 +228,20 @@ HRESULT CPawn::SetUp_ShaderResources()
 	return S_OK;
 }
 
-_bool CPawn::IsDead()
+_bool CKeese::IsDead()
 {
-	if (m_bDead && m_eState == STATE::DEADFALL)//&& m_dwDeathTime + 1000 < GetTickCount())
+	if (m_bDead && m_eState == STATE::DEAD)//&& m_dwDeathTime + 1000 < GetTickCount())
 		return true;
-	else if (m_bDead && m_eState != STATE::DEADFALL)
+	else if (m_bDead && m_eState != STATE::DEAD)
 	{
 		m_dwDeathTime = GetTickCount();
-		m_eState = STATE::DEADFALL;
+		m_eState = STATE::DEAD;
 	}
 
 	return false;
 }
 
-void CPawn::Find_Target()
+void CKeese::Find_Target()
 {
 	if (!m_bIsAttacking && !m_bHit && !m_bDead)
 	{
@@ -257,7 +275,7 @@ void CPawn::Find_Target()
 	}
 }
 
-void CPawn::Follow_Target(_float fTimeDelta)
+void CKeese::Follow_Target(_float fTimeDelta)
 {
 	if (m_pTarget == nullptr)
 		return;
@@ -272,9 +290,9 @@ void CPawn::Follow_Target(_float fTimeDelta)
 	m_bIsAttacking = false;
 }
 
-void CPawn::AI_Behaviour(_float fTimeDelta)
+void CKeese::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_eState == DAMAGE  || m_eState == DEADFALL)
+	if (!m_bMove || m_eState == DEAD || m_eState == PIYO)
 		return;
 
 	// Check for Target, AggroRadius
@@ -283,32 +301,26 @@ void CPawn::AI_Behaviour(_float fTimeDelta)
 	if (m_pTarget && m_pSPHERECom->Collision(m_pTarget->Get_Collider()) == true)
 	{
 		m_bAggro = true;
-		// If in AttackRadius > Attack
-		if (m_fDistanceToTarget < m_fAttackRadius)
-		{
-			m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
-			m_eState = STATE::STUN;
-			m_bIsAttacking = true;
 
-		}
-		else
-			Follow_Target(fTimeDelta);
+		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		m_pTransformCom->LookDir(vDir);
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+		m_eState = STATE::WALK;
+		m_bIsAttacking = true;
+
 	}
 	else
 	{
-		if(m_bAggro)
-			Follow_Target(fTimeDelta);
-		else
-			m_eState = IDLE;
+		m_eState = IDLE;
 	}
-	
+
 }
 
 
 
-_uint CPawn::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
+_uint CKeese::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
-	if (m_eState == DEADFALL || m_eState == STATE::DAMAGE )
+	if (m_eState == DEAD || m_eState == STATE::PIYO)
 		return 0;
 
 	_uint fHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
@@ -318,7 +330,7 @@ _uint CPawn::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 		if (!m_bDead)
 		{
 			m_bHit = true;
-			m_eState = STATE::DAMAGE;
+			m_eState = STATE::PIYO;
 			m_bMove = true;
 		}
 
@@ -329,37 +341,37 @@ _uint CPawn::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 		return fHp;
 	}
 	else
-		m_eState = STATE::DEADFALL;
+		m_eState = STATE::DEAD;
 
 	return 0;
 }
 
-CPawn * CPawn::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CKeese * CKeese::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CPawn*	pInstance = new CPawn(pDevice, pContext);
+	CKeese*	pInstance = new CKeese(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		ERR_MSG(TEXT("Failed to Created : CPawn"));
+		ERR_MSG(TEXT("Failed to Created : CKeese"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CPawn::Clone(void * pArg)
+CGameObject * CKeese::Clone(void * pArg)
 {
-	CPawn*	pInstance = new CPawn(*this);
+	CKeese*	pInstance = new CKeese(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		ERR_MSG(TEXT("Failed to Cloned : CPawn"));
+		ERR_MSG(TEXT("Failed to Cloned : CZol"));
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CPawn::Free()
+void CKeese::Free()
 {
 	__super::Free();
 }

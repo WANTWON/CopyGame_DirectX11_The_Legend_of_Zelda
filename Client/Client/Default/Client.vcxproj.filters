@@ -136,6 +136,9 @@
     <Filter Include="02.GameObjects\03.Monster\06.RedZol">
       <UniqueIdentifier>{a26cceaa-cd44-49cf-9e87-748752733c87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\03.Monster\07.Keese">
+      <UniqueIdentifier>{97c7ffc2-0d5c-4c3f-968e-a991e8dc1945}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -273,6 +276,9 @@
     <ClInclude Include="..\Public\RedZol.h">
       <Filter>02.GameObjects\03.Monster\06.RedZol</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Keese.h">
+      <Filter>02.GameObjects\03.Monster\07.Keese</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -394,6 +400,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\RedZol.cpp">
       <Filter>02.GameObjects\03.Monster\06.RedZol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Keese.cpp">
+      <Filter>02.GameObjects\03.Monster\07.Keese</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

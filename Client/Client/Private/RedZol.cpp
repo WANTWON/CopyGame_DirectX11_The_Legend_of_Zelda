@@ -47,7 +47,7 @@ int CRedZol::Tick(_float fTimeDelta)
 
 
 	AI_Behaviour(fTimeDelta);
-	Check_Navigation();
+	Check_Navigation(fTimeDelta);
 
 	m_pModelCom->Set_NextAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
@@ -77,7 +77,7 @@ HRESULT CRedZol::Render()
 	return S_OK;
 }
 
-void CRedZol::Check_Navigation()
+void CRedZol::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
 		m_eState = DEAD;

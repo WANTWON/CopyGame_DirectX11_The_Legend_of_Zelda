@@ -24,6 +24,7 @@ public:
 public:
 	_bool isMove(_fvector vPosition);
 	_uint Get_CurrentCelltype();
+	_vector Get_CurrentCellCenter();
 
 #ifdef _DEBUG
 public:

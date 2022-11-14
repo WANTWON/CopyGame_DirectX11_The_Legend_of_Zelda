@@ -47,7 +47,7 @@ int CBuzzBlob::Tick(_float fTimeDelta)
 
 
 	AI_Behaviour(fTimeDelta);
-	Check_Navigation();
+	Check_Navigation(fTimeDelta);
 
 	m_pModelCom->Set_NextAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
@@ -77,7 +77,7 @@ HRESULT CBuzzBlob::Render()
 	return S_OK;
 }
 
-void CBuzzBlob::Check_Navigation()
+void CBuzzBlob::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
 		m_eState = DEAD;

@@ -257,6 +257,11 @@ HRESULT CLevel_TailCave::Ready_Layer_Monster(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_RedZol"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
 				return E_FAIL;
 		}
+		else if (!wcscmp(pModeltag, TEXT("Keese.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Keese"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
+		}
 		else if (!wcscmp(pModeltag, TEXT("TailBoss1.fbx")))
 		{
 			CTailBoss::TAILDESC TailDesc;
@@ -267,6 +272,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Monster(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TailBoss"), LEVEL_TAILCAVE, pLayerTag, &TailDesc)))
 				return E_FAIL;
 		}
+		
 
 	}
 

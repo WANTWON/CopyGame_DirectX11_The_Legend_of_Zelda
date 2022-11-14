@@ -62,7 +62,7 @@ int CTailBoss::Tick(_float fTimeDelta)
 
 
 	AI_Behaviour(fTimeDelta);
-	Check_Navigation();
+	Check_Navigation(fTimeDelta);
 
 	if (m_TailDesc.eTailType != TAIL1)
 		m_eState = dynamic_cast<CTailBoss*>(m_TailDesc.pParent)->Get_AnimState();
@@ -109,7 +109,7 @@ HRESULT CTailBoss::Render()
 	return S_OK;
 }
 
-void CTailBoss::Check_Navigation()
+void CTailBoss::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
 	{

@@ -37,7 +37,7 @@ private:
 	virtual void AI_Behaviour(_float fTimeDelta) override;
 	void Patrol(_float fTimeDelta);
 	_bool Moving_AttackPosition(_float fTimeDelta);
-	virtual void Check_Navigation();
+	virtual void Check_Navigation(_float fTimeDelta) override;
 	
 private:
 	STATE m_eState = IDLE;

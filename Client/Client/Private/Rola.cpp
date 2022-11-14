@@ -49,7 +49,7 @@ int CRola::Tick(_float fTimeDelta)
 	
 
 	AI_Behaviour(fTimeDelta);
-	Check_Navigation();
+	Check_Navigation(fTimeDelta);
 	if (m_eState != m_ePreState)
 	{
 		m_pModelCom->Set_NextAnimIndex(m_eState);
@@ -462,7 +462,7 @@ _bool CRola::Moving_AttackPosition(_float fTimeDelta)
 	return false;
 }
 
-void CRola::Check_Navigation()
+void CRola::Check_Navigation(_float fTimeDelta)
 {
 		if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
 			m_eState = IDLE;

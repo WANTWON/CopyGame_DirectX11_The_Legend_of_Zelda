@@ -3,16 +3,15 @@
 
 
 BEGIN(Client)
-class CPawn final : public CMonster
+class CKeese final : public CMonster
 {
 public:
-	enum STATE {
-		DAMAGE,	DEAD, DEADFALL, STUN, IDLE, WALK
-	};
+	enum STATE { ATTACK_LP, ATTACK_ST, DEAD, DEAD_FIRE, FALL, 
+		WALK, PIYO, IDLE };
 
 private:
-	CPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual ~CPawn() = default;
+	CKeese(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual ~CKeese() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -20,7 +19,7 @@ public:
 	virtual int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-	virtual void Check_Navigation(_float fTimeDelta)  override;
+	virtual void Check_Navigation(_float fTimeDelta) override;
 
 public:
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
@@ -42,7 +41,7 @@ private:
 	STATE m_eState = IDLE;
 
 public:
-	static CPawn* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CKeese* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 

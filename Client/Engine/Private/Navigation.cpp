@@ -160,6 +160,11 @@ _uint CNavigation::Get_CurrentCelltype()
 	return (_uint)m_Cells[m_NaviDesc.iCurrentCellIndex]->Get_CellType();
 }
 
+_vector CNavigation::Get_CurrentCellCenter()
+{
+	return m_Cells[m_NaviDesc.iCurrentCellIndex]->Get_Center();
+}
+
 #ifdef _DEBUG
 HRESULT CNavigation::Render_Navigation()
 {
