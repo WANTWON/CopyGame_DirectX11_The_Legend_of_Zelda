@@ -25,6 +25,7 @@ public:
 	_bool isMove(_fvector vPosition);
 	_uint Get_CurrentCelltype();
 	_vector Get_CurrentCellCenter();
+	_vector Get_LastNormal() { return XMLoadFloat3(&m_vLastNormal); }
 
 #ifdef _DEBUG
 public:
@@ -34,7 +35,7 @@ public:
 private:
 	NAVIDESC				m_NaviDesc;
 	vector<class CCell*>	m_Cells;
-
+	_float3					m_vLastNormal = _float3(0.f, 0.f, 0.f);
 #ifdef _DEBUG
 private:
 	class CShader*			m_pShader = nullptr;

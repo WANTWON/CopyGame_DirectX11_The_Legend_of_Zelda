@@ -133,7 +133,7 @@ _bool CNavigation::isMove(_fvector vPosition)
 				if (-1 == iNeighborIndex)
 					return false;
 
-				if (true == m_Cells[iNeighborIndex]->isIn(vPosition, &iNeighborIndex))
+				if (true == m_Cells[iNeighborIndex]->isIn(vPosition, &iNeighborIndex, &m_vLastNormal))
 					break;
 			}
 			

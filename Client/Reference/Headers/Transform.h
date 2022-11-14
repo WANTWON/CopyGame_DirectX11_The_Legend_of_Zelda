@@ -51,6 +51,7 @@ public:
 
 public:
 	bool Go_Straight(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
+	bool Go_StraightSliding(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 	void Go_Backward(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);	

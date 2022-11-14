@@ -28,7 +28,7 @@ public:
 public:
 	HRESULT		Initialize(const _float3* pPoints, _int iIndex);
 	_bool		Compare_Points(const _float3* pSourPoint, const _float3* pDestPoint);
-	_bool		isIn(_fvector vPosition, _int* pNeighborIndex);
+	_bool		isIn(_fvector vPosition, _int* pNeighborIndex, _float3* vLastNormal = nullptr);
 	void		Set_CellType(CELLTYPE eType) { m_eCellType = eType; }
 	CELLTYPE	Get_CellType() { return m_eCellType;}
 	_vector		Get_Center();
@@ -51,6 +51,7 @@ private:
 	_float3					m_vPoints[POINT_END];
 	_float3					m_vNormals[LINE_END];
 	_int					m_iNeighborIndices[LINE_END] = { -1, -1, -1 };
+	
 	CELLTYPE				m_eCellType = ACCESSIBLE;
 private:
 #ifdef _DEBUG

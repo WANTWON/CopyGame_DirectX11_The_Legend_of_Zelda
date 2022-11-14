@@ -108,10 +108,6 @@ void CKeese::Check_Navigation(_float fTimeDelta)
 		}
 
 	}
-	else
-	{
-
-	}
 
 }
 

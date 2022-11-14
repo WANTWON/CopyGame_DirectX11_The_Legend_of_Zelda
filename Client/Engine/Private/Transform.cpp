@@ -58,6 +58,31 @@ bool CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
 	return true;
 }
 
+bool CTransform::Go_StraightSliding(_float fTimeDelta, CNavigation * pNavigation)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	_vector		vLook = Get_State(CTransform::STATE_LOOK);
+
+	vPosition += XMVector3Normalize(vLook) * m_TransformDesc.fSpeedPerSec * fTimeDelta;
+
+	if (nullptr == pNavigation)
+		Set_State(CTransform::STATE_POSITION, vPosition);
+	else if (true == pNavigation->isMove(vPosition))
+		Set_State(CTransform::STATE_POSITION, vPosition);
+	else if (false == pNavigation->isMove(vPosition))
+	{
+		_vector vNormal = XMVector3Normalize(pNavigation->Get_LastNormal());
+		_vector vSliding = XMVector3Normalize(vLook - vNormal);
+		_vector vPos = Get_State(CTransform::STATE_POSITION);
+		vPos += vSliding*fTimeDelta*m_TransformDesc.fSpeedPerSec;
+		Set_State(CTransform::STATE_POSITION, vPos);
+		return false;
+	}
+		
+
+	return true;
+}
+
 void CTransform::Go_Backward(_float fTimeDelta, CNavigation* pNavigation)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
