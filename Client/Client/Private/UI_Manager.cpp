@@ -186,6 +186,11 @@ void CUI_Manager::Get_Key()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CUI_Manager::Use_Key()
+{
+	m_KeyList.back()->Set_Dead(true);
+	m_KeyList.pop_back();
+}
 
 
 void CUI_Manager::Free()

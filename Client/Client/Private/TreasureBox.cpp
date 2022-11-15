@@ -27,7 +27,7 @@ HRESULT CTreasureBox::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_eObjectID = OBJID::OBJ_BLOCK;
-	Set_Scale(_float3(1.2, 1.2, 1.2));
+	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
 
 	_vector vecPostion = XMLoadFloat3(&m_eTreasureBoxDesc.vPosition);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);

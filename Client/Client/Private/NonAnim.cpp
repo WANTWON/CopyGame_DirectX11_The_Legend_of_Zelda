@@ -53,13 +53,17 @@ int CNonAnim::Tick(_float fTimeDelta)
 
 void CNonAnim::Late_Tick(_float fTimeDelta)
 {
-	if (nullptr != m_pRendererCom)
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	_float3 vScale = Get_Scale();
+	_float fCullingRadius = max( max(vScale.x, vScale.y), vScale.z);
+	if (nullptr != m_pRendererCom && true == pGameInstance->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius+2))
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
-	/*XMStoreFloat3(&m_ModelDesc.vPosition, Get_Position());
-	m_ModelDesc.vScale = Get_Scale();*/
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CNonAnim::Render()
@@ -70,7 +74,6 @@ HRESULT CNonAnim::Render()
 
 	if (FAILED(SetUp_ShaderID()))
 		return E_FAIL;
-
 
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
@@ -84,13 +87,22 @@ HRESULT CNonAnim::Render()
 
 		//if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_OcculsionTexture", i, aiTextureType_SPECULAR)))
 			//return E_FAIL;
-///
 		//if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS)))
 			//return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))
 			return E_FAIL;
 	}
+
+#ifdef _DEBUG
+	if (m_pAABBCom != nullptr)
+		m_pAABBCom->Render();
+	if (m_pOBBCom != nullptr)
+		m_pOBBCom->Render();
+	if (m_pSPHERECom != nullptr)
+		m_pSPHERECom->Render();
+#endif
+
 
 	return S_OK;
 }
@@ -188,6 +200,10 @@ CGameObject * CNonAnim::Clone(void * pArg)
 void CNonAnim::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pAABBCom);
+	Safe_Release(m_pOBBCom);
+	Safe_Release(m_pSPHERECom);
 
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pShaderCom);

@@ -139,6 +139,12 @@
     <Filter Include="02.GameObjects\03.Monster\07.Keese">
       <UniqueIdentifier>{97c7ffc2-0d5c-4c3f-968e-a991e8dc1945}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\01.NonAnim\04.SquareBlock">
+      <UniqueIdentifier>{75a6af79-4d70-472d-8782-ce6af3fa590c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.Monster\08.Tail">
+      <UniqueIdentifier>{4469c2a0-c4ac-42cb-9245-bec1fb6535f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -279,6 +285,12 @@
     <ClInclude Include="..\Public\Keese.h">
       <Filter>02.GameObjects\03.Monster\07.Keese</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SquareBlock.h">
+      <Filter>02.GameObjects\01.NonAnim\04.SquareBlock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Tail.h">
+      <Filter>02.GameObjects\03.Monster\08.Tail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -403,6 +415,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Keese.cpp">
       <Filter>02.GameObjects\03.Monster\07.Keese</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SquareBlock.cpp">
+      <Filter>02.GameObjects\01.NonAnim\04.SquareBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tail.cpp">
+      <Filter>02.GameObjects\03.Monster\08.Tail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

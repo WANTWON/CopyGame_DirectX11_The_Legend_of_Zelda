@@ -6,6 +6,7 @@
 #include "Object_Manager.h"
 #include "Timer_Manager.h"
 #include "PipeLine.h"
+#include "Frustum.h"
 
 #include "Component_Manager.h"
 #include "Light_Manager.h"
@@ -89,6 +90,9 @@ public: /* For Picking */
 	_vector Get_RayPos();
 	_vector Get_RayDir();
 
+public: /* For.Frustum */
+	_bool isIn_WorldFrustum(_fvector vPosition, _float fRange = 0.f);
+
 public:
 	static void Release_Engine();
 
@@ -103,6 +107,7 @@ private:
 	CLight_Manager*					m_pLight_Manager = nullptr;
 	CFont_Manager*					m_pFont_Manager = nullptr;
 	CPicking*						m_pPicking = nullptr;
+	CFrustum*						m_pFrustum = nullptr;
 public:
 	virtual void Free() override;
 };

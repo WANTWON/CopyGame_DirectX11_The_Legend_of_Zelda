@@ -24,12 +24,15 @@ public:
 	void Tick_PlayerState();
 	void Tick_Message();
 	
-public:
-	void Set_UI_Open();
-	void Set_EquipItem(EQUIP_BT eEquipBt, CObj_UI* pObj);
-	_bool Get_UI_Open() { return m_bUIOpen; }
-	_bool Get_OpenMessage() { return m_bOpenMessage; }
-	CObj_UI* Get_EquipItem(EQUIP_BT eEquipBt) { return m_EquipTile[eEquipBt];}
+public: /*Getter Setter*/
+	void		Set_UI_Open();
+	void		Set_EquipItem(EQUIP_BT eEquipBt, CObj_UI* pObj);
+	void		Get_Key();
+	_uint		Get_KeySize() { return (_uint)m_KeyList.size(); }
+	CObj_UI*	Get_Button() { return m_pButton; }
+	_bool		Get_UI_Open() { return m_bUIOpen; }
+	_bool		Get_OpenMessage() { return m_bOpenMessage; }
+	CObj_UI*	Get_EquipItem(EQUIP_BT eEquipBt) { return m_EquipTile[eEquipBt];}
 	MESSAGETYPE Get_MessageType() { return m_eMessageType; }
 
 public:
@@ -37,8 +40,7 @@ public:
 	void Add_InvenGroup(CObj_UI* pObj) { m_InvenTile.push_back(pObj);  }
 	void Add_HpGroup(CObj_UI* pObj) { m_HpList.push_back(pObj); }
 	void Add_KeyGroup(CObj_UI* pObj) { m_KeyList.push_back(pObj); }
-	void Get_Key();
-	CObj_UI* Get_Button() { return m_pButton; }
+	void Use_Key();
 	void Open_Message(MESSAGETYPE eType) { m_bOpenMessage = true; m_eMessageType = eType; }
 	void Close_Message() {m_bOpenMessage = false;}
 

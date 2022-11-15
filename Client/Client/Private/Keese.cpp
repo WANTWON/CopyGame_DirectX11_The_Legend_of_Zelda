@@ -95,7 +95,7 @@ void CKeese::Check_Navigation(_float fTimeDelta)
 			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
 		else
 			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
-		m_pTransformCom->Go_PosDir(fTimeDelta*1.5, vDirection, m_pNavigationCom);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection, m_pNavigationCom);
 	}
 	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
 	{
@@ -300,7 +300,7 @@ void CKeese::AI_Behaviour(_float fTimeDelta)
 
 		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
 		m_pTransformCom->LookDir(vDir);
-		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
 		m_eState = STATE::WALK;
 		m_bIsAttacking = true;
 

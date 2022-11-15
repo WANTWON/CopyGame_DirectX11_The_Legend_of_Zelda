@@ -68,14 +68,21 @@ bool CTransform::Go_StraightSliding(_float fTimeDelta, CNavigation * pNavigation
 	if (nullptr == pNavigation)
 		Set_State(CTransform::STATE_POSITION, vPosition);
 	else if (true == pNavigation->isMove(vPosition))
+	{
 		Set_State(CTransform::STATE_POSITION, vPosition);
+	}
+		
 	else if (false == pNavigation->isMove(vPosition))
 	{
 		_vector vNormal = XMVector3Normalize(pNavigation->Get_LastNormal());
-		_vector vSliding = XMVector3Normalize(vLook - vNormal);
+
+		_float fDot = XMVectorGetX(XMVector3Dot(vLook, vNormal));
+		vNormal = vNormal*fDot*-1.f;
+		_vector vSliding = XMVector3Normalize(vLook + vNormal);
 		_vector vPos = Get_State(CTransform::STATE_POSITION);
 		vPos += vSliding*fTimeDelta*m_TransformDesc.fSpeedPerSec;
-		Set_State(CTransform::STATE_POSITION, vPos);
+		if (true == pNavigation->isMove(vPos))
+			Set_State(CTransform::STATE_POSITION, vPos);
 		return false;
 	}
 		

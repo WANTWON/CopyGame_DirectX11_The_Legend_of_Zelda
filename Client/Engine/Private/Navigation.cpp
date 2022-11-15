@@ -119,7 +119,7 @@ _bool CNavigation::isMove(_fvector vPosition)
 	_int		iNeighborIndex = -1;
 
 	/* 현재 존재하는 쎌안에서 움직였다. */
-	if (true == m_Cells[m_NaviDesc.iCurrentCellIndex]->isIn(vPosition, &iNeighborIndex))
+	if (true == m_Cells[m_NaviDesc.iCurrentCellIndex]->isIn(vPosition, &iNeighborIndex, &m_vLastNormal))
 		return true;
 
 	/* 현재 존재하는 쎌을 벗어난다.  */

@@ -21,6 +21,7 @@
 #include "TailBoss.h"
 #include "RedZol.h"
 #include "Keese.h"
+#include "Tail.h"
 
 //for UI
 #include "BackGround.h"
@@ -38,6 +39,7 @@
 #include "FootSwitch.h"
 #include "CollapseTile.h"
 #include "Door.h"
+#include "SquareBlock.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -398,6 +400,19 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/TailBoss/TailBoss3.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_Tail*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Tail1"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Tail/Tail1.fbx", PivotMatrix))))
+		return E_FAIL;
+	/*For.Prototype_Component_Model_Tail*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Tail2"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Tail/Tail2.fbx", PivotMatrix))))
+		return E_FAIL;
+	/*For.Prototype_Component_Model_Tail*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Tail3"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Tail/Tail3.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	/* For.Prototype_Component_Model_CollapseTile */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_CollapseTile"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/CollapseTile/CollapseTile.fbx", PivotMatrix))))
@@ -416,6 +431,11 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 	/*For.Prototype_Component_Model_LockDoor*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_LockDoor"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Door/LockDoor/LockDoor.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_SquareBlock*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_SquareBlock"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/SquareBlock/SquareBlock.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/* 콜라이더 생성 중. */
@@ -450,6 +470,16 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/*For.Prototype_GameObject_Keese*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tail"),
+		CTail::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_Keese*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_SquareBlock"),
+		CSquareBlock::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	/*For.Prototype_GameObject_Keese*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Keese"),

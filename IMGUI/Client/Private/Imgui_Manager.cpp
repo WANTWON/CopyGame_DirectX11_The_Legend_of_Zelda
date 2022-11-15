@@ -1542,7 +1542,7 @@ void CImgui_Manager::Show_CurrentModelList()
 				if (iter == nullptr)
 					continue;
 
-				char label[MAX_PATH];
+				char label[MAX_PATH] = "";
 				char szLayertag[MAX_PATH] = "";
 
 				string  ModelTag = iter->Get_Modeltag();

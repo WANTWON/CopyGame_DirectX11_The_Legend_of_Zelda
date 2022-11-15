@@ -5,12 +5,12 @@
 #include "UI_Manager.h"
 
 CCollapseTile::CCollapseTile(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	: CBaseObj(pDevice, pContext)
+	: CNonAnim(pDevice, pContext)
 {
 }
 
 CCollapseTile::CCollapseTile(const CCollapseTile & rhs)
-	: CBaseObj(rhs)
+	: CNonAnim(rhs)
 {
 }
 
@@ -50,7 +50,6 @@ int CCollapseTile::Tick(_float fTimeDelta)
 	}
 	
 
-
 	return OBJ_NOEVENT;
 }
 
@@ -77,33 +76,7 @@ void CCollapseTile::Late_Tick(_float fTimeDelta)
 
 HRESULT CCollapseTile::Render()
 {
-	if (nullptr == m_pShaderCom ||
-		nullptr == m_pModelCom)
-		return E_FAIL;
-
-	if (FAILED(SetUp_ShaderID()))
-		return E_FAIL;
-
-
-	if (FAILED(SetUp_ShaderResources()))
-		return E_FAIL;
-
-	_uint		iNumMeshes = m_pModelCom->Get_NumMeshContainers();
-
-	for (_uint i = 0; i < iNumMeshes; ++i)
-	{
-		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
-			return E_FAIL;
-
-		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))
-			return E_FAIL;
-	}
-
-#ifdef _DEBUG
-	//m_pAABBCom->Render();
-	if(m_pOBBCom != nullptr)
-			m_pOBBCom->Render();
-#endif
+	__super::Render();
 
 	return S_OK;
 
@@ -145,34 +118,6 @@ HRESULT CCollapseTile::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CCollapseTile::SetUp_ShaderResources()
-{
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
-		return E_FAIL;
-
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
-		return E_FAIL;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return S_OK;
-}
-
-HRESULT CCollapseTile::SetUp_ShaderID()
-{
-	return S_OK;
-}
 
 CCollapseTile * CCollapseTile::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
@@ -204,12 +149,4 @@ void CCollapseTile::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pAABBCom);
-	Safe_Release(m_pOBBCom);
-	Safe_Release(m_pSPHERECom);
-
-	Safe_Release(m_pTransformCom);
-	Safe_Release(m_pShaderCom);
-	Safe_Release(m_pRendererCom);
-	Safe_Release(m_pModelCom);
 }

@@ -8,7 +8,7 @@ END
 
 BEGIN(Client)
 
-class CNonAnim final : public CBaseObj
+class CNonAnim : public CBaseObj
 {
 public:
 	typedef struct NonAnimModelTag
@@ -21,7 +21,7 @@ public:
 
 	}NONANIMDESC;
 
-private:
+protected:
 	CNonAnim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CNonAnim(const CNonAnim& rhs);
 	virtual ~CNonAnim() = default;
@@ -39,12 +39,12 @@ public:
 	const char* Get_Modeltag() { return m_ModelDesc.pModeltag; }
 	const NONANIMDESC Get_ModelDesc() {return m_ModelDesc;}
 
-private:
+protected:
 	CModel*					m_pModelCom = nullptr;
 	NONANIMDESC				m_ModelDesc;
 	_float					m_fAlpha = 1.f;
 
-private:
+protected:
 	virtual HRESULT Ready_Components(void* pArg) override;
 	virtual HRESULT SetUp_ShaderResources() override; /* 셰이더 전역변수에 값을 전달한다. */
 	virtual HRESULT SetUp_ShaderID() override;

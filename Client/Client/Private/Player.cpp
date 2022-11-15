@@ -93,12 +93,15 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 	CBaseObj* pCollisionBlock = nullptr;
 	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pOBBCom, &pCollisionBlock))
 	{
+		if (m_eState == PUSH_LP)
+			return;
+
 		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionBlock->Get_TransformState(CTransform::STATE_POSITION);
 		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
 			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
 		else
 			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
-		m_pTransformCom->Go_PosDir(fTimeDelta*1.5, vDirection, m_pNavigationCom[m_iCurrentLevel]);
+		m_pTransformCom->Go_PosDir(fTimeDelta, vDirection, m_pNavigationCom[m_iCurrentLevel]);
 	}
 
 }
@@ -184,7 +187,7 @@ _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 			m_eState = CPlayer::DMG_F;
 
 	}
-	
+
 
 	return 0;
 }
@@ -200,7 +203,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 
 	if (pGameInstance->Key_Down(DIK_SPACE))
-	 {
+	{
 		if (m_eState == ITEM_GET_LP)
 			m_eState = ITEM_GET_ED;
 	}
@@ -211,7 +214,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		RELEASE_INSTANCE(CGameInstance);
 		return;
 	}
-		
+
 
 	/* Move Left and Right*/
 	if (pGameInstance->Key_Down(DIK_LEFT))
@@ -221,7 +224,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_iDash[DIR_X]--;
 			m_dwDashTime = GetTickCount();
 		}
-	
+
 	}
 	else if (pGameInstance->Key_Down(DIK_RIGHT))
 	{
@@ -294,7 +297,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	}
 	else if (pGameInstance->Key_Pressing(DIK_Z))
 	{
-		if(m_eState == IDLE)
+		if (m_eState == IDLE)
 			m_eState = ANIM::SLASH_HOLD_ST;
 		else if (m_eState == SLASH_HOLD_B || m_eState == SLASH_HOLD_F || m_eState == SLASH_HOLD_R || m_eState == SLASH_HOLD_L)
 			m_eState = SLASH_HOLD_LP;
@@ -334,7 +337,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_iDash[DIR_Z] = 0;
 			m_iDash[DIR_X] = 0;
 		}
-			
+
 	}
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -467,7 +470,9 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
 		return;
 
-	if (m_eState == SLASH_HOLD_LP || m_eState == SLASH_HOLD_ST || m_eState == SLASH_HOLD_B ||
+	if (m_eState == PUSH_LP || m_eState == PUSH_WAIT || m_eState == PULL_LP)
+		SetDirection_Pushing(fTimeDelta);
+	else if (m_eState == SLASH_HOLD_LP || m_eState == SLASH_HOLD_ST || m_eState == SLASH_HOLD_B ||
 		m_eState == SLASH_HOLD_F || m_eState == SLASH_HOLD_L || m_eState == SLASH_HOLD_R)
 		SetDirection_byPosition(fTimeDelta);
 	else
@@ -494,14 +499,14 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 		{
 			if (abs(m_iDash[DIR_X]) > 1 || abs(m_iDash[DIR_Z]) > 1)
 			{
-				if(m_eState != DASH_LP)
+				if (m_eState != DASH_LP)
 					m_eState = DASH_ST;
-			}	
+			}
 			else
 				m_eState = RUN;
 		}
-			
-		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
+
+		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
 	}
 
 }
@@ -526,8 +531,40 @@ void CPlayer::SetDirection_byPosition(_float fTimeDelta)
 
 	_vector vDirection = XMVectorSet((_float)m_eDir[DIR_X], 0.f, (_float)m_eDir[DIR_Z], 0.f);
 	m_pTransformCom->Go_PosDir(fTimeDelta, vDirection);
-		
 
+
+}
+
+void CPlayer::SetDirection_Pushing(_float fTimeDelta)
+{
+
+	if (m_eDir[DIR_X] == 0 && m_eDir[DIR_Z] == 0)
+	{
+		m_eState = PUSH_WAIT;
+	}
+	else
+	{
+		_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		if (fabs(XMVectorGetX(vLook)) > fabs(XMVectorGetZ(vLook)))
+			vLook = XMVectorGetX(vLook) > 0 ? XMVectorSet(1.f, 0.f, 0.f, 0.f) : XMVectorSet(-1.f, 0.f, 0.f, 0.f);
+	
+		else
+			vLook = XMVectorGetZ(vLook) > 0 ? XMVectorSet(0.f, 0.f, 1.f, 0.f) : XMVectorSet(0.f, 0.f, -1.f, 0.f);
+
+		_vector vNewLook = XMVectorSet(m_eDir[DIR_X], 0.f, m_eDir[DIR_Z], 0.f);
+
+		if (0 > XMVectorGetX(XMVector3Dot(vLook, vNewLook)))
+		{
+			m_eState = PULL_LP;
+			m_pTransformCom->Go_Backward(fTimeDelta*0.2f, m_pNavigationCom[m_iCurrentLevel]);
+		}
+		else
+		{
+			m_eState = PUSH_LP;
+			m_pTransformCom->Go_Straight(fTimeDelta*0.2f, m_pNavigationCom[m_iCurrentLevel]);
+		}
+		
+	}
 }
 
 void CPlayer::Change_Animation(_float fTimeDelta)
@@ -546,6 +583,17 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::SLASH_HOLD_R:
 	case Client::CPlayer::SLASH_HOLD_LP:
 	case Client::CPlayer::ITEM_GET_LP:
+	case Client::CPlayer::PULL_LP:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
+		break;
+	case Client::CPlayer::PUSH_LP:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
+		break;
+	case Client::CPlayer::PUSH_WAIT:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
@@ -610,7 +658,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		if (m_fPressedScale > 0.1f && !m_bPressed)
 		{
 			m_fPressedScale -= 0.1f;
-			Set_Scale(_float3(1.f, m_fPressedScale, 1.f));	
+			Set_Scale(_float3(1.f, m_fPressedScale, 1.f));
 
 			if (m_fPressedScale <= 0.1f)
 			{
@@ -619,7 +667,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 			}
 		}
 
-		if(m_bPressed && m_dwPressedTime + 1000 < GetTickCount())
+		if (m_bPressed && m_dwPressedTime + 1000 < GetTickCount())
 		{
 			if (m_fPressedScale < 1.f)
 			{
@@ -635,7 +683,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 			m_eState = IDLE;
 			Set_Scale(_float3(1.f, m_fPressedScale, 1.f));
 		}
-			
+
 		break;
 	case Client::CPlayer::DMG_B:
 	case Client::CPlayer::DMG_QUAKE:
@@ -696,7 +744,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		{
 			m_eState = FALL_FROMTOP;
 			m_pTransformCom->Go_Backward(fTimeDelta * 20, m_pNavigationCom[m_iCurrentLevel]);
-		}	
+		}
 		break;
 	case Client::CPlayer::FALL_FROMTOP:
 		m_eAnimSpeed = 2.f;
@@ -720,10 +768,10 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::DROP)
 	{
-		if(m_eState != FALL_ANTLION)
-			m_pTransformCom->Go_Straight(fTimeDelta*10, m_pNavigationCom[m_iCurrentLevel]);
+		if (m_eState != FALL_ANTLION)
+			m_pTransformCom->Go_Straight(fTimeDelta * 10, m_pNavigationCom[m_iCurrentLevel]);
 		m_eState = FALL_ANTLION;
-	}	
+	}
 	else if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::ACCESSIBLE)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -791,5 +839,5 @@ void CPlayer::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pModelCom);
 
-	
+
 }

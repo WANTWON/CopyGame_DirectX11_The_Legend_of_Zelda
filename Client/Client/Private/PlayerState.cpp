@@ -54,7 +54,8 @@ HRESULT CPlayerState::Initialize(void * pArg)
 
 int CPlayerState::Tick(_float fTimeDelta)
 {
-	__super::Tick(fTimeDelta);
+	if (__super::Tick(fTimeDelta))
+		return OBJ_DEAD;
 
 	return OBJ_NOEVENT;
 }

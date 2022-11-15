@@ -18,6 +18,7 @@
 #include "TreasureBox.h"
 #include "TailBoss.h"
 #include "Door.h"
+#include "Tail.h"
 
 CLevel_TailCave::CLevel_TailCave(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -272,6 +273,16 @@ HRESULT CLevel_TailCave::Ready_Layer_Monster(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TailBoss"), LEVEL_TAILCAVE, pLayerTag, &TailDesc)))
 				return E_FAIL;
 		}
+		else if (!wcscmp(pModeltag, TEXT("Tail1.fbx")))
+		{
+			CTail::TAILDESC TailDesc;
+			TailDesc.eTailType = CTail::TAIL1;
+			TailDesc.InitPostion = XMLoadFloat3(&ModelDesc.vPosition);
+			TailDesc.InitPostion = XMVectorSetW(TailDesc.InitPostion, 1.f);
+			TailDesc.pParent = nullptr;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Tail"), LEVEL_TAILCAVE, pLayerTag, &TailDesc)))
+				return E_FAIL;
+		}
 		
 
 	}
@@ -331,6 +342,11 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CollapeTile"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
 				return E_FAIL;
 		}
+		else if (!wcscmp(pModeltag, TEXT("SquareBlock.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_SquareBlock"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
+		}
 		else if (!wcscmp(pModeltag, TEXT("ClosedDoor.fbx")))
 		{
 			CDoor::DOORDESC DoorDesc;
@@ -346,7 +362,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 			DoorDesc.eType = CDoor::DOOR_KEY;
 			DoorDesc.InitPosition = ModelDesc.vPosition;
 			DoorDesc.fAngle = ModelDesc.m_fAngle;
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_Component_Model_LockDoor"), LEVEL_TAILCAVE, pLayerTag, &DoorDesc)))
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Door"), LEVEL_TAILCAVE, pLayerTag, &DoorDesc)))
 				return E_FAIL;
 		}
 

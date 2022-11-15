@@ -196,6 +196,12 @@ void CDoor::Tick_ClosedDoor(_float fTimeDelta)
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	CLevel* pLevel = pGameInstance->Get_CurrentLevel();
+	if (pLevel == nullptr || pGameInstance->Get_CurrentLevelIndex() != LEVEL_TAILCAVE)
+	{
+		RELEASE_INSTANCE(CGameInstance);
+		return;
+	}
+
 	m_bOpen = dynamic_cast<CLevel_TailCave*>(pLevel)->Get_OpenDoor();
 	if (m_bOpen)
 	{
@@ -224,8 +230,15 @@ void CDoor::Tick_ClosedDoor(_float fTimeDelta)
 
 void CDoor::Tick_LockDoor(_float fTimeDelta)
 {
-	CBaseObj* pPlayer = nullptr;
-	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pOBBCom, &pPlayer))
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+
+	_vector vTargetPos = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
+	_float fDistanceToTarget = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
+
+	
+	if (fDistanceToTarget < 3.f)
 	{
 		CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
 		pButton->Set_Visible(true);
@@ -235,17 +248,31 @@ void CDoor::Tick_LockDoor(_float fTimeDelta)
 		fPosition.y -= 30.f;
 		pButton->Set_Position(fPosition);
 
-		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_A)) 
 		{
-			pButton->Set_Visible(false);
-			dynamic_cast<CPlayer*>(pPlayer)->Set_AnimState(CPlayer::KEY_OPEN);
-			m_eState = OPEN_LD;
+			if (CUI_Manager::Get_Instance()->Get_KeySize() != 0)
+			{
+				pButton->Set_Visible(false);
+				dynamic_cast<CPlayer*>(pPlayer)->Set_AnimState(CPlayer::KEY_OPEN);
+				m_eState = OPEN_LD;
+			}
 		}
-		else
-			m_eState = CLOSE_LD;
+		
 	}
 	else
 		m_eState = CLOSE_LD;
+
+
+	if (m_eState != m_ePreState)
+	{
+		m_pModelCom->Set_NextAnimIndex(m_eState);
+		m_ePreState = m_eState;
+	}
+
+	
+	Change_Animation(fTimeDelta);
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CDoor::Tick_BossDoor(_float fTimeDelta)
@@ -301,7 +328,10 @@ void CDoor::Change_Animation_LockDDoor(_float fTimeDelta)
 	case Client::CDoor::OPEN2_LD:
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
-			m_bDead = true;
+		{
+			CUI_Manager::Get_Instance()->Use_Key();
+			m_bDead = true;		
+		}	
 		break;
 	default:
 		break;

@@ -103,7 +103,7 @@ void CRedZol::Change_Animation(_float fTimeDelta)
 	{
 		m_fAnimSpeed = 3.f;
 		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
-		m_pTransformCom->Go_PosDir(fTimeDelta * 2, vDir, m_pNavigationCom);
+		m_pTransformCom->Go_PosDir(fTimeDelta * 3, vDir, m_pNavigationCom);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_eState = WALK;

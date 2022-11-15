@@ -86,7 +86,7 @@ void CTailBoss::Late_Tick(_float fTimeDelta)
 			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
 		else
 			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
-		m_pTransformCom->Go_PosDir(fTimeDelta*1.5, vDirection);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection);
 
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
 		m_fTurnAngle = (rand() % 2000) * 0.001f + 0.1f;
@@ -365,7 +365,7 @@ HRESULT CTailBoss::Create_Tail(TAILTYPE eType)
 
 
 	RELEASE_INSTANCE(CGameInstance);
-
+	return S_OK;
 }
 
 

@@ -32,6 +32,9 @@ HRESULT CObj_UI::Initialize(void * pArg)
 
 int CObj_UI::Tick(_float fTimeDelta)
 {
+	if (m_bDead)
+		return OBJ_DEAD;
+
 	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, m_fSize.x);
 	m_pTransformCom->Set_Scale(CTransform::STATE_UP, m_fSize.y);
 

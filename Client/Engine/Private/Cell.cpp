@@ -80,6 +80,7 @@ _bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex, _float3* vLastNormal
 			return false;
 		}
 	}
+
 	return true;
 }
 

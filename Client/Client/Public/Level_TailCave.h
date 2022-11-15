@@ -37,7 +37,7 @@ public:
 
 
 private:
-	_bool m_bDoorOpen = false;
+	_bool							m_bDoorOpen = false;
 	vector<_bool>					m_vecIsSolved = { false };
 
 public:

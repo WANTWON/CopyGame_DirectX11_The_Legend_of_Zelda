@@ -203,6 +203,8 @@
     <ClInclude Include="..\Public\PlayerBullet.h" />
     <ClInclude Include="..\Public\RedZol.h" />
     <ClInclude Include="..\Public\Rola.h" />
+    <ClInclude Include="..\Public\SquareBlock.h" />
+    <ClInclude Include="..\Public\Tail.h" />
     <ClInclude Include="..\Public\TailBoss.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TreasureBox.h" />
@@ -248,6 +250,8 @@
     <ClCompile Include="..\Private\PlayerBullet.cpp" />
     <ClCompile Include="..\Private\RedZol.cpp" />
     <ClCompile Include="..\Private\Rola.cpp" />
+    <ClCompile Include="..\Private\SquareBlock.cpp" />
+    <ClCompile Include="..\Private\Tail.cpp" />
     <ClCompile Include="..\Private\TailBoss.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TreasureBox.cpp" />
