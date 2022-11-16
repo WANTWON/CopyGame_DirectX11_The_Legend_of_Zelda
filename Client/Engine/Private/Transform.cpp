@@ -1,6 +1,6 @@
 #include "..\Public\Transform.h"
 #include "..\Public\Navigation.h"
-
+#include "Cell.h"
 CTransform::CTransform(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
 {
@@ -69,7 +69,21 @@ bool CTransform::Go_StraightSliding(_float fTimeDelta, CNavigation * pNavigation
 		Set_State(CTransform::STATE_POSITION, vPosition);
 	else if (true == pNavigation->isMove(vPosition))
 	{
-		Set_State(CTransform::STATE_POSITION, vPosition);
+		if (pNavigation->Get_CurrentCelltype() == CCell::DROP)
+		{
+			_vector vNormal = XMVector3Normalize(pNavigation->Get_LastNormal());
+
+			_float fDot = XMVectorGetX(XMVector3Dot(vLook, vNormal));
+			vNormal = vNormal*fDot*-1.f;
+			_vector vSliding = XMVector3Normalize(vLook + vNormal);
+			_vector vPos = Get_State(CTransform::STATE_POSITION);
+			vPos += vSliding*fTimeDelta*m_TransformDesc.fSpeedPerSec;
+			if (true == pNavigation->isMove(vPos) && pNavigation->Get_CurrentCelltype() != CCell::DROP)
+				Set_State(CTransform::STATE_POSITION, vPos);
+			return false;
+		}
+		else
+			Set_State(CTransform::STATE_POSITION, vPosition);
 	}
 		
 	else if (false == pNavigation->isMove(vPosition))

@@ -379,6 +379,16 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/SquareBlock/SquareBlock.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_Togezo*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Togezo.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Togezo/Togezo.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_BladeTrap*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("BladeTrap.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/BladeTrap/BladeTrap.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }

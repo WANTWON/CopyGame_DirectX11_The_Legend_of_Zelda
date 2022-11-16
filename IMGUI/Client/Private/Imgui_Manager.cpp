@@ -774,11 +774,11 @@ void CImgui_Manager::Set_Terrain_Map()
 
 	m_pTerrain_Manager->Set_TerrainDesc(&TerrainDesc);
 
-	if (m_PickingType == PICKING_TERRAIN_TRANSFORM)
+	/*if (m_PickingType == PICKING_TERRAIN_TRANSFORM)
 	{
 		if (CGameInstance::Get_Instance()->Mouse_Down(DIMK_LBUTTON))
 			CPickingMgr::Get_Instance()->Picking();
-	}
+	}*/
 
 	if (CGameInstance::Get_Instance()->Key_Up(DIK_Z))
 	{
@@ -792,11 +792,11 @@ void CImgui_Manager::Set_Terrain_Map()
 		Safe_Release(*iter);
 		plistClone->erase(iter);
 	}
-	else if (CGameInstance::Get_Instance()->Key_Up(DIK_SPACE))
+	/*else if (CGameInstance::Get_Instance()->Key_Up(DIK_SPACE))
 	{
 		if (FAILED(m_pTerrain_Manager->Create_Terrain(m_iCurrentLevel, TEXT("Layer_Terrain"))))
 			return;
-	}
+	}*/
 
 }
 

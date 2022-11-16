@@ -36,7 +36,7 @@ HRESULT CTerrain::Initialize(void* pArg)
 		CTerrain_Manager::Get_Instance()->Add_DebugTerrain(this);
 	}
 
-	//CPickingMgr::Get_Instance()->Add_PickingGroup(this);
+	CPickingMgr::Get_Instance()->Add_PickingGroup(this);
 
 	m_eObjectID = OBJ_BACKGROUND;
 

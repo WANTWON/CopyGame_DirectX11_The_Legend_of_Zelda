@@ -207,6 +207,7 @@
     <ClInclude Include="..\Public\Tail.h" />
     <ClInclude Include="..\Public\TailBoss.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\Public\Togezo.h" />
     <ClInclude Include="..\Public\TreasureBox.h" />
     <ClInclude Include="..\Public\UIButton.h" />
     <ClInclude Include="..\Public\UI_Manager.h" />
@@ -254,6 +255,7 @@
     <ClCompile Include="..\Private\Tail.cpp" />
     <ClCompile Include="..\Private\TailBoss.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\Private\Togezo.cpp" />
     <ClCompile Include="..\Private\TreasureBox.cpp" />
     <ClCompile Include="..\Private\UIButton.cpp" />
     <ClCompile Include="..\Private\UI_Manager.cpp" />

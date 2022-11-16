@@ -22,6 +22,7 @@
 #include "RedZol.h"
 #include "Keese.h"
 #include "Tail.h"
+#include "Togezo.h"
 
 //for UI
 #include "BackGround.h"
@@ -438,6 +439,11 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/SquareBlock/SquareBlock.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_Togezo*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Togezo"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Togezo/Togezo.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	/* 콜라이더 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("콜라이더 생성 중."));
 
@@ -471,12 +477,17 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	/*For.Prototype_GameObject_Keese*/
+	/*For.Prototype_GameObject_Togezo*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Togezo"),
+		CTogezo::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_Tail*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tail"),
 		CTail::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	/*For.Prototype_GameObject_Keese*/
+	/*For.Prototype_GameObject_SquareBlock*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_SquareBlock"),
 		CSquareBlock::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -524,6 +535,7 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround_UI"),
 		CBackGround::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
 
 	/*For.Prototype_GameObject_UI */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_InvenTile_UI"),

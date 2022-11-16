@@ -134,7 +134,9 @@ void CKeese::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
-			m_bDead = true;
+			if(m_tInfo.iCurrentHp <= 0)
+				m_bDead = true;
+			m_eState = IDLE;
 		}
 		break;
 	}
@@ -164,7 +166,7 @@ HRESULT CKeese::Ready_Components(void * pArg)
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
-	TransformDesc.fSpeedPerSec = 3.f;
+	TransformDesc.fSpeedPerSec = 2.f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
@@ -179,7 +181,7 @@ HRESULT CKeese::Ready_Components(void * pArg)
 
 	/* For.Com_OBB*/
 	CCollider::COLLIDERDESC		ColliderDesc;
-	ColliderDesc.vScale = _float3(1.5f, 2.f, 1.5f);
+	ColliderDesc.vScale = _float3(1.5f, 2.f, 0.5f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.0f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
@@ -326,7 +328,7 @@ _uint CKeese::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCau
 		if (!m_bDead)
 		{
 			m_bHit = true;
-			m_eState = STATE::PIYO;
+			m_eState = STATE::DEAD;
 			m_bMove = true;
 		}
 

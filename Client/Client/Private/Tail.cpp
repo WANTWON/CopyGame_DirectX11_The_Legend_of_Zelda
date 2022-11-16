@@ -134,9 +134,12 @@ void CTail::Change_Animation(_float fTimeDelta)
 	case Client::CTail::DAMAGE:
 		m_fAnimSpeed = 3.f;
 		m_bIsLoop = false;
-		m_pTarget = dynamic_cast<CBaseObj*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
-		m_pTransformCom->Go_PosDir(fTimeDelta * 2, vDir, m_pNavigationCom);
+		if (m_TailDesc.eTailType == TAIL1)
+		{
+			m_pTarget = dynamic_cast<CBaseObj*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+			_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+			m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom);
+		}
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_bIsAttacking = false;
@@ -280,7 +283,7 @@ _bool CTail::IsDead()
 
 void CTail::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_eState == DAMAGE || m_eState == DEAD || m_eState == PIYO)
+	if (!m_bMove || m_eState == DEAD || m_eState == PIYO)
 		return;
 
 
@@ -293,7 +296,7 @@ void CTail::AI_Behaviour(_float fTimeDelta)
 
 void CTail::Behaviour_Head(_float fTimeDelta)
 {
-	if (m_bDead)
+	if (m_bDead || m_eState == DAMAGE )
 		return;
 
 	Find_Target();
@@ -315,7 +318,7 @@ void CTail::Behaviour_Head(_float fTimeDelta)
 		if (m_bChangeDirection == false)
 		{
 			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
-			m_fTurnAngle = rand() % 2 == 0 ? 3.f : -3.f;
+			m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
 		}
 
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTurnAngle);
@@ -334,7 +337,7 @@ void CTail::Behaviour_Tail(_float fTimeDelta)
 	{ 
 		_vector vPosition;
 		if(m_TailDesc.eTailType == TAIL2)
-			 vPosition = m_TailDesc.pParent->Get_TransformState(CTransform::STATE_POSITION) - m_TailDesc.pParent->Get_TransformState(CTransform::STATE_LOOK)*0.5f;
+			 vPosition = m_TailDesc.pParent->Get_TransformState(CTransform::STATE_POSITION) - m_TailDesc.pParent->Get_TransformState(CTransform::STATE_LOOK)*0.4f;
 		else if (m_TailDesc.eTailType == TAIL3)
 			vPosition = m_TailDesc.pParent->Get_TransformState(CTransform::STATE_POSITION) - m_TailDesc.pParent->Get_TransformState(CTransform::STATE_LOOK)*0.3f;
 		m_pTransformCom->LookAt(vPosition);

@@ -263,6 +263,11 @@ HRESULT CLevel_TailCave::Ready_Layer_Monster(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Keese"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
 				return E_FAIL;
 		}
+		else if (!wcscmp(pModeltag, TEXT("Togezo.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Togezo"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
+		}
 		else if (!wcscmp(pModeltag, TEXT("TailBoss1.fbx")))
 		{
 			CTailBoss::TAILDESC TailDesc;
@@ -346,6 +351,11 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 		{
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_SquareBlock"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
 				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("BladeTrap.fbx")))
+		{
+			//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BladeTrap"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				//return E_FAIL;
 		}
 		else if (!wcscmp(pModeltag, TEXT("ClosedDoor.fbx")))
 		{
