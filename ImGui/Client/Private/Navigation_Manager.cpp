@@ -150,19 +150,23 @@ void CNavigation_Manager::Cancle_Cell()
 	m_Cells.pop_back();
 }
 
-CCell * CNavigation_Manager::Find_PickingCell()
+void CNavigation_Manager::Erase_Cell()
 {
+	auto& iter = m_Cells.begin();
+	while (iter != m_Cells.end())
+	{
+		if (*iter == m_Cells[m_iClickedCellIndex])
+		{
+			iter = m_Cells.erase(iter);
+			return;
+		}
+		else
+			++iter;
+	}
+}
 
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	// 찍은 점에서 거리가 가장 가까운 셀을 구한다. 셀을 이웃하게 찍어야 하니까.
-	XMVECTOR		vRayDir, vRayPos;
-
-	vRayDir = pGameInstance->Get_RayDir();
-	vRayDir = XMVector3Normalize(vRayDir);
-	vRayPos = pGameInstance->Get_RayPos();
-	vRayPos = XMVectorSetW(vRayPos, 1.f);
-
+CCell * CNavigation_Manager::Find_PickingCell(_vector vPickingPos)
+{
 	_float fMinDistance = MAX_NUM;
 	CCell* pMinCell = nullptr;
 
@@ -173,39 +177,21 @@ CCell * CNavigation_Manager::Find_PickingCell()
 		if (nullptr == pCell)
 			continue;
 
-		_float3 vPoint[CCell::POINT_END];
+		_vector vCenter = pCell->Get_Center();
+		_float fDistance = XMVectorGetX(XMVector3Length(vCenter - vPickingPos));
 
-		vPoint[CCell::POINT_A] = pCell->Get_PointValue(CCell::POINT_A);
-		vPoint[CCell::POINT_B] = pCell->Get_PointValue(CCell::POINT_B);
-		vPoint[CCell::POINT_C] = pCell->Get_PointValue(CCell::POINT_C);
-
-		_float		fDist;
-
-		_vector vTemp_1 = XMLoadFloat3(&vPoint[CCell::POINT_A]);
-		vTemp_1 = XMVectorSetW(vTemp_1, 1.f);
-		_vector vTemp_2 = XMLoadFloat3(&vPoint[CCell::POINT_B]);
-		vTemp_2 = XMVectorSetW(vTemp_2, 1.f);
-		_vector vTemp_3 = XMLoadFloat3(&vPoint[CCell::POINT_C]);
-		vTemp_3 = XMVectorSetW(vTemp_3, 1.f);
-
-		if (true == TriangleTests::Intersects(vRayPos, vRayDir, vTemp_1, vTemp_2, vTemp_3, fDist))
+		if (fMinDistance > fDistance)
 		{
-			if (fMinDistance > fDist)
-			{
-				fMinDistance = fDist;
-				pMinCell = m_Cells[i];
-			}
+			fMinDistance = fDistance;
+			pMinCell = m_Cells[i];
+			m_iClickedCellIndex = i;
 		}
-
 	}
 
 	if (fMinDistance != MAX_NUM)
 	{
-		RELEASE_INSTANCE(CGameInstance);
-		return pMinCell;
+ 		return pMinCell;
 	}
-
-	RELEASE_INSTANCE(CGameInstance);
 	return nullptr;
 }
 
@@ -406,6 +392,9 @@ HRESULT CNavigation_Manager::Render()
 				break;
 			case Engine::CCell::DROP:
 				m_pShader->Set_RawValue("g_vColor", &_float4(0.7f, 0.f, 1.f, 1.f), sizeof(_float4));
+				break;
+			case Engine::CCell::UPDOWN:
+				m_pShader->Set_RawValue("g_vColor", &_float4(0.0f, 1.f, 1.f, 1.f), sizeof(_float4));
 				break;
 			default:
 				break;

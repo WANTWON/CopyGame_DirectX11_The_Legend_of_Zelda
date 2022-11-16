@@ -213,6 +213,9 @@ void CImgui_Manager::Show_GuiTick()
 		}
 		if (ImGui::BeginTabItem("Navigation Tool"))
 		{
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Navigation"); ImGui::SameLine();
+			ImGui::Checkbox("##Picking for Navigation", &m_bNaviPicking);
+
 			ImGui::Text("This is the navigation tool ");
 			Set_Navigation();
 			ImGui::EndTabItem();
@@ -547,9 +550,11 @@ void CImgui_Manager::Set_Navigation()
 		if (ImGui::Button("PopBack Cell"))
 			m_pNavigation_Manager->Cancle_Cell();
 		ImGui::SameLine();
+		if (ImGui::Button("Erase Picked Cell"))
+			m_pNavigation_Manager->Erase_Cell();
 		if (ImGui::Button("All_Clear Cell"))
 			m_pNavigation_Manager->Clear_Cells();
-
+		
 
 
 		ImGui::CollapsingHeader("Setting Cell Type");
@@ -563,9 +568,12 @@ void CImgui_Manager::Set_Navigation()
 		ImGui::TextColored(ImVec4(0.7f, 0.0f, 1.0f, 1.0f), "Drop"); ImGui::SameLine();
 		if (ImGui::RadioButton("##Drop", &m_iCellType, 2))
 			m_pNavigation_Manager->Set_CellType((CCell::CELLTYPE)m_iCellType);
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "UpDown"); ImGui::SameLine();
+		if (ImGui::RadioButton("##UpDown", &m_iCellType, 3))
+			m_pNavigation_Manager->Set_CellType((CCell::CELLTYPE)m_iCellType);
+
+
 		
-
-
 		if (ImGui::Button("Save Navigation"))
 		{
 			Save_Navigation();
@@ -599,6 +607,20 @@ void CImgui_Manager::Set_Navigation()
 		}
 
 	}
+	else if (m_bNaviPicking && CGameInstance::Get_Instance()->Mouse_Up(DIMK_RBUTTON))
+	{
+		if (CPickingMgr::Get_Instance()->Picking())
+		{
+			_float3 fPosition = CPickingMgr::Get_Instance()->Get_PickingPos();
+			_vector vPosition = XMLoadFloat3(&fPosition);
+			vPosition = XMVectorSetW(vPosition, 1.f);
+			m_pNavigation_Manager->Find_PickingCell(vPosition);
+
+			m_iCellIndex = m_pNavigation_Manager->Get_CurrentCellIndex();
+		}
+		
+	}
+
 	m_pNavigation_Manager->Render();
 
 }

@@ -151,6 +151,9 @@
     <Filter Include="02.GameObjects\05.Object\03.BladeTrap">
       <UniqueIdentifier>{8721f067-9032-484c-bec4-20c3e5fdab24}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\01.NonAnim\05.Portal">
+      <UniqueIdentifier>{30af3763-4fa6-485f-a9a9-c6f8e074088d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -300,6 +303,12 @@
     <ClInclude Include="..\Public\Togezo.h">
       <Filter>02.GameObjects\03.Monster\09.Togezo</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BladeTrap.h">
+      <Filter>02.GameObjects\05.Object\03.BladeTrap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Portal.h">
+      <Filter>02.GameObjects\01.NonAnim\05.Portal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -433,6 +442,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Togezo.cpp">
       <Filter>02.GameObjects\03.Monster\09.Togezo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BladeTrap.cpp">
+      <Filter>02.GameObjects\05.Object\03.BladeTrap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Portal.cpp">
+      <Filter>02.GameObjects\01.NonAnim\05.Portal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

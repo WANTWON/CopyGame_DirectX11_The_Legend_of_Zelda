@@ -199,6 +199,9 @@ HRESULT CNavigation::Render_Navigation()
 				case Engine::CCell::DROP:
 					m_pShader->Set_RawValue("g_vColor", &_float4(0.7f, 0.f, 1.f, 1.f), sizeof(_float4));
 					break;
+				case Engine::CCell::UPDOWN:
+					m_pShader->Set_RawValue("g_vColor", &_float4(0.0f, 1.f, 1.f, 1.f), sizeof(_float4));
+					break;
 				default:
 					break;
 				}

@@ -89,8 +89,9 @@ _vector CCell::Get_Center()
 {
 
 	_float PositionX = (m_vPoints[POINT_A].x + m_vPoints[POINT_B].x + m_vPoints[POINT_C].x) / 3.f;
+	_float PositionY = (m_vPoints[POINT_A].y + m_vPoints[POINT_B].y + m_vPoints[POINT_C].y) / 3.f;
 	_float PositionZ = (m_vPoints[POINT_A].z + m_vPoints[POINT_B].z + m_vPoints[POINT_C].z) / 3.f;
-	return XMVectorSet(PositionX, 0.f, PositionZ, 1.f);
+	return XMVectorSet(PositionX, PositionY, PositionZ, 1.f);
 }
 
 

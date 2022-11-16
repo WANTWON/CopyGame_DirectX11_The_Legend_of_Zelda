@@ -69,9 +69,13 @@ void CTogezo::Late_Tick(_float fTimeDelta)
 		
 		if (ePlayerState == CPlayer::SHIELD_LP)
 		{
-			pPlayer->Set_AnimState(CPlayer::SHIELD_HIT);
-			m_eState = REBOUND_ST;
-			m_dwStunTime = GetTickCount();
+			if (m_eState != REBOUND_ST)
+			{
+				pPlayer->Set_AnimState(CPlayer::SHIELD_HIT);
+				m_eState = REBOUND_ST;
+				m_dwStunTime = GetTickCount();
+			}
+		
 		}
 		else if (m_eState != REBOUND_ST && m_eState != STUN && m_eState != STUN_ED)
 			m_eState = RUN_ED;
@@ -96,11 +100,6 @@ HRESULT CTogezo::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-#ifdef _DEBUG
-	m_pOBBCom->Render();
-	//m_pAABBCom->Render();
-	m_pSPHERECom->Render();
-#endif
 
 	return S_OK;
 }
@@ -150,7 +149,7 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
 
-		if (m_dwStunTime + 3000 < GetTickCount())
+		if (m_dwStunTime +10000 < GetTickCount())
 			m_eState = STUN_ED;
 		break;
 	case Client::CTogezo::RUN_ST:
@@ -179,6 +178,7 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CTogezo::REBOUND_ST:
 		m_bIsLoop = false;
+		m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_eState = STUN;
 		break;
@@ -198,6 +198,7 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 	{
 		m_fAnimSpeed = 3.f;
 		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		vDir = XMVectorSetY(vDir, 0.f);
 		m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
@@ -239,7 +240,7 @@ HRESULT CTogezo::Ready_Components(void * pArg)
 
 	/* For.Com_OBB*/
 	CCollider::COLLIDERDESC		ColliderDesc;
-	ColliderDesc.vScale = _float3(1.5f, 1.5f, 1.5f);
+	ColliderDesc.vScale = _float3(1.0f, 1.0f, 1.0f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.0f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))

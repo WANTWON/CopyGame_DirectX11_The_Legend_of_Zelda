@@ -41,6 +41,8 @@
 #include "CollapseTile.h"
 #include "Door.h"
 #include "SquareBlock.h"
+#include "BladeTrap.h"
+#include "Portal.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -444,6 +446,16 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Togezo/Togezo.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_BladeTrap*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_BladeTrap"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Obj/BladeTrap/BladeTrap.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_BladeTrap*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Boulder"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Boulder/Boulder.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	/* 콜라이더 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("콜라이더 생성 중."));
 
@@ -476,6 +488,16 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/*For.Prototype_GameObject_Portal*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Portal"),
+		CPortal::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_BladeTrap*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BladeTrap"),
+		CBladeTrap::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	/*For.Prototype_GameObject_Togezo*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Togezo"),

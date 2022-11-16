@@ -87,6 +87,15 @@ HRESULT CMonster::Render()
 			return E_FAIL;
 	}
 
+#ifdef _DEBUG
+	if (m_pAABBCom != nullptr)
+		m_pAABBCom->Render();
+	if (m_pOBBCom != nullptr)
+		m_pOBBCom->Render();
+	if (m_pSPHERECom != nullptr)
+		m_pSPHERECom->Render();
+#endif
+
 	return S_OK;
 }
 

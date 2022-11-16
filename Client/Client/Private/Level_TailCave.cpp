@@ -19,6 +19,7 @@
 #include "TailBoss.h"
 #include "Door.h"
 #include "Tail.h"
+#include "Portal.h"
 
 CLevel_TailCave::CLevel_TailCave(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -46,6 +47,9 @@ HRESULT CLevel_TailCave::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Object(TEXT("Layer_Object"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_Layer_Portal(TEXT("Layer_Portal"))))
 		return E_FAIL;
 	
 	CCameraManager* pCameraManager = CCameraManager::Get_Instance();
@@ -354,8 +358,8 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 		}
 		else if (!wcscmp(pModeltag, TEXT("BladeTrap.fbx")))
 		{
-			//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BladeTrap"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
-				//return E_FAIL;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BladeTrap"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
 		}
 		else if (!wcscmp(pModeltag, TEXT("ClosedDoor.fbx")))
 		{
@@ -381,6 +385,53 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 	CloseHandle(hFile);
 
 	
+	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
+}
+
+HRESULT CLevel_TailCave::Ready_Layer_Portal(const _tchar * pLayerTag)
+{
+	HANDLE hFile = 0;
+	_ulong dwByte = 0;
+	CNonAnim::NONANIMDESC  ModelDesc1;
+	CNonAnim::NONANIMDESC  ModelDesc2;
+	_uint iNum = 0;
+	
+	CPortal::PORTALDESC PortalDesc;
+
+
+	hFile = CreateFile(TEXT("../../../Bin/Data/TailCave_Portal.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
+		return E_FAIL;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+	for (_uint i = 0; i < iNum/2; ++i)
+	{
+		ReadFile(hFile, &(ModelDesc1), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+		ReadFile(hFile, &(ModelDesc2), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+		PortalDesc.vInitPos = ModelDesc1.vPosition;
+		PortalDesc.vConnectPos = ModelDesc2.vPosition;
+		PortalDesc.bConnectPortal2D = true;
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_TAILCAVE, pLayerTag, &PortalDesc)))
+			return E_FAIL;
+
+		PortalDesc.vInitPos = ModelDesc2.vPosition;
+		PortalDesc.vConnectPos = ModelDesc1.vPosition;
+		PortalDesc.bConnectPortal2D = false;
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_TAILCAVE, pLayerTag, &PortalDesc)))
+			return E_FAIL;
+
+	}
+
+
+	CloseHandle(hFile);
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }

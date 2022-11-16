@@ -68,11 +68,6 @@ HRESULT CRedZol::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-#ifdef _DEBUG
-	m_pOBBCom->Render();
-	//m_pAABBCom->Render();
-	m_pSPHERECom->Render();
-#endif
 
 	return S_OK;
 }

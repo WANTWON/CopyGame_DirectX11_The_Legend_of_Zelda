@@ -77,7 +77,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 
-	if (Out.vColor.a <= 0.3f)
+	if (Out.vColor.a < 0.2f)
 		discard;
 
 	return Out;
@@ -92,7 +92,7 @@ technique11 DefaultTechnique
 	pass Default
 	{
 		SetRasterizerState(RS_Default);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
 		SetDepthStencilState(DSS_Default, 0);
 
 		VertexShader = compile vs_5_0 VS_MAIN();

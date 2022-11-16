@@ -47,6 +47,7 @@ public:
 	OBJINFO Get_Info() { return m_tInfo; }
 	void Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
+	void Set_NextPortal(_float3 vPosition, _bool is2D) { m_vPortalPos = vPosition; m_bPortal2D = is2D;}
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
 
 private:
@@ -96,7 +97,8 @@ private:
 	DWORD					m_dwDashTime = GetTickCount();
 	DWORD					m_dwPressedTime = GetTickCount();
 
-
+	_float3					m_vPortalPos = _float3(0.f, 0.f, 0.f);
+	_bool					m_bPortal2D = false;
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

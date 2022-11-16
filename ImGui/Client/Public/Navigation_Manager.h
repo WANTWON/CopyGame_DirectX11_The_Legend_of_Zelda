@@ -32,6 +32,7 @@ public:
 	CCell* Get_Cell();
 	CCell* Get_Cell(_uint iIndex);
 	_float3 Get_ClickedPos() { return m_vClickedPos; }
+	_int Get_CurrentCellIndex() { return m_iClickedCellIndex; }
 	void Set_CilckedCellIndex(_uint iIndex) { m_iClickedCellIndex = iIndex; }
 	void Set_CellType(CCell::CELLTYPE eType);
 	CCell::CELLTYPE Get_SellType() { return m_Cells[m_iClickedCellIndex]->Get_CellType(); }
@@ -44,11 +45,12 @@ public:
 	void Update_ClickedPosition(_float3 position);
 	void Clear_Cells();
 	void Cancle_Cell();
+	void Erase_Cell();
 	void Sort_CellByPosition(_float3 * vPoss);
 	void Sort_CellByDot(_float3 * vPoss);
+	CCell* Find_PickingCell(_vector vPickingPos);
 
 private:
-	CCell* Find_PickingCell();
 	_float3 Find_MinDistance(_vector vPosition);
 	_bool Check_Sell(_float3 * vPoss);
 

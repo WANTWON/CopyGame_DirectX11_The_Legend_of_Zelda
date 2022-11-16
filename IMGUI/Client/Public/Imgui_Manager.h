@@ -106,6 +106,7 @@ private:
 
 
 	/*For Navigation*/
+	_bool									m_bNaviPicking = false;
 	CNavigation_Manager*					m_pNavigation_Manager = nullptr;
 	_int									m_iCellIndex = 0;
 	_int									m_iCellType = 0;

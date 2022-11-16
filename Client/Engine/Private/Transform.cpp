@@ -65,6 +65,11 @@ bool CTransform::Go_StraightSliding(_float fTimeDelta, CNavigation * pNavigation
 
 	vPosition += XMVector3Normalize(vLook) * m_TransformDesc.fSpeedPerSec * fTimeDelta;
 
+	if (pNavigation)
+	{
+		pNavigation->Compute_CurrentIndex(vPosition);
+	}
+
 	if (nullptr == pNavigation)
 		Set_State(CTransform::STATE_POSITION, vPosition);
 	else if (true == pNavigation->isMove(vPosition))
@@ -171,7 +176,7 @@ void CTransform::Go_PosTarget(_float fTimeDelta, _vector TargetPos, _vector dist
 	
 }
 
-void CTransform::Go_PosDir(_float fTimeDelta, _vector vecDir, CNavigation* pNavigation)
+bool CTransform::Go_PosDir(_float fTimeDelta, _vector vecDir, CNavigation* pNavigation)
 {
 	_vector vPos = Get_State(CTransform::STATE_POSITION);
 	_vector vDir = vecDir;
@@ -181,10 +186,17 @@ void CTransform::Go_PosDir(_float fTimeDelta, _vector vecDir, CNavigation* pNavi
 	vPos += vDir*fTimeDelta*m_TransformDesc.fSpeedPerSec;
 
 	if (nullptr == pNavigation)
+	{
 		Set_State(CTransform::STATE_POSITION, vPos);
-
+		return true;
+	}
 	else if (true == pNavigation->isMove(vPos))
+	{
 		Set_State(CTransform::STATE_POSITION, vPos);
+		return true;
+	}
+	else
+		return false;
 }
 
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)

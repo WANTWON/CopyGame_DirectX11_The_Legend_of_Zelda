@@ -41,9 +41,10 @@ _bool CCollision_Manager::CollisionwithGroup(COLLSIONGROUP CollisionGroup, CColl
 {
 	for (auto& iter : m_GameObjects[CollisionGroup])
 	{
-		CCollider* pTargetCollider = iter->Get_Collider();
-		if (iter == nullptr)
+		if (iter == nullptr || iter->Get_Collider() == pCollider)
 			continue;
+
+		CCollider* pTargetCollider = iter->Get_Collider();
 
 		if (pCollider->Collision(pTargetCollider))
 		{

@@ -196,7 +196,8 @@ void CPlayer::Key_Input(_float fTimeDelta)
 {
 
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == FALL_FROMTOP ||
-		m_eState == FALL_HOLE || m_eState == FALL_ANTLION || m_eState == KEY_OPEN)
+		m_eState == FALL_HOLE || m_eState == FALL_ANTLION || m_eState == KEY_OPEN ||
+		m_eState == STAIR_DOWN || m_eState == STAIR_UP)
 		return;
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -464,7 +465,7 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 {
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE ||
 		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP || m_eState == FALL_FROMTOP || m_eState == FALL_HOLE ||
-		m_eState == FALL_ANTLION || m_eState == KEY_OPEN)
+		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP)
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
@@ -747,12 +748,35 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		}
 		break;
 	case Client::CPlayer::FALL_FROMTOP:
+	case Client::CPlayer::STAIR_UP:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
 			m_eState = IDLE;
 
+		}
+		break;
+	case Client::CPlayer::STAIR_DOWN:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			_vector vPortalPos = XMLoadFloat3(&m_vPortalPos);
+			vPortalPos = XMVectorSetW(vPortalPos, 1.f);
+
+			if (!m_bPortal2D)
+			{
+				m_eState = STAIR_UP;
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPortalPos);
+			}
+			else
+			{
+				m_eState = IDLE;
+				vPortalPos = XMVectorSetY(vPortalPos, XMVectorGetY(vPortalPos) - 1.f);
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPortalPos);
+			}
+			
 		}
 		break;
 	default:
@@ -772,7 +796,8 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 			m_pTransformCom->Go_Straight(fTimeDelta * 10, m_pNavigationCom[m_iCurrentLevel]);
 		m_eState = FALL_ANTLION;
 	}
-	else if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::ACCESSIBLE)
+	else if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::ACCESSIBLE ||
+	m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::UPDOWN)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(vPosition, 0.f);
