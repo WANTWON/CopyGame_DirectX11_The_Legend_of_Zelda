@@ -510,7 +510,15 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 		}
 
 		if (m_b2D)
-			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
+		{
+			if (m_bUpDown)
+			{
+				_vector vDir = XMVectorSet(m_eDir[DIR_X], m_eDir[DIR_Z], 0.f, 0.f);
+				m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom[m_iCurrentLevel]);
+			}
+			else
+				m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
+		}	
 		else
 			m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
 	}
@@ -785,6 +793,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPortalPos);
 				CCameraManager::Get_Instance()->Set_CamState(CCameraManager::CAM_2D);
 				m_pNavigationCom[m_iCurrentLevel]->Set_2DNaviGation(true);
+				m_pNavigationCom[m_iCurrentLevel]->Compute_CurrentIndex_byDistance(vPortalPos);
 			}
 			
 		}
@@ -800,14 +809,17 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 
 void CPlayer::Check_Navigation(_float fTimeDelta)
 {
+	if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCellIndex() == -1)
+		return;
+
+
 	if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::DROP)
 	{
 		if (m_eState != FALL_ANTLION)
 			m_pTransformCom->Go_Straight(fTimeDelta * 10, m_pNavigationCom[m_iCurrentLevel]);
 		m_eState = FALL_ANTLION;
 	}
-	else if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::ACCESSIBLE ||
-	m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::UPDOWN)
+	else if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::ACCESSIBLE)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(vPosition, 0.f);
@@ -819,7 +831,37 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 			vPosition = XMVectorSetY(vPosition, m_fWalkingHeight);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 		}
+
 	}
+	else if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::ONLYJUMP)
+	{
+		m_fStartHeight = 0;
+		m_fEndHeight = 0;
+
+		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(vPosition, 0.f);
+		if (m_fWalkingHeight > XMVectorGetY(vPosition))
+		{
+			m_pNavigationCom[m_iCurrentLevel]->Compute_CurrentIndex_byHeight(vPosition);
+		}
+	}
+
+
+	if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::UPDOWN)
+	{
+		m_bUpDown = true;
+
+		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(vPosition, 0.f);
+		m_fStartHeight = m_fWalkingHeight;
+		m_fEndHeight = m_fWalkingHeight;
+		if (m_fWalkingHeight > XMVectorGetY(vPosition))
+		{
+			m_pNavigationCom[m_iCurrentLevel]->Compute_CurrentIndex_byHeight(vPosition);
+		}
+	}	
+	else
+		m_bUpDown = false;
 }
 
 CPlayer * CPlayer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

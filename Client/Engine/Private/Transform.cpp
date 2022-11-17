@@ -67,7 +67,7 @@ bool CTransform::Go_StraightSliding(_float fTimeDelta, CNavigation * pNavigation
 
 	if (pNavigation)
 	{
-		pNavigation->Compute_CurrentIndex(vPosition);
+		pNavigation->Compute_CurrentIndex_byDistance(vPosition);
 	}
 
 	if (nullptr == pNavigation)

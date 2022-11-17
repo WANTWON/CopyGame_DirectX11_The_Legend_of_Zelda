@@ -44,6 +44,7 @@
 #include "SquareBlock.h"
 #include "BladeTrap.h"
 #include "Portal.h"
+#include "PrizeItem.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -170,6 +171,41 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	/*For.Prototype_Component_Model_SmallKey*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_SmallKey"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/DgnKey/SmallKey/SmallKey.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_BossKey*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_BossKey"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/DgnKey/BossKey/BossKey.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Compass*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Compass"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Compass/Compass.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_DgnMap*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_DgnMap"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/DgnMap/DgnMap.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_HeartRecovery*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_HeartRecovery"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/HeartRecovery/HeartRecovery.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Ruby*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Ruby"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Ruby/Ruby.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Feather*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Feather"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Feather/Feather.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_FullMoonCello*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_FullMoonCello"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/FullMoonCello/FullMoonCello.fbx", PivotMatrix))))
 		return E_FAIL;
 
 
@@ -489,6 +525,11 @@ HRESULT CLoader::Loading_ForTailCaveLevel()
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/*For.Prototype_GameObject_PrizeItem*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_PrizeItem"),
+		CPrizeItem::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	/*For.Prototype_GameObject_Camera2D*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_2D"),

@@ -157,6 +157,9 @@
     <Filter Include="96.Camera\2DCam">
       <UniqueIdentifier>{d5aa3d88-0a33-4dfd-bc33-691978807bf0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\01.NonAnim\06.PrizeItem">
+      <UniqueIdentifier>{59264d96-cec9-4d0c-a0e1-2ba39fb57a9b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -315,6 +318,9 @@
     <ClInclude Include="..\Public\Camera_2D.h">
       <Filter>96.Camera\2DCam</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PrizeItem.h">
+      <Filter>02.GameObjects\01.NonAnim\06.PrizeItem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -457,6 +463,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Camera_2D.cpp">
       <Filter>96.Camera\2DCam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PrizeItem.cpp">
+      <Filter>02.GameObjects\01.NonAnim\06.PrizeItem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

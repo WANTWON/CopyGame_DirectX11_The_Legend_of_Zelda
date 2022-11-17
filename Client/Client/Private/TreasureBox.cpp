@@ -3,7 +3,7 @@
 #include "GameInstance.h"
 #include "Player.h"
 #include "UIButton.h"
-#include "InvenItem.h"
+#include  "PrizeItem.h"
 
 CTreasureBox::CTreasureBox(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -120,9 +120,12 @@ HRESULT CTreasureBox::Render()
 	}
 
 #ifdef _DEBUG
-	//m_pAABBCom->Render();
-	m_pOBBCom->Render();
-	//m_pSPHERECom->Render();
+	if (m_pAABBCom != nullptr)
+		m_pAABBCom->Render();
+	if (m_pOBBCom != nullptr)
+		m_pOBBCom->Render();
+	if (m_pSPHERECom != nullptr)
+		m_pSPHERECom->Render();
 #endif
 
 	return S_OK;
@@ -231,29 +234,27 @@ void CTreasureBox::OpenBox()
 	pPlayer->Set_AnimState(CPlayer::ITEM_GET_ST);
 	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
 
-	CInvenItem::ITEMDESC ItemDesc;
-	ItemDesc.eItemType = CInvenItem::ITEM_PRIZE;
-	ItemDesc.m_iTextureNum = CInvenItem::COMPASS;
-	ItemDesc.vPosition = pPlayer->Get_ProjPosition();
-	ItemDesc.vPosition.y = g_iWinSizeY - ItemDesc.vPosition.y; 
-	ItemDesc.vPosition.y -= 100.f;
+	CPrizeItem::ITEMDESC ItemDesc;
+	XMStoreFloat3(&ItemDesc.vPosition, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	
+	ItemDesc.m_bPrize = true;
 
 	switch (m_eTreasureBoxDesc.eItemType)
 	{
 	case COMPASS:
-		ItemDesc.m_iTextureNum = CInvenItem::COMPASS;
+		ItemDesc.eType = CPrizeItem::COMPASS;
 		CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::COMPOSS);
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	case MAP:
-		ItemDesc.m_iTextureNum = CInvenItem::DGN_MAP;
+		ItemDesc.eType = CPrizeItem::MAP;
 		CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::DGN_MAP);
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	case DGN_KEY:
-		ItemDesc.m_iTextureNum = CInvenItem::DGN_KEY;
+		ItemDesc.eType = CPrizeItem::SMALL_KEY;
 		CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::DGN_KEY);
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	default:
 		break;

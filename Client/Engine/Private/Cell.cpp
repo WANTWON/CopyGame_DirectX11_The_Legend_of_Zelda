@@ -79,11 +79,13 @@ _bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex, _float3* vLastNormal
 				*vLastNormal = m_vNormals[i];
 			return false;
 		}
-		*vLastNormal = m_vNormals[i];
+		if (vLastNormal != nullptr)
+			*vLastNormal = m_vNormals[i];
 	}
 
 	return true;
 }
+
 
 _vector CCell::Get_Center()
 {

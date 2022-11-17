@@ -94,12 +94,12 @@ void CCamera_2D::Camera_2D(_float fTimeDelta)
 	_float fPosX = XMVectorGetX(m_pTransform->Get_State(CTransform::STATE_POSITION));
 	if (fPosX <= m_CameraDesc.fMaxXPos && fPosX >= m_CameraDesc.fMinXPos)
 	{
-		if (vTargetProjPos.x < 200)
-			m_pTransform->Go_Right(fTimeDelta);
+		if (vTargetProjPos.x < 400)
+			m_pTransform->Go_Left(fTimeDelta);
 			
 
-		if (vTargetProjPos.x > 1000)
-			m_pTransform->Go_Left(fTimeDelta);
+		if (vTargetProjPos.x > 800)
+			m_pTransform->Go_Right(fTimeDelta);
 	}
 	else
 	{

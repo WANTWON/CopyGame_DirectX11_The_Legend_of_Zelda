@@ -32,7 +32,7 @@ HRESULT CPawn::Initialize(void * pArg)
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	
-	m_pNavigationCom->Compute_CurrentIndex(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);

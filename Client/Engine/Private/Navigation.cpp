@@ -79,6 +79,9 @@ HRESULT CNavigation::Initialize(void * pArg)
 
 _float CNavigation::Compute_Height(_vector vPosition, _float foffset)
 {
+
+
+
 	_vector PointA = XMLoadFloat3(&m_Cells[m_NaviDesc.iCurrentCellIndex]->Get_PointValue(CCell::POINT_A));
 	PointA = XMVectorSetW(PointA, 1.f);
 	_vector PointB = XMLoadFloat3(&m_Cells[m_NaviDesc.iCurrentCellIndex]->Get_PointValue(CCell::POINT_B));
@@ -94,15 +97,15 @@ _float CNavigation::Compute_Height(_vector vPosition, _float foffset)
 	return fHeight;
 }
 
-void CNavigation::Compute_CurrentIndex(_vector vPosition)
+void CNavigation::Compute_CurrentIndex_byDistance(_vector vPosition)
 {
 	int	iIndexNum = 0;
 	_float fMinDistance = 9999;
 	_float fDistance;
 
-	for (int i =0; i< m_Cells.size(); ++i)
+	for (int i = 0; i < m_Cells.size(); ++i)
 	{
-		fDistance =  XMVectorGetX(XMVector3Length(vPosition - m_Cells[i]->Get_Center()));
+		fDistance = XMVectorGetX(XMVector3Length(vPosition - m_Cells[i]->Get_Center()));
 
 		if (fMinDistance > fDistance)
 		{
@@ -112,6 +115,48 @@ void CNavigation::Compute_CurrentIndex(_vector vPosition)
 	}
 
 	m_NaviDesc.iCurrentCellIndex = iIndexNum;
+}
+
+_bool CNavigation::Compute_CurrentIndex_byHeight(_vector vPosition)
+{
+	_int iNeighborIndex = -1;
+
+	//셀을 순회하여 내 위치에 xz로 셀이 존재하는 지 확인한다.
+	for (int i = 0; i < m_Cells.size(); ++i)
+	{
+
+
+		if (m_Cells[i]->isIn(vPosition, &iNeighborIndex, &m_vLastNormal))
+			m_ForComputeCells.push_back(m_Cells[i]);
+
+
+	}
+
+	//존재하지 않다면 false
+	if (m_ForComputeCells.size() == 0)
+		return false;
+	else
+	{
+		_float fMinDistance = 9999;
+		_float fDistance;
+
+		for (int i = 0; i < m_ForComputeCells.size(); ++i)
+		{
+			if (XMVectorGetY(vPosition) < XMVectorGetY(m_ForComputeCells[i]->Get_Center()))
+				continue;
+
+			fDistance = XMVectorGetX(XMVector3Length(vPosition - m_ForComputeCells[i]->Get_Center()));
+
+			if (fMinDistance > fDistance)
+			{
+				fMinDistance = fDistance;
+				iNeighborIndex = m_ForComputeCells[i]->Get_Index();
+			}
+		}
+		m_NaviDesc.iCurrentCellIndex = iNeighborIndex;
+		m_ForComputeCells.clear();
+		return true;
+	}
 }
 
 _bool CNavigation::isMove(_fvector vPosition)
@@ -162,6 +207,10 @@ _bool CNavigation::isMove3D(_fvector vPosition)
 
 _bool CNavigation::isMove2D(_fvector vPosition)
 {
+	if (m_NaviDesc.iCurrentCellIndex == -1)
+	{
+		return Compute_CurrentIndex_byHeight(vPosition);
+	}
 
 	_int		iNeighborIndex = -1;
 
@@ -179,37 +228,9 @@ _bool CNavigation::isMove2D(_fvector vPosition)
 			{
 				if (-1 == iNeighborIndex)
 				{
-					//셀을 순회하여 내 위치에 xz로 셀이 존재하는 지 확인한다.
-					for (int i = 0; i < m_Cells.size(); ++i)
-					{
-						if (m_Cells[i]->isIn(vPosition, &iNeighborIndex, &m_vLastNormal))
-							m_ForComputeCells.push_back(m_Cells[i]);
-					}
-
-					//존재하지 않다면 false
-					if (m_ForComputeCells.size() == 0)
-						return false;
-					else
-					{
-						_float fMinDistance = 9999;
-						_float fDistance;
-
-						for (int i = 0; i < m_ForComputeCells.size(); ++i)
-						{
-							fDistance = XMVectorGetX(XMVector3Length(vPosition - m_ForComputeCells[i]->Get_Center()));
-
-							if (fMinDistance > fDistance)
-							{
-								fMinDistance = fDistance;
-								iNeighborIndex = m_ForComputeCells[i]->Get_Index();
-							}
-						}
-						m_NaviDesc.iCurrentCellIndex = iNeighborIndex;
-						m_ForComputeCells.clear();
-						return true;
-					}
+					return Compute_CurrentIndex_byHeight(vPosition);
 				}
-					
+
 				if (true == m_Cells[iNeighborIndex]->isIn(vPosition, &iNeighborIndex, &m_vLastNormal))
 					break;
 			}
@@ -219,43 +240,15 @@ _bool CNavigation::isMove2D(_fvector vPosition)
 			return true;
 		}
 		else
-		{
-			//셀을 순회하여 내 위치에 xz로 셀이 존재하는 지 확인한다.
-			for (int i = 0; i < m_Cells.size(); ++i)
-			{
-				if (m_Cells[i]->isIn(vPosition, &iNeighborIndex, &m_vLastNormal))
-					m_ForComputeCells.push_back(m_Cells[i]);
-			}
-
-			//존재하지 않다면 false
-			if (m_ForComputeCells.size() == 0)
-				return false;
-			else
-			{
-				_float fMinDistance = 9999;
-				_float fDistance;
-
-				for (int i = 0; i < m_ForComputeCells.size(); ++i)
-				{
-					fDistance = XMVectorGetX(XMVector3Length(vPosition - m_ForComputeCells[i]->Get_Center()));
-
-					if (fMinDistance > fDistance)
-					{
-						fMinDistance = fDistance;
-						iNeighborIndex = m_ForComputeCells[i]->Get_Index();
-					}
-				}
-				m_NaviDesc.iCurrentCellIndex = iNeighborIndex;
-				m_ForComputeCells.clear();
-				return true;
-			}
-		}
+			return Compute_CurrentIndex_byHeight(vPosition);
 	}
-	return false;
 }
 
 _uint CNavigation::Get_CurrentCelltype()
 {
+	if (m_NaviDesc.iCurrentCellIndex == -1)
+		return false;
+
 	return (_uint)m_Cells[m_NaviDesc.iCurrentCellIndex]->Get_CellType();
 }
 

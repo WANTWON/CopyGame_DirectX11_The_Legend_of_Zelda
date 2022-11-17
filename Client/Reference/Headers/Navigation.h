@@ -19,12 +19,15 @@ public:
 	virtual HRESULT Initialize_Prototype(const _tchar* pNavigationData);
 	virtual HRESULT Initialize(void* pArg);
 	_float	Compute_Height(_vector vPosition, _float foffset);
-	void	Compute_CurrentIndex(_vector vPosition);
+	void	Compute_CurrentIndex_byDistance(_vector vPosition);
+	_bool	Compute_CurrentIndex_byHeight(_vector vPosition);
+
 
 public:
 	_bool	isMove(_fvector vPosition);
 	_bool	isMove3D(_fvector vPosition);
 	_bool	isMove2D(_fvector vPosition);
+	_int	Get_CurrentCellIndex() {return m_NaviDesc.iCurrentCellIndex;}
 	_uint	Get_CurrentCelltype();
 	_vector Get_CurrentCellCenter();
 	_vector Get_LastNormal() { return XMLoadFloat3(&m_vLastNormal); }

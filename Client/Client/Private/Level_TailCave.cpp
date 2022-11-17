@@ -454,8 +454,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Portal(const _tchar * pLayerTag)
 	/* 타일의 개수 받아오기 */
 	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
 
-	for (_uint i = 0; i < iNum/2; ++i)
-	{
+	
 		ReadFile(hFile, &(ModelDesc1), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
 		ReadFile(hFile, &(ModelDesc2), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
 
@@ -473,7 +472,24 @@ HRESULT CLevel_TailCave::Ready_Layer_Portal(const _tchar * pLayerTag)
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_TAILCAVE, pLayerTag, &PortalDesc)))
 			return E_FAIL;
 
-	}
+	
+		ReadFile(hFile, &(ModelDesc1), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+		ReadFile(hFile, &(ModelDesc2), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+		PortalDesc.vInitPos = ModelDesc1.vPosition;
+		PortalDesc.vConnectPos = ModelDesc2.vPosition;
+		PortalDesc.bConnectPortal2D = false;
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_TAILCAVE, pLayerTag, &PortalDesc)))
+			return E_FAIL;
+
+		PortalDesc.vInitPos = ModelDesc2.vPosition;
+		PortalDesc.vConnectPos = ModelDesc1.vPosition;
+		PortalDesc.bConnectPortal2D = true;
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_TAILCAVE, pLayerTag, &PortalDesc)))
+			return E_FAIL;
+
 
 
 	CloseHandle(hFile);

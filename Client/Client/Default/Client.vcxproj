@@ -204,6 +204,7 @@
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerBullet.h" />
     <ClInclude Include="..\Public\Portal.h" />
+    <ClInclude Include="..\Public\PrizeItem.h" />
     <ClInclude Include="..\Public\RedZol.h" />
     <ClInclude Include="..\Public\Rola.h" />
     <ClInclude Include="..\Public\SquareBlock.h" />
@@ -255,6 +256,7 @@
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerBullet.cpp" />
     <ClCompile Include="..\Private\Portal.cpp" />
+    <ClCompile Include="..\Private\PrizeItem.cpp" />
     <ClCompile Include="..\Private\RedZol.cpp" />
     <ClCompile Include="..\Private\Rola.cpp" />
     <ClCompile Include="..\Private\SquareBlock.cpp" />
