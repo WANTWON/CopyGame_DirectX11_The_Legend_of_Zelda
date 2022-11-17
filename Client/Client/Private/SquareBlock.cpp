@@ -112,7 +112,7 @@ void CSquareBlock::Late_Tick(_float fTimeDelta)
 				vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
 			else
 				vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
-			m_pTransformCom->Go_PosDir(fTimeDelta*0.2, vDirection);
+			m_pTransformCom->Go_PosDir(fTimeDelta*0.2f, vDirection);
 		}
 		
 	}

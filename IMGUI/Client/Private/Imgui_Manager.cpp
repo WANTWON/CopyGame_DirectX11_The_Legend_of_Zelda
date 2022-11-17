@@ -3,12 +3,14 @@
 #include "imgui.h"
 #include "GameInstance.h"
 #include "PickingMgr.h"
+#include "Cell.h"
 #include "BaseObj.h"
 #include <windows.h>
 #include <string.h>
+
 //This is needed for virtually everything in BrowseFolder.
 #include <shlobj.h> 
-#include "Cell.h"
+
 
 IMPLEMENT_SINGLETON(CImgui_Manager)
 
@@ -58,16 +60,20 @@ CImgui_Manager::CImgui_Manager()
 	: m_pTerrain_Manager(CTerrain_Manager::Get_Instance())
 	, m_pModel_Manager(CModelManager::Get_Instance())
 	, m_pNavigation_Manager(CNavigation_Manager::Get_Instance())
+	, m_pCamera_Manager(CCamera_Manager::Get_Instance())
 {
 	Safe_AddRef(m_pModel_Manager);
 	Safe_AddRef(m_pTerrain_Manager);
 	Safe_AddRef(m_pNavigation_Manager);
+	Safe_AddRef(m_pCamera_Manager);
 
 	char* LayerTag = "Layer_Map";
 	char* LayerTag2 = "Layer_Terrain";
+	char* LayerTag3 = "Layer_CameraModel";
 
 	m_stLayerTags.push_back(LayerTag);
 	m_stLayerTags.push_back(LayerTag2);
+	m_stLayerTags.push_back(LayerTag3);
 }
 
 
@@ -122,7 +128,7 @@ void CImgui_Manager::Tick(_float fTimeDelta)
 	m_pTerrain_Manager->Set_TerrainDesc(&TerrainDesc);
 	RELEASE_INSTANCE(CGameInstance);
 
-	Show_GuiTick();
+	Tick_Imgui();
 	ImGui::EndFrame();
 
 }
@@ -134,7 +140,7 @@ void CImgui_Manager::Render()
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
-void CImgui_Manager::Show_GuiTick()
+void CImgui_Manager::Tick_Imgui()
 {
 	ImGui::Begin(u8"Editor", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar
 		| ImGuiWindowFlags_AlwaysVerticalScrollbar);
@@ -190,7 +196,7 @@ void CImgui_Manager::Show_GuiTick()
 		if (ImGui::BeginTabItem("Model Tool"))
 		{
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Object"); ImGui::SameLine();
-			ImGui::Checkbox("##Picking for Object", &m_bPickingMode);
+			ImGui::Checkbox("##Picking for Object", &m_bCreateModel);
 
 
 			if (ImGui::BeginTabBar("ModelsTabs", ImGuiTabBarFlags_None))
@@ -218,6 +224,13 @@ void CImgui_Manager::Show_GuiTick()
 
 			ImGui::Text("This is the navigation tool ");
 			Set_Navigation();
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Camera Tool"))
+		{
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Add Camera Mode on"); ImGui::SameLine();
+			ImGui::Checkbox("##Add Camera Mode on", &m_bMakeCamera);
+			Set_Camera();
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
@@ -549,7 +562,6 @@ void CImgui_Manager::Set_Navigation()
 
 		if (ImGui::Button("PopBack Cell"))
 			m_pNavigation_Manager->Cancle_Cell();
-		ImGui::SameLine();
 		if (ImGui::Button("Erase Picked Cell"))
 			m_pNavigation_Manager->Erase_Cell();
 		if (ImGui::Button("All_Clear Cell"))
@@ -681,7 +693,6 @@ void CImgui_Manager::Save_Navigation()
 
 void CImgui_Manager::Load_Navigation()
 {
-
 
 	OPENFILENAME OFN;
 	TCHAR filePathName[300] = L"";
@@ -849,54 +860,6 @@ void CImgui_Manager::Set_Object_Map()
 	m_InitDesc.m_fAngle = Offset[0];
 	m_fDist = Offset[1];
 
-
-	const char* ObjectID[] = { "OBJ_BACKGROUND", "OBJ_MONSTER", "OBJ_BLOCK", "OBJ_INTERATIVE", "OBJ_UNINTERATIVE", "OBJ_END" };
-	static int iObjectID = 5;
-	ImGui::Combo("Object_ID", &iObjectID, ObjectID, IM_ARRAYSIZE(ObjectID));
-	m_eObjID = (OBJID)iObjectID;
-
-
-	switch (m_eObjID)
-	{
-	case Client::OBJ_BACKGROUND:
-	{
-		const char* ObjectList[] = { "Terrain1", "Terrain2", "Terrain3", "Terrain4" };
-		static int ObjectCurrentList = 0; // Here we store our selection data as an index.
-		ImGui::Combo("ObjectList", &ObjectCurrentList, ObjectList, IM_ARRAYSIZE(ObjectList));
-		break;
-	}
-	case Client::OBJ_MONSTER:
-	{
-		const char* ObjectList[] = { "Pig", "Mpbline", "Spider", "Bearger", "Boarwarrior", "Boss" };
-		static int ObjectCurrentList = 0; // Here we store our selection data as an index.
-		ImGui::Combo("ObjectList", &ObjectCurrentList, ObjectList, IM_ARRAYSIZE(ObjectList));
-		break;
-	}
-	case Client::OBJ_BLOCK:
-	{
-		const char* ObjectList[] = { "Block1", "Block2", "Block3" };
-		static int ObjectCurrentList = 0; // Here we store our selection data as an index.
-		ImGui::Combo("ObjectList", &ObjectCurrentList, ObjectList, IM_ARRAYSIZE(ObjectList));
-		break;
-	}
-	case Client::OBJ_INTERATIVE:
-	{
-		const char* ObjectList[] = { "Grass", "Tree", "Pot", "Tent", "Food", "Flower" };
-		static int ObjectCurrentList = 0; // Here we store our selection data as an index.
-		ImGui::Combo("ObjectList", &ObjectCurrentList, ObjectList, IM_ARRAYSIZE(ObjectList));
-		break;
-	}
-	case Client::OBJ_UNINTERATIVE:
-	{
-		const char* ObjectList[] = { "Wall", "Rock", "Deco1", "Deco2", "Deco3" };
-		static int ObjectCurrentList = 0; // Here we store our selection data as an index.
-		ImGui::Combo("ObjectList", &ObjectCurrentList, ObjectList, IM_ARRAYSIZE(ObjectList));
-		break;
-	}
-	default:
-		break;
-	}
-
 }
 
 void CImgui_Manager::Set_Terrain_Shape()
@@ -1016,57 +979,6 @@ void CImgui_Manager::ShowPickedObjLayOut(bool * p_open)
 					m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
 				}
 
-				ImGui::Text("OBJECT_ID : ");
-				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "%s", ObjectID[iObjectID]);
-
-				ImGui::Text("OBJECT_TYPE : ");
-				ImGui::SameLine();
-				switch (m_eObjID)
-				{
-				case Client::OBJ_BACKGROUND:
-				{
-					const char* ObjectList[] = { "Terrain1", "Terrain2", "Terrain3", "Terrain4" };
-					static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-					break;
-				}
-				case Client::OBJ_MONSTER:
-				{
-					const char* ObjectList[] = { "Pig", "Mpbline", "Spider", "Bearger", "Boarwarrior", "Boss" };
-					static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-					break;
-				}
-				case Client::OBJ_BLOCK:
-				{
-					const char* ObjectList[] = { "Block1", "Block2", "Block3" };
-					static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-					break;
-				}
-				case Client::OBJ_INTERATIVE:
-				{
-					const char* ObjectList[] = { "Grass", "Tree", "Pot", "Tent", "Food", "Flower" };
-					static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-					break;
-				}
-				case Client::OBJ_UNINTERATIVE:
-				{
-					const char* ObjectList[] = { "Wall", "Rock", "Deco1", "Deco2", "Deco3" };
-					static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-					break;
-				}
-				case Client::OBJ_END:
-				{
-					ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "NONE");
-					break;
-				}
-				default:
-					break;
-				}
 
 				ImGui::NewLine();
 				ImGui::BulletText("Position");
@@ -1146,57 +1058,6 @@ void CImgui_Manager::ShowPickedObj()
 		m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
 	}
 
-	ImGui::Text("OBJECT_ID : ");
-	ImGui::SameLine();
-	ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "%s", ObjectID[iObjectID]);
-
-	ImGui::Text("OBJECT_TYPE : ");
-	ImGui::SameLine();
-	switch (m_eObjID)
-	{
-	case Client::OBJ_BACKGROUND:
-	{
-		const char* ObjectList[] = { "Terrain1", "Terrain2", "Terrain3", "Terrain4" };
-		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-		break;
-	}
-	case Client::OBJ_MONSTER:
-	{
-		const char* ObjectList[] = { "Pig", "Mpbline", "Spider", "Bearger", "Boarwarrior", "Boss" };
-		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-		break;
-	}
-	case Client::OBJ_BLOCK:
-	{
-		const char* ObjectList[] = { "Block1", "Block2", "Block3" };
-		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-		break;
-	}
-	case Client::OBJ_INTERATIVE:
-	{
-		const char* ObjectList[] = { "Grass", "Tree", "Pot", "Tent", "Food", "Flower" };
-		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-		break;
-	}
-	case Client::OBJ_UNINTERATIVE:
-	{
-		const char* ObjectList[] = { "Wall", "Rock", "Deco1", "Deco2", "Deco3" };
-		static int ObjectCurrentList = m_iObjectList; // Here we store our selection data as an index.
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "%s", ObjectList[ObjectCurrentList]);
-		break;
-	}
-	case Client::OBJ_END:
-	{
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "NONE");
-		break;
-	}
-	default:
-		break;
-	}
 
 	ImGui::NewLine();
 	ImGui::BulletText("Position");
@@ -1512,7 +1373,7 @@ void CImgui_Manager::Show_ModelList()
 	}
 
 
-	if (m_bPickingMode && CGameInstance::Get_Instance()->Key_Up(DIK_X))
+	if (m_bCreateModel && CGameInstance::Get_Instance()->Key_Up(DIK_X))
 	{
 		if (CPickingMgr::Get_Instance()->Picking())
 		{
@@ -1524,7 +1385,7 @@ void CImgui_Manager::Show_ModelList()
 		}
 	}
 
-	if (m_bPickingMode && CGameInstance::Get_Instance()->Key_Up(DIK_Z))
+	if (m_bCreateModel && CGameInstance::Get_Instance()->Key_Up(DIK_Z))
 	{
 		_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
 		m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
@@ -1621,7 +1482,7 @@ void CImgui_Manager::Show_CurrentModelList()
 	}
 
 
-	if (m_bPickingMode && CGameInstance::Get_Instance()->Key_Up(DIK_Z))
+	if (m_bCreateModel && CGameInstance::Get_Instance()->Key_Up(DIK_Z))
 	{
 		_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
 		m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
@@ -1701,6 +1562,205 @@ void CImgui_Manager::Read_Objects_Name(_tchar* cFolderPath)
 	FindClose(hDir);
 }
 
+void CImgui_Manager::Set_Camera()
+{
+	static int selected = 0;
+	{
+		ImGui::BeginChild("left pane", ImVec2(150, 0), true);
+
+		if ((int)m_pCamera_Manager->Get_CameraSize()!= 0)
+		{
+			for (int i = 0; i < m_pCamera_Manager->Get_CameraSize();)
+			{
+				//char label[MAX_PATH] = "";
+				char szLayertag[MAX_PATH] = "Camera";
+
+				char label[MAX_PATH] = "Camera";
+				char buffer[MAX_PATH];
+				sprintf(buffer, "%d", i);
+				strcat(label, buffer);
+				if (ImGui::Selectable(label, m_iCameraIndex == i))
+				{
+					m_iCameraIndex = i;
+
+				}
+				i++;
+			}
+		}
+		ImGui::EndChild();
+	}
+	ImGui::SameLine();
+	// ------------------------ Right -----------------------------------
+	{
+
+		ImGui::BeginGroup();
+		ImGui::BeginChild("Cell view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+
+
+		ImGui::CollapsingHeader("Show Current Camera");
+
+		ImGui::Text("Selected Index : "); ImGui::SameLine();  ImGui::Text("%d", m_iCameraIndex);
+		m_pCamera_Manager->Set_CilckedCamIndex(m_iCameraIndex);
+		CNonAnim* pCurrentCam = m_pCamera_Manager->Get_CurrentCam();
+
+	
+		static float fCamPositionX  = m_fCamPosition.x ;
+		static float fCamPositionY = m_fCamPosition.y ;
+		static float fCamPositionZ = m_fCamPosition.z ;
+		
+
+		if (pCurrentCam != nullptr)
+		{
+			_vector vCamPos =  pCurrentCam->Get_Position();
+			fCamPositionX = XMVectorGetX(vCamPos);
+			fCamPositionY = XMVectorGetY(vCamPos);
+			fCamPositionZ = XMVectorGetZ(vCamPos);
+			m_fCamPosition = _float3(fCamPositionX, fCamPositionY, fCamPositionZ);
+		}
+
+
+		ImGui::Text("CamPositionXYZ");  
+		ImGui::DragFloat("CamPosX", &fCamPositionX, 0.01f);
+		ImGui::DragFloat("CamPosY", &fCamPositionY, 0.01f);
+		ImGui::DragFloat("CamPosZ", &fCamPositionZ, 0.01f);
+
+		m_fCamPosition = _float3(fCamPositionX, fCamPositionY, fCamPositionZ);
+		//m_pCamera_Manager->Update_CamPosition(m_fCamPosition);
+
+
+		if (ImGui::Button("Erase Picked Camera"))
+		{
+			m_pCamera_Manager->Out_CreatedCamera(pCurrentCam);
+			pCurrentCam->Set_Dead(true);
+		}
+			
+		if (ImGui::Button("All_Clear Camera"))
+			m_pCamera_Manager->Clear_Camreras();
+
+
+		if (ImGui::Button("Save Camera"))
+		{
+			Save_Camera();
+		}
+		if (ImGui::Button("Load Camera"))
+		{
+			Load_Camera();
+		}
+
+		ImGui::EndChild();
+		ImGui::EndGroup();
+	}
+
+
+	if (m_bMakeCamera && CGameInstance::Get_Instance()->Key_Up(DIK_X))
+	{
+		
+		if (FAILED(m_pCamera_Manager->Add_Camera()))
+			return;
+		XMStoreFloat3(&m_fCamPosition, m_pCamera_Manager->Get_LastCam()->Get_Position());
+	}
+	
+}
+
+void CImgui_Manager::Save_Camera()
+{
+	OPENFILENAME OFN;
+	TCHAR filePathName[300] = L"";
+	TCHAR lpstrFile[300] = L"";
+	static TCHAR filter[] = L"데이터 파일\0*.dat\0텍스트 파일\0*.txt";
+
+	memset(&OFN, 0, sizeof(OPENFILENAME));
+	OFN.lStructSize = sizeof(OPENFILENAME);
+	OFN.hwndOwner = g_hWnd;
+	OFN.lpstrFilter = filter;
+	OFN.lpstrFile = lpstrFile;
+	OFN.nMaxFile = 300;
+	OFN.lpstrInitialDir = L".";
+	OFN.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
+
+	if (GetSaveFileName(&OFN))
+	{
+		//ERR_MSG(TEXT("save-as  '%s'\n"), ofn.lpstrFile); //경로// 파일이름.확장자
+		//ERR_MSG(TEXT("filename '%s'\n"), ofn.lpstrFile + ofn.nFileOffset); 
+
+		HANDLE hFile = 0;
+		_ulong dwByte = 0;
+		_uint iNum = 0;
+		_float3	 vPosition;
+		m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
+
+		list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, TEXT("Layer_CameraModel"));
+		iNum = (_int)m_pCamera_Manager->Get_CameraSize();
+
+
+		hFile = CreateFile(OFN.lpstrFile, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);;
+		if (0 == hFile)
+			return;
+
+		/* 첫줄은 object 리스트의 size 받아서 갯수만큼 for문 돌리게 하려고 저장해놓음*/
+		WriteFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+		for (auto& iter : *plistClone)
+		{
+			
+			XMStoreFloat3(&vPosition, dynamic_cast<CBaseObj*>(iter)->Get_Position());
+			WriteFile(hFile, &vPosition, sizeof(_float3), &dwByte, nullptr);
+
+		}
+
+		CloseHandle(hFile);
+	}
+}
+
+void CImgui_Manager::Load_Camera()
+{
+	OPENFILENAME OFN;
+	TCHAR filePathName[300] = L"";
+	TCHAR lpstrFile[300] = L"";
+	static TCHAR filter[] = L"데이터 파일\0*.dat\0텍스트 파일\0*.txt";
+
+	memset(&OFN, 0, sizeof(OPENFILENAME));
+	OFN.lStructSize = sizeof(OPENFILENAME);
+	OFN.hwndOwner = g_hWnd;
+	OFN.lpstrFilter = filter;
+	OFN.lpstrFile = lpstrFile;
+	OFN.nMaxFile = 300;
+	OFN.lpstrInitialDir = L".";
+
+	if (GetOpenFileName(&OFN) != 0) {
+		wsprintf(filePathName, L"%s 파일을 열겠습니까?", OFN.lpstrFile);
+		MessageBox(g_hWnd, filePathName, L"열기 선택", MB_OK);
+
+		//ERR_MSG(TEXT("save-as  '%s'\n"), ofn.lpstrFile); //경로// 파일이름.확장자
+		//ERR_MSG(TEXT("filename '%s'\n"), ofn.lpstrFile + ofn.nFileOffset); 
+
+		HANDLE hFile = 0;
+		_ulong dwByte = 0;
+		_uint iNum = 0;
+		_float3		vPosition;
+
+		hFile = CreateFile(OFN.lpstrFile, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		if (0 == hFile)
+			return;
+
+
+
+		/* 타일의 개수 받아오기 */
+		ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+		for (int i = 0; i< iNum; ++i)
+		{
+			ReadFile(hFile, &vPosition, sizeof(_float3), &dwByte, nullptr);
+			if (0 == dwByte)
+				break;
+
+			m_pCamera_Manager->Add_Camera(vPosition);
+		}
+		CloseHandle(hFile);
+
+	}
+}
+
 void CImgui_Manager::Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag, _bool bCreatePrototype)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -1732,6 +1792,8 @@ void CImgui_Manager::Free()
 	Safe_Release(m_pModel_Manager);
 	Safe_Release(m_pTerrain_Manager);
 	Safe_Release(m_pNavigation_Manager);
+	Safe_Release(m_pCamera_Manager);
+	CCamera_Manager::Get_Instance()->Destroy_Instance();
 	CTerrain_Manager::Get_Instance()->Destroy_Instance();
 	CModelManager::Get_Instance()->Destroy_Instance();
 	CNavigation_Manager::Get_Instance()->Destroy_Instance();

@@ -6,6 +6,7 @@
 #include "Weapon.h"
 #include "PipeLine.h"
 #include "Cell.h"
+#include "CameraManager.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -452,6 +453,7 @@ HRESULT CPlayer::SetUp_ShaderID()
 	return S_OK;
 }
 
+
 void CPlayer::Render_Model(MESH_NAME eMeshName)
 {
 	if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", eMeshName, aiTextureType_DIFFUSE)))
@@ -507,7 +509,10 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 				m_eState = RUN;
 		}
 
-		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
+		if (m_b2D)
+			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
+		else
+			m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
 	}
 
 }
@@ -765,16 +770,21 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 			_vector vPortalPos = XMLoadFloat3(&m_vPortalPos);
 			vPortalPos = XMVectorSetW(vPortalPos, 1.f);
 
-			if (!m_bPortal2D)
+			if (!m_b2D)
 			{
 				m_eState = STAIR_UP;
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPortalPos);
+				if (CCameraManager::Get_Instance()->Get_CamState() != CCameraManager::CAM_DYNAMIC)
+					CCameraManager::Get_Instance()->Set_CamState(CCameraManager::CAM_DYNAMIC);
+				m_pNavigationCom[m_iCurrentLevel]->Set_2DNaviGation(false);
 			}
 			else
 			{
 				m_eState = IDLE;
 				vPortalPos = XMVectorSetY(vPortalPos, XMVectorGetY(vPortalPos) - 1.f);
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPortalPos);
+				CCameraManager::Get_Instance()->Set_CamState(CCameraManager::CAM_2D);
+				m_pNavigationCom[m_iCurrentLevel]->Set_2DNaviGation(true);
 			}
 			
 		}

@@ -2,6 +2,7 @@
 #include "..\Public\Camera_Dynamic.h"
 #include "GameInstance.h"
 #include "Player.h"
+#include "CameraManager.h"
 
 CCamera_Dynamic::CCamera_Dynamic(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera(pDevice, pContext)
@@ -51,6 +52,9 @@ int CCamera_Dynamic::Tick(_float fTimeDelta)
 	default:
 		break;
 	}
+
+	if (CCameraManager::Get_Instance()->Get_CamState() != CCameraManager::CAM_DYNAMIC)
+		return OBJ_NOEVENT;
 
 	if (FAILED(Bind_OnPipeLine()))
 		return OBJ_NOEVENT;

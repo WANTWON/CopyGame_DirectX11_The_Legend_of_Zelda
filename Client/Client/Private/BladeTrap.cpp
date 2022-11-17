@@ -31,7 +31,7 @@ HRESULT CBladeTrap::Initialize(void * pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 
 	m_pNavigationCom->Compute_CurrentIndex(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
+	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_TRAP, this);
 	return S_OK;
 }
 

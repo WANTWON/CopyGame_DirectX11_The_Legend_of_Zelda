@@ -1,5 +1,6 @@
 #pragma once
 #include "Camera_Dynamic.h"
+#include "Camera_2D.h"
 
 
 BEGIN(Client)
@@ -8,9 +9,7 @@ class CCameraManager final : public CBase
 {
 	DECLARE_SINGLETON(CCameraManager)
 public:
-
-	enum CAM_STATE { CAM_PLAYER, CAM_FPS, CAM_TARGET, CAM_END };
-	enum CAM_DIR { DIR_DEFAULT, DIR_1, DIR_2, DIR_3, DIR_MAX };
+	enum CAM_STATE { CAM_DYNAMIC, CAM_2D, CAM_TARGET, CAM_END };
 
 public:
 	CCameraManager();
@@ -18,23 +17,18 @@ public:
 
 public: /* Get*/ 
 	CAM_STATE Get_CamState() { return m_eCamState; }
-	CAM_DIR Get_CamDir() { return m_eCamDir; }
 	CCamera* Get_CurrentCamera() { return m_pCurrentCamera; }
 
 public:/*Set*/
 	void Set_CamState(CAM_STATE _eState);
 	void Set_CurrentCamera(CCamera* _pCamera) { m_pCurrentCamera = _pCamera; }
 
-public: /*For Player Cam*/
-	void PlayerCamera_TurnLeft(LEVEL LevelIndex);
-	void PlayerCamera_TurnRight(LEVEL LevelIndex);
-	
 public:
 	HRESULT Ready_Camera(LEVEL eLevelIndex);
+
 private:
 	CCamera*					m_pCurrentCamera = nullptr;
-	CAM_STATE					m_eCamState = CAM_PLAYER;
-	CAM_DIR						m_eCamDir = DIR_MAX;
+	CAM_STATE					m_eCamState = CAM_DYNAMIC;
 	LEVEL						m_eCurrentLevel;
 
 	

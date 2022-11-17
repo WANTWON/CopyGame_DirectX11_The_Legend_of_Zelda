@@ -191,30 +191,75 @@ HRESULT CLevel_TailCave::Ready_Layer_Effect(const _tchar * pLayerTag)
 
 HRESULT CLevel_TailCave::Ready_Layer_Camera(const _tchar * pLayerTag)
 {
-	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
-	Safe_AddRef(pGameInstance);
+	CGameInstance*			pGameInstance = GET_INSTANCE(CGameInstance);
 
-	CCamera_Dynamic::CAMERADESC_DERIVED				CameraDesc;
-	ZeroMemory(&CameraDesc, sizeof(CCamera_Dynamic::CAMERADESC_DERIVED));
+#pragma region Camera Dynamic
+	CCamera_Dynamic::CAMERADESC_DERIVED				CameraDesc_Dynamic;
+	ZeroMemory(&CameraDesc_Dynamic, sizeof(CCamera_Dynamic::CAMERADESC_DERIVED));
 
-	CameraDesc.iTest = 10;
+	CameraDesc_Dynamic.iTest = 10;
 
-	CameraDesc.CameraDesc.vEye = _float4(0.f, 11.8f, -3.5f, 1.f);
-	CameraDesc.CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.InitPostion = _float4(54.f, 10.1f, 2.8f, 1.f);
+	CameraDesc_Dynamic.CameraDesc.vEye = _float4(0.f, 11.8f, -3.5f, 1.f);
+	CameraDesc_Dynamic.CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CameraDesc_Dynamic.InitPostion = _float4(54.f, 10.1f, 2.8f, 1.f);
 
-	CameraDesc.CameraDesc.fFovy = XMConvertToRadians(60.0f);
-	CameraDesc.CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
-	CameraDesc.CameraDesc.fNear = 0.2f;
-	CameraDesc.CameraDesc.fFar = 500.f;
+	CameraDesc_Dynamic.CameraDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraDesc_Dynamic.CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
+	CameraDesc_Dynamic.CameraDesc.fNear = 0.2f;
+	CameraDesc_Dynamic.CameraDesc.fFar = 500.f;
 
-	CameraDesc.CameraDesc.TransformDesc.fSpeedPerSec = 10.f;
-	CameraDesc.CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	CameraDesc_Dynamic.CameraDesc.TransformDesc.fSpeedPerSec = 10.f;
+	CameraDesc_Dynamic.CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Camera_Dynamic"), LEVEL_TAILCAVE, pLayerTag, &CameraDesc)))
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Camera_Dynamic"), LEVEL_TAILCAVE, pLayerTag, &CameraDesc_Dynamic)))
+		return E_FAIL;
+#pragma endregion Camera Dynamic
+
+#pragma region Camera 2D
+
+
+	HANDLE hFile = 0;
+	_ulong dwByte = 0;
+	_float3 vInitPos = _float3(0.f,0.f,0.f);
+	_float3 vMaxXPos = _float3(0.f,0.f,0.f);
+	_float3 vMinXPos = _float3(0.f,0.f,0.f);
+	_uint iNum = 0;
+
+	hFile = CreateFile(TEXT("../../../Bin/Data/TailCave_Camera2D.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
 		return E_FAIL;
 
-	Safe_Release(pGameInstance);
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+	ReadFile(hFile, &(vInitPos), sizeof(_float3), &dwByte, nullptr);
+	ReadFile(hFile, &(vMaxXPos), sizeof(_float3), &dwByte, nullptr);
+	ReadFile(hFile, &(vMinXPos), sizeof(_float3), &dwByte, nullptr);
+
+	CCamera_2D::CAMERADESC_DERIVED				CameraDesc_2D;
+	ZeroMemory(&CameraDesc_2D, sizeof(CCamera_2D::CAMERADESC_DERIVED));
+
+	XMStoreFloat4(&CameraDesc_2D.InitPostion, XMVectorSetW(XMLoadFloat3(&vInitPos), 1.f));
+	CameraDesc_2D.fMaxXPos = vMaxXPos.x;
+	CameraDesc_2D.fMinXPos = vMinXPos.x;
+
+	CameraDesc_2D.CameraDesc.vEye = _float4(0.f, 11.8f, -3.5f, 1.f);
+	CameraDesc_2D.CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+
+	CameraDesc_2D.CameraDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraDesc_2D.CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
+	CameraDesc_2D.CameraDesc.fNear = 0.2f;
+	CameraDesc_2D.CameraDesc.fFar = 500.f;
+
+	CameraDesc_2D.CameraDesc.TransformDesc.fSpeedPerSec = 3.f;
+	CameraDesc_2D.CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Camera_2D"), LEVEL_TAILCAVE, pLayerTag, &CameraDesc_2D)))
+		return E_FAIL;
+
+	CloseHandle(hFile);
+#pragma endregion Camera 2D
+
+	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }
@@ -309,7 +354,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 
 	CTreasureBox::TreasureBoxTag Boxtag;
 	Boxtag.eItemType = CTreasureBox::COMPASS;
-	Boxtag.vPosition = _float3(15.09, 0.1f, 6.66f);
+	Boxtag.vPosition = _float3(15.09f, 0.1f, 6.66f);
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_TAILCAVE, pLayerTag, &Boxtag)))
 		return E_FAIL;
 

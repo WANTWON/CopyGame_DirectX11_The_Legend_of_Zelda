@@ -20,7 +20,7 @@ HRESULT CTogezo::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_tInfo.iMaxHp = 10;
+	m_tInfo.iMaxHp = 5;
 	m_tInfo.iDamage = 4;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
@@ -77,7 +77,7 @@ void CTogezo::Late_Tick(_float fTimeDelta)
 			}
 		
 		}
-		else if (m_eState != REBOUND_ST && m_eState != STUN && m_eState != STUN_ED)
+		else if (m_eState != REBOUND_ST && m_eState != STUN && m_eState != STUN_ED &&  m_eState != IDLE)
 			m_eState = RUN_ED;
 	
 	}
@@ -90,7 +90,7 @@ void CTogezo::Late_Tick(_float fTimeDelta)
 			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
 		else
 			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
-		m_pTransformCom->Go_PosDir(fTimeDelta*1.5, vDirection, m_pNavigationCom);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection, m_pNavigationCom);
 	}
 	
 }
@@ -149,7 +149,7 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
 
-		if (m_dwStunTime +10000 < GetTickCount())
+		if (m_dwStunTime +5000 < GetTickCount())
 			m_eState = STUN_ED;
 		break;
 	case Client::CTogezo::RUN_ST:

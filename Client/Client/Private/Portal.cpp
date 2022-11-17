@@ -37,7 +37,7 @@ HRESULT CPortal::Initialize(void * pArg)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	}
 
-	Set_Scale(_float3(1.f, 1.f, 1.f));
+	Set_Scale(_float3(2.f, 2.f, 2.f));
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_INTERACT, this);
 
 	return S_OK;
@@ -76,7 +76,16 @@ void CPortal::Late_Tick(_float fTimeDelta)
 
 HRESULT CPortal::Render()
 {
-	__super::Render();
+	//__super::Render();
+
+#ifdef _DEBUG
+	if (m_pAABBCom != nullptr)
+		m_pAABBCom->Render();
+	if (m_pOBBCom != nullptr)
+		m_pOBBCom->Render();
+	if (m_pSPHERECom != nullptr)
+		m_pSPHERECom->Render();
+#endif
 
 	return S_OK;
 

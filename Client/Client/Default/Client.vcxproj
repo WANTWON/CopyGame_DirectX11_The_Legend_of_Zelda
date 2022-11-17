@@ -173,6 +173,7 @@
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\BaseObj.h" />
     <ClInclude Include="..\Public\BladeTrap.h" />
+    <ClInclude Include="..\Public\Camera_2D.h" />
     <ClInclude Include="..\Public\CollapseTile.h" />
     <ClInclude Include="..\Public\Data_Manager.h" />
     <ClInclude Include="..\Public\DgnKey.h" />
@@ -224,6 +225,7 @@
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\BaseObj.cpp" />
     <ClCompile Include="..\Private\BladeTrap.cpp" />
+    <ClCompile Include="..\Private\Camera_2D.cpp" />
     <ClCompile Include="..\Private\CollapseTile.cpp" />
     <ClCompile Include="..\Private\Data_Manager.cpp" />
     <ClCompile Include="..\Private\DgnKey.cpp" />

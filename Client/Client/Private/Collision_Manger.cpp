@@ -119,7 +119,7 @@ void CCollision_Manager::CollisionwithBullet()
 	{
 		CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")))->Get_AnimState();
 		if(ePlayerState == CPlayer::SLASH || ePlayerState == CPlayer::SLASH_HOLD_ED)
-		dynamic_cast<CMonster*>(pMonster)->Take_Damage(1, nullptr, nullptr);
+			dynamic_cast<CMonster*>(pMonster)->Take_Damage(1, nullptr, nullptr);
 	}
 }
 

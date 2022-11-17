@@ -68,7 +68,7 @@ void CKeese::Late_Tick(_float fTimeDelta)
 			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
 		else
 			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
-		m_pTransformCom->Go_PosDir(fTimeDelta*1.5, vDirection, m_pNavigationCom);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection, m_pNavigationCom);
 	}
 }
 

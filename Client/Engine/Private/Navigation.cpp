@@ -28,7 +28,7 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar * pNavigationData)
 	_ulong			dwByte = 0;
 	HANDLE			hFile = CreateFile(pNavigationData, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
-		return E_FAIL;	
+		return E_FAIL;
 	_uint iNum = 0;
 	CCell::CELLTYPE eCelltype;
 	_float3		vPoints[3];
@@ -36,7 +36,7 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar * pNavigationData)
 	/* 타일의 개수 받아오기 */
 	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
 
-	for (_uint i = 0; i< iNum; ++i)
+	for (_uint i = 0; i < iNum; ++i)
 	{
 		ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
 		ReadFile(hFile, &eCelltype, sizeof(CCell::CELLTYPE), &dwByte, nullptr);
@@ -47,7 +47,7 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar * pNavigationData)
 		if (nullptr == pCell)
 			return E_FAIL;
 
-		m_Cells.push_back(pCell);	
+		m_Cells.push_back(pCell);
 		m_Cells.back()->Set_CellType(eCelltype);
 	}
 
@@ -108,13 +108,21 @@ void CNavigation::Compute_CurrentIndex(_vector vPosition)
 		{
 			fMinDistance = fDistance;
 			iIndexNum = i;
-		}	
+		}
 	}
 
 	m_NaviDesc.iCurrentCellIndex = iIndexNum;
 }
 
 _bool CNavigation::isMove(_fvector vPosition)
+{
+	if (m_bIs2D)
+		return isMove2D(vPosition);
+	else
+		return isMove3D(vPosition);
+}
+
+_bool CNavigation::isMove3D(_fvector vPosition)
 {
 	_int		iNeighborIndex = -1;
 
@@ -136,7 +144,7 @@ _bool CNavigation::isMove(_fvector vPosition)
 				if (true == m_Cells[iNeighborIndex]->isIn(vPosition, &iNeighborIndex, &m_vLastNormal))
 					break;
 			}
-			
+
 			m_NaviDesc.iCurrentCellIndex = iNeighborIndex;
 			return true;
 		}
@@ -144,14 +152,105 @@ _bool CNavigation::isMove(_fvector vPosition)
 		/* 나간 방향에 이웃셀이 존재하지않는다. . */
 		else
 		{
-			/*슬라이딩을 위한 리턴을 정의해도 된다. */		
+			/*슬라이딩을 위한 리턴을 정의해도 된다. */
 			return false;
 		}
-		
-		
 	}
-	
+	return false;
 
+}
+
+_bool CNavigation::isMove2D(_fvector vPosition)
+{
+
+	_int		iNeighborIndex = -1;
+
+	/* 현재 존재하는 쎌안에서 움직였다. */
+	if (true == m_Cells[m_NaviDesc.iCurrentCellIndex]->isIn(vPosition, &iNeighborIndex, &m_vLastNormal))
+		return true;
+
+	/* 현재 존재하는 쎌을 벗어난다.  */
+	else
+	{
+		/* 나간 방향에 이웃셀이 존재한다. */
+		if (0 <= iNeighborIndex)
+		{
+			while (true)
+			{
+				if (-1 == iNeighborIndex)
+				{
+					//셀을 순회하여 내 위치에 xz로 셀이 존재하는 지 확인한다.
+					for (int i = 0; i < m_Cells.size(); ++i)
+					{
+						if (m_Cells[i]->isIn(vPosition, &iNeighborIndex, &m_vLastNormal))
+							m_ForComputeCells.push_back(m_Cells[i]);
+					}
+
+					//존재하지 않다면 false
+					if (m_ForComputeCells.size() == 0)
+						return false;
+					else
+					{
+						_float fMinDistance = 9999;
+						_float fDistance;
+
+						for (int i = 0; i < m_ForComputeCells.size(); ++i)
+						{
+							fDistance = XMVectorGetX(XMVector3Length(vPosition - m_ForComputeCells[i]->Get_Center()));
+
+							if (fMinDistance > fDistance)
+							{
+								fMinDistance = fDistance;
+								iNeighborIndex = m_ForComputeCells[i]->Get_Index();
+							}
+						}
+						m_NaviDesc.iCurrentCellIndex = iNeighborIndex;
+						m_ForComputeCells.clear();
+						return true;
+					}
+				}
+					
+				if (true == m_Cells[iNeighborIndex]->isIn(vPosition, &iNeighborIndex, &m_vLastNormal))
+					break;
+			}
+
+			m_NaviDesc.iCurrentCellIndex = iNeighborIndex;
+			m_ForComputeCells.clear();
+			return true;
+		}
+		else
+		{
+			//셀을 순회하여 내 위치에 xz로 셀이 존재하는 지 확인한다.
+			for (int i = 0; i < m_Cells.size(); ++i)
+			{
+				if (m_Cells[i]->isIn(vPosition, &iNeighborIndex, &m_vLastNormal))
+					m_ForComputeCells.push_back(m_Cells[i]);
+			}
+
+			//존재하지 않다면 false
+			if (m_ForComputeCells.size() == 0)
+				return false;
+			else
+			{
+				_float fMinDistance = 9999;
+				_float fDistance;
+
+				for (int i = 0; i < m_ForComputeCells.size(); ++i)
+				{
+					fDistance = XMVectorGetX(XMVector3Length(vPosition - m_ForComputeCells[i]->Get_Center()));
+
+					if (fMinDistance > fDistance)
+					{
+						fMinDistance = fDistance;
+						iNeighborIndex = m_ForComputeCells[i]->Get_Index();
+					}
+				}
+				m_NaviDesc.iCurrentCellIndex = iNeighborIndex;
+				m_ForComputeCells.clear();
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
@@ -175,14 +274,14 @@ HRESULT CNavigation::Render_Navigation()
 	CPipeLine*			pPipeLine = GET_INSTANCE(CPipeLine);
 
 	m_pShader->Set_RawValue("g_ViewMatrix", &pPipeLine->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4));
-	m_pShader->Set_RawValue("g_ProjMatrix", &pPipeLine->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4));	
+	m_pShader->Set_RawValue("g_ProjMatrix", &pPipeLine->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4));
 
 	RELEASE_INSTANCE(CPipeLine);
 
 	if (-1 == m_NaviDesc.iCurrentCellIndex)
 	{
 		m_pShader->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4));
-		
+
 
 		for (auto& pCell : m_Cells)
 		{

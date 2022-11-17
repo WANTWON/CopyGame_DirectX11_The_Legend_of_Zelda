@@ -18,14 +18,18 @@ private:
 public:
 	virtual HRESULT Initialize_Prototype(const _tchar* pNavigationData);
 	virtual HRESULT Initialize(void* pArg);
-	_float Compute_Height(_vector vPosition, _float foffset);
-	void Compute_CurrentIndex(_vector vPosition);
+	_float	Compute_Height(_vector vPosition, _float foffset);
+	void	Compute_CurrentIndex(_vector vPosition);
 
 public:
-	_bool isMove(_fvector vPosition);
-	_uint Get_CurrentCelltype();
+	_bool	isMove(_fvector vPosition);
+	_bool	isMove3D(_fvector vPosition);
+	_bool	isMove2D(_fvector vPosition);
+	_uint	Get_CurrentCelltype();
 	_vector Get_CurrentCellCenter();
 	_vector Get_LastNormal() { return XMLoadFloat3(&m_vLastNormal); }
+	void	Set_2DNaviGation(_bool type) { m_bIs2D = true; }
+
 
 #ifdef _DEBUG
 public:
@@ -36,6 +40,12 @@ private:
 	NAVIDESC				m_NaviDesc;
 	vector<class CCell*>	m_Cells;
 	_float3					m_vLastNormal = _float3(0.f, 0.f, 0.f);
+	_bool					m_bIs2D = false;
+
+	/* x z가 같고 높이가 다른 셀이 존재할 수도 있어서 다른 컨테이너에 담아두고*/
+	/* 해당 벡터를 돌아서 높이 비교로 현재 셀을 확정 시킬 것*/
+	vector<class CCell*>	m_ForComputeCells;
+
 #ifdef _DEBUG
 private:
 	class CShader*			m_pShader = nullptr;

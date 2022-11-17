@@ -54,7 +54,7 @@ private:
 	CAMERAMODE		m_ePreCamMode = CAM_PLAYER;
 	CAMERAMODE		m_eCamMode = CAM_PLAYER;
 	_float4			m_vDistance = _float4(0, 10, -10, 0.f);
-	_long			m_lMouseWheel = 0;
+	_double			m_lMouseWheel = 0;
 	_float4			m_fTargetPos = _float4(0.f, 0.f, 0.f, 1.f);
 
 	/* For Shaking Camera */

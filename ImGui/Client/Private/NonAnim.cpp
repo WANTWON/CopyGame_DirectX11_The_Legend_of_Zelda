@@ -43,7 +43,10 @@ HRESULT CNonAnim::Initialize(void * pArg)
 	}
 	
 
-	CModelManager::Get_Instance()->Add_CreatedModel(this);
+	if (CImgui_Manager::Get_Instance()->Get_ModelPicking() == true)
+		CModelManager::Get_Instance()->Add_CreatedModel(this);
+	else if (CImgui_Manager::Get_Instance()->Get_CameraPicking() == true)
+		CCamera_Manager::Get_Instance()->Add_CreatedCamera(this);
 
 	return S_OK;
 }

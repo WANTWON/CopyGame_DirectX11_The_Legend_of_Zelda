@@ -68,7 +68,7 @@ protected:
 	_float3			m_vScale = _float3(1.f,1.f,1.f);
 	_float3			m_vMousePickPos;
 	_float			m_eDir[DIR_END] = { 0 };
-	_int			m_ePreDir[DIR_END] = { 0 };
+	_float			m_ePreDir[DIR_END] = { 0 };
 	_float			m_fWalkingHeight = 0.f;
 	_float			m_fAlpha = 1.f;
 

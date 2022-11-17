@@ -47,7 +47,7 @@ public:
 	OBJINFO Get_Info() { return m_tInfo; }
 	void Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
-	void Set_NextPortal(_float3 vPosition, _bool is2D) { m_vPortalPos = vPosition; m_bPortal2D = is2D;}
+	void Set_NextPortal(_float3 vPosition, _bool is2D) { m_vPortalPos = vPosition; m_b2D = is2D;}
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
 
 private:
@@ -62,6 +62,7 @@ private:
 	virtual HRESULT Ready_Components(void* pArg) override;
 	virtual HRESULT SetUp_ShaderResources() override; /* 셰이더 전역변수에 값을 전달한다. */
 	virtual HRESULT SetUp_ShaderID() override;
+
 	void SetDirection_byLook(_float fTimeDelta);
 	void SetDirection_byPosition(_float fTimeDelta);
 	void SetDirection_Pushing(_float fTimeDelta);
@@ -98,7 +99,7 @@ private:
 	DWORD					m_dwPressedTime = GetTickCount();
 
 	_float3					m_vPortalPos = _float3(0.f, 0.f, 0.f);
-	_bool					m_bPortal2D = false;
+	_bool					m_b2D = false;
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

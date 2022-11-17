@@ -32,7 +32,7 @@ public:
 	void		Set_CellType(CELLTYPE eType) { m_eCellType = eType; }
 	CELLTYPE	Get_CellType() { return m_eCellType;}
 	_vector		Get_Center();
-
+	_int		Get_Index() { return m_iIndex; }
 
 
 #ifdef _DEBUG
