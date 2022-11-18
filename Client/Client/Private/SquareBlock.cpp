@@ -22,7 +22,9 @@ HRESULT CSquareBlock::Initialize_Prototype()
 
 HRESULT CSquareBlock::Initialize(void * pArg)
 {
-	
+	if (pArg != nullptr)
+		memcpy(&m_BlockDesc, pArg, sizeof(BLOCKDESC));
+
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
@@ -31,7 +33,7 @@ HRESULT CSquareBlock::Initialize(void * pArg)
 
 	if (pArg != nullptr)
 	{
-		_vector vecPostion = XMLoadFloat3((_float3*)pArg);
+		_vector vecPostion = XMLoadFloat3(&m_BlockDesc.vInitPosition);
 		vecPostion = XMVectorSetW(vecPostion, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	}
@@ -44,79 +46,32 @@ HRESULT CSquareBlock::Initialize(void * pArg)
 
 int CSquareBlock::Tick(_float fTimeDelta)
 {
-	
+	if (m_bDead)
+	{
+		m_fAlpha -= 0.1f;
+
+		if (m_fAlpha <= 0)
+		{
+			CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+			return OBJ_DEAD;
+		}
+	}
+
 	return OBJ_NOEVENT;
 }
 
 void CSquareBlock::Late_Tick(_float fTimeDelta)
 {
-	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) == false)
-		return;
-
-	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
-
-	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-
 	
-	CBaseObj* pTarget = nullptr;
-	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom, &pTarget))
+	switch (m_BlockDesc.eType)
 	{
-		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
-
-		CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
-		pButton->Set_Visible(true);
-		_float2 fPosition = pPlayer->Get_ProjPosition();
-		fPosition.y = g_iWinSizeY - fPosition.y;
-		fPosition.x += 50.f;
-		fPosition.y -= 30.f;
-		pButton->Set_Position(fPosition);
-
-		CPlayer::ANIM ePlayerState = pPlayer->Get_AnimState();
-
-		if (CGameInstance::Get_Instance()->Key_Pressing(DIK_A))
-		{
-			pButton->Set_Visible(false);
-
-			if (ePlayerState != CPlayer::PUSH_WAIT && ePlayerState != CPlayer::PULL_LP && ePlayerState != CPlayer::PUSH_LP)
-			{
-				pPlayer->Set_AnimState(CPlayer::PUSH_WAIT);
-				//pPlayer->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			}
-				
-		}
-		else
-		{
-			if (ePlayerState == CPlayer::PUSH_WAIT && ePlayerState!= CPlayer::IDLE)
-				pPlayer->Set_AnimState(CPlayer::IDLE);
-		}
-
-
-		if (ePlayerState == CPlayer::PUSH_LP)
-		{
-			if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pAABBCom))
-			{
-				_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pPlayer->Get_TransformState(CTransform::STATE_POSITION);
-				if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
-					vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
-				else
-					vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
-				m_pTransformCom->Go_PosDir(fTimeDelta, vDirection);
-			}
-			
-		}
-		else if (ePlayerState == CPlayer::PULL_LP)
-		{
-			_vector vDirection =  pPlayer->Get_TransformState(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-			if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
-				vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
-			else
-				vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
-			m_pTransformCom->Go_PosDir(fTimeDelta*0.2f, vDirection);
-		}
-		
+	case SQUARE_BLOCK:
+		Tick_SquareBlock( fTimeDelta);
+		break;
+	case LOCK_BLOCK:
+		Tick_LockBlock( fTimeDelta);
+		break;
 	}
-
 
 }
 
@@ -147,9 +102,20 @@ HRESULT CSquareBlock::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_SquareBlock"), (CComponent**)&m_pModelCom)))
-		return E_FAIL;
+	switch (m_BlockDesc.eType)
+	{
+	case SQUARE_BLOCK:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_SquareBlock"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case LOCK_BLOCK:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_LockBlock"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	}
+	
 
 	CCollider::COLLIDERDESC		ColliderDesc;
 
@@ -168,6 +134,108 @@ HRESULT CSquareBlock::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CSquareBlock::Tick_SquareBlock(_float fTimeDelta)
+{
+	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) == false)
+		return;
+
+	if (nullptr != m_pRendererCom)
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+
+	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+
+	CBaseObj* pTarget = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom, &pTarget))
+	{
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+
+		CPlayer::ANIM ePlayerState = pPlayer->Get_AnimState();
+
+		if (CGameInstance::Get_Instance()->Key_Pressing(DIK_A))
+		{
+	
+			if (ePlayerState != CPlayer::PUSH_WAIT && ePlayerState != CPlayer::PULL_LP && ePlayerState != CPlayer::PUSH_LP)
+			{
+				pPlayer->Set_AnimState(CPlayer::PUSH_WAIT);
+
+			}
+
+		}
+		else
+		{
+			if (ePlayerState == CPlayer::PUSH_WAIT && ePlayerState != CPlayer::IDLE)
+				pPlayer->Set_AnimState(CPlayer::IDLE);
+		}
+
+
+		if (ePlayerState == CPlayer::PUSH_LP)
+		{
+			if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pAABBCom))
+			{
+				_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pPlayer->Get_TransformState(CTransform::STATE_POSITION);
+				if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+					vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+				else
+					vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+				m_pTransformCom->Go_PosDir(fTimeDelta, vDirection);
+			}
+
+		}
+		else if (ePlayerState == CPlayer::PULL_LP)
+		{
+			_vector vDirection = pPlayer->Get_TransformState(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+				vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+			else
+				vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+			m_pTransformCom->Go_PosDir(fTimeDelta*0.2f, vDirection);
+		}
+
+	}
+
+}
+
+void CSquareBlock::Tick_LockBlock(_float fTimeDelta)
+{
+	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) == false)
+		return;
+
+	if (nullptr != m_pRendererCom)
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+
+	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+
+	CBaseObj* pTarget = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom, &pTarget))
+	{
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+
+		CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
+		if(m_bDead == false)
+			pButton->Set_Visible(true);
+		_float2 fPosition = pPlayer->Get_ProjPosition();
+		fPosition.y = g_iWinSizeY - fPosition.y;
+		fPosition.x += 50.f;
+		fPosition.y -= 30.f;
+		pButton->Set_Position(fPosition);
+
+		CPlayer::ANIM ePlayerState = pPlayer->Get_AnimState();
+
+		if (CGameInstance::Get_Instance()->Key_Pressing(DIK_A))
+		{
+			if (CUI_Manager::Get_Instance()->Get_KeySize() != 0)
+			{
+				pButton->Set_Visible(false);
+				dynamic_cast<CPlayer*>(pPlayer)->Set_AnimState(CPlayer::KEY_OPEN);
+				m_bDead = true;
+			}
+
+		}
+	}
 }
 
 

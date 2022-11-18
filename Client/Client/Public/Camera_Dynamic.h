@@ -49,6 +49,7 @@ public:
 	void Player_Camera(_float fTimeDelta);
 	void Shaking_Camera(_float fTimeDelta, _float fPower);
 	void Terrain_Camera(_float fTimeDelta);
+	void Set_Position(_vector vPosition);
 
 private:
 	CAMERAMODE		m_ePreCamMode = CAM_PLAYER;

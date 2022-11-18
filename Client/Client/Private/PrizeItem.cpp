@@ -49,24 +49,9 @@ int CPrizeItem::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
-		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
 		return OBJ_DEAD;
 	}
 		
-
-	if (m_bGet)
-	{
-		CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-		_vector pPlayerPostion = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
-		pPlayerPostion = XMVectorSetY(pPlayerPostion, XMVectorGetY(pPlayerPostion) + 3.f );
-		m_pTransformCom->Go_PosTarget(fTimeDelta, pPlayerPostion);
-
-		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
-		{
-			m_bDead = true;
-		}
-			
-	}
 
 
 	return OBJ_NOEVENT;
@@ -84,8 +69,36 @@ void CPrizeItem::Late_Tick(_float fTimeDelta)
 	
 	if (m_ItemDesc.m_bPrize && m_pSPHERECom->Collision(pTarget->Get_Collider()))
 	{
-		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(90.f));
+		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(-70.f));
+		m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-180.f));
+		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
+
+		if (m_ItemDesc.m_bPrize && !m_bGet)
+		{
+			dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
+			CUI_Manager::Get_Instance()->Open_Message((CUI_Manager::MESSAGETYPE)m_ItemDesc.eType);
+		}
+		
 		m_bGet = true;
+	}
+
+
+	if (m_bGet)
+	{
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+		_vector pPlayerPostion = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
+		
+		pPlayerPostion = XMVectorSetY(pPlayerPostion, XMVectorGetY(pPlayerPostion) + 3.f);
+		m_pTransformCom->Go_PosTarget(fTimeDelta, pPlayerPostion);
+
+		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
+		{
+			CUI_Manager::Get_Instance()->Close_Message();
+			if(m_ItemDesc.eType == SMALL_KEY)
+				CUI_Manager::Get_Instance()->Get_Key();
+			m_bDead = true;
+		}
+
 	}
 
 	RELEASE_INSTANCE(CGameInstance);

@@ -37,6 +37,7 @@ public:
 
 
 private:
+	_float							m_fTime = 0.f;
 	_bool							m_bDoorOpen = false;
 	vector<_bool>					m_vecIsSolved = { false };
 

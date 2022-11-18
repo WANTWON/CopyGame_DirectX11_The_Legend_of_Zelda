@@ -10,7 +10,12 @@ namespace Client
 	enum OBJID { OBJ_BACKGROUND, OBJ_MONSTER, OBJ_BLOCK, OBJ_INTERATIVE, OBJ_UNINTERATIVE, OBJ_END };
 	enum CONSTRUCT_ID { CONSTRUCT_HOUSE, CONSTRUCT_TREE, CONSTRUCT_END};
 	enum SHADER_ID { SHADER_DEFAULT, SHADER_WIREFRAME, SHADER_PICKED, SHADER_SYMBOL};
+
+
+	
+
 }
+
 
 #include <process.h>
 #include <commdlg.h>
@@ -24,3 +29,4 @@ using namespace Client;
 using namespace std;
 
 #define MAX_NUM 9999
+

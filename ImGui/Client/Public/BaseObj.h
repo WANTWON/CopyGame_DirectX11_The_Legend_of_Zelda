@@ -27,8 +27,8 @@ public:
 	virtual HRESULT Render();
 
 public:
-	virtual _bool Picking(_float3* PickingPoint) = 0;
-	virtual void PickingTrue() = 0;
+	virtual _bool Picking(_float3* PickingPoint)  { return false; };
+	virtual void PickingTrue() {};
 
 public:
 	OBJID Get_ObjectID() { return m_eObjectID; }

@@ -43,10 +43,12 @@ HRESULT CNonAnim::Initialize(void * pArg)
 	}
 	
 
-	if (CImgui_Manager::Get_Instance()->Get_ModelPicking() == true)
-		CModelManager::Get_Instance()->Add_CreatedModel(this);
-	else if (CImgui_Manager::Get_Instance()->Get_CameraPicking() == true)
+	
+		
+	if (CImgui_Manager::Get_Instance()->Get_CameraPicking() == true)
 		CCamera_Manager::Get_Instance()->Add_CreatedCamera(this);
+	else
+		CModelManager::Get_Instance()->Add_CreatedModel(this);
 
 	return S_OK;
 }
@@ -64,7 +66,7 @@ void CNonAnim::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 
-	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	//Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 	XMStoreFloat3(&m_ModelDesc.vPosition, Get_Position());
 	m_ModelDesc.vScale = Get_Scale();

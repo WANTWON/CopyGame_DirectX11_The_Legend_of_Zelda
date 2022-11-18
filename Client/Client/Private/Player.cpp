@@ -783,7 +783,12 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 				m_eState = STAIR_UP;
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPortalPos);
 				if (CCameraManager::Get_Instance()->Get_CamState() != CCameraManager::CAM_DYNAMIC)
+				{
 					CCameraManager::Get_Instance()->Set_CamState(CCameraManager::CAM_DYNAMIC);
+					CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+					dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_Position(vPortalPos);
+				}
+					
 				m_pNavigationCom[m_iCurrentLevel]->Set_2DNaviGation(false);
 			}
 			else

@@ -12,13 +12,13 @@ class CTreasureBox final : public CBaseObj
 {
 public:
 	enum STATE { APPEAR, CLOSE, CLOSE_WAIT, NOT_OPEN, OPEN, OPEN_WAIT };
-	enum ITEMTYPE { COMPASS, MAP, SMALL_KEY, BOSS_KEY, FEATHER , HEART, RUBY};
+	enum ITEMTYPE { COMPASS, MAP, SMALL_KEY, BOSS_KEY, FEATHER, HEART, RUBY };
 
 	typedef struct TreasureBoxTag
 	{
 		ITEMTYPE eItemType = COMPASS;
 		_float3 vPosition = _float3(0.f, 0.f, 0.f);
-		_bool   bVisible = true;
+		_bool	bVisible = true;
 	}BOXTAG;
 	
 
@@ -32,17 +32,17 @@ public:
 	virtual int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	BOXTAG	Get_BoxDesc() { return m_eTreasureBoxDesc; }
+	void	Set_BoxDesc(BOXTAG BoxDesc) { memcpy(&m_eTreasureBoxDesc, &BoxDesc, sizeof(BOXTAG)); }
+	void	Set_Picked();
 
 private:
-	void Change_Animation(_float fTimeDelta);
+	void Change_Animation(_float fTimeDelta); 
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
 	virtual HRESULT SetUp_ShaderResources() override;
-	void OpenBox();
 
 private:
 	CModel*					m_pModelCom = nullptr;
-	STATE					m_eState = CLOSE_WAIT;
-	STATE					m_ePreState = APPEAR;
 	BOXTAG					m_eTreasureBoxDesc;
 	_bool					m_bGet = false;
 

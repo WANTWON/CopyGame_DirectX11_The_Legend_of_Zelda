@@ -116,7 +116,7 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 		return E_FAIL;
 
 	CCollider::COLLIDERDESC		ColliderDesc;
-	/* For.Com_AABB */
+
 	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
 
 
@@ -127,7 +127,11 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 		return E_FAIL;
 
 	
-
+	///* For.Com_SHPERE */
+	//ColliderDesc.vScale = _float3(0.7f, 0.2f, 0.2f);
+	//ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
+	//if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
+	//	return E_FAIL;
 
 	return S_OK;
 }

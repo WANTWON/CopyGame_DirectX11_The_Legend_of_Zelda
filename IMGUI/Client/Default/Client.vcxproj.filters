@@ -70,6 +70,9 @@
     <Filter Include="03.ToolManager\Camera_Manager">
       <UniqueIdentifier>{b7467d6f-dfe3-4fd1-b63f-eb75469faf32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\04.TreasureBox">
+      <UniqueIdentifier>{b14591bf-3e81-4afd-b902-9b852f7a00f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -165,6 +168,9 @@
     <ClInclude Include="..\Public\Camera_Manager.h">
       <Filter>03.ToolManager\Camera_Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TreasureBox.h">
+      <Filter>02.GameObjects\04.TreasureBox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -241,6 +247,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Manager.cpp">
       <Filter>03.ToolManager\Camera_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TreasureBox.cpp">
+      <Filter>02.GameObjects\04.TreasureBox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

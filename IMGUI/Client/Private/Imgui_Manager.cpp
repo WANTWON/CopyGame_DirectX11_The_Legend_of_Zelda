@@ -74,6 +74,8 @@ CImgui_Manager::CImgui_Manager()
 	m_stLayerTags.push_back(LayerTag);
 	m_stLayerTags.push_back(LayerTag2);
 	m_stLayerTags.push_back(LayerTag3);
+
+	ZeroMemory(&m_BoxDesc, sizeof(CTreasureBox::BOXTAG));
 }
 
 
@@ -209,6 +211,11 @@ void CImgui_Manager::Tick_Imgui()
 				if (ImGui::BeginTabItem("Show Current Model List"))
 				{
 					Show_CurrentModelList();
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("TreasureBox Setting"))
+				{
+					Set_TrasureBox();
 					ImGui::EndTabItem();
 				}
 
@@ -359,6 +366,251 @@ void CImgui_Manager::BrowseForFolder()
 
 		m_bLoad = false;
 	}
+}
+
+void CImgui_Manager::Set_TrasureBox()
+{
+	static int selected = 0;
+	{
+		ImGui::BeginChild("left pane", ImVec2(150, 0), true);
+
+		if ((int)m_pModel_Manager->Get_TreasureBoxSize() != 0)
+		{
+			for (int i = 0; i < m_pModel_Manager->Get_TreasureBoxSize();)
+			{
+				//char label[MAX_PATH] = "";
+				char szLayertag[MAX_PATH] = "TreasureBox";
+
+				char label[MAX_PATH] = "TreasureBox";
+				char buffer[MAX_PATH];
+				sprintf(buffer, "%d", i);
+				strcat(label, buffer);
+				if (ImGui::Selectable(label, m_iTreasureIndex == i))
+				{
+					m_iTreasureIndex = i;
+					m_pModel_Manager->Get_TreasureBox(m_iTreasureIndex)->Set_Picked();
+				}
+				i++;
+			}
+		}
+		ImGui::EndChild();
+	}
+	ImGui::SameLine();
+	// ------------------------ Right -----------------------------------
+	{
+
+		ImGui::BeginGroup();
+		ImGui::BeginChild("TreasureBox view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+
+
+		Set_LayerTag();
+		ImGui::NewLine();
+
+		ImGui::CollapsingHeader("Show Current TreasureBox");
+
+		ImGui::Text("Selected Index : "); ImGui::SameLine();  ImGui::Text("%d", m_iTreasureIndex);
+		CTreasureBox* pTreasureBox = m_pModel_Manager->Get_TreasureBox(m_iTreasureIndex);
+		
+
+		if (pTreasureBox != nullptr)
+		{
+			XMStoreFloat3(&m_vPickedObjPos, pTreasureBox->Get_Position());
+			CTreasureBox::BOXTAG  BoxTag = pTreasureBox->Get_BoxDesc();
+			m_Visible = BoxTag.bVisible;
+			m_ItemType = BoxTag.eItemType;
+		}
+		else
+		{
+			m_vPickedObjPos = _float3(0.f, 0.f, 0.f);
+			m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
+			m_Visible = false;
+			m_ItemType = CTreasureBox::COMPASS;
+		}
+
+		ImGui::NewLine();
+		ImGui::BulletText("Position");
+		ImGui::Text("Position X");
+		ImGui::SameLine();
+		ImGui::DragFloat("##PositionX", &m_vPickedObjPos.x, 0.01f);
+
+		ImGui::Text("Position Z");
+		ImGui::SameLine();
+		ImGui::DragFloat("##PositionZ", &m_vPickedObjPos.z, 0.01f);
+
+		ImGui::Text("Position Y");
+		ImGui::SameLine();
+		ImGui::DragFloat("##PositionY", &m_vPickedObjPos.y, 0.01f, -10, 10);
+
+		ImGui::NewLine();
+	
+		ImGui::Checkbox("isVisible", &m_Visible);
+
+		const char* TypeList[] = { "COMPASS", "MAP","SMALL_KEY","BOSS_KEY", "FEATHER", "HEART", "RUBY" };
+		ImGui::Combo("ItemType", &m_ItemType, TypeList, IM_ARRAYSIZE(TypeList));
+		
+
+
+		if (pTreasureBox != nullptr)
+		{
+			CTreasureBox::BOXTAG BoxDesc; 
+			BoxDesc.vPosition = m_vPickedObjPos;
+			m_vPickedObjPos = BoxDesc.vPosition;
+			BoxDesc.eItemType = (CTreasureBox::ITEMTYPE)m_ItemType;
+			BoxDesc.bVisible = m_Visible;
+
+			pTreasureBox->Set_BoxDesc(BoxDesc);
+		}
+
+
+		if (ImGui::Button("Save TreasureBox"))
+		{
+			Save_TrasureBox();
+		}
+		if (ImGui::Button("Load TreasureBox"))
+		{
+			Load_TrasureBox();
+		}
+
+		ImGui::EndChild();
+		ImGui::EndGroup();
+	}
+
+
+	if (m_bCreateModel && CGameInstance::Get_Instance()->Key_Up(DIK_X))
+	{
+		if (CPickingMgr::Get_Instance()->Picking())
+		{
+			m_BoxDesc.vPosition = CPickingMgr::Get_Instance()->Get_PickingPos();
+			m_BoxDesc.bVisible = m_Visible;
+			m_BoxDesc.eItemType = (CTreasureBox::ITEMTYPE)m_ItemType;
+			_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+			m_TempLayerTags.push_back(LayerTag);
+			if (FAILED(m_pModel_Manager->Add_TreasureBox(LayerTag, &m_BoxDesc)))
+				return;
+			m_fTreasureBoxPos = m_pModel_Manager->Get_LastTreasureBox()->Get_BoxDesc().vPosition;
+
+		}
+	}
+	if (m_bCreateModel && CGameInstance::Get_Instance()->Key_Up(DIK_Z))
+	{
+		_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+		m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
+		list<CGameObject*>* plistClone = CGameInstance::Get_Instance()->Get_ObjectList(m_iCurrentLevel, LayerTag);
+		if (nullptr == plistClone || plistClone->size() == 0)
+		{
+			delete LayerTag;
+			return;
+		}
+
+		auto iter = --plistClone->end();
+		m_pModel_Manager->Out_TreasureBoxGroup(dynamic_cast<CTreasureBox*>(*iter));
+		Safe_Release(*iter);
+		plistClone->erase(iter);
+
+		delete LayerTag;
+	}
+
+	
+}
+
+void CImgui_Manager::Save_TrasureBox()
+{
+	OPENFILENAME OFN;
+	TCHAR filePathName[300] = L"";
+	TCHAR lpstrFile[300] = L"";
+	static TCHAR filter[] = L"데이터 파일\0*.dat\0텍스트 파일\0*.txt";
+
+	memset(&OFN, 0, sizeof(OPENFILENAME));
+	OFN.lStructSize = sizeof(OPENFILENAME);
+	OFN.hwndOwner = g_hWnd;
+	OFN.lpstrFilter = filter;
+	OFN.lpstrFile = lpstrFile;
+	OFN.nMaxFile = 300;
+	OFN.lpstrInitialDir = L".";
+	OFN.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
+
+	if (GetSaveFileName(&OFN))
+	{
+		//ERR_MSG(TEXT("save-as  '%s'\n"), ofn.lpstrFile); //경로// 파일이름.확장자
+		//ERR_MSG(TEXT("filename '%s'\n"), ofn.lpstrFile + ofn.nFileOffset); 
+
+		HANDLE hFile = 0;
+		_ulong dwByte = 0;
+		CTreasureBox::BOXTAG	TreasureBoxDesc;
+
+		_uint iNum = 0;
+		_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+		m_TempLayerTags.push_back(LayerTag);
+		m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
+	
+		iNum = m_pModel_Manager->Get_TreasureBoxSize();
+
+		hFile = CreateFile(OFN.lpstrFile, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);;
+		if (0 == hFile)
+			return;
+
+		/* 첫줄은 object 리스트의 size 받아서 갯수만큼 for문 돌리게 하려고 저장해놓음*/
+		WriteFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+		for (_int i =0; i< iNum; ++i)
+		{
+			TreasureBoxDesc = m_pModel_Manager->Get_TreasureBox(i)->Get_BoxDesc();
+			WriteFile(hFile, &TreasureBoxDesc, sizeof(CTreasureBox::BOXTAG), &dwByte, nullptr);
+
+		}
+		CloseHandle(hFile);
+
+	}
+}
+
+void CImgui_Manager::Load_TrasureBox()
+{
+	OPENFILENAME OFN;
+	TCHAR filePathName[300] = L"";
+	TCHAR lpstrFile[300] = L"";
+	static TCHAR filter[] = L"데이터 파일\0*.dat\0텍스트 파일\0*.txt";
+
+	memset(&OFN, 0, sizeof(OPENFILENAME));
+	OFN.lStructSize = sizeof(OPENFILENAME);
+	OFN.hwndOwner = g_hWnd;
+	OFN.lpstrFilter = filter;
+	OFN.lpstrFile = lpstrFile;
+	OFN.nMaxFile = 300;
+	OFN.lpstrInitialDir = L".";
+
+	if (GetOpenFileName(&OFN) != 0) {
+		wsprintf(filePathName, L"%s 파일을 열겠습니까?", OFN.lpstrFile);
+		MessageBox(g_hWnd, filePathName, L"열기 선택", MB_OK);
+
+		//ERR_MSG(TEXT("save-as  '%s'\n"), ofn.lpstrFile); //경로// 파일이름.확장자
+		//ERR_MSG(TEXT("filename '%s'\n"), ofn.lpstrFile + ofn.nFileOffset); 
+
+		HANDLE hFile = 0;
+		_ulong dwByte = 0;
+		CTreasureBox::BOXTAG  ModelDesc;
+		_uint iNum = 0;
+		LEVEL iLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
+		_matrix			PivotMatrix = XMMatrixIdentity();
+
+		_tchar* LayerTag = StringToTCHAR(m_stLayerTags[m_iSeletecLayerNum]);
+		m_TempLayerTags.push_back(LayerTag);
+
+		hFile = CreateFile(OFN.lpstrFile, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		if (0 == hFile)
+			return;
+
+		/* 타일의 개수 받아오기 */
+		ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+		for (_uint i = 0; i < iNum; ++i)
+		{
+			ReadFile(hFile, &(ModelDesc), sizeof(CTreasureBox::BOXTAG), &dwByte, nullptr);
+			m_pModel_Manager->Add_TreasureBox(LayerTag, &ModelDesc);
+			
+		}
+		CloseHandle(hFile);
+	}
+
 }
 
 void CImgui_Manager::Set_FilePath()
@@ -1039,13 +1291,8 @@ void CImgui_Manager::ShowPickedObj()
 	CGameObject* pPickedObj = pPickingMgr->Get_PickedObj();
 
 
-	ImGui::BulletText("ObjectInfo");
-	const char* ObjectID[] = { "OBJ_BACKGROUND", "OBJ_MONSTER", "OBJ_BLOCK", "OBJ_INTERATIVE", "OBJ_UNINTERATIVE", "OBJ_END" };
-	static int iObjectID = 5;
-
 	if (pPickedObj != nullptr)
 	{
-		iObjectID = dynamic_cast<CBaseObj*>(pPickedObj)->Get_ObjectID();
 		DirectX::XMStoreFloat3(&m_vPickedObjPos, dynamic_cast<CBaseObj*>(pPickedObj)->Get_Position());
 		m_vPickedObjScale = dynamic_cast<CBaseObj*>(pPickedObj)->Get_Scale();
 		m_vPickedRotAxis = dynamic_cast<CNonAnim*>(pPickedObj)->Get_ModelDesc().vRotation;
@@ -1053,7 +1300,6 @@ void CImgui_Manager::ShowPickedObj()
 	}
 	else
 	{
-		iObjectID = 5;
 		m_vPickedObjPos = _float3(0.f, 0.f, 0.f);
 		m_vPickedObjScale = _float3(1.f, 1.f, 1.f);
 	}

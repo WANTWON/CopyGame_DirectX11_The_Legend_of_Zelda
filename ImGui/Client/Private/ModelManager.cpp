@@ -125,6 +125,41 @@ void CModelManager::Clear_Layer()
 
 }
 
+HRESULT CModelManager::Add_TreasureBox(const _tchar* pLayerTag, CTreasureBox::BOXTAG* BoxDesc)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_GAMEPLAY, pLayerTag, BoxDesc)))
+	{
+		RELEASE_INSTANCE(CGameInstance);
+		return E_FAIL;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return S_OK;
+}
+
+void CModelManager::Out_TreasureBoxGroup(CTreasureBox * pGameObject)
+{
+	auto& iter = m_TreasureBox.begin();
+	while (iter != m_TreasureBox.end())
+	{
+		if (*iter == pGameObject)
+			iter = m_TreasureBox.erase(iter);
+		else
+			++iter;
+	}
+}
+
+CTreasureBox* CModelManager::Get_TreasureBox(_int index)
+{
+	if (index >= m_TreasureBox.size())
+		return nullptr;
+		
+	return m_TreasureBox[index];
+}
+
 void CModelManager::Free()
 {
 

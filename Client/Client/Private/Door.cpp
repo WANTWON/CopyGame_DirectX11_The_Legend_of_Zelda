@@ -35,6 +35,21 @@ HRESULT CDoor::Initialize(void * pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(m_DoorDesc.fAngle));
 
+	switch (m_DoorDesc.eType)
+	{
+	case DOOR_CLOSED:
+		m_eState = OPEN_CD;
+	case DOOR_KEY:
+		m_eState = CLOSE_LD;
+		break;
+	case DOOR_BOSS:
+		m_eState = REMOVE_KEY;
+		break;
+	default:
+		break;
+	}
+
+
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
 	return S_OK;
 }
@@ -151,6 +166,10 @@ HRESULT CDoor::Ready_Components(void * pArg)
 			return E_FAIL;
 		break;
 	case DOOR_BOSS:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_BossDoor"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
 		break;
 	default:
 		break;
@@ -238,10 +257,12 @@ void CDoor::Tick_LockDoor(_float fTimeDelta)
 	_float fDistanceToTarget = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
 
 	
-	if (fDistanceToTarget < 3.f)
+	if (fDistanceToTarget < 3.f )
 	{
 		CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
-		pButton->Set_Visible(true);
+		
+		if(m_eState != OPEN_LD )
+			pButton->Set_Visible(true);
 		_float2 fPosition = pPlayer->Get_ProjPosition();
 		fPosition.y = g_iWinSizeY - fPosition.y;
 		fPosition.x += 50.f;
@@ -277,6 +298,49 @@ void CDoor::Tick_LockDoor(_float fTimeDelta)
 
 void CDoor::Tick_BossDoor(_float fTimeDelta)
 {
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+
+	_vector vTargetPos = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
+	_float fDistanceToTarget = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
+
+
+	if (fDistanceToTarget < 3.f)
+	{
+		CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
+		if(m_bOpen == false)
+			pButton->Set_Visible(true);
+		_float2 fPosition = pPlayer->Get_ProjPosition();
+		fPosition.y = g_iWinSizeY - fPosition.y;
+		fPosition.x += 50.f;
+		fPosition.y -= 30.f;
+		pButton->Set_Position(fPosition);
+
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
+		{
+			if (CUI_Manager::Get_Instance()->Get_KeySize() != 0)
+			{
+				pButton->Set_Visible(false);
+				dynamic_cast<CPlayer*>(pPlayer)->Set_AnimState(CPlayer::KEY_OPEN);
+				m_eState = REMOVE_KEY;
+				m_bOpen = true;
+				m_bPlay = true;
+			}
+		}
+	}
+
+
+	if (m_eState != m_ePreState)
+	{
+		m_pModelCom->Set_NextAnimIndex(m_eState);
+		m_ePreState = m_eState;
+	}
+
+	if (m_bPlay)
+		Change_Animation(fTimeDelta);
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CDoor::Change_Animation_ClosedDoor(_float fTimeDelta)
@@ -340,6 +404,30 @@ void CDoor::Change_Animation_LockDDoor(_float fTimeDelta)
 
 void CDoor::Change_Animation_BossDoor(_float fTimeDelta)
 {
+	switch (m_eState)
+	{
+	case Client::CDoor::REMOVE_KEY:
+		if (m_bOpen)
+		{
+			m_bIsLoop = false;
+			if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+			{
+				CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+				m_eState = OPEN_BOSS;
+			}
+
+		}
+		break;
+	case Client::CDoor::OPEN_BOSS:
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		{
+			m_bDead = true;
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 CDoor * CDoor::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

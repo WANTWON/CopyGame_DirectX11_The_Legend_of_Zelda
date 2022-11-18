@@ -9,6 +9,7 @@
 #include "NonAnim.h"
 #include "Navigation_Manager.h"
 #include "Camera_Manager.h"
+#include "TreasureBox.h"
 
 BEGIN(Engine)
 class CGameObject;
@@ -21,6 +22,9 @@ class CImgui_Manager final : public CBase
 
 public:
 	enum PICKING_TYPE { PICKING_TERRAIN_TRANSFORM, PICKING_TERRAIN_SHAPE };
+
+	
+
 
 private:
 	CImgui_Manager();
@@ -50,12 +54,16 @@ public:
 	/* For Model Tool */
 	void Set_Object_Map();
 	void Set_File_Path_Dialog();
-	void Show_ModelList();
-	void Show_CurrentModelList();
-	void BrowseForFolder();
 	void Set_FilePath();
 	void Set_LayerTag();
 	void Set_Macro();
+	void Show_ModelList();
+	void Show_CurrentModelList();
+	void BrowseForFolder();
+
+	void Set_TrasureBox();
+	void Save_TrasureBox();
+	void Load_TrasureBox();
 
 	/* For Navigation Tool */
 	void Set_Navigation();
@@ -99,8 +107,14 @@ private:
 	_int									m_iCreatedSelected = 0;
 	_int									m_iSeletecLayerNum = 0;
 	_float									m_fDist = 1.f;
-	_bool									m_bCreateModel = false;
 
+	//TreasureBox
+	_bool									m_bCreateModel = false;
+	CTreasureBox::BOXTAG					m_BoxDesc;
+	_int									m_iTreasureIndex = 0;
+	_float3									m_fTreasureBoxPos = _float3(0.f, 0.f, 0.f);
+	_int									m_ItemType = 0;
+	_bool									m_Visible = false;
 
 	/* For Picking */
 	_float3									m_vPickedObjPos = _float3(1.f, 1.f, 1.f);

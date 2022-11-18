@@ -272,6 +272,11 @@ void CBuzzBlob::AI_Behaviour(_float fTimeDelta)
 	{
 		m_bAggro = true;
 
+		if (m_pOBBCom->Collision(m_pTarget->Get_Collider()) == true)
+		{
+			m_eState = IDLE;
+			return;
+		}
 
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
 		Follow_Target(fTimeDelta);

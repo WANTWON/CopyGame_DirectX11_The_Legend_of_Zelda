@@ -206,27 +206,14 @@ void CCamera_Dynamic::Terrain_Camera(_float fTimeDelta)
 
 	_float fMinDistance = 9999;
 
-	if (m_lMouseWheel > 0)
-		m_lMouseWheel -= 0.001;
-	if (m_lMouseWheel < 0)
-		m_lMouseWheel += 0.001;
-
-	if (m_lMouseWheel += (pGameInstance->Get_DIMMoveState(DIMM_WHEEL)*0.05))
-	{
-		m_vDistance.y -= _float(fTimeDelta*m_lMouseWheel*0.01f);
-		m_vDistance.z += _float(fTimeDelta*m_lMouseWheel*0.01f);
-	}
-
-
+	
 	if (pGameInstance->Key_Pressing(DIK_F1))
 	{
 		m_vDistance.y -= 0.03f;
-		m_vDistance.z -= 0.06f;
 	}
 	if (pGameInstance->Key_Pressing(DIK_F2))
 	{
 		m_vDistance.y += 0.03f;
-		m_vDistance.z += 0.06f;
 	}
 
 
@@ -246,6 +233,11 @@ void CCamera_Dynamic::Terrain_Camera(_float fTimeDelta)
 
 	
 	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CCamera_Dynamic::Set_Position(_vector vPosition)
+{
+	m_pTransform->Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
 CCamera_Dynamic * CCamera_Dynamic::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
