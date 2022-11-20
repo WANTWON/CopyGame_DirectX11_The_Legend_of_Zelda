@@ -206,6 +206,12 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 	if (pGameInstance->Key_Down(DIK_SPACE))
 	{
+		
+		CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+		if(m_iCurrentLevel == LEVEL_GAMEPLAY)
+			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
+		if (m_iCurrentLevel == LEVEL_TAILCAVE)
+			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TAILCAVE);
 		if (m_eState == ITEM_GET_LP)
 			m_eState = ITEM_GET_ED;
 	}
@@ -520,7 +526,7 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 				m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
 		}	
 		else
-			m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
+			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
 	}
 
 }
@@ -570,7 +576,7 @@ void CPlayer::SetDirection_Pushing(_float fTimeDelta)
 		if (0 > XMVectorGetX(XMVector3Dot(vLook, vNewLook)))
 		{
 			m_eState = PULL_LP;
-			m_pTransformCom->Go_Backward(fTimeDelta*0.2f, m_pNavigationCom[m_iCurrentLevel]);
+			m_pTransformCom->Go_Backward(fTimeDelta*0.1f, m_pNavigationCom[m_iCurrentLevel]);
 		}
 		else
 		{
@@ -656,6 +662,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CPlayer::SHIELD_ST:
 	case Client::CPlayer::SHIELD_HIT:
+		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = SHIELD_LP;
@@ -717,7 +724,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::SLASH:
 	case Client::CPlayer::S_SLASH:
 	case Client::CPlayer::KEY_OPEN:
-		m_eAnimSpeed = 1.5f;
+		m_eAnimSpeed = 2.5f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = IDLE;
@@ -730,10 +737,9 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CPlayer::ITEM_GET_ST:
 	{
-		_matrix CamMatrix = XMMatrixInverse(nullptr, (CGameInstance::Get_Instance()->Get_TransformMatrix(CPipeLine::D3DTS_VIEW)));
-		_vector CamPosition = CamMatrix.r[3];
-		CamPosition = XMVectorSetY(CamPosition, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
-		m_pTransformCom->LookAt(CamPosition);
+		CCamera* pCamera =  CCameraManager::Get_Instance()->Get_CurrentCamera();
+		dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_ITEMGET);
+		m_pTransformCom->LookDir(XMVectorSet(0.f, 0.f, -1.f ,0.f));
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
@@ -743,6 +749,11 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::DASH_ED:
 	case Client::CPlayer::SHIELD_ED:
 	case Client::CPlayer::SLASH_HOLD_ED:
+		m_eAnimSpeed = 4.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eState = IDLE;
+		break;
 	case Client::CPlayer::ITEM_GET_ED:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;

@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "CameraManager.h"
 
+
 CCamera_Dynamic::CCamera_Dynamic(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera(pDevice, pContext)
 {
@@ -47,8 +48,12 @@ int CCamera_Dynamic::Tick(_float fTimeDelta)
 	case Client::CCamera_Dynamic::CAM_SHAKING:
 		Shaking_Camera(fTimeDelta, m_fPower);
 		break;
-	case Client::CCamera_Dynamic::CAM_TERRAIN:
+	case Client::CCamera_Dynamic::CAM_TAILCAVE:
 		Terrain_Camera(fTimeDelta);
+		break;
+	case Client::CCamera_Dynamic::CAM_ITEMGET:
+		Item_Camera(fTimeDelta);
+		break;
 	default:
 		break;
 	}
@@ -103,17 +108,12 @@ void CCamera_Dynamic::Player_Camera(_float fTimeDelta)
 		m_vDistance.z += 0.06f;
 	}
 
-
 	CPlayer* pTarget = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
-
 	Safe_AddRef(pTarget);
-
 	_vector m_TargetPos = pTarget->Get_TransformState(CTransform::STATE_POSITION);
 
 	Safe_Release(pTarget);
-
 	m_pTransform->LookAt(m_TargetPos);
-
 	m_pTransform->Follow_Target(fTimeDelta, m_TargetPos, XMVectorSet(m_vDistance.x , m_vDistance.y, m_vDistance.z, 0.f));
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -133,7 +133,7 @@ void CCamera_Dynamic::Shaking_Camera(_float fTimeDelta, _float fPower)
 		pTarget = (CBaseObj*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 		XMStoreFloat3(&vTargetPos, pTarget->Get_TransformState(CTransform::STATE_POSITION));
 		break;
-	case Client::CCamera_Dynamic::CAM_TERRAIN:
+	case Client::CCamera_Dynamic::CAM_TAILCAVE:
 		XMStoreFloat3(&vTargetPos, XMLoadFloat4(&m_fTargetPos));
 		break;
 	}
@@ -177,8 +177,8 @@ void CCamera_Dynamic::Shaking_Camera(_float fTimeDelta, _float fPower)
 		case Client::CCamera_Dynamic::CAM_PLAYER:
 			m_eCamMode = CAM_PLAYER;
 			break;
-		case Client::CCamera_Dynamic::CAM_TERRAIN:
-			m_eCamMode = CAM_TERRAIN;
+		case Client::CCamera_Dynamic::CAM_TAILCAVE:
+			m_eCamMode = CAM_TAILCAVE;
 			break;
 		}
 		m_ePreCamMode = m_eCamMode;
@@ -229,9 +229,23 @@ void CCamera_Dynamic::Terrain_Camera(_float fTimeDelta)
 	}
 
 	//m_pTransform->LookAt(XMLoadFloat4(&m_fTargetPos));
-	m_pTransform->Go_PosTarget(fTimeDelta*2, XMLoadFloat4(&m_fTargetPos) , XMVectorSet(m_vDistance.x, m_vDistance.y, m_vDistance.z, 0.f));
+	//m_pTransform->Go_PosTarget(fTimeDelta*2, XMLoadFloat4(&m_fTargetPos) , XMVectorSet(m_vDistance.x, m_vDistance.y, m_vDistance.z, 0.f));
+	m_pTransform->Go_PosLerp(fTimeDelta, XMLoadFloat4(&m_fTargetPos), 0.05f, XMVectorSet(m_vDistance.x, m_vDistance.y, m_vDistance.z, 0.f));
 
 	
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CCamera_Dynamic::Item_Camera(_float fTimeDelta)
+{
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CPlayer* pTarget = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+	_vector m_TargetPos = pTarget->Get_TransformState(CTransform::STATE_POSITION);
+	_vector vOffsetPos = m_TargetPos + XMVectorSet(0, m_vDistance.y - 2, m_vDistance.z, 0.f);
+	
+	m_pTransform->Go_PosLerp(fTimeDelta, vOffsetPos, 0.02f);
+
 	RELEASE_INSTANCE(CGameInstance);
 }
 

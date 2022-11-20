@@ -168,6 +168,8 @@ HRESULT CLoader::Loading_ForStaticLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Link/Link_Anim.fbx", PivotMatrix))))
 		return E_FAIL;
 
+
+	PivotMatrix = XMMatrixIdentity();
 	/*For.Prototype_Component_Model_SmallKey*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_SmallKey"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/DgnKey/SmallKey/SmallKey.fbx", PivotMatrix))))

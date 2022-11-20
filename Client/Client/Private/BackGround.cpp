@@ -31,6 +31,12 @@ HRESULT CBackGround::Initialize(void * pArg)
 
 	m_eShaderID = UI_ALPHABLEND;
 
+	if (m_BackgroundDesc.eVisibleScreen == VISIBLE_SCREEN)
+	{
+		m_fAlpha = 0.f;
+		m_eShaderID = UI_SCREEN;
+	}
+
 	return S_OK;
 }
 
@@ -43,6 +49,30 @@ int CBackGround::Tick(_float fTimeDelta)
 void CBackGround::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
+
+	if (m_BackgroundDesc.eVisibleScreen == VISIBLE_SCREEN)
+	{
+		if (CUI_Manager::Get_Instance()->Get_NextLevel() == true)
+		{
+			m_fAlpha += 0.05f;
+
+			if (m_fAlpha >= 1.f)
+			{
+				CUI_Manager::Get_Instance()->Set_NextLevelFinished(true);
+				m_fAlpha = 1.f;
+			}	
+			else
+				CUI_Manager::Get_Instance()->Set_NextLevelFinished(false);
+		}
+		else
+		{
+			m_fAlpha -= 0.05f;
+			if (m_fAlpha <= 0.f)
+				m_fAlpha = 0.f;
+		}
+	}
+
+
 }
 
 HRESULT CBackGround::Render()
@@ -74,9 +104,13 @@ HRESULT CBackGround::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_UI"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_Texture */
-	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, m_BackgroundDesc.pTextureTag, (CComponent**)&m_pTextureCom)))
-		return E_FAIL;
+	if (m_BackgroundDesc.pTextureTag != nullptr)
+	{
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, m_BackgroundDesc.pTextureTag, (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+	}
+	
 
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
@@ -92,14 +126,26 @@ HRESULT CBackGround::SetUp_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &m_ViewMatrix, sizeof(_float4x4))))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4))))
 		return E_FAIL;
+	
 
-	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(0))))
-		return E_FAIL;
+	if (m_BackgroundDesc.eVisibleScreen == VISIBLE_SCREEN)
+	{
+		if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+			return E_FAIL;
+	}
 
+	if (m_BackgroundDesc.pTextureTag != nullptr)
+	{
+		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(0))))
+			return E_FAIL;
+	}
+	
 	return S_OK;
 }
 

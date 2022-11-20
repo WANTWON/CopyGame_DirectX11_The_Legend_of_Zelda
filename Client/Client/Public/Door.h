@@ -45,6 +45,8 @@ private:
 	void Change_Animation_ClosedDoor(_float fTimeDelta);
 	void Change_Animation_LockDDoor(_float fTimeDelta);
 	void Change_Animation_BossDoor(_float fTimeDelta);
+	void Check_Close();
+	_bool Check_Open();
 
 private:
 	CModel*					m_pModelCom = nullptr;

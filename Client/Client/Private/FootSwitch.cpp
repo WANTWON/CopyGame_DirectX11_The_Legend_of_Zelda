@@ -57,13 +57,22 @@ void CFootSwitch::Late_Tick(_float fTimeDelta)
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 
-	if (m_pOBBCom->Collision(pTarget->Get_Collider()))
+
+	if (m_pOBBCom->Collision(pTarget->Get_Collider()) || CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pOBBCom) == true)
 	{
 		if (m_eState != PRESSING)
+		{
+			m_bMadeBox = true;
 			m_eState = PRESS;
+		}
+			
 	}
 	else
+	{
 		m_eState = IDLE;
+		m_bMadeBox = false;
+	}
+		
 
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -108,15 +117,6 @@ void CFootSwitch::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
-			if (!m_bMadeBox)
-			{
-				CTreasureBox::TreasureBoxTag Boxtag;
-				Boxtag.eItemType = CTreasureBox::MAP;
-				Boxtag.vPosition = _float3(58.71f, 0.1f, 23.52f);
-				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_TAILCAVE, TEXT("Layer_Object"), &Boxtag);
-				m_bMadeBox = true;
-			}
-		
 			m_eState = PRESSING;
 		}
 			

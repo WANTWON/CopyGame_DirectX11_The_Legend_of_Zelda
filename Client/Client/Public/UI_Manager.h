@@ -27,11 +27,15 @@ public:
 public: /*Getter Setter*/
 	void		Set_UI_Open();
 	void		Set_EquipItem(EQUIP_BT eEquipBt, CObj_UI* pObj);
+	void		Set_NextLevel(_bool type) {m_bNextLevel = type; m_bFinishedReady= false;}
+	void		Set_NextLevelFinished(_bool type) { m_bFinishedReady = type; }
 	void		Get_Key();
 	_uint		Get_KeySize() { return (_uint)m_KeyList.size(); }
 	CObj_UI*	Get_Button() { return m_pButton; }
 	_bool		Get_UI_Open() { return m_bUIOpen; }
 	_bool		Get_OpenMessage() { return m_bOpenMessage; }
+	_bool		Get_NextLevel() { return m_bNextLevel; }
+	_bool		Get_NextLevelFinished() { return m_bFinishedReady; }
 	CObj_UI*	Get_EquipItem(EQUIP_BT eEquipBt) { return m_EquipTile[eEquipBt];}
 	MESSAGETYPE Get_MessageType() { return m_eMessageType; }
 
@@ -47,6 +51,8 @@ public:
 private:
 	_bool m_bUIOpen = false;
 	_bool m_bOpenMessage = false;
+	_bool m_bNextLevel = false;
+	_bool m_bFinishedReady = false;
 	MESSAGETYPE m_eMessageType = DGN_KEY;
 	
 	/*For Inventory*/

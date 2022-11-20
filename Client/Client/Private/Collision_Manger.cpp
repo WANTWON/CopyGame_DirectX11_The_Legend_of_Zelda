@@ -72,6 +72,8 @@ _bool CCollision_Manager::CollisionwithGroup(COLLSIONGROUP SourGroup, COLLSIONGR
 			if (pDestCollider == nullptr)
 				continue;
 
+		
+
 			if (pDestCollider->Collision(pSourCollider))
 			{
 				*outSour = Sour;

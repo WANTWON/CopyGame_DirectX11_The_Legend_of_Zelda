@@ -69,8 +69,8 @@ void CPrizeItem::Late_Tick(_float fTimeDelta)
 	
 	if (m_ItemDesc.m_bPrize && m_pSPHERECom->Collision(pTarget->Get_Collider()))
 	{
-		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(-70.f));
-		m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-180.f));
+		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(90.f));
+	
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
 
 		if (m_ItemDesc.m_bPrize && !m_bGet)
@@ -182,6 +182,8 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 
 	/* For.Com_SPHERE */
 	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+	if(m_ItemDesc.eType == CELLO)
+		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))

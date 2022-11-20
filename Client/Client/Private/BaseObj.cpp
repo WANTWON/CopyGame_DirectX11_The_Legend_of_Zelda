@@ -46,6 +46,15 @@ HRESULT CBaseObj::Render()
 	return S_OK;
 }
 
+
+_bool CBaseObj::Check_IsinFrustum()
+{
+	if (m_bDead)
+		return false;
+
+	return CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), Get_Scale().y);
+}
+
 void CBaseObj::Change_Direction()
 {
 	if (m_eDir[DIR_X] != m_ePreDir[DIR_X] || m_eDir[DIR_Z] != m_ePreDir[DIR_Z])

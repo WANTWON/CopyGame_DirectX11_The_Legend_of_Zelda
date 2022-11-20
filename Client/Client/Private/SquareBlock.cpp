@@ -48,7 +48,7 @@ int CSquareBlock::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
-		m_fAlpha -= 0.1f;
+		m_fAlpha -= 0.05f;
 
 		if (m_fAlpha <= 0)
 		{
@@ -204,7 +204,7 @@ void CSquareBlock::Tick_LockBlock(_float fTimeDelta)
 		return;
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 

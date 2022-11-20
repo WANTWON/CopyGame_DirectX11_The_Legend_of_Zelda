@@ -77,6 +77,9 @@ int CInvenTile::Tick(_float fTimeDelta)
 
 void CInvenTile::Late_Tick(_float fTimeDelta)
 {
+	if (CUI_Manager::Get_Instance()->Get_NextLevel() == true)
+		return;
+
 	__super::Late_Tick(fTimeDelta);
 
 	if (!CUI_Manager::Get_Instance()->Get_UI_Open() && m_InvenDesc.eTileType != EQUIP_TILE)

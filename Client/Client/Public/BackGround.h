@@ -6,7 +6,7 @@ BEGIN(Client)
 class CBackGround final : public CObj_UI
 {
 public:
-	enum VISIBLESCENE { VISIBLE_LOGO, VISIBLE_LOADING, VISIBLE_PLAYGAME };
+	enum VISIBLESCENE { VISIBLE_LOGO, VISIBLE_LOADING, VISIBLE_PLAYGAME, VISIBLE_SCREEN };
 
 	typedef struct backgroundTag
 	{
@@ -34,6 +34,7 @@ private:
 
 private:
 	BACKGROUNDESC m_BackgroundDesc;
+	_float		  m_fAlpha = 1.f;
 
 public:
 	static CBackGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

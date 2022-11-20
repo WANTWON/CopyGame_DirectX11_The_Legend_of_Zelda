@@ -57,6 +57,11 @@ HRESULT CTailBoss::Initialize(void * pArg)
 
 int CTailBoss::Tick(_float fTimeDelta)
 {
+	_float3 vScale = Get_Scale();
+	_float fCullingRadius = max(max(vScale.x, vScale.y), vScale.z);
+	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 2) == false)
+		return OBJ_NOEVENT;
+
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
 

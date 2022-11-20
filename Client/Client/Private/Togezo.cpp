@@ -108,7 +108,7 @@ void CTogezo::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
 	{
-		if (m_eState == DAMAGE)
+		if (m_eState == DAMAGE || m_eState == RUN)
 		{
 			m_eState = DEADFALL;
 			return;
@@ -188,6 +188,7 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 	{
 		m_fAnimSpeed = 1.f;
 		m_bIsLoop = false;
+		m_pTransformCom->Go_PosDir(fTimeDelta * 2, XMVectorSet(0.f, -0.1f, 0.f, 0.f), m_pNavigationCom);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_bDead = true;
@@ -199,7 +200,7 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 		m_fAnimSpeed = 3.f;
 		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
 		vDir = XMVectorSetY(vDir, 0.f);
-		m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom);
+		m_pTransformCom->Go_PosDir(fTimeDelta*2, vDir, m_pNavigationCom);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
@@ -363,21 +364,26 @@ void CTogezo::AI_Behaviour(_float fTimeDelta)
 		return;
 	}
 		
-
-	if (m_pTarget && m_pSPHERECom->Collision(m_pTarget->Get_Collider()) == true)
+	if (m_bAggro)
 	{
-		m_bAggro = true;
+		if (m_bIsAttacking)
+		{
+			m_eState = STATE::RUN_ST;
+		}
 		if (!m_bIsAttacking && m_dwAttackTime + 1500 < GetTickCount())
 		{
 			m_bIsAttacking = true;
 			//m_dwAttackTime = GetTickCount();
 		}
+	}
+	
+	if (m_pTarget && m_pSPHERECom->Collision(m_pTarget->Get_Collider()) == true)
+	{
+		m_bAggro = true;
+		
 
-		if (m_bIsAttacking)
-		{
-			m_eState = STATE::RUN_ST;
-		}
-		else if (!m_bIsAttacking)
+		
+		if (!m_bIsAttacking)
 		{
 			m_pTransformCom->LookAt((m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
 			m_eState = STATE::WALK;
@@ -404,7 +410,7 @@ void CTogezo::AI_Behaviour(_float fTimeDelta)
 
 _uint CTogezo::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
-	if (m_eState == DEAD || m_eState == STATE::DAMAGE )
+	if (m_eState == DEAD || m_eState == STATE::DAMAGE || m_eState == STUN_ED)
 		return 0;
 
 	if (m_eState == REBOUND || m_eState == STUN)

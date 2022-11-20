@@ -37,6 +37,7 @@ private:
 	void Change_Animation(_float fTimeDelta);
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
 	virtual HRESULT SetUp_ShaderResources() override;
+	_bool Check_Visible();
 	void OpenBox();
 
 private:

@@ -30,6 +30,7 @@ public:
 public:
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser);
 	virtual void Check_Navigation(_float fTimeDelta);
+	
 
 protected:
 	virtual HRESULT Ready_Components(void* pArg = nullptr) = 0;

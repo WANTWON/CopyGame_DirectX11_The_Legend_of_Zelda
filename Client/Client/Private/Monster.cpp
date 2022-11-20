@@ -64,6 +64,9 @@ void CMonster::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	SetUp_ShaderID();
+
+	if (CGameInstance::Get_Instance()->Key_Up(DIK_9))
+		m_bDead = true;
 }
 
 HRESULT CMonster::Render()
@@ -197,6 +200,7 @@ void CMonster::Check_Navigation(_float fTimeDelta)
 	if (m_pNavigationCom == nullptr)
 		return;
 }
+
 
 
 void CMonster::Free()

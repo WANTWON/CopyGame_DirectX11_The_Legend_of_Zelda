@@ -62,6 +62,9 @@ int CPlayerState::Tick(_float fTimeDelta)
 
 void CPlayerState::Late_Tick(_float fTimeDelta)
 {
+	if (CUI_Manager::Get_Instance()->Get_NextLevel() == true)
+		return;
+
 	__super::Late_Tick(fTimeDelta);
 }
 

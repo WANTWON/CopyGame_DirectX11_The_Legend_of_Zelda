@@ -49,6 +49,7 @@ public:
 public:
 	void Set_CollisionDesc(COLLIDERDESC CollisionDesc) { m_ColliderDesc = CollisionDesc; }
 	COLLIDERDESC Get_CollisionDesc() { return m_ColliderDesc; };
+	OBBDESC		 Get_OBBCollisionDesc() { return Compute_OBBDesc(); }
 
 private:
 	TYPE					m_eType = TYPE_END;

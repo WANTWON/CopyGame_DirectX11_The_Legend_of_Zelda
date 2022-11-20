@@ -59,8 +59,9 @@ HRESULT CLevel_TailCave::Initialize()
 	pCameraManager->Ready_Camera(LEVEL::LEVEL_TAILCAVE);
 
 	CCamera* pCamera = pCameraManager->Get_CurrentCamera();
-	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TERRAIN);
-	
+	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TAILCAVE);
+	CUI_Manager::Get_Instance()->Set_NextLevel(false);
+
 	return S_OK;
 }
 
@@ -391,7 +392,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 		}
 		else if (!wcscmp(pModeltag, TEXT("FootSwitch.fbx")))
 		{
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FootSwitch"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FootSwitch"), LEVEL_TAILCAVE, TEXT("Layer_FootSwitch"), &ModelDesc.vPosition)))
 				return E_FAIL;
 		}
 		else if (!wcscmp(pModeltag, TEXT("CollapseTile.fbx")))

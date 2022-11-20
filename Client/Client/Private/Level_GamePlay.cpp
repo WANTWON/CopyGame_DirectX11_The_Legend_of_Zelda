@@ -47,6 +47,14 @@ HRESULT CLevel_GamePlay::Initialize()
 
 	if (g_bUIMadefirst == false)
 	{
+
+		CBackGround::BACKGROUNDESC BackgroundDesc;
+		BackgroundDesc.eVisibleScreen = CBackGround::VISIBLE_SCREEN;
+		BackgroundDesc.pTextureTag = nullptr;
+		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, TEXT("UI_Screen"),
+			&BackgroundDesc)))
+			return E_FAIL;
+
 		if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 			return E_FAIL;
 
@@ -64,19 +72,21 @@ void CLevel_GamePlay::Tick(_float fTimeDelta)
 
 	CUI_Manager::Get_Instance()->Tick_UI();
 
-	if (GetKeyState(VK_SPACE) & 0x8000)
+
+	if (CUI_Manager::Get_Instance()->Get_NextLevelFinished())
 	{
 		CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
 		Safe_AddRef(pGameInstance);
-
 		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_MONSTER);
 		pGameInstance->Set_DestinationLevel(LEVEL_TAILCAVE);
 		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TAILCAVE))))
 			return;
-
 		Safe_Release(pGameInstance);
 	}
 
+
+	if (GetKeyState(VK_SPACE) & 0x8000)
+		CUI_Manager::Get_Instance()->Set_NextLevel(true);
 
 }
 
@@ -266,7 +276,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 
 	CUIButton::BUTTONDESC ButtonDesc;
 	ButtonDesc.eButtonType = CUIButton::BTN_FIX;
-	ButtonDesc.eColor = CUIButton::BTN_BLACK;
+	ButtonDesc.iTexNum = CUIButton::BTN_BLACK;
 	ButtonDesc.eState = CUIButton::BTN_X;
 	ButtonDesc.vPosition = _float2(InvenDesc.vPosition.x - 20, InvenDesc.vPosition.y + 20);
 
@@ -288,7 +298,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 		return E_FAIL;
 	
 
-	ButtonDesc.eButtonType = CUIButton::BTN_OPEN;
+	ButtonDesc.eButtonType = CUIButton::BTN_INTERACT;
 	ButtonDesc.eState = CUIButton::BTN_A;
 	ButtonDesc.vPosition = _float2(0, 0);
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, pLayerTag, &ButtonDesc)))
@@ -314,7 +324,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 
 	
 	ButtonDesc.eButtonType = CUIButton::BTN_INVEN;
-	ButtonDesc.eColor = CUIButton::BTN_GREEN;
+	ButtonDesc.iTexNum = CUIButton::BTN_GREEN;
 	ButtonDesc.eState = CUIButton::BTN_X;
 	ButtonDesc.vPosition = _float2(780 - 30, 260 + 30);
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, pLayerTag, &ButtonDesc)))

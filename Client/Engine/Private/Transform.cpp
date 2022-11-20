@@ -176,6 +176,22 @@ void CTransform::Go_PosTarget(_float fTimeDelta, _vector TargetPos, _vector dist
 	
 }
 
+void CTransform::Go_PosLerp(_float fTimeDelta, _vector TargetPos, _float fVecOffset, _vector distance)
+{
+	_vector vPos = Get_State(CTransform::STATE_POSITION);
+	_vector vOffsetPos = TargetPos + distance;
+	_vector vDir = vOffsetPos - vPos;
+
+	_vector m_TargetPos = TargetPos;
+
+	_float fLength = XMVectorGetX(XMVector3Length(vPos - vOffsetPos));
+	_float  fVec = (1 - fTimeDelta) * 0 + fTimeDelta*fLength;
+	
+	vPos += vDir*fVec*m_TransformDesc.fSpeedPerSec*fVecOffset;
+	Set_State(CTransform::STATE_POSITION, vPos);
+	
+}
+
 bool CTransform::Go_PosDir(_float fTimeDelta, _vector vecDir, CNavigation* pNavigation)
 {
 	_vector vPos = Get_State(CTransform::STATE_POSITION);

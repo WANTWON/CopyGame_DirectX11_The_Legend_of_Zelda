@@ -35,6 +35,8 @@ public:
 	void Change_Direction();
 	void Update_Collider();
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) { return 0; };
+	_bool Check_IsinFrustum();
+
 
 public:
 	OBJID Get_ObjectID() { return m_eObjectID; }
@@ -44,7 +46,6 @@ public:
 	void Set_State(CTransform::STATE eState, _fvector vState);
 	void Set_Scale(_float3 vScale);
 	CCollider*	Get_Collider();
-
 	
 protected: /* For.Components */
 	CShader*				m_pShaderCom = nullptr;

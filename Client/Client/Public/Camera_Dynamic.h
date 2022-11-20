@@ -11,7 +11,7 @@ BEGIN(Client)
 class CCamera_Dynamic final : public CCamera
 {
 public:
-	enum CAMERAMODE {CAM_PLAYER, CAM_SHAKING, CAM_TERRAIN, CAM_END };
+	enum CAMERAMODE {CAM_PLAYER, CAM_SHAKING, CAM_TAILCAVE, CAM_ITEMGET, CAM_END };
 
 	typedef struct tagCameraDesc_Derived
 	{
@@ -30,13 +30,15 @@ public:
 	{
 		if (m_eCamMode == CAM_PLAYER)
 			m_ePreCamMode = CAM_PLAYER;
-		if (m_eCamMode == CAM_TERRAIN)
-			m_ePreCamMode = CAM_TERRAIN;
+		if (m_eCamMode == CAM_TAILCAVE)
+			m_ePreCamMode = CAM_TAILCAVE;
+		if (m_eCamMode == CAM_ITEMGET)
+			m_ePreCamMode = CAM_ITEMGET;
 
 		m_eCamMode = _eCamMode; m_fPower = fPower; m_fVelocity = fVelocity; m_fMinusVelocity = fMinusVelocity;
 	
 	}
-	void Set_CamMode(CAMERAMODE _eCamMode) { m_eCamMode = _eCamMode; }
+	void Set_CamMode(CAMERAMODE _eCamMode) { m_eCamMode = _eCamMode; m_fTime = 0.f; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -49,6 +51,7 @@ public:
 	void Player_Camera(_float fTimeDelta);
 	void Shaking_Camera(_float fTimeDelta, _float fPower);
 	void Terrain_Camera(_float fTimeDelta);
+	void Item_Camera(_float fTimeDelta);
 	void Set_Position(_vector vPosition);
 
 private:
@@ -62,6 +65,7 @@ private:
 	_float m_fPower = 0.f;
 	_float m_fVelocity = 0.f;
 	_float m_fMinusVelocity = 0.f;
+	_float m_fTime = 0.f;
 	_int   m_iShakingCount = 0;
 public:
 	static CCamera_Dynamic* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

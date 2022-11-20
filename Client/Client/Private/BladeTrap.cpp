@@ -92,7 +92,7 @@ void CBladeTrap::Late_Tick(_float fTimeDelta)
 	SetUp_ShaderID();
 
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP ||
-		CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_MONSTER, m_pSPHERECom))
+		CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_TRAP, m_pSPHERECom))
 	{
 		m_vDir *= -1.f;
 		m_iMoveCount++;

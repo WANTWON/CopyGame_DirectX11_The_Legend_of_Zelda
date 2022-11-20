@@ -20,7 +20,7 @@ HRESULT CKeese::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_tInfo.iMaxHp = 2;
+	m_tInfo.iMaxHp = 1;
 	m_tInfo.iDamage = 4;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 

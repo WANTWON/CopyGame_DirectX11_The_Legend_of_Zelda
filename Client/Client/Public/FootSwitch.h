@@ -23,6 +23,7 @@ public:
 	virtual int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	_bool  Get_IsBoxMade() { return m_bMadeBox; }
 
 private:
 	void Change_Animation(_float fTimeDelta);

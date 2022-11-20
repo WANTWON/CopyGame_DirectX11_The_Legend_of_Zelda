@@ -76,8 +76,19 @@ void CUIButton::Late_Tick(_float fTimeDelta)
 {
 	//__super::Late_Tick(fTimeDelta);
 
+	if (CUI_Manager::Get_Instance()->Get_NextLevel() == true)
+		return;
+
+
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+
+	if (m_ButtonDesc.eButtonType == BTN_INTERACT)
+	{
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fPosition.x - g_iWinSizeX * 0.5f, -m_fPosition.y + g_iWinSizeY * 0.5f, 0.f, 1.f));
+
+	}
+
 
 	if (m_bShow)
 	{
@@ -168,18 +179,18 @@ HRESULT CUIButton::SetUp_ShaderResources()
 	if (m_ButtonDesc.eButtonType == BTN_FIX)
 	{
 		if (CUI_Manager::Get_Instance()->Get_UI_Open())
-			m_ButtonDesc.eColor = BTN_GREEN;
+			m_ButtonDesc.iTexNum = BTN_GREEN;
 		else
-			m_ButtonDesc.eColor = BTN_BLACK;
+			m_ButtonDesc.iTexNum = BTN_BLACK;
 	}
 
-	if (m_ButtonDesc.eButtonType == BTN_OPEN)
+	if (m_ButtonDesc.eButtonType == BTN_INTERACT)
 	{
 		if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 			return E_FAIL;
 	}
 
-	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_ButtonDesc.eColor))))
+	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_ButtonDesc.iTexNum))))
 		return E_FAIL;
 
 	return S_OK;

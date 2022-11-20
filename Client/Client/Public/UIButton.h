@@ -6,14 +6,16 @@ BEGIN(Client)
 class CUIButton final : public CObj_UI
 {
 public:
-	enum BUTTON_TYPE { BTN_FIX, BTN_INVEN, BTN_OPEN };
+	enum BUTTON_TYPE { BTN_FIX, BTN_INVEN, BTN_INTERACT };
 	enum BUTTON_COLOR { BTN_BLACK, BTN_GREEN, BTN_WHITE };
 	enum BUTTON_KEY { BTN_X, BTN_Y, BTN_A };
+
+	enum INTERACT_TEX { OPEN , TALK};
 
 	typedef struct InvenTiletag
 	{
 		BUTTON_TYPE eButtonType = BTN_FIX;
-		BUTTON_COLOR eColor = BTN_BLACK;
+		_uint iTexNum = BTN_BLACK;
 		BUTTON_KEY eState = BTN_X;
 		_float2 vPosition = _float2(0.f, 0.f);
 
@@ -32,6 +34,7 @@ public:
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 	void Set_Visible(_bool type) { m_bShow = type; }
+	void Set_TexType(_uint iNum) { m_ButtonDesc.iTexNum = iNum; }
 
 private:
 	virtual HRESULT Ready_Components(void * pArg = nullptr) override;

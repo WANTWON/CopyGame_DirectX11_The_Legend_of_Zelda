@@ -4,6 +4,8 @@
 #include "Player.h"
 #include "UIButton.h"
 #include  "PrizeItem.h"
+#include "Monster.h"
+#include "FootSwitch.h"
 
 CTreasureBox::CTreasureBox(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -27,7 +29,7 @@ HRESULT CTreasureBox::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_eObjectID = OBJID::OBJ_BLOCK;
-	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
+	Set_Scale(_float3(1.3f, 1.3f, 1.3f));
 
 	_vector vecPostion = XMLoadFloat3(&m_eTreasureBoxDesc.vPosition);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
@@ -53,18 +55,31 @@ int CTreasureBox::Tick(_float fTimeDelta)
 
 void CTreasureBox::Late_Tick(_float fTimeDelta)
 {
+
 	CGameInstance*  pGameInstance = GET_INSTANCE(CGameInstance);
 	if (pGameInstance->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 3.f) == false)
 	{
 		RELEASE_INSTANCE(CGameInstance);
 		return;
 	}
-	
+
+	if (m_eTreasureBoxDesc.bVisible == false)
+	{
+		m_eTreasureBoxDesc.bVisible = Check_Visible();
+
+		if (m_eTreasureBoxDesc.bVisible == false)
+		{
+			RELEASE_INSTANCE(CGameInstance);
+			return;
+		}
+			
+	}
+		
+
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	SetUp_ShaderID();
 
-	
 	CBaseObj*		pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
 	LEVEL			iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
@@ -73,6 +88,7 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 	if (!m_bGet && m_pOBBCom->Collision(pTarget->Get_Collider()))
 	{
 		pButton->Set_Visible(true);
+		pButton->Set_TexType(CUIButton::OPEN);
 		_float2 fPosition = pTarget->Get_ProjPosition();
 		fPosition.y = g_iWinSizeY - fPosition.y;
 		fPosition.x += 50.f;
@@ -81,9 +97,9 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 		if (pGameInstance->Key_Down(DIK_A))
 		{
 			pButton->Set_Visible(false);
-			if(m_eState == CLOSE_WAIT)
+			if (m_eState == CLOSE_WAIT)
 				m_eState = OPEN;
-			else if(m_eState == OPEN_WAIT)
+			else if (m_eState == OPEN_WAIT)
 				m_eState = CLOSE;
 		}
 	}
@@ -98,11 +114,11 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 		{
 			CUI_Manager::Get_Instance()->Close_Message();
 			pGameInstance->Clear_Layer(iLevel, TEXT("PrizeItem"));
-		}	
+		}
 	}
 
-
 	RELEASE_INSTANCE(CGameInstance);
+
 }
 
 HRESULT CTreasureBox::Render()
@@ -165,7 +181,7 @@ void CTreasureBox::Change_Animation(_float fTimeDelta)
 			m_bGet = true;
 			OpenBox();
 		}
-			
+
 		break;
 	case Client::CTreasureBox::OPEN_WAIT:
 		m_bIsLoop = true;
@@ -233,9 +249,51 @@ HRESULT CTreasureBox::SetUp_ShaderResources()
 	return S_OK;
 }
 
+_bool CTreasureBox::Check_Visible()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	// 조건 1 스위치가 없거나 스위치가 눌려 있을 경우
+	list<CGameObject*>* pSwitches = pGameInstance->Get_ObjectList(LEVEL_TAILCAVE, TEXT("Layer_FootSwitch"));
+	for (auto& iter : *pSwitches)
+	{
+		if (dynamic_cast<CBaseObj*>(iter)->Check_IsinFrustum() == false)
+			continue;
+
+		if (dynamic_cast<CFootSwitch*>(iter)->Get_IsBoxMade() == false)
+			goto RETURN_UNVISIBLE;
+
+	}
+
+	// 조건 2 .화면 내에 있는 몬스터들이 없거나 모두 죽었다면 
+	list<CGameObject*>* pMonsters = pGameInstance->Get_ObjectList(LEVEL_TAILCAVE, TEXT("Layer_Monster"));
+
+	for (auto& iter : *pMonsters)
+	{
+		if (iter == nullptr)
+			continue;
+
+		if (dynamic_cast<CBaseObj*>(iter)->Check_IsinFrustum() == false)
+			continue;
+
+		if (iter->Get_Dead() == false)
+			goto RETURN_UNVISIBLE;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+	return true;
+
+
+
+RETURN_UNVISIBLE:
+	RELEASE_INSTANCE(CGameInstance);
+	return false;
+
+}
+
 void CTreasureBox::OpenBox()
 {
-	
+
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	pPlayer->Set_AnimState(CPlayer::ITEM_GET_ST);
@@ -243,7 +301,7 @@ void CTreasureBox::OpenBox()
 
 	CPrizeItem::ITEMDESC ItemDesc;
 	XMStoreFloat3(&ItemDesc.vPosition, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-	
+
 	ItemDesc.m_bPrize = true;
 
 	switch (m_eTreasureBoxDesc.eItemType)
@@ -286,7 +344,7 @@ void CTreasureBox::OpenBox()
 	default:
 		break;
 	}
-	
+
 
 
 	RELEASE_INSTANCE(CGameInstance);

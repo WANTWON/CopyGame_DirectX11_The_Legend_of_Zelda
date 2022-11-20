@@ -5,6 +5,7 @@
 #include "TreasureBox.h"
 #include "Level_TailCave.h"
 #include "UIButton.h"
+#include "FootSwitch.h"
 
 CDoor::CDoor(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -38,7 +39,8 @@ HRESULT CDoor::Initialize(void * pArg)
 	switch (m_DoorDesc.eType)
 	{
 	case DOOR_CLOSED:
-		m_eState = OPEN_CD;
+		m_eState = CLOSE_CD;
+		break;
 	case DOOR_KEY:
 		m_eState = CLOSE_LD;
 		break;
@@ -51,11 +53,16 @@ HRESULT CDoor::Initialize(void * pArg)
 
 
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+	
+	
 	return S_OK;
 }
 
 int CDoor::Tick(_float fTimeDelta)
 {
+	if(CGameInstance::Get_Instance()->isIn_WorldFrustum(Get_TransformState(CTransform::STATE_POSITION)) == false)
+		return OBJ_NOEVENT;
+
 	if (m_bDead)
 	{
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
@@ -215,13 +222,14 @@ void CDoor::Tick_ClosedDoor(_float fTimeDelta)
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	CLevel* pLevel = pGameInstance->Get_CurrentLevel();
-	if (pLevel == nullptr || pGameInstance->Get_CurrentLevelIndex() != LEVEL_TAILCAVE)
+	if (pLevel == nullptr || pGameInstance->Get_CurrentLevelIndex() != LEVEL_TAILCAVE )
 	{
 		RELEASE_INSTANCE(CGameInstance);
 		return;
 	}
 
-	m_bOpen = dynamic_cast<CLevel_TailCave*>(pLevel)->Get_OpenDoor();
+	//m_bOpen = dynamic_cast<CLevel_TailCave*>(pLevel)->Get_OpenDoor();
+	m_bOpen = Check_Open();
 	if (m_bOpen)
 	{
 		if (m_eState != OPEN_WAIT_CD)
@@ -235,34 +243,42 @@ void CDoor::Tick_ClosedDoor(_float fTimeDelta)
 	else
 		m_eState = CLOSE_CD;
 
-	if (m_eState != m_ePreState)
-	{
-		m_pModelCom->Set_NextAnimIndex(m_eState);
-		m_ePreState = m_eState;
-	}
 
 	if (m_bPlay)
+	{
+		if (m_eState != m_ePreState)
+		{
+			m_pModelCom->Set_NextAnimIndex(m_eState);
+			m_ePreState = m_eState;
+		}
+
 		Change_Animation(fTimeDelta);
+	}
+		
 
 	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CDoor::Tick_LockDoor(_float fTimeDelta)
 {
+	if (!Check_IsinFrustum())
+		return;
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
 
 	_vector vTargetPos = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
 	_float fDistanceToTarget = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
-
+	CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
 	
-	if (fDistanceToTarget < 3.f )
+	if (fDistanceToTarget < 2.5f)
 	{
-		CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
-		
-		if(m_eState != OPEN_LD )
+		if (m_eState != OPEN_LD)
+		{
+			pButton->Set_TexType(CUIButton::OPEN);
 			pButton->Set_Visible(true);
+		}
+			
 		_float2 fPosition = pPlayer->Get_ProjPosition();
 		fPosition.y = g_iWinSizeY - fPosition.y;
 		fPosition.x += 50.f;
@@ -281,7 +297,12 @@ void CDoor::Tick_LockDoor(_float fTimeDelta)
 		
 	}
 	else
+	{
 		m_eState = CLOSE_LD;
+		pButton->Set_Visible(false);
+	}
+		
+		
 
 
 	if (m_eState != m_ePreState)
@@ -298,19 +319,25 @@ void CDoor::Tick_LockDoor(_float fTimeDelta)
 
 void CDoor::Tick_BossDoor(_float fTimeDelta)
 {
+	if (!Check_IsinFrustum())
+		return;
+
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
 
 	_vector vTargetPos = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
 	_float fDistanceToTarget = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
+	CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
 
-
-	if (fDistanceToTarget < 3.f)
+	if (fDistanceToTarget < 2.5f)
 	{
-		CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
-		if(m_bOpen == false)
+		if (m_bOpen == false)
+		{
+			pButton->Set_TexType(CUIButton::OPEN);
 			pButton->Set_Visible(true);
+		}
+			
 		_float2 fPosition = pPlayer->Get_ProjPosition();
 		fPosition.y = g_iWinSizeY - fPosition.y;
 		fPosition.x += 50.f;
@@ -329,6 +356,8 @@ void CDoor::Tick_BossDoor(_float fTimeDelta)
 			}
 		}
 	}
+	else
+		pButton->Set_Visible(false);
 
 
 	if (m_eState != m_ePreState)
@@ -428,6 +457,68 @@ void CDoor::Change_Animation_BossDoor(_float fTimeDelta)
 	default:
 		break;
 	}
+}
+
+void CDoor::Check_Close()
+{
+	
+}
+
+_bool CDoor::Check_Open()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CBaseObj* pPlayer = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_vector vPlayerPos = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
+	_vector vDir = vPlayerPos - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	if (0 < XMVectorGetX(XMVector3Dot(vDir, vLook)))
+	{
+		// 조건 1 스위치가 없거나 스위치가 눌려 있을 경우
+		list<CGameObject*>* pSwitches = pGameInstance->Get_ObjectList(LEVEL_TAILCAVE, TEXT("Layer_FootSwitch"));
+		for (auto& iter : *pSwitches)
+		{
+			if (dynamic_cast<CBaseObj*>(iter)->Check_IsinFrustum() == false)
+				continue;
+
+			if (dynamic_cast<CFootSwitch*>(iter)->Get_IsBoxMade() == false)
+				goto RETURN_CLOSEDOOR;
+
+		}
+
+		// 조건 2 .화면 내에 있는 몬스터들이 없거나 모두 죽었다면 
+		list<CGameObject*>* pMonsters = pGameInstance->Get_ObjectList(LEVEL_TAILCAVE, TEXT("Layer_Monster"));
+
+		for (auto& iter : *pMonsters)
+		{
+			if (iter == nullptr)
+				continue;
+
+			if (dynamic_cast<CBaseObj*>(iter)->Check_IsinFrustum() == false)
+				continue;
+
+			if (iter->Get_Dead() == false)
+				goto RETURN_CLOSEDOOR;
+		}
+
+		RELEASE_INSTANCE(CGameInstance);
+		return true;
+	}
+
+	if (XMVectorGetX(XMVector3Length(vDir)) < 2.f)
+	{
+		RELEASE_INSTANCE(CGameInstance);
+		return true;
+
+	}
+	else
+		goto RETURN_CLOSEDOOR;
+	
+
+RETURN_CLOSEDOOR:
+	RELEASE_INSTANCE(CGameInstance);
+	return false;
+
 }
 
 CDoor * CDoor::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
