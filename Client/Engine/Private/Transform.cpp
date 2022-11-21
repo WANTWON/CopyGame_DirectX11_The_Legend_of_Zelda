@@ -146,12 +146,12 @@ void CTransform::Go_Right(_float fTimeDelta)
 void CTransform::Jump(_float fTimeDelta, _float fVelocity, _float fGravity, _float fStartiHeight, _float fEndiHeight)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
-	float fSpeed = fStartiHeight + fVelocity * fTimeDelta - (0.5f*fGravity*fTimeDelta*fTimeDelta);
+	float fPosY = fStartiHeight + fVelocity * fTimeDelta - (0.5f*fGravity*fTimeDelta*fTimeDelta);
 
-	vPosition = XMVectorSetY(vPosition, fSpeed);
+	vPosition = XMVectorSetY(vPosition, fPosY);
 
 	float y = XMVectorGetY(vPosition);
-	if (y <= fEndiHeight)
+	if (y < fEndiHeight)
 		vPosition = XMVectorSetY(vPosition, fEndiHeight);
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
@@ -186,8 +186,8 @@ void CTransform::Go_PosLerp(_float fTimeDelta, _vector TargetPos, _float fVecOff
 
 	_float fLength = XMVectorGetX(XMVector3Length(vPos - vOffsetPos));
 	_float  fVec = (1 - fTimeDelta) * 0 + fTimeDelta*fLength;
-	
-	vPos += vDir*fVec*m_TransformDesc.fSpeedPerSec*fVecOffset;
+
+	vPos += XMVector3Normalize(vDir)*fVec*m_TransformDesc.fSpeedPerSec*fVecOffset;
 	Set_State(CTransform::STATE_POSITION, vPos);
 	
 }

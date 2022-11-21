@@ -51,7 +51,7 @@ private:
 private:
 	CModel*					m_pModelCom = nullptr;
 	_bool					m_bOpen = false;
-	_bool					m_bPlay = false;
+	_bool					m_bPlay = true;
 
 	_uint m_eState = OPEN_CD;
 	_uint m_ePreState = OPEN2_CD;

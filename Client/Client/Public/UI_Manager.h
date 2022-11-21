@@ -64,6 +64,7 @@ private:
 	/*For Player State*/
 	vector<CObj_UI*> m_HpList;
 	vector<CObj_UI*> m_KeyList;
+	vector<CObj_UI*> m_RubyList;
 
 	/*For Button */
 	CObj_UI* m_pButton = nullptr;

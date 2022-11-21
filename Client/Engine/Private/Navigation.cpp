@@ -169,6 +169,12 @@ _bool CNavigation::isMove(_fvector vPosition)
 
 _bool CNavigation::isMove3D(_fvector vPosition)
 {
+
+	if (m_NaviDesc.iCurrentCellIndex == -1)
+	{
+		Compute_CurrentIndex_byDistance(vPosition);
+	}
+
 	_int		iNeighborIndex = -1;
 
 	/* 현재 존재하는 쎌안에서 움직였다. */

@@ -66,7 +66,8 @@ private:
 	_float m_fVelocity = 0.f;
 	_float m_fMinusVelocity = 0.f;
 	_float m_fTime = 0.f;
-	_int   m_iShakingCount = 0;
+	_int   m_iShakingCount = 0; 
+
 public:
 	static CCamera_Dynamic* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;

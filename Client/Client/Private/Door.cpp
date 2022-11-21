@@ -466,6 +466,7 @@ void CDoor::Check_Close()
 
 _bool CDoor::Check_Open()
 {
+
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CBaseObj* pPlayer = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
@@ -505,7 +506,7 @@ _bool CDoor::Check_Open()
 		return true;
 	}
 
-	if (XMVectorGetX(XMVector3Length(vDir)) < 2.f)
+	if (XMVectorGetX(XMVector3Length(vDir)) < 3.f)
 	{
 		RELEASE_INSTANCE(CGameInstance);
 		return true;

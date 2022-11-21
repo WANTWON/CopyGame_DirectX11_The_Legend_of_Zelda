@@ -6,8 +6,9 @@ BEGIN(Client)
 class CPlayerState final : public CObj_UI
 {
 public:
-	enum HP_STATE { HP100, HP75, HP50, HP25, HP0 };
-	enum STATE_TYPE { HP, KEY, RUBY, TYPE_END };
+	enum STATE_TYPE { HP, KEY, RUBY, NUMBER, TYPE_END };
+	enum HP_TEXNUM { HP100, HP75, HP50, HP25, HP0 };
+	enum NUM_TEXNUM { NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9};
 
 	typedef struct Statetag
 	{

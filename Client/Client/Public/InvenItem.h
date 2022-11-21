@@ -38,8 +38,9 @@ public:
 
 public:
 	void Set_ItemSize(_float2 fSize) { m_fSize = fSize; }
+	void Set_CompassOn(_bool type) { m_bCompass = type; }
 	void Set_TextureNum(_uint iNum) { m_ItemDesc.m_iTextureNum = iNum; }
-	void Set_bShow(_bool tyoe) { m_bShow = tyoe; }
+	void Set_bShow(_bool type) { m_bShow = type; }
 	_uint Get_TextureNum() { return m_ItemDesc.m_iTextureNum; }
 
 private:
@@ -50,6 +51,9 @@ private:
 	ITEMDESC  m_ItemDesc;
 	_bool m_bEmpty = true;
 	_bool m_bShow = true;
+	_bool m_bCompass = false; 
+
+	_float m_falpha = 1.f;
 
 public:
 	static CInvenItem* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

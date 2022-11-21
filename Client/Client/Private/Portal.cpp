@@ -37,7 +37,7 @@ HRESULT CPortal::Initialize(void * pArg)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	}
 
-	Set_Scale(_float3(2.f, 2.f, 2.f));
+	Set_Scale(_float3(3.f, 3.f, 3.f));
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_INTERACT, this);
 
 	return S_OK;
@@ -67,7 +67,11 @@ void CPortal::Late_Tick(_float fTimeDelta)
 	{
 		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
 		{
-			dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::STAIR_DOWN);
+			
+			if (m_PortalDesc.bConnectPortal2D == false)
+				dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::LADDER_UP_ED);
+			else
+				dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::STAIR_DOWN);
 			dynamic_cast<CPlayer*>(pTarget)->Set_NextPortal(m_PortalDesc.vConnectPos, m_PortalDesc.bConnectPortal2D);
 		}	
 	}

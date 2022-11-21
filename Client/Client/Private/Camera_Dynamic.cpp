@@ -225,12 +225,32 @@ void CCamera_Dynamic::Terrain_Camera(_float fTimeDelta)
 		{
 			fMinDistance = fDistance;
 			XMStoreFloat4(&m_fTargetPos, dynamic_cast<CBaseObj*>(iter)->Get_TransformState(CTransform::STATE_POSITION));
+			
 		}
 	}
 
 	//m_pTransform->LookAt(XMLoadFloat4(&m_fTargetPos));
 	//m_pTransform->Go_PosTarget(fTimeDelta*2, XMLoadFloat4(&m_fTargetPos) , XMVectorSet(m_vDistance.x, m_vDistance.y, m_vDistance.z, 0.f));
-	m_pTransform->Go_PosLerp(fTimeDelta, XMLoadFloat4(&m_fTargetPos), 0.05f, XMVectorSet(m_vDistance.x, m_vDistance.y, m_vDistance.z, 0.f));
+	
+	//_vector vOffsetPos = XMLoadFloat4(&m_fTargetPos) + XMLoadFloat4(&m_vDistance);
+	//vOffsetPos = XMVectorSetW(vOffsetPos, 1.f);
+	//_vector vPosition = m_pTransform->Get_State(CTransform::STATE_POSITION);
+
+
+	//m_fTime += fTimeDelta;
+	//m_fTime /= 3.f;
+
+	//if (m_fTime >= 1.f)
+	//	m_fTime = 1.f;
+
+
+	//_vector GoPos = XMVectorLerp(vPosition, vOffsetPos, m_fTime);
+
+
+
+	//m_pTransform->Set_State(CTransform::STATE_POSITION, GoPos);
+
+	m_pTransform->Go_PosLerp(fTimeDelta, XMLoadFloat4(&m_fTargetPos), 1.f, XMVectorSet(m_vDistance.x, m_vDistance.y, m_vDistance.z, 0.f));
 
 	
 	RELEASE_INSTANCE(CGameInstance);
@@ -244,7 +264,7 @@ void CCamera_Dynamic::Item_Camera(_float fTimeDelta)
 	_vector m_TargetPos = pTarget->Get_TransformState(CTransform::STATE_POSITION);
 	_vector vOffsetPos = m_TargetPos + XMVectorSet(0, m_vDistance.y - 2, m_vDistance.z, 0.f);
 	
-	m_pTransform->Go_PosLerp(fTimeDelta, vOffsetPos, 0.02f);
+	m_pTransform->Go_PosLerp(fTimeDelta, vOffsetPos, 1.f);
 
 	RELEASE_INSTANCE(CGameInstance);
 }

@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "Player.h"
 #include "UI_Manager.h"
+#include "InvenItem.h"
 
 CPrizeItem::CPrizeItem(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -96,6 +97,16 @@ void CPrizeItem::Late_Tick(_float fTimeDelta)
 			CUI_Manager::Get_Instance()->Close_Message();
 			if(m_ItemDesc.eType == SMALL_KEY)
 				CUI_Manager::Get_Instance()->Get_Key();
+
+			if (m_ItemDesc.eType == COMPASS)
+			{
+				CInvenItem::ITEMDESC ItemDesc;
+				ItemDesc.eItemType = CInvenItem::ITEM_PRIZE;
+				ItemDesc.m_iTextureNum = CInvenItem::COMPASS; 
+				ItemDesc.vPosition = _float2(1400, 200);
+				if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_Compass"), &ItemDesc)))
+					int a = 0;
+			}
 			m_bDead = true;
 		}
 

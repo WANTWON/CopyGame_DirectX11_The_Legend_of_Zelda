@@ -18,7 +18,8 @@ namespace Client
 		int iMaxHp;
 		int iCurrentHp;
 		int iDamage;
-		//vector<Item*> vItemDrops;
+		int iCoin = 30;
+		
 	}OBJINFO;
 }
 

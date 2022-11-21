@@ -6,6 +6,7 @@
 #include  "PrizeItem.h"
 #include "Monster.h"
 #include "FootSwitch.h"
+#include "InvenItem.h"
 
 CTreasureBox::CTreasureBox(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -63,8 +64,23 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 		return;
 	}
 
+	CBaseObj*		pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	if (m_eTreasureBoxDesc.bVisible == false)
 	{
+
+		_float fDistance = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - pTarget->Get_TransformState(CTransform::STATE_POSITION)));
+		CInvenItem* pInvenItem = dynamic_cast<CInvenItem*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Compass")));
+		if (fDistance < 15.f)
+		{
+			if (pInvenItem != nullptr)
+				pInvenItem->Set_CompassOn(true);
+		}
+		else
+		{
+			if (pInvenItem != nullptr)
+				pInvenItem->Set_CompassOn(false);
+		}
+
 		m_eTreasureBoxDesc.bVisible = Check_Visible();
 
 		if (m_eTreasureBoxDesc.bVisible == false)
@@ -80,7 +96,7 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	SetUp_ShaderID();
 
-	CBaseObj*		pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	
 	CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
 	LEVEL			iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
 
@@ -105,17 +121,6 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 	}
 	else
 		pButton->Set_Visible(false);
-
-
-	if (m_bGet)
-	{
-		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
-		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
-		{
-			CUI_Manager::Get_Instance()->Close_Message();
-			pGameInstance->Clear_Layer(iLevel, TEXT("PrizeItem"));
-		}
-	}
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -280,6 +285,9 @@ _bool CTreasureBox::Check_Visible()
 			goto RETURN_UNVISIBLE;
 	}
 
+	CInvenItem* pInvenItem = dynamic_cast<CInvenItem*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Compass")));
+	if (pInvenItem != nullptr)
+		pInvenItem->Set_CompassOn(false);
 	RELEASE_INSTANCE(CGameInstance);
 	return true;
 

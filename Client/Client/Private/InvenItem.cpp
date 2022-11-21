@@ -37,6 +37,8 @@ HRESULT CInvenItem::Initialize(void * pArg)
 	switch (m_ItemDesc.eItemType)
 	{
 	case ITEM_PRIZE:
+		m_fSize = _float2(90, 90);
+		break;
 	case ITEM_EQUIP:
 	case ITEM_QUEST:
 		m_fSize = _float2(70, 70);
@@ -66,11 +68,36 @@ void CInvenItem::Late_Tick(_float fTimeDelta)
 {
 	//__super::Late_Tick(fTimeDelta);
 
+	if (CUI_Manager::Get_Instance()->Get_NextLevel() == true)
+		return;
+
+
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 
 	if (m_ItemDesc.eItemType != ITEM_USABLE && m_ItemDesc.eItemType != ITEM_PRIZE)
 		m_bShow = CUI_Manager::Get_Instance()->Get_UI_Open();
+
+
+	if (m_ItemDesc.eItemType == ITEM_PRIZE && m_ItemDesc.m_iTextureNum == COMPASS)
+	{
+
+		if (!m_bCompass)
+		{
+			m_falpha += 0.025;
+			if (m_falpha >= 1.f)
+				m_falpha = 1.f;
+		}
+		else
+		{
+			m_falpha -= 0.025;
+			if (m_falpha <= 0.f)
+				m_falpha = 0.f;
+
+		}
+			m_fPosition.x  = (1 - m_falpha) * 1200 + m_falpha *1400;
+	}
+
 }
 
 HRESULT CInvenItem::Render()

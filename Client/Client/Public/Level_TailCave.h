@@ -31,15 +31,9 @@ private:
 	HRESULT Ready_Layer_Object(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Portal (const _tchar* pLayerTag);
 
-public:
-	_bool Get_OpenDoor() { return m_bDoorOpen; }
-	void Check_Solved_Puzzle(); 
-
 
 private:
 	_float							m_fTime = 0.f;
-	_bool							m_bDoorOpen = false;
-	vector<_bool>					m_vecIsSolved = { false };
 
 public:
 	static CLevel_TailCave* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

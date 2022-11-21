@@ -65,7 +65,7 @@ int CBladeTrap::Tick(_float fTimeDelta)
 		}
 			
 
-		if (m_dwAttackTime + 3000 < GetTickCount())
+		if (m_dwAttackTime + 2000 < GetTickCount())
 			m_eState = TURN;
 	}
 

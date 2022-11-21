@@ -152,6 +152,11 @@ HRESULT CPlayer::Render()
 
 
 
+void CPlayer::Compute_CurrentIndex(LEVEL eLevel)
+{
+	m_pNavigationCom[eLevel]->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+}
+
 _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE)
@@ -473,7 +478,7 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 {
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE ||
 		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP || m_eState == FALL_FROMTOP || m_eState == FALL_HOLE ||
-		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP)
+		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP || m_eState == LADDER_UP_ED)
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
@@ -499,8 +504,17 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 
 	if (m_eDir[DIR_X] == 0 && m_eDir[DIR_Z] == 0)
 	{
-		if (m_eState == RUN) m_eState = IDLE;
-		if (m_eState == DASH_LP) m_eState = DASH_ED;
+		if (m_bUpDown)
+		{
+			m_eState = LADDER_WAIT;
+			m_pTransformCom->LookDir(XMVectorSet(0.f, 0.f, 1.f, 0.f));
+		}
+		else
+		{
+			if (m_eState == RUN) m_eState = IDLE;
+			if (m_eState == DASH_LP) m_eState = DASH_ED;
+		}
+		
 	}
 	else
 	{
@@ -519,6 +533,13 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 		{
 			if (m_bUpDown)
 			{
+				if (m_eDir[DIR_X] == 0 && m_eDir[DIR_Z] != 0)
+				{
+					m_eState = LADDER_UP;
+					m_pTransformCom->LookDir(XMVectorSet(0.f, 0.f, 1.f, 0.f));
+				}
+					
+
 				_vector vDir = XMVectorSet(m_eDir[DIR_X], m_eDir[DIR_Z], 0.f, 0.f);
 				m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom[m_iCurrentLevel]);
 			}
@@ -596,6 +617,8 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CPlayer::RUN:
+	case Client::CPlayer::LADDER_UP:
+	case Client::CPlayer::LADDER_WAIT:
 	case Client::CPlayer::DASH_LP:
 	case Client::CPlayer::SLASH_HOLD_F:
 	case Client::CPlayer::SLASH_HOLD_B:
@@ -652,6 +675,22 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 			m_eState = D_LAND;
 		if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= m_fEndHeight)
 			m_eState = D_LAND;
+		break;
+	}
+	case Client::CPlayer::FALL:
+	{
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
+		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -1.f, 0.f, 0.f), m_pNavigationCom[m_iCurrentLevel]);
+		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+		if (m_fWalkingHeight >= XMVectorGetY(vPosition))
+		{
+			vPosition = XMVectorSetY(vPosition, m_fWalkingHeight);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+			m_eState = LAND;
+		}
 		break;
 	}
 	case Client::CPlayer::SLASH_HOLD_ST:
@@ -782,6 +821,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		}
 		break;
 	case Client::CPlayer::STAIR_DOWN:
+	case Client::CPlayer::LADDER_UP_ED:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
@@ -791,7 +831,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 
 			if (!m_b2D)
 			{
-				m_eState = STAIR_UP;
+				m_eState = FALL_FROMTOP;
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPortalPos);
 				if (CCameraManager::Get_Instance()->Get_CamState() != CCameraManager::CAM_DYNAMIC)
 				{
@@ -839,23 +879,54 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(vPosition, 0.f);
-		m_fStartHeight = m_fWalkingHeight;
+		
+		if(m_eState != D_FALL &&  m_eState != JUMP)
+				m_fStartHeight = m_fWalkingHeight;
 		m_fEndHeight = m_fWalkingHeight;
 
+		if (m_eState != JUMP && m_eState != D_JUMP && m_eState != D_FALL && m_eState != LAND && m_eState != D_LAND)
+		{
+			if (m_fWalkingHeight < XMVectorGetY(vPosition) && m_b2D)
+				m_eState = FALL;
+			else if (m_fWalkingHeight < XMVectorGetY(vPosition))
+			{
+				vPosition = XMVectorSetY(vPosition, m_fWalkingHeight);
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+			}
+
+		}
+	
 		if (m_fWalkingHeight > XMVectorGetY(vPosition))
 		{
+			if (m_eState == FALL)
+				m_eState = LAND;
 			vPosition = XMVectorSetY(vPosition, m_fWalkingHeight);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 		}
+		
+
 
 	}
 	else if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::ONLYJUMP)
 	{
-		m_fStartHeight = 0;
-		m_fEndHeight = 0;
-
+		
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(vPosition, 0.f);
+		
+		m_fStartHeight = m_fWalkingHeight;
+		m_fEndHeight = m_fWalkingHeight -2;
+
+		
+		if (m_eState == LAND)
+			m_eState = FALL;
+
+		if (m_eState != JUMP && m_eState != D_JUMP && m_eState != D_FALL && m_eState != LAND && m_eState != D_LAND)
+		{
+			if (m_fWalkingHeight <= XMVectorGetY(vPosition))
+				m_eState = FALL;
+
+		}
+		
 		if (m_fWalkingHeight > XMVectorGetY(vPosition))
 		{
 			m_pNavigationCom[m_iCurrentLevel]->Compute_CurrentIndex_byHeight(vPosition);
@@ -871,6 +942,7 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 		_float m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(vPosition, 0.f);
 		m_fStartHeight = m_fWalkingHeight;
 		m_fEndHeight = m_fWalkingHeight;
+
 		if (m_fWalkingHeight > XMVectorGetY(vPosition))
 		{
 			m_pNavigationCom[m_iCurrentLevel]->Compute_CurrentIndex_byHeight(vPosition);

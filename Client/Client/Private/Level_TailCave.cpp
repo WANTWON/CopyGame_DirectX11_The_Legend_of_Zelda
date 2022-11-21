@@ -71,9 +71,6 @@ void CLevel_TailCave::Tick(_float fTimeDelta)
 
 	CUI_Manager::Get_Instance()->Tick_UI();
 
-	Check_Solved_Puzzle();
-
-
 }
 
 void CLevel_TailCave::Late_Tick(_float fTimeDelta)
@@ -138,9 +135,11 @@ HRESULT CLevel_TailCave::Ready_Layer_Player(const _tchar * pLayerTag)
 
 	CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
-	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(54.f, 0.1f, 2.8f, 1.f));
+	//pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(54.f, 0.1f, 2.8f, 1.f));
+	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(23.f, 0.1f, 63.f, 1.f));
 	pPlayer->Set_JumpingHeight(0.1f);
-			
+	pPlayer->Compute_CurrentIndex(LEVEL_TAILCAVE);
+
 	Safe_Release(pGameInstance);
 
 	
@@ -219,7 +218,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Camera(const _tchar * pLayerTag)
 	CameraDesc_Dynamic.CameraDesc.fNear = 0.2f;
 	CameraDesc_Dynamic.CameraDesc.fFar = 500.f;
 
-	CameraDesc_Dynamic.CameraDesc.TransformDesc.fSpeedPerSec = 10.f;
+	CameraDesc_Dynamic.CameraDesc.TransformDesc.fSpeedPerSec = 3.f;
 	CameraDesc_Dynamic.CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Camera_Dynamic"), LEVEL_TAILCAVE, pLayerTag, &CameraDesc_Dynamic)))
@@ -554,11 +553,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Portal(const _tchar * pLayerTag)
 	return S_OK;
 }
 
-void CLevel_TailCave::Check_Solved_Puzzle()
-{
-	if (CGameInstance::Get_Instance()->Key_Up(DIK_0))
-		m_bDoorOpen = !m_bDoorOpen;
-}
+
 
 CLevel_TailCave * CLevel_TailCave::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

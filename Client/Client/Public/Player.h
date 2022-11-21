@@ -16,7 +16,7 @@ class CPlayer final : public CBaseObj
 public:
 	//ST : Start,  LP : Loop, ED : End
 	enum ANIM {
-		IDLE, RUN, WALK, STAIR_DOWN, STAIR_UP, D_FALL, D_JUMP, D_LAND, JUMP, LAND, S_SLASH, SLASH, SLASH_HOLD_B, SLASH_HOLD_ED, SLASH_HOLD_F,
+		IDLE, RUN, WALK, STAIR_DOWN, STAIR_UP,FALL, LADDER_UP, LADDER_UP_ED, LADDER_WAIT, D_FALL, D_JUMP, D_LAND, JUMP, LAND, S_SLASH, SLASH, SLASH_HOLD_B, SLASH_HOLD_ED, SLASH_HOLD_F,
 		SLASH_HOLD_L, SLASH_HOLD_LP, SLASH_HOLD_R, SLASH_HOLD_ST, SHIELD_ED, SHIELD_LP, SHIELD_ST, SHIELD_HIT,
 		BOW_ED, BOW_ST, DASH_ED, DASH_LP, DASH_ST, DMG_B, DMG_F, DMG_PRESS, DMG_QUAKE, ITEM_GET_ED, ITEM_GET_LP, ITEM_GET_ST,
 		KEY_OPEN, FALL_ANTLION, FALL_FROMTOP, FALL_HOLE, PULL_LP, PUSH_LP, PUSH_WAIT
@@ -48,6 +48,7 @@ public:
 	void Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
 	void Set_NextPortal(_float3 vPosition, _bool is2D) { m_vPortalPos = vPosition; m_b2D = is2D;}
+	void Compute_CurrentIndex(LEVEL eLevel);
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
 
 private:
