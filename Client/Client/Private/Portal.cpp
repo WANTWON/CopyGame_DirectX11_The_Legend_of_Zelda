@@ -58,8 +58,20 @@ int CPortal::Tick(_float fTimeDelta)
 void CPortal::Late_Tick(_float fTimeDelta)
 {
 	if (nullptr != m_pRendererCom)
+	{
+#ifdef _DEBUG
+		if (m_pAABBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pAABBCom);
+		if (m_pOBBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pOBBCom);
+		if (m_pSPHERECom != nullptr)
+			m_pRendererCom->Add_Debug(m_pSPHERECom);
+#endif
+
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 
+	}
+		
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 	CBaseObj* pTarget = nullptr;
@@ -81,15 +93,6 @@ void CPortal::Late_Tick(_float fTimeDelta)
 HRESULT CPortal::Render()
 {
 	//__super::Render();
-
-#ifdef _DEBUG
-	if (m_pAABBCom != nullptr)
-		m_pAABBCom->Render();
-	if (m_pOBBCom != nullptr)
-		m_pOBBCom->Render();
-	if (m_pSPHERECom != nullptr)
-		m_pSPHERECom->Render();
-#endif
 
 	return S_OK;
 

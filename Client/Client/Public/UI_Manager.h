@@ -22,7 +22,8 @@ public:
 	void Tick_UI();
 	void Tick_Inventory();
 	void Tick_PlayerState();
-	void Tick_Message();
+	void Tick_Coin();
+
 	
 public: /*Getter Setter*/
 	void		Set_UI_Open();
@@ -44,6 +45,7 @@ public:
 	void Add_InvenGroup(CObj_UI* pObj) { m_InvenTile.push_back(pObj);  }
 	void Add_HpGroup(CObj_UI* pObj) { m_HpList.push_back(pObj); }
 	void Add_KeyGroup(CObj_UI* pObj) { m_KeyList.push_back(pObj); }
+	void Add_RubyGroup(CObj_UI* pObj) { m_RubyList.push_back(pObj); }
 	void Use_Key();
 	void Open_Message(MESSAGETYPE eType) { m_bOpenMessage = true; m_eMessageType = eType; }
 	void Close_Message() {m_bOpenMessage = false;}
@@ -65,6 +67,7 @@ private:
 	vector<CObj_UI*> m_HpList;
 	vector<CObj_UI*> m_KeyList;
 	vector<CObj_UI*> m_RubyList;
+	_int			 m_iRubyShareSize = 0;
 
 	/*For Button */
 	CObj_UI* m_pButton = nullptr;

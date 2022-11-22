@@ -43,8 +43,10 @@ HRESULT CPawn::Initialize(void * pArg)
 int CPawn::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
+	{
+		Drop_Items();
 		return OBJ_DEAD;
-
+	}
 
 	AI_Behaviour(fTimeDelta);
 	Check_Navigation(fTimeDelta);

@@ -33,6 +33,10 @@ public:
 	virtual HRESULT Render();
 
 private:
+	void LateTick_PrizeModeItem(_float fTimeDelta);
+	void LateTick_UnPrizeModeItem(_float fTimeDelta);
+
+private:
 	ITEMDESC				m_ItemDesc;
 	_bool					m_bGet = false;
 

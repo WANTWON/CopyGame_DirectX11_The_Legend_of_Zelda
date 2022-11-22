@@ -229,6 +229,11 @@ void CImgui_Manager::Tick_Imgui()
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Navigation"); ImGui::SameLine();
 			ImGui::Checkbox("##Picking for Navigation", &m_bNaviPicking);
 
+			ImGui::SameLine();
+
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Show Only Navigation"); ImGui::SameLine();
+			ImGui::Checkbox("##Show Only Navigation", &m_bShowOnlyNavi);
+
 			ImGui::Text("This is the navigation tool ");
 			Set_Navigation();
 			ImGui::EndTabItem();

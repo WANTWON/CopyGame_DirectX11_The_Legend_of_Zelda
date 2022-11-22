@@ -43,7 +43,11 @@ HRESULT CKeese::Initialize(void * pArg)
 int CKeese::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
+	{
+		Drop_Items();
 		return OBJ_DEAD;
+	}
+		
 
 
 	AI_Behaviour(fTimeDelta);
@@ -95,12 +99,8 @@ void CKeese::Check_Navigation(_float fTimeDelta)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float fHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
-		if (fHeight > XMVectorGetY(vPosition))
-		{
-			vPosition = XMVectorSetY(vPosition, fHeight);
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-		}
-
+		vPosition = XMVectorSetY(vPosition, fHeight);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 	}
 
 }

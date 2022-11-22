@@ -69,6 +69,7 @@ public:
 	void Set_Navigation();
 	void Save_Navigation();
 	void Load_Navigation();
+	_bool Get_ShowOnlyNavi() { return m_bShowOnlyNavi; }
 
 	/* For Camera Tool */
 	void Set_Camera();
@@ -130,7 +131,7 @@ private:
 	_int									m_iCellIndex = 0;
 	_int									m_iCellType = 0;
 	_float3									m_fClickPoint = _float3(0.f, 0.f, 0.f);
-
+	_bool									m_bShowOnlyNavi = false;
 
 	/*For Camera*/
 	CCamera_Manager*						m_pCamera_Manager = nullptr;

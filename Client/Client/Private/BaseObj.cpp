@@ -39,6 +39,15 @@ int CBaseObj::Tick(_float fTimeDelta)
 void CBaseObj::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
+
+#ifdef _DEBUG
+	if (m_pAABBCom != nullptr)
+		m_pRendererCom->Add_Debug(m_pAABBCom);
+	if (m_pOBBCom != nullptr)
+		m_pRendererCom->Add_Debug(m_pOBBCom);
+	if (m_pSPHERECom != nullptr)
+		m_pRendererCom->Add_Debug(m_pSPHERECom);
+#endif
 }
 
 HRESULT CBaseObj::Render()

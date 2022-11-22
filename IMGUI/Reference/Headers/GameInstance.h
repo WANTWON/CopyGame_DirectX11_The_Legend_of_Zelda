@@ -13,6 +13,7 @@
 #include "Font_Manager.h"
 #include "Picking.h"
 #include "GameObject.h"
+#include "Target_Manager.h"
 
 BEGIN(Engine)
 
@@ -108,6 +109,7 @@ private:
 	CFont_Manager*					m_pFont_Manager = nullptr;
 	CPicking*						m_pPicking = nullptr;
 	CFrustum*						m_pFrustum = nullptr;
+	CTarget_Manager*				m_pTarget_Manager = nullptr;
 public:
 	virtual void Free() override;
 };

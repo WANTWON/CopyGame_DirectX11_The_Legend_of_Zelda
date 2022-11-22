@@ -37,7 +37,13 @@ int CTerrain::Tick(_float fTimeDelta)
 void CTerrain::Late_Tick(_float fTimeDelta)
 {
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+#ifdef _DEBUG		
+		m_pRendererCom->Add_Debug(m_pNavigationCom);
+#endif
+	}
+	
 }
 
 HRESULT CTerrain::Render()
@@ -46,16 +52,7 @@ HRESULT CTerrain::Render()
 		nullptr == m_pVIBufferCom)
 		return E_FAIL;
 
-	//if (FAILED(SetUp_ShaderResources()))
-		//return E_FAIL;
 
-	
-	//m_pShaderCom->Begin(0);
-
-#ifdef _DEBUG
-	m_pNavigationCom->Render_Navigation();
-#endif
-	//m_pVIBufferCom->Render();
 
 	return S_OK;
 }

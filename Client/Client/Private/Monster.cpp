@@ -3,7 +3,7 @@
 #include "Player.h"
 #include "Level_Manager.h"
 #include "CameraManager.h"
-
+#include "PrizeItem.h"
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CBaseObj(pDevice, pContext)
@@ -65,6 +65,17 @@ void CMonster::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	SetUp_ShaderID();
 
+#ifdef _DEBUG
+	if (m_pAABBCom != nullptr)
+		m_pRendererCom->Add_Debug(m_pAABBCom);
+	if (m_pOBBCom != nullptr)
+		m_pRendererCom->Add_Debug(m_pOBBCom);
+	if (m_pSPHERECom != nullptr)
+		m_pRendererCom->Add_Debug(m_pSPHERECom);
+#endif
+
+
+
 	if (CGameInstance::Get_Instance()->Key_Up(DIK_9))
 		m_bDead = true;
 }
@@ -90,14 +101,7 @@ HRESULT CMonster::Render()
 			return E_FAIL;
 	}
 
-#ifdef _DEBUG
-	if (m_pAABBCom != nullptr)
-		m_pAABBCom->Render();
-	if (m_pOBBCom != nullptr)
-		m_pOBBCom->Render();
-	if (m_pSPHERECom != nullptr)
-		m_pSPHERECom->Render();
-#endif
+
 
 	return S_OK;
 }
@@ -177,6 +181,30 @@ void CMonster::Find_Target()
 				m_pTarget = nullptr;
 		}
 	}
+}
+
+HRESULT CMonster::Drop_Items()
+{
+	int iRadomItem = rand() % 3;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
+
+	CPrizeItem::ITEMDESC ItemDesc;
+	XMStoreFloat3(&ItemDesc.vPosition, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	ItemDesc.vPosition.y += 0.5f;
+	ItemDesc.m_bPrize = false;
+
+	
+	if (iRadomItem == 1)
+		ItemDesc.eType = CPrizeItem::HEART;
+	else
+		ItemDesc.eType = CPrizeItem::RUBY;
+
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
+
+	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
 }
 
 _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)

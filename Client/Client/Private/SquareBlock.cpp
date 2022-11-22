@@ -204,7 +204,19 @@ void CSquareBlock::Tick_LockBlock(_float fTimeDelta)
 		return;
 
 	if (nullptr != m_pRendererCom)
+	{
+#ifdef _DEBUG
+		if (m_pAABBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pAABBCom);
+		if (m_pOBBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pOBBCom);
+		if (m_pSPHERECom != nullptr)
+			m_pRendererCom->Add_Debug(m_pSPHERECom);
+#endif
+
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
+	}
+	
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 

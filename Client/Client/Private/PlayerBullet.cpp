@@ -86,13 +86,6 @@ void CPlayerBullet::Late_Tick(_float fTimeDelta)
 HRESULT CPlayerBullet::Render()
 {
 
-#ifdef _DEBUG
-	//m_pAABBCom->Render();
-	m_pOBBCom->Render();
-	/*m_pSPHERECom->Render();*/
-#endif
-
-
 	if (nullptr == m_pShaderCom ||
 		nullptr == m_pModelCom)
 		return E_FAIL;

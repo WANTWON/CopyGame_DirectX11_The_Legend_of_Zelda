@@ -40,6 +40,10 @@ HRESULT CPlayerState::Initialize(void * pArg)
 		CUI_Manager::Get_Instance()->Add_KeyGroup(this);
 		break;
 	case Client::CPlayerState::RUBY:
+	case Client::CPlayerState::NUMBER:
+		m_fSize.x = 25;
+		m_fSize.y = 40;
+		CUI_Manager::Get_Instance()->Add_RubyGroup(this);
 		break;
 	case Client::CPlayerState::TYPE_END:
 		break;
@@ -102,7 +106,15 @@ HRESULT CPlayerState::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_SmallKey"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
+	case Client::CPlayerState::NUMBER:
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Number"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
 	case Client::CPlayerState::RUBY:
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rupee"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
 		break;
 	case Client::CPlayerState::TYPE_END:
 		break;

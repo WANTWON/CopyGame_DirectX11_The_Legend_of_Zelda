@@ -88,7 +88,10 @@ void CBladeTrap::Late_Tick(_float fTimeDelta)
 		return;
 
 	if (nullptr != m_pRendererCom)
+	{
+		__super::Late_Tick(fTimeDelta);
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+	}
 	SetUp_ShaderID();
 
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP ||
@@ -120,14 +123,7 @@ HRESULT CBladeTrap::Render()
 			return E_FAIL;
 	}
 
-#ifdef _DEBUG
-	if (m_pAABBCom != nullptr)
-		m_pAABBCom->Render();
-	if (m_pOBBCom != nullptr)
-		m_pOBBCom->Render();
-	if (m_pSPHERECom != nullptr)
-		m_pSPHERECom->Render();
-#endif
+
 
 	return S_OK;
 }

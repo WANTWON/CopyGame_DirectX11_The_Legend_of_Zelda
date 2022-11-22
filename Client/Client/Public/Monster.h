@@ -50,7 +50,7 @@ protected:
 	virtual void AI_Behaviour(_float fTimeDelta) { };
 	virtual void Find_Target();
 	virtual void Follow_Target(_float fTimeDelta) { };
-	virtual HRESULT Drop_Items() { return S_OK; };
+	virtual HRESULT Drop_Items();
 	virtual _bool IsDead() = 0;
 
 protected:

@@ -85,27 +85,15 @@ void CCamera_Dynamic::Player_Camera(_float fTimeDelta)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (m_lMouseWheel > 0)
-		m_lMouseWheel -= 0.001;
-	if (m_lMouseWheel < 0)
-		m_lMouseWheel += 0.001;
-
-	if (m_lMouseWheel += (pGameInstance->Get_DIMMoveState(DIMM_WHEEL)*0.05))
-	{
-		m_vDistance.y -= _float(fTimeDelta*m_lMouseWheel*0.01f);
-		m_vDistance.z += _float(fTimeDelta*m_lMouseWheel*0.01f);
-	}
-
+	
 
 	if (pGameInstance->Key_Pressing(DIK_F1))
 	{
 		m_vDistance.y -= 0.03f;
-		m_vDistance.z -= 0.06f;
 	}
 	if (pGameInstance->Key_Pressing(DIK_F2))
 	{
 		m_vDistance.y += 0.03f;
-		m_vDistance.z += 0.06f;
 	}
 
 	CPlayer* pTarget = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
@@ -113,8 +101,8 @@ void CCamera_Dynamic::Player_Camera(_float fTimeDelta)
 	_vector m_TargetPos = pTarget->Get_TransformState(CTransform::STATE_POSITION);
 
 	Safe_Release(pTarget);
-	m_pTransform->LookAt(m_TargetPos);
-	m_pTransform->Follow_Target(fTimeDelta, m_TargetPos, XMVectorSet(m_vDistance.x , m_vDistance.y, m_vDistance.z, 0.f));
+	//m_pTransform->LookAt(m_TargetPos);
+	m_pTransform->Go_PosLerp(fTimeDelta, m_TargetPos, 1.f, XMVectorSet(m_vDistance.x , m_vDistance.y, m_vDistance.z, 0.f));
 
 	RELEASE_INSTANCE(CGameInstance);
 }

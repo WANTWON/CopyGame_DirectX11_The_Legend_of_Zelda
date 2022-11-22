@@ -28,14 +28,16 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3, m_fStartHeight, 46.8, 1.f));
+	Compute_CurrentIndex(LEVEL_GAMEPLAY);
+
 	m_fWalkingHeight = m_pNavigationCom[CLevel_Manager::Get_Instance()->Get_DestinationLevelIndex()]->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), (Get_Scale().y * 0.5f));
 	m_fStartHeight = m_fWalkingHeight;
 	m_fEndHeight = m_fWalkingHeight;
 
-	//Set_Scale(_float3(0.5, 0.5, 0.5));
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(3.9f, m_fStartHeight, -1.33f, 1.f));
-
-	m_tInfo.iMaxHp = 50;
+	Set_Scale(_float3(1.2, 1.2, 1.2));
+	
+	m_tInfo.iMaxHp = 52;
 	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
@@ -44,6 +46,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 	m_pModelCom->Set_CurrentAnimIndex(m_eState);
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PLAYER, this);
+	
 	return S_OK;
 }
 
@@ -89,6 +92,19 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_BOW]);
+
+
+#ifdef _DEBUG
+		if (m_pAABBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pAABBCom);
+		if (m_pOBBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pOBBCom);
+		if (m_pSPHERECom != nullptr)
+			m_pRendererCom->Add_Debug(m_pSPHERECom);
+		if (m_pNavigationCom[m_iCurrentLevel] != nullptr)
+			m_pRendererCom->Add_Debug(m_pNavigationCom[m_iCurrentLevel]);
+#endif
+
 	}
 
 	CBaseObj* pCollisionBlock = nullptr;
@@ -105,6 +121,8 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		m_pTransformCom->Go_PosDir(fTimeDelta, vDirection, m_pNavigationCom[m_iCurrentLevel]);
 	}
 
+	//if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_MONSTER, m_pOBBCom))
+		//Take_Damage(1.f, nullptr, nullptr);
 }
 
 HRESULT CPlayer::Render()
@@ -139,14 +157,6 @@ HRESULT CPlayer::Render()
 	Render_Model(m_eRightHand);
 	*/
 
-
-#ifdef _DEBUG
-	//m_pAABBCom->Render();
-	m_pOBBCom->Render();
-	m_pNavigationCom[m_iCurrentLevel]->Render_Navigation();
-	//m_pSPHERECom->Render();
-#endif
-
 	return S_OK;
 }
 
@@ -170,6 +180,12 @@ _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 	if (m_tInfo.iCurrentHp <= 0)
 		m_tInfo.iCurrentHp = 0;
 
+	if (DamageType == nullptr)
+	{
+		m_eState = CPlayer::DMG_QUAKE;
+		return 0;
+	}
+		
 
 	CMonsterBullet::BULLETDESC BulletDesc;
 	memcpy(&BulletDesc, DamageType, sizeof(CMonsterBullet::BULLETDESC));
@@ -208,6 +224,22 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	if (CGameInstance::Get_Instance()->Key_Pressing(DIK_0))
+		m_tInfo.iCoin++;
+	if (CGameInstance::Get_Instance()->Key_Pressing(DIK_8))
+	{
+		m_tInfo.iCoin--;
+		if(m_tInfo.iCoin < 0)
+			m_tInfo.iCoin = 0;
+	}
+	if (CGameInstance::Get_Instance()->Key_Up(DIK_7))
+	{
+		m_tInfo.iCurrentHp--;
+		if (m_tInfo.iCurrentHp < 0)
+			m_tInfo.iCurrentHp = 0;
+	}
+
+		
 
 	if (pGameInstance->Key_Down(DIK_SPACE))
 	{
@@ -468,6 +500,9 @@ HRESULT CPlayer::SetUp_ShaderID()
 void CPlayer::Render_Model(MESH_NAME eMeshName)
 {
 	if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", eMeshName, aiTextureType_DIFFUSE)))
+		return;
+
+	if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_NormalTexture", eMeshName, aiTextureType_NORMALS)))
 		return;
 
 	if (FAILED(m_pModelCom->Render(m_pShaderCom, eMeshName, m_eShaderID)))
@@ -746,7 +781,6 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 
 		break;
 	case Client::CPlayer::DMG_B:
-	case Client::CPlayer::DMG_QUAKE:
 		m_eAnimSpeed = 1.5f;
 		m_bIsLoop = false;
 		m_pTransformCom->Go_Straight(fTimeDelta*0.4f);
@@ -754,6 +788,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 			m_eState = IDLE;
 		break;
 	case Client::CPlayer::DMG_F:
+	case Client::CPlayer::DMG_QUAKE:
 		m_eAnimSpeed = 1.5f;
 		m_bIsLoop = false;
 		m_pTransformCom->Go_Backward(fTimeDelta*0.1f);

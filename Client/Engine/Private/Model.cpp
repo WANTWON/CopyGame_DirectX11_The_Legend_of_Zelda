@@ -157,11 +157,20 @@ _bool CModel::Play_Animation(_float fTimeDelta, _bool isLoop)
 
 HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iPassIndex)
 {		
-	_float4x4		BoneMatrix[256];
+	/* 메시별로 그린다. */
+	/* 메시 당 영향ㅇ르 주는 뼈들의 행렬을 가져온다. */
+	if (TYPE_ANIM == m_eModelType)
+	{
+		_float4x4		BoneMatrix[256];
 
-	m_Meshes[iMeshIndex]->Get_BoneMatrices(BoneMatrix, XMLoadFloat4x4(&m_PivotMatrix));
 
-	pShader->Set_MatrixArray("g_BoneMatrices", BoneMatrix, 256);
+		/* 메시에게 접근해서 니가 들고있는 뼈들을 배열에 담아와.
+		뼈 = 뼈의 오프셋 * 뼈의 컴바인드매트릭스 * 최초상태제어행렬 */
+		m_Meshes[iMeshIndex]->Get_BoneMatrices(BoneMatrix, XMLoadFloat4x4(&m_PivotMatrix));
+
+		pShader->Set_MatrixArray("g_BoneMatrices", BoneMatrix, 256);
+
+	}
 
 	pShader->Begin(iPassIndex);
 

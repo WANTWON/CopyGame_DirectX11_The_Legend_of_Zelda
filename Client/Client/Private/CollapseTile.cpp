@@ -56,7 +56,19 @@ int CCollapseTile::Tick(_float fTimeDelta)
 void CCollapseTile::Late_Tick(_float fTimeDelta)
 {
 	if (nullptr != m_pRendererCom)
+	{
+#ifdef _DEBUG
+		if (m_pAABBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pAABBCom);
+		if (m_pOBBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pOBBCom);
+		if (m_pSPHERECom != nullptr)
+			m_pRendererCom->Add_Debug(m_pSPHERECom);
+#endif
+
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+	}
+		
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 

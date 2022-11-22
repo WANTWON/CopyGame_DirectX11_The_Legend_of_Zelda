@@ -150,7 +150,7 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
 	/* For.Prototype_Component_Navigation */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Field"),
-		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Navi_test.dat")))))
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Filed_Navi.dat")))))
 		return E_FAIL;
 
 
@@ -704,6 +704,14 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 HRESULT CLoader::Loading_For_UITexture()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rupee"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Ruby/Rupee_00.dds"), 1))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Number"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Number/Number_%d.dds"), 10))))
+		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_GetMessage"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/MesGetFrame_%02d.dds"), 8))))

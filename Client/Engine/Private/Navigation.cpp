@@ -264,7 +264,7 @@ _vector CNavigation::Get_CurrentCellCenter()
 }
 
 #ifdef _DEBUG
-HRESULT CNavigation::Render_Navigation()
+HRESULT CNavigation::Render()
 {
 	_float4x4			WorldMatrix;
 	XMStoreFloat4x4(&WorldMatrix, XMMatrixIdentity());

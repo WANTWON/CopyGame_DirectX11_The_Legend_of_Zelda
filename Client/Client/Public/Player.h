@@ -42,14 +42,18 @@ public:
 	virtual HRESULT Render();
 
 public:
-	ANIM Get_AnimState() { return m_eState; }
-	void Set_AnimState(ANIM eAnim) { m_eState = eAnim; }
+
+	ANIM	Get_AnimState() { return m_eState; }
 	OBJINFO Get_Info() { return m_tInfo; }
-	void Set_Info(OBJINFO Info) { m_tInfo = Info; }
-	void Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
-	void Set_NextPortal(_float3 vPosition, _bool is2D) { m_vPortalPos = vPosition; m_b2D = is2D;}
-	void Compute_CurrentIndex(LEVEL eLevel);
+	void	Set_Info(OBJINFO Info) { m_tInfo = Info; }
+	void	Set_AnimState(ANIM eAnim) { m_eState = eAnim; }
+	void	Set_RecoverHp() { m_tInfo.iCurrentHp += 4; if (m_tInfo.iCurrentHp > m_tInfo.iMaxHp) m_tInfo.iCurrentHp = m_tInfo.iMaxHp; }
+	void	Set_RubyAdd() { m_tInfo.iCoin++; }
+	void	Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
+	void	Set_NextPortal(_float3 vPosition, _bool is2D) { m_vPortalPos = vPosition; m_b2D = is2D;}
+	void	Compute_CurrentIndex(LEVEL eLevel);
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
+
 
 private:
 	void Key_Input(_float fTimeDelta);
@@ -57,6 +61,7 @@ private:
 	void Change_Animation(_float fTimeDelta);
 	void Check_Navigation(_float fTimeDelta);
 	void Render_Model(MESH_NAME eMeshName);
+	
 
 private:
 	HRESULT Ready_Parts();

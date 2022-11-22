@@ -36,7 +36,7 @@ public:
 
 #ifdef _DEBUG
 public:
-	HRESULT Render_Navigation();
+	HRESULT Render();
 #endif // _DEBUG
 
 private:

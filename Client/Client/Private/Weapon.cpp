@@ -57,6 +57,11 @@ int CWeapon::Tick(_float fTimeDelta)
 void CWeapon::Late_Tick(_float fTimeDelta)
 {
 
+#ifdef _DEBUG
+	if (m_pOBBCom != nullptr)
+		m_pRendererCom->Add_Debug(m_pOBBCom);
+#endif
+
 }
 
 HRESULT CWeapon::Render()
@@ -78,10 +83,6 @@ HRESULT CWeapon::Render()
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, 0)))
 			return E_FAIL;
 	}
-
-#ifdef _DEBUG
-	m_pOBBCom->Render();
-#endif
 
 
 

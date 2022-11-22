@@ -104,6 +104,23 @@ void CCollider::Update(_fmatrix WorldMatrix)
 HRESULT CCollider::Render()
 {
 #ifdef _DEBUG
+
+	m_pContext->GSSetShader(nullptr, nullptr, 0);
+
+
+	//ID3D11DepthStencilState*			pDepthStencilState = nullptr;
+
+	//D3D11_DEPTH_STENCIL_DESC			DepthStecilDesc;
+	//ZeroMemory(&DepthStecilDesc, sizeof(DepthStecilDesc));
+
+	//DepthStecilDesc.DepthEnable = TRUE;
+	//DepthStecilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+
+	//if (FAILED(m_pDevice->CreateDepthStencilState(&DepthStecilDesc, &pDepthStencilState)))
+	//	return E_FAIL;
+
+	//m_pContext->OMSetDepthStencilState(pDepthStencilState, 0);
+
 	m_pBatch->Begin();
 
 	m_pContext->IASetInputLayout(m_pInputLayout);

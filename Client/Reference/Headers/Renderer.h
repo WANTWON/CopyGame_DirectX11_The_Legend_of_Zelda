@@ -8,10 +8,10 @@ BEGIN(Engine)
 class ENGINE_DLL CRenderer final : public CComponent
 {
 public:
-	enum RENDERGROUP {RENDER_PRIORITY, RENDER_NONALPHABLEND, RENDER_ALPHABLEND, RENDER_UI_BACK,RENDER_UI_FRONT, RENDER_END };
+	enum RENDERGROUP { RENDER_PRIORITY, RENDER_NONALPHABLEND, RENDER_NONLIGHT, RENDER_ALPHABLEND, RENDER_UI_FRONT, RENDER_UI_BACK, RENDER_END };
 
 private:
-	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);	
+	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
 
 public:
@@ -22,15 +22,47 @@ public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pGameObject);
 	HRESULT Render_GameObjects();
 
+
+#ifdef _DEBUG
+public:
+	HRESULT Add_Debug(class CComponent* pDebugCom);
+
+#endif // _DEBUG
+
+
 private:
 	list<class CGameObject*>				m_GameObjects[RENDER_END];
 	typedef list<class CGameObject*>		GAMEOBJECTS;
 
+#ifdef _DEBUG
+private:
+	list<class CComponent*>					m_DebugComponents;
+#endif
+
+
+private:
+	class CTarget_Manager*					m_pTarget_Manager = nullptr;
+	class CLight_Manager*					m_pLight_Manager = nullptr;
+
+	class CVIBuffer_Rect*					m_pVIBuffer = nullptr;
+	class CShader*							m_pShader = nullptr;
+	_float4x4								m_WorldMatrix, m_ViewMatrix, m_ProjMatrix;
+
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_NonAlphaBlend();
+	HRESULT Render_Lights();
+	HRESULT Render_Blend();
+	HRESULT Render_NonLight();
 	HRESULT Render_AlphaBlend();
 	HRESULT Render_UI();
+
+
+
+#ifdef _DEBUG
+private:
+	HRESULT Render_Debug();
+#endif // _DEBUG
 public:
 	static CRenderer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CComponent* Clone(void* pArg = nullptr)override;

@@ -57,8 +57,19 @@ void CNonAnim::Late_Tick(_float fTimeDelta)
 
 	_float3 vScale = Get_Scale();
 	_float fCullingRadius = max( max(vScale.x, vScale.y), vScale.z);
-	if (nullptr != m_pRendererCom && true == pGameInstance->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius+4))
+	if (nullptr != m_pRendererCom && true == pGameInstance->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 4))
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+#ifdef _DEBUG
+		if (m_pAABBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pAABBCom);
+		if (m_pOBBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pOBBCom);
+		if (m_pSPHERECom != nullptr)
+			m_pRendererCom->Add_Debug(m_pSPHERECom);
+#endif
+	}
+		
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
@@ -85,24 +96,16 @@ HRESULT CNonAnim::Render()
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
 			return E_FAIL;
 
-		//if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_OcculsionTexture", i, aiTextureType_SPECULAR)))
-			//return E_FAIL;
-		//if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS)))
-			//return E_FAIL;
+		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS)))
+			return E_FAIL;
+
+	//	if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_SpecularTexture", i, aiTextureType_SPECULAR)))
+		//	return E_FAIL;
+		
 
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))
 			return E_FAIL;
 	}
-
-#ifdef _DEBUG
-	if (m_pAABBCom != nullptr)
-		m_pAABBCom->Render();
-	if (m_pOBBCom != nullptr)
-		m_pOBBCom->Render();
-	if (m_pSPHERECom != nullptr)
-		m_pSPHERECom->Render();
-#endif
-
 
 	return S_OK;
 }

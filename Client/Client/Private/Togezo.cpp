@@ -43,8 +43,10 @@ HRESULT CTogezo::Initialize(void * pArg)
 int CTogezo::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
+	{
+		Drop_Items();
 		return OBJ_DEAD;
-
+	}
 
 	AI_Behaviour(fTimeDelta);
 	Check_Navigation(fTimeDelta);
@@ -413,7 +415,7 @@ _uint CTogezo::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 	if (m_eState == DEAD || m_eState == STATE::DAMAGE || m_eState == STUN_ED)
 		return 0;
 
-	if (m_eState == REBOUND || m_eState == STUN)
+	if (m_eState == REBOUND || m_eState == STUN || m_eState == STUN_ED)
 	{
 		_uint fHp = __super::Take_Damage(fDamage, DamageType, DamageCauser);
 

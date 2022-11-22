@@ -111,7 +111,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 
 	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
+	LightDesc.vDirection = _float4(-0.5f, -1.f, -0.5f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);	
@@ -166,7 +166,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 
 	}
 
-
 	Safe_Release(pGameInstance);
 
 	
@@ -187,7 +186,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	CNonAnim::NONANIMDESC  ModelDesc;
 	_uint iNum = 0;
 
-	hFile = CreateFile(TEXT("../../../Bin/Data/Filed_Map.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	hFile = CreateFile(TEXT("../../../Bin/Data/Filed_Map2.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
 		return E_FAIL;
 
@@ -234,7 +233,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _tchar * pLayerTag)
 
 	CameraDesc.iTest = 10;
 
-	CameraDesc.CameraDesc.vEye = _float4(0.f, 8.0f, -8.f, 1.f);
+	CameraDesc.CameraDesc.vEye = _float4(0.f, 12.4f, -5.54f, 1.f);
 	CameraDesc.CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 
 	CameraDesc.CameraDesc.fFovy = XMConvertToRadians(60.0f);

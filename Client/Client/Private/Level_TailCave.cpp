@@ -81,14 +81,8 @@ void CLevel_TailCave::Late_Tick(_float fTimeDelta)
 	SetWindowText(g_hWnd, TEXT("TailCave Level."));
 
 	CCollision_Manager::Get_Instance()->Update_Collider();
-
-	m_fTime += fTimeDelta;
-
-	if (m_fTime > 0.1f)
-	{
-		CCollision_Manager::Get_Instance()->CollisionwithBullet();
-		m_fTime = 0;
-	}
+	CCollision_Manager::Get_Instance()->CollisionwithBullet();
+	
 	
 }
 
@@ -135,8 +129,8 @@ HRESULT CLevel_TailCave::Ready_Layer_Player(const _tchar * pLayerTag)
 
 	CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
-	//pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(54.f, 0.1f, 2.8f, 1.f));
-	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(23.f, 0.1f, 63.f, 1.f));
+	pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(54.f, 0.1f, 2.8f, 1.f));
+	//pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(23.f, 0.1f, 63.f, 1.f));
 	pPlayer->Set_JumpingHeight(0.1f);
 	pPlayer->Compute_CurrentIndex(LEVEL_TAILCAVE);
 

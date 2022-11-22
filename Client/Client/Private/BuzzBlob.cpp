@@ -43,8 +43,10 @@ HRESULT CBuzzBlob::Initialize(void * pArg)
 int CBuzzBlob::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
+	{
+		Drop_Items();
 		return OBJ_DEAD;
-
+	}
 
 	AI_Behaviour(fTimeDelta);
 	Check_Navigation(fTimeDelta);

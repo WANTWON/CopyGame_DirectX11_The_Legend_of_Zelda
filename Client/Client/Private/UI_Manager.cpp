@@ -101,6 +101,7 @@ void CUI_Manager::Tick_PlayerState()
 
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 
+	/* HP Update */
 	_int iMaxHp = (pPlayer->Get_Info().iMaxHp) / 4;
 	if (iMaxHp > m_HpList.size())
 	{
@@ -135,8 +136,15 @@ void CUI_Manager::Tick_PlayerState()
 	for (int i = 0; i < iCurrentFullHp; ++i)
 		dynamic_cast<CPlayerState*>(m_HpList[i])->Set_TextureNum(CPlayerState::HP100);
 	
-	if(iCurrentLastHp == 0)
+	if (iCurrentLastHp == 0)
+	{
+		if (m_HpList.size() <= iCurrentFullHp)
+		{
+			RELEASE_INSTANCE(CGameInstance);
+			return;
+		}
 		dynamic_cast<CPlayerState*>(m_HpList[iCurrentFullHp])->Set_TextureNum(CPlayerState::HP0);
+	}
 	if (iCurrentLastHp == 1)
 		dynamic_cast<CPlayerState*>(m_HpList[iCurrentFullHp])->Set_TextureNum(CPlayerState::HP25);
 	if (iCurrentLastHp == 2)
@@ -144,16 +152,106 @@ void CUI_Manager::Tick_PlayerState()
 	if (iCurrentLastHp == 3)
 		dynamic_cast<CPlayerState*>(m_HpList[iCurrentFullHp])->Set_TextureNum(CPlayerState::HP75);
 
+
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-void CUI_Manager::Tick_Message()
+void CUI_Manager::Tick_Coin()
 {
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+
+	
+
+	int iRuby = pPlayer->Get_Info().iCoin;
+	int iRubyShare = iRuby;
+	int iRubyShareSize = 0;
+
+	while (true)
+	{
+		int iDivid = iRubyShare % 10;
+		iRubyShare = iRubyShare / 10;
+		++iRubyShareSize;
+
+		if (iRubyShare == 0)
+			break;
+	}
+
+
+	if (m_iRubyShareSize != 0 && iRubyShareSize == m_iRubyShareSize)
+	{
+		if (m_RubyList.empty())
+			return;
+
+		int iShare = iRuby;
+
+		int i = 0;
+	
+		while (true)
+		{
+			int iDivid = iShare % 10;
+
+			dynamic_cast<CPlayerState*>(m_RubyList[m_iRubyShareSize - i])->Set_TextureNum(iDivid);
+
+			iShare = iShare / 10;
+			++i;
+
+			if (iShare == 0)
+				break;
+		}
+
+	}
+	else
+	{
+
+		for (auto& iter : m_RubyList)
+			iter->Set_Dead(true);
+		m_RubyList.clear();
+
+		CPlayerState::STATEDESC StateDesc;
+		StateDesc.m_eType = CPlayerState::RUBY;
+		StateDesc.fPosition = _float2(500.f, 30.f);
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerState"), LEVEL_STATIC, TEXT("Layer_Number"), &StateDesc)))
+			return;
+
+		int iShare = iRuby;
+
+		int i = 0;
+
+		while (true)
+		{
+			int iDivid = iShare % 10;
+
+			CPlayerState::STATEDESC StateDesc;
+			StateDesc.m_eType = CPlayerState::NUMBER;
+			StateDesc.fPosition = _float2(520.f + i * 20.f, 30.f);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerState"), LEVEL_STATIC, TEXT("Layer_Number"), &StateDesc)))
+				return;
+
+			iShare = iShare / 10;
+			++i;
+
+			if (iShare == 0)
+				break;
+		}
+
+		m_iRubyShareSize = i;
+	}
+
+
+	RELEASE_INSTANCE(CGameInstance);
 }
+
 
 void CUI_Manager::Tick_UI()
 {
 	Tick_PlayerState();
+	Tick_Coin();
+
+	
+
 }
 
 void CUI_Manager::Set_UI_Open()

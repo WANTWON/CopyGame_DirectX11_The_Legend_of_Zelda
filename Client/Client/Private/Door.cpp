@@ -91,7 +91,10 @@ int CDoor::Tick(_float fTimeDelta)
 void CDoor::Late_Tick(_float fTimeDelta)
 {
 	if (nullptr != m_pRendererCom)
+	{
+		__super::Late_Tick(fTimeDelta);
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+	}
 	SetUp_ShaderID();
 }
 
@@ -116,11 +119,7 @@ HRESULT CDoor::Render()
 			return E_FAIL;
 	}
 
-#ifdef _DEBUG
-	//m_pAABBCom->Render();
-	m_pOBBCom->Render();
-	/*m_pSPHERECom->Render();*/
-#endif
+
 
 	return S_OK;
 }

@@ -118,6 +118,12 @@
     <ClCompile Include="..\Private\Frustum.cpp">
       <Filter>01.Utility\09.Frustum</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\RenderTarget.cpp">
+      <Filter>01.Utility\10.RenderTarget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Target_Manager.cpp">
+      <Filter>01.Utility\10.RenderTarget</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -249,6 +255,12 @@
     <ClInclude Include="..\Public\Frustum.h">
       <Filter>01.Utility\09.Frustum</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\RenderTarget.h">
+      <Filter>01.Utility\10.RenderTarget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Target_Manager.h">
+      <Filter>01.Utility\10.RenderTarget</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="00.System">
@@ -374,10 +386,19 @@
     <Filter Include="01.Utility\09.Frustum">
       <UniqueIdentifier>{e9665c3a-cc3a-4906-9fb4-7562ac695f00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\10.RenderTarget">
+      <UniqueIdentifier>{c0c90051-8556-4046-bf03-53be9ea13d84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\01.Renderer\Shader">
+      <UniqueIdentifier>{7afe32c8-59c1-45a4-9cf2-0c2164b6b645}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_Navigation.hlsl">
       <Filter>01.Utility\03.Components\02.VIBuffer\03.Navigation\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_Deferred.hlsl">
+      <Filter>01.Utility\03.Components\01.Renderer\Shader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

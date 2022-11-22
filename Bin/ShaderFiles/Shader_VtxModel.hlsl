@@ -2,24 +2,11 @@
 #include "Client_Shader_Defines.hpp"
 
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-
-vector			g_vCamPosition;
-
-matrix			g_BoneMatrices[256];
-
 float			g_fAlpha = 1.f;
-
 texture2D		g_DiffuseTexture;
-texture2D		g_OcculsionTexture;
 texture2D		g_NormalTexture;
+texture2D		g_SpecularTexture;
 
-float4			g_vLightDiffuse = float4(1.f, 1.f, 1.f, 1.f);
-float4			g_vLightAmbient = float4(0.3f, 0.3f, 0.3f, 1.f);
-float4			g_vLightSpecular = float4(1.f, 1.f, 1.f, 1.f);
-
-/* For.Directional */
-float4			g_vLightDir = float4(1.f, -1.f, 1.f, 0.f);
-float4			g_vMtrlAmbient = float4(1.f, 1.f, 1.f, 1.f);
 
 
 struct VS_IN
@@ -35,9 +22,6 @@ struct VS_OUT
 	float4		vPosition : SV_POSITION;
 	float4		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
-	float4		vWorldPos : TEXCOORD1;
-	float		fSpecular : COLOR1;
-	float		fShade : COLOR0;
 };
 
 /* DrawIndexed함수를 호출하면. */
@@ -52,20 +36,13 @@ VS_OUT VS_MAIN(VS_IN In)
 	matWV = mul(g_WorldMatrix, g_ViewMatrix);
 	matWVP = mul(matWV, g_ProjMatrix);
 
+	vector vNormal = normalize(mul(vector(In.vNormal, 0.f), g_WorldMatrix));
+
 	/* 정점의 위치에 월드 뷰 투영행렬을 곱한다. 현재 정점은 ViewSpace에 존재하낟. */
 	/* 투영행렬까지 곱하면 정점위치의 w에 뷰스페이스 상의 z를 보관한다. == Out.vPosition이 반드시 float4이어야하는 이유. */
 	Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
+	Out.vNormal = vNormal;
 	Out.vTexUV = In.vTexUV;
-
-	vector		vWorldNormal = mul(vector(In.vNormal, 0.f), g_WorldMatrix);
-	vector		vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
-	vector		vLook = vWorldPos - g_vCamPosition;
-	vector		vReflect = reflect(normalize(g_vLightDir), normalize(vWorldNormal));
-
-	Out.fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 20);
-	Out.vWorldPos = vWorldPos;
-	Out.vNormal = vWorldNormal;
-	Out.fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(vWorldNormal)), 0.f);
 
 	return Out;
 }
@@ -76,14 +53,12 @@ struct PS_IN
 	float4		vPosition : SV_POSITION;
 	float4		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
-	float4		vWorldPos : TEXCOORD1;
-	float		fSpecular : COLOR1;
-	float		fShade : COLOR0;
 };
 
 struct PS_OUT
 {
-	float4		vColor : SV_TARGET0;
+	float4		vDiffuse : SV_TARGET0;
+	float4		vNormal : SV_TARGET1;
 };
 
 /* 이렇게 만들어진 픽셀을 PS_MAIN함수의 인자로 던진다. */
@@ -93,25 +68,19 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
-	vector		vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	vector		vMtrlOcculsion = g_OcculsionTexture.Sample(LinearSampler, In.vTexUV);
-	vector		vMtrlNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
-	
-	vector		vLook = In.vWorldPos - g_vCamPosition;
-	vector		vReflect = reflect(normalize(g_vLightDir), normalize(vMtrlNormal));
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
 
-	float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 20);
-	float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(vMtrlNormal)), 0.f);
+	//vector Spec = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
+	//float ret = reflect(Spec, Out.vNormal);
 
+	//Out.vNormal = Out.vNormal*ret;
+	Out.vNormal = vector(Out.vNormal.xyz * 0.5f + 0.5f, 0.f) ;
+	//Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDiffuse.a = g_fAlpha;
 
-	Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) *saturate(In.fShade + g_vLightAmbient * g_vMtrlAmbient )
-		+ (g_vLightSpecular * vMtrlNormal) * In.fSpecular;
-
-	//Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) *saturate(fShade + g_vLightAmbient * g_vMtrlAmbient)
-		//+ (g_vLightSpecular * vMtrlOcculsion) * fSpecular ;
-
-	Out.vColor.a = g_fAlpha;
-	
+	if (Out.vDiffuse.a <= 0.2f)
+		discard;
 
 	return Out;
 }
@@ -120,11 +89,11 @@ PS_OUT PS_PICKED(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
-	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDiffuse.rgb += 0.2f;
 
-	Out.vColor.rgb += 0.2f;
-
-	if (Out.vColor.a <= 0.3f)
+	if (Out.vDiffuse.a <= 0.3f)
 		discard;
 
 	return Out;
@@ -133,8 +102,8 @@ PS_OUT PS_PICKED(PS_IN In)
 PS_OUT PS_SYMBOL(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
-
-	Out.vColor = float4(1.f,0.f,1.f,1.f);
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDiffuse = float4(1.f,0.f,1.f,1.f);
 
 	return Out;
 }

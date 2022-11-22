@@ -50,28 +50,59 @@ int CPrizeItem::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
+		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
+
 		return OBJ_DEAD;
 	}
 		
-
-
 	return OBJ_NOEVENT;
 }
 
 void CPrizeItem::Late_Tick(_float fTimeDelta)
 {
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+
+#ifdef _DEBUG
+		if (m_pAABBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pAABBCom);
+		if (m_pOBBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pOBBCom);
+		if (m_pSPHERECom != nullptr)
+			m_pRendererCom->Add_Debug(m_pSPHERECom);
+#endif
+	}
+		
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
+	if (m_ItemDesc.m_bPrize)
+		LateTick_PrizeModeItem(fTimeDelta);
+	else
+		LateTick_UnPrizeModeItem(fTimeDelta);
+
+	
+}
+
+HRESULT CPrizeItem::Render()
+{
+	__super::Render();
+
+
+	return S_OK;
+
+}
+
+void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
+{
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-	
+
 	if (m_ItemDesc.m_bPrize && m_pSPHERECom->Collision(pTarget->Get_Collider()))
 	{
 		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(90.f));
-	
+
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
 
 		if (m_ItemDesc.m_bPrize && !m_bGet)
@@ -79,7 +110,7 @@ void CPrizeItem::Late_Tick(_float fTimeDelta)
 			dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
 			CUI_Manager::Get_Instance()->Open_Message((CUI_Manager::MESSAGETYPE)m_ItemDesc.eType);
 		}
-		
+
 		m_bGet = true;
 	}
 
@@ -88,21 +119,21 @@ void CPrizeItem::Late_Tick(_float fTimeDelta)
 	{
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 		_vector pPlayerPostion = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
-		
+
 		pPlayerPostion = XMVectorSetY(pPlayerPostion, XMVectorGetY(pPlayerPostion) + 3.f);
 		m_pTransformCom->Go_PosTarget(fTimeDelta, pPlayerPostion);
 
 		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
 		{
 			CUI_Manager::Get_Instance()->Close_Message();
-			if(m_ItemDesc.eType == SMALL_KEY)
+			if (m_ItemDesc.eType == SMALL_KEY)
 				CUI_Manager::Get_Instance()->Get_Key();
 
 			if (m_ItemDesc.eType == COMPASS)
 			{
 				CInvenItem::ITEMDESC ItemDesc;
 				ItemDesc.eItemType = CInvenItem::ITEM_PRIZE;
-				ItemDesc.m_iTextureNum = CInvenItem::COMPASS; 
+				ItemDesc.m_iTextureNum = CInvenItem::COMPASS;
 				ItemDesc.vPosition = _float2(1400, 200);
 				if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_Compass"), &ItemDesc)))
 					int a = 0;
@@ -115,13 +146,21 @@ void CPrizeItem::Late_Tick(_float fTimeDelta)
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-HRESULT CPrizeItem::Render()
+void CPrizeItem::LateTick_UnPrizeModeItem(_float fTimeDelta)
 {
-	__super::Render();
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom))
+		m_bGet = true;
 
 
-	return S_OK;
-
+	if (m_bGet)
+	{
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+		if (m_ItemDesc.eType == RUBY)
+			pPlayer->Set_RubyAdd();
+		else if (m_ItemDesc.eType == HEART)
+			pPlayer->Set_RecoverHp();
+		m_bDead = true;
+	}
 }
 
 HRESULT CPrizeItem::Ready_Components(void * pArg)
@@ -195,6 +234,8 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
 	if(m_ItemDesc.eType == CELLO)
 		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+	if(m_ItemDesc.m_bPrize == false)
+		ColliderDesc.vScale = _float3(0.3f, 0.3f, 0.3f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))

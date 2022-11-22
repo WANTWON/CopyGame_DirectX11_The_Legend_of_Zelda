@@ -64,6 +64,8 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 		return;
 	}
 
+	__super::Late_Tick(fTimeDelta);
+
 	CBaseObj*		pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	if (m_eTreasureBoxDesc.bVisible == false)
 	{
@@ -147,14 +149,6 @@ HRESULT CTreasureBox::Render()
 			return E_FAIL;
 	}
 
-#ifdef _DEBUG
-	if (m_pAABBCom != nullptr)
-		m_pAABBCom->Render();
-	if (m_pOBBCom != nullptr)
-		m_pOBBCom->Render();
-	if (m_pSPHERECom != nullptr)
-		m_pSPHERECom->Render();
-#endif
 
 	return S_OK;
 }
