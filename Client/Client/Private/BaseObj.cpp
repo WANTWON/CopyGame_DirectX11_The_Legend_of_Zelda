@@ -64,6 +64,21 @@ _bool CBaseObj::Check_IsinFrustum()
 	return CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), Get_Scale().y);
 }
 
+void CBaseObj::SetUp_BillBoard()
+{
+	_float4x4 ViewMatrix;
+
+	ViewMatrix = CGameInstance::Get_Instance()->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW); // Get View Matrix
+	_matrix matViewInv = XMMatrixInverse(nullptr, XMLoadFloat4x4(&ViewMatrix));      // Get Inverse of View Matrix (World Matrix of Camera)
+
+	_vector vRight = (_vector)matViewInv.r[0];
+	_vector vUp = (_vector)matViewInv.r[1];
+	_vector vLook = (_vector)matViewInv.r[2];
+	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) *Get_Scale().x);
+	m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * Get_Scale().y);
+	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) *Get_Scale().z);
+}
+
 void CBaseObj::Change_Direction()
 {
 	if (m_eDir[DIR_X] != m_ePreDir[DIR_X] || m_eDir[DIR_Z] != m_ePreDir[DIR_Z])

@@ -311,12 +311,8 @@ HRESULT CModel::Create_Materials(const char* pModelFilePath)
 
 			if (j == 6)
 			{
-				if (FAILED(pAIMaterial->GetTexture(aiTextureType(8), 0, &strPath)))
-				{
-					if((FAILED(pAIMaterial->GetTexture(aiTextureType(2), 0, &strPath))))
-						continue;
-				}
-					
+				if (FAILED(pAIMaterial->GetTexture(aiTextureType(1), 0, &strPath)))
+						continue;	
 			}
 			else
 			{
@@ -333,20 +329,11 @@ HRESULT CModel::Create_Materials(const char* pModelFilePath)
 
 			if (j == 6)
 			{
-				char* ptr = strstr(szName, "smt");  
+				char* ptr = strstr(szName, "alb");  
 
 				if (ptr) {
 					strncpy(ptr, "nml", 3);  
 					puts(szName);
-				}
-				else
-				{
-					ptr = strstr(szName, "occ");  
-
-					if (ptr) {
-						strncpy(ptr, "nml", 3);
-						puts(szName);
-					}
 				}
 
 			}

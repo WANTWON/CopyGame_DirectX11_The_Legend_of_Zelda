@@ -239,7 +239,7 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 	_matrix			PivotMatrix = XMMatrixIdentity();
 
 #pragma region Field
-	for (int i = 1; i < 17; ++i)
+	for (int i = 0; i < 17; ++i)
 	{
 		for (int j = 0; j < 7; ++j)
 		{
@@ -311,11 +311,11 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 	/* Model for Monster */
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MoblinSword.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/MoblinSword/MoblinSword.fbx", PivotMatrix))))
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/MoblinSword/MoblinSword.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Octorock.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/Octorock/Octorock.fbx", PivotMatrix))))
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Octorock/Octorock.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Pawn.fbx"), CModel::Create(m_pDevice, m_pContext,
@@ -420,6 +420,26 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 	/*For.Prototype_Component_Model_Lawn*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Lawn.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Lawn/Lawn.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Lawn*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Grass.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Grass/Grass.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Lawn*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Grass2x2.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Grass2x2/Grass2x2.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_TailCaveStatue*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("TailCaveStatue.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/TailStatue/TailStatue.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_TailCaveShutter*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("TailCaveShutter.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Door/TailCaveShutter/TailCaveShutter.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);

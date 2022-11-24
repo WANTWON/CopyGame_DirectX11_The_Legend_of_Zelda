@@ -81,6 +81,10 @@ void CNonAnim::Late_Tick(_float fTimeDelta)
 
 	_float3 vScale = Get_Scale();
 	_float fCullingRadius = max( max(vScale.x, vScale.y), vScale.z);
+
+	if (pGameInstance->Get_CurrentLevelIndex() == LEVEL_GAMEPLAY)
+		fCullingRadius += 5;
+
 	if (nullptr != m_pRendererCom && true == pGameInstance->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 4))
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);

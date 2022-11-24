@@ -11,10 +11,11 @@ BEGIN(Client)
 class CDoor final : public CBaseObj
 {
 public:
-	enum DOORTYPE { DOOR_CLOSED, DOOR_KEY, DOOR_BOSS };
+	enum DOORTYPE { DOOR_CLOSED, DOOR_KEY, DOOR_BOSS, DOOR_TAIL };
 	enum STATE_CLOSED { CLOSE_CD, CLOSE2_CD, OPEN_CD, OPEN2_CD, OPEN_WAIT_CD, OPEN_WAIT2_CD};
 	enum STATE_LOCK { CLOSE_LD, OPEN_LD, OPEN2_LD};
-	enum STATEBOSS { OPEN_BOSS, REMOVE_KEY };
+	enum STATE_BOSS { OPEN_BOSS, REMOVE_KEY };
+	enum STATE_TAIL { CLOSE_TAIL, OPEN_TAIL, OPEN_WAIT_TAIL };
 	typedef struct DoorTag
 	{
 		DOORTYPE eType = DOOR_CLOSED;
@@ -33,6 +34,9 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+public:
+	void Set_OpenDoor(_bool type) { m_bOpen = type; }
+
 private:
 	void Change_Animation(_float fTimeDelta);
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
@@ -42,9 +46,11 @@ private:
 	void Tick_ClosedDoor(_float fTimeDelta);
 	void Tick_LockDoor(_float fTimeDelta);
 	void Tick_BossDoor(_float fTimeDelta);
+	void Tick_TailDoor(_float fTimeDelta);
 	void Change_Animation_ClosedDoor(_float fTimeDelta);
 	void Change_Animation_LockDDoor(_float fTimeDelta);
 	void Change_Animation_BossDoor(_float fTimeDelta);
+	void Change_Animation_TailDoor(_float fTimeDelta);
 	void Check_Close();
 	_bool Check_Open();
 

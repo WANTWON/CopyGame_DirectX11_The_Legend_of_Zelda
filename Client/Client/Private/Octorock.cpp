@@ -34,11 +34,28 @@ HRESULT COctorock::Initialize(void * pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
+	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	//CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
+	//char cName[MAX_PATH];
+	//ZeroMemory(cName, sizeof(char) * MAX_PATH);
+	//pData_Manager->TCtoC(TEXT("Octorock"), cName);
+	//pData_Manager->Conv_Bin_Model(m_pModelCom, cName, CData_Manager::DATA_ANIM);
+	////ERR_MSG(TEXT("Save_Bin_Model"));
+	//RELEASE_INSTANCE(CData_Manager);
+
+	//RELEASE_INSTANCE(CGameInstance);
+
 	return S_OK;
 }
 
 int COctorock::Tick(_float fTimeDelta)
 {
+	_float3 vScale = Get_Scale();
+	_float fCullingRadius = max(max(vScale.x, vScale.y), vScale.z);
+	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 2) == false)
+		return OBJ_NOEVENT;
+
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
 		
@@ -144,7 +161,7 @@ HRESULT COctorock::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Octorock"), (CComponent**)&m_pModelCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Octorock"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
 	/* For.Com_OBB*/

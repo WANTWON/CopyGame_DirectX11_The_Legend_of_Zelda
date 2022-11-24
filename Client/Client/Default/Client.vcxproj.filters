@@ -163,6 +163,9 @@
     <Filter Include="95.UI\06. Number">
       <UniqueIdentifier>{2c45e4e9-08d9-4d27-8e10-c9365e914a16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\01.NonAnim\07.Grass">
+      <UniqueIdentifier>{7846b7eb-1e36-4ca2-962a-d07170beec4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -324,6 +327,9 @@
     <ClInclude Include="..\Public\PrizeItem.h">
       <Filter>02.GameObjects\01.NonAnim\06.PrizeItem</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Grass.h">
+      <Filter>02.GameObjects\01.NonAnim\07.Grass</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -469,6 +475,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\PrizeItem.cpp">
       <Filter>02.GameObjects\01.NonAnim\06.PrizeItem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Grass.cpp">
+      <Filter>02.GameObjects\01.NonAnim\07.Grass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

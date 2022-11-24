@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "UI_Manager.h"
 #include "UIButton.h"
+#include "Door.h"
 
 CSquareBlock::CSquareBlock(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -36,6 +37,8 @@ HRESULT CSquareBlock::Initialize(void * pArg)
 		_vector vecPostion = XMLoadFloat3(&m_BlockDesc.vInitPosition);
 		vecPostion = XMVectorSetW(vecPostion, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
+		m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(m_BlockDesc.fAngle));
+
 	}
 
 	Set_Scale(_float3(3.f, 3.f, 3.f));
@@ -70,6 +73,9 @@ void CSquareBlock::Late_Tick(_float fTimeDelta)
 		break;
 	case LOCK_BLOCK:
 		Tick_LockBlock( fTimeDelta);
+		break;
+	case TAIL_STATUE:
+		Tick_TailStatue(fTimeDelta);
 		break;
 	}
 
@@ -114,6 +120,11 @@ HRESULT CSquareBlock::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_LockBlock"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
+	case TAIL_STATUE:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_TailStatue"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
 	}
 	
 
@@ -123,14 +134,14 @@ HRESULT CSquareBlock::Ready_Components(void * pArg)
 	ColliderDesc.vScale = _float3(0.5f, 0.2f, 0.5f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
+	if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
 		return E_FAIL;
 
 	/* For.Com_SHPERE */
 	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
+	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -248,6 +259,63 @@ void CSquareBlock::Tick_LockBlock(_float fTimeDelta)
 
 		}
 	}
+}
+
+void CSquareBlock::Tick_TailStatue(_float fTimeDelta)
+{
+	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) == false)
+		return;
+
+	if (m_bOpen)
+		return;
+
+	if (nullptr != m_pRendererCom)
+	{
+#ifdef _DEBUG
+		if (m_pAABBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pAABBCom);
+		if (m_pOBBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pOBBCom);
+		if (m_pSPHERECom != nullptr)
+			m_pRendererCom->Add_Debug(m_pSPHERECom);
+#endif
+
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+	}
+
+
+	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+	CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
+	CBaseObj* pTarget = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom, &pTarget))
+	{
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+		if (m_bDead == false)
+			pButton->Set_Visible(true);
+		_float2 fPosition = pPlayer->Get_ProjPosition();
+		fPosition.y = g_iWinSizeY - fPosition.y;
+		fPosition.x += 50.f;
+		fPosition.y -= 30.f;
+		pButton->Set_Position(fPosition);
+
+		CPlayer::ANIM ePlayerState = pPlayer->Get_AnimState();
+
+		if (CGameInstance::Get_Instance()->Key_Pressing(DIK_A))
+		{
+			if (CUI_Manager::Get_Instance()->Get_KeySize() != 0)
+			{
+				pButton->Set_Visible(false);
+				dynamic_cast<CPlayer*>(pPlayer)->Set_AnimState(CPlayer::KEY_OPEN);
+				CGameObject* pDoor = CGameInstance::Get_Instance()->Get_Object(LEVEL_GAMEPLAY, TEXT("Layer_Shutter"));
+				dynamic_cast<CDoor*>(pDoor)->Set_OpenDoor(true);
+				m_bDead = true;
+			}
+
+		}
+	}
+	else
+		pButton->Set_Visible(true);
 }
 
 

@@ -179,6 +179,7 @@
     <ClInclude Include="..\Public\DgnKey.h" />
     <ClInclude Include="..\Public\Door.h" />
     <ClInclude Include="..\Public\FootSwitch.h" />
+    <ClInclude Include="..\Public\Grass.h" />
     <ClInclude Include="..\Public\Keese.h" />
     <ClInclude Include="..\Public\MessageBox.h" />
     <ClInclude Include="..\Public\MonsterBullet.h" />
@@ -232,6 +233,7 @@
     <ClCompile Include="..\Private\DgnKey.cpp" />
     <ClCompile Include="..\Private\Door.cpp" />
     <ClCompile Include="..\Private\FootSwitch.cpp" />
+    <ClCompile Include="..\Private\Grass.cpp" />
     <ClCompile Include="..\Private\Keese.cpp" />
     <ClCompile Include="..\Private\MessageBox.cpp" />
     <ClCompile Include="..\Private\MonsterBullet.cpp" />

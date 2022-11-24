@@ -8,12 +8,13 @@ BEGIN(Client)
 class CSquareBlock final : public CNonAnim
 {
 public:
-	enum TYPE {SQUARE_BLOCK , LOCK_BLOCK};
+	enum TYPE {SQUARE_BLOCK , LOCK_BLOCK, TAIL_STATUE };
 
 	typedef struct BlockTag
 	{
 		_float3 vInitPosition = _float3(0.f, 0.f, 0.f);
 		TYPE	eType = SQUARE_BLOCK;
+		_float  fAngle = 0.f;
 	}BLOCKDESC;
 
 private:
@@ -32,9 +33,11 @@ private:
 	virtual HRESULT Ready_Components(void* pArg) override;
 	void Tick_SquareBlock(_float fTimeDelta);
 	void Tick_LockBlock(_float fTimeDelta);
+	void Tick_TailStatue(_float fTimeDelta);
 
 private:
 	BLOCKDESC m_BlockDesc;
+	_bool	  m_bOpen = false;
 
 public:
 	static CSquareBlock* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

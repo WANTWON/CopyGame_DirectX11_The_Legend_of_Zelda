@@ -37,6 +37,7 @@ public:
 	void Update_Collider();
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) { return 0; };
 	_bool Check_IsinFrustum();
+	void SetUp_BillBoard();
 
 
 public:

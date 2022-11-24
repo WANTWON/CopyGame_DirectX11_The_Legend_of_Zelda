@@ -47,6 +47,9 @@ HRESULT CDoor::Initialize(void * pArg)
 	case DOOR_BOSS:
 		m_eState = REMOVE_KEY;
 		break;
+	case DOOR_TAIL:
+		m_eState = CLOSE_TAIL;
+		break;
 	default:
 		break;
 	}
@@ -79,6 +82,9 @@ int CDoor::Tick(_float fTimeDelta)
 		break;
 	case DOOR_BOSS:
 		Tick_BossDoor(fTimeDelta);
+		break;
+	case DOOR_TAIL:
+		Tick_TailDoor(fTimeDelta);
 		break;
 	default:
 		break;
@@ -137,6 +143,9 @@ void CDoor::Change_Animation(_float fTimeDelta)
 	case DOOR_BOSS:
 		Change_Animation_BossDoor(fTimeDelta);
 		break;
+	case DOOR_TAIL:
+		Change_Animation_TailDoor(fTimeDelta);
+		break;
 	}
 }
 
@@ -176,6 +185,10 @@ HRESULT CDoor::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_BossDoor"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
+	case DOOR_TAIL:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_TailCaveShutter"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
 		break;
 	default:
 		break;
@@ -188,7 +201,7 @@ HRESULT CDoor::Ready_Components(void * pArg)
 	ColliderDesc.vScale = _float3(3.f, 2.f, 0.7f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.5f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
 
@@ -371,6 +384,32 @@ void CDoor::Tick_BossDoor(_float fTimeDelta)
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CDoor::Tick_TailDoor(_float fTimeDelta)
+{
+	if (!Check_IsinFrustum())
+		return;
+
+	if (m_bOpen && m_eState != OPEN_WAIT_TAIL)
+	{
+		m_eState = OPEN_TAIL;
+	}
+		
+	if (m_eState == OPEN_WAIT_TAIL && CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pOBBCom))
+	{
+		CUI_Manager::Get_Instance()->Set_NextLevelIndex(LEVEL_TAILCAVE);
+		CUI_Manager::Get_Instance()->Set_NextLevel(true);
+	}
+
+
+	if (m_eState != m_ePreState)
+	{
+		m_pModelCom->Set_NextAnimIndex(m_eState);
+		m_ePreState = m_eState;
+	}
+
+	Change_Animation(fTimeDelta);
+}
+
 void CDoor::Change_Animation_ClosedDoor(_float fTimeDelta)
 {
 	switch (m_eState)
@@ -451,6 +490,27 @@ void CDoor::Change_Animation_BossDoor(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
 			m_bDead = true;
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void CDoor::Change_Animation_TailDoor(_float fTimeDelta)
+{
+	switch (m_eState)
+	{
+	case Client::CDoor::CLOSE_TAIL:
+	case Client::CDoor::OPEN_WAIT_TAIL:
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
+		break;
+	case Client::CDoor::OPEN_TAIL:
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		{
+			m_eState = OPEN_WAIT_TAIL;
 		}
 		break;
 	default:

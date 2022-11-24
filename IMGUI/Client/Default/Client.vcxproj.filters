@@ -73,6 +73,9 @@
     <Filter Include="02.GameObjects\04.TreasureBox">
       <UniqueIdentifier>{b14591bf-3e81-4afd-b902-9b852f7a00f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.ToolManager\Data_Manager">
+      <UniqueIdentifier>{226bc1a1-c7bf-4b55-8c9b-30e39cdffd35}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

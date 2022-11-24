@@ -32,7 +32,7 @@ HRESULT CPortal::Initialize(void * pArg)
 
 	if (pArg != nullptr)
 	{
-		_vector vecPostion = XMLoadFloat3((_float3*)pArg);
+		_vector vecPostion = XMLoadFloat3(&m_PortalDesc.vInitPos);
 		vecPostion = XMVectorSetW(vecPostion, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	}
@@ -69,24 +69,23 @@ void CPortal::Late_Tick(_float fTimeDelta)
 #endif
 
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
-
 	}
 		
+
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
-	CBaseObj* pTarget = nullptr;
-	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pOBBCom, &pTarget) == true)
+	switch (m_PortalDesc.ePortalType)
 	{
-		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
-		{
-			
-			if (m_PortalDesc.bConnectPortal2D == false)
-				dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::LADDER_UP_ED);
-			else
-				dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::STAIR_DOWN);
-			dynamic_cast<CPlayer*>(pTarget)->Set_NextPortal(m_PortalDesc.vConnectPos, m_PortalDesc.bConnectPortal2D);
-		}	
+	case PORTAL_POSITION:
+		Portal_Position_Tick(fTimeDelta);
+		break;
+	case PORTAL_LEVEL:
+		Portal_Level_Tick(fTimeDelta);
+		break;
+	default:
+		break;
 	}
+	
 	
 }
 
@@ -96,6 +95,33 @@ HRESULT CPortal::Render()
 
 	return S_OK;
 
+}
+
+void CPortal::Portal_Position_Tick(_float fTimeDelta)
+{
+	CBaseObj* pTarget = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pOBBCom, &pTarget) == true)
+	{
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
+		{
+
+			if (m_PortalDesc.bConnectPortal2D == false)
+				dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::LADDER_UP_ED);
+			else
+				dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::STAIR_DOWN);
+			dynamic_cast<CPlayer*>(pTarget)->Set_NextPortal(m_PortalDesc.vConnectPos, m_PortalDesc.bConnectPortal2D);
+		}
+	}
+}
+
+void CPortal::Portal_Level_Tick(_float fTimeDelta)
+{
+	CBaseObj* pTarget = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pOBBCom, &pTarget) == true)
+	{
+		CUI_Manager::Get_Instance()->Set_NextLevelIndex(m_PortalDesc.eConnectLevel);
+		CUI_Manager::Get_Instance()->Set_NextLevel(true);
+	}
 }
 
 HRESULT CPortal::Ready_Components(void * pArg)
@@ -118,7 +144,7 @@ HRESULT CPortal::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_Boulder"), (CComponent**)&m_pModelCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Boulder"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
 	CCollider::COLLIDERDESC		ColliderDesc;
@@ -127,7 +153,7 @@ HRESULT CPortal::Ready_Components(void * pArg)
 	ColliderDesc.vScale = _float3(0.5f, 0.2f, 0.5f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
 

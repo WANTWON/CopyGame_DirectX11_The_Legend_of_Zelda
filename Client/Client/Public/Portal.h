@@ -8,10 +8,14 @@ BEGIN(Client)
 class CPortal final : public CNonAnim
 {
 public:
+	enum TYPE { PORTAL_POSITION , PORTAL_LEVEL};
+
 	typedef struct Portaltag
 	{
+		TYPE	ePortalType = PORTAL_POSITION;
 		_float3 vInitPos = _float3(0.f, 0.f, 0.f);
 		_float3 vConnectPos = _float3(0.f, 0.f, 0.f);
+		LEVEL   eConnectLevel = LEVEL_GAMEPLAY;
 		_bool bConnectPortal2D = false;
 	}PORTALDESC;
 
@@ -27,6 +31,9 @@ public:
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 
+private:
+	void Portal_Position_Tick(_float fTimeDelta);
+	void Portal_Level_Tick(_float fTimeDelta);
 
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;

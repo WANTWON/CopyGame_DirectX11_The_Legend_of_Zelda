@@ -76,7 +76,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDepth = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
 	//Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
-	Out.vNormal = vector(Out.vNormal.xyz * 0.5f + 0.5f, 0.f) ;
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f) ;
 	
 
 
