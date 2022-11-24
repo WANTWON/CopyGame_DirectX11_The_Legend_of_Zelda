@@ -25,6 +25,7 @@ private:
 public:
 	HRESULT Reserve_Container(_uint iNumLevels);
 	HRESULT Add_Prototype(_uint iLevelIndex, const _tchar* pPrototypeTag, class CComponent* pPrototype);
+	HRESULT	Check_Prototype(_int iLevelIndex, const _tchar* pPrototypeTag); // Ãß°¡
 	class CComponent* Clone_Component(_uint iLevelIndex, const _tchar* pPrototypeTag, void* pArg = nullptr);
 	void Clear(_uint iLevelIndex);
 private:

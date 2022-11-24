@@ -141,4 +141,86 @@ namespace Engine
 		WINMODE			eWinMode;
 
 	}GRAPHIC_DESC;
+
+	// For. Data
+
+	typedef struct tagBinHierarchyNode
+	{
+
+		char cName[MAX_PATH];
+		char cParent[MAX_PATH];
+		int  iDepth;
+		XMFLOAT4X4 mTransform;
+
+	}DATA_BINNODE;
+
+	typedef struct tagBinMaterial
+	{
+
+		char cNames[AI_TEXTURE_TYPE_MAX][MAX_PATH];
+
+	}DATA_BINMATERIAL;
+
+
+	typedef struct tagBinBone
+	{
+		char		cNames[MAX_PATH];
+		XMFLOAT4X4	mOffsetTransform;
+	}DATA_BINBONE;
+
+	typedef struct tagBinMesh
+	{
+		char				cName[MAX_PATH];
+		int					iMaterialIndex;
+
+		int					NumVertices;
+		VTXMODEL*			pNonAnimVertices;
+		VTXANIMMODEL*		pAnimVertices;
+
+		int					iNumPrimitives;
+		FACEINDICES32*		pIndices;
+
+		int					iNumBones;
+		DATA_BINBONE*		pBones;
+
+	}DATA_BINMESH;
+
+
+	typedef struct tagBinChannel
+	{
+
+		char				szName[MAX_PATH];
+		int					iNumKeyFrames;
+		KEYFRAME*			pKeyFrames;
+
+	}DATA_BINCHANNEL;
+	typedef struct tagBinAnim
+	{
+
+		bool				bLoop;
+		char				szName[MAX_PATH];
+		int					iNumChannels;
+		float				fDuration;
+		float				fTickPerSecond;
+		DATA_BINCHANNEL*	pBinChannel;
+
+
+	}DATA_BINANIM;
+
+	typedef struct tagBinScene
+	{
+
+		int iNodeCount;
+		DATA_BINNODE* pBinNodes;
+
+		int iMaterialCount;
+		DATA_BINMATERIAL* pBinMaterial;
+
+		int iMeshCount;
+		DATA_BINMESH* pBinMesh;
+
+		int iNumAnimations;
+		DATA_BINANIM* pBinAnim;
+
+	}DATA_BINSCENE;
 }

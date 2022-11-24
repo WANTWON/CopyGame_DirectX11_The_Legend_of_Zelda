@@ -62,6 +62,7 @@ private:
 #ifdef _DEBUG
 private:
 	HRESULT Render_Debug();
+	bool	m_bRenderDebug = false;
 #endif // _DEBUG
 public:
 	static CRenderer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

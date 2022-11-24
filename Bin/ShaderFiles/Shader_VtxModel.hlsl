@@ -22,6 +22,7 @@ struct VS_OUT
 	float4		vPosition : SV_POSITION;
 	float4		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
+	float4		vProjPos : TEXCOORD1;
 };
 
 /* DrawIndexed함수를 호출하면. */
@@ -36,6 +37,7 @@ VS_OUT VS_MAIN(VS_IN In)
 	matWV = mul(g_WorldMatrix, g_ViewMatrix);
 	matWVP = mul(matWV, g_ProjMatrix);
 
+
 	vector vNormal = normalize(mul(vector(In.vNormal, 0.f), g_WorldMatrix));
 
 	/* 정점의 위치에 월드 뷰 투영행렬을 곱한다. 현재 정점은 ViewSpace에 존재하낟. */
@@ -43,7 +45,7 @@ VS_OUT VS_MAIN(VS_IN In)
 	Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
 	Out.vNormal = vNormal;
 	Out.vTexUV = In.vTexUV;
-
+	Out.vProjPos = Out.vPosition;
 	return Out;
 }
 
@@ -53,12 +55,14 @@ struct PS_IN
 	float4		vPosition : SV_POSITION;
 	float4		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
+	float4		vProjPos : TEXCOORD1;
 };
 
 struct PS_OUT
 {
 	float4		vDiffuse : SV_TARGET0;
 	float4		vNormal : SV_TARGET1;
+	float4		vDepth : SV_TARGET2;
 };
 
 /* 이렇게 만들어진 픽셀을 PS_MAIN함수의 인자로 던진다. */
@@ -70,13 +74,12 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
-
-	//vector Spec = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
-	//float ret = reflect(Spec, Out.vNormal);
-
-	//Out.vNormal = Out.vNormal*ret;
+	Out.vDepth = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
+	//Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
 	Out.vNormal = vector(Out.vNormal.xyz * 0.5f + 0.5f, 0.f) ;
-	//Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	
+
+
 	Out.vDiffuse.a = g_fAlpha;
 
 	if (Out.vDiffuse.a <= 0.2f)

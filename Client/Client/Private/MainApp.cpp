@@ -33,6 +33,9 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(m_pGameInstance->Initialize_Engine(g_hInst, LEVEL_END, Graphic_Desc, &m_pDevice, &m_pContext)))
 		return E_FAIL;
 
+	if (FAILED(CData_Manager::Get_Instance()->Init(m_pDevice, m_pContext)))
+		return E_FAIL;	// Ãß°¡
+
 	if (FAILED(Ready_Prototype_Component()))
 		return E_FAIL;
 

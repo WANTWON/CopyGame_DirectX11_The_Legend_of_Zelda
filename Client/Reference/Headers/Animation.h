@@ -12,6 +12,7 @@ private:
 
 public:
 	HRESULT Initialize(class CModel* pModel, aiAnimation* pAIAnimation);
+	HRESULT Bin_Initialize(DATA_BINANIM* pAIAnimation, class CModel* pModel); // 추가
 	_bool Invalidate_TransformationMatrix(_float fTimeDelta, _bool isLoop);
 	
 
@@ -48,8 +49,13 @@ private:
 	_float m_fLinear_CurrentTime = 0.f;
 	_bool	m_bLinearFinished = false;
 
+public: // For. Data 추가
+	void Get_AnimData(DATA_BINANIM* pAnimData);
+
+
 public:
 	static CAnimation* Create(class CModel* pModel, aiAnimation* pAIAnimation);
+	static CAnimation* Bin_Create(DATA_BINANIM* pAIAnimation, class CModel* pModel); // 추가
 	virtual void Free() override;
 };
 

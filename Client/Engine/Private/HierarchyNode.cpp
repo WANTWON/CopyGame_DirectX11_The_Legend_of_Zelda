@@ -27,10 +27,36 @@ HRESULT CHierarchyNode::Initialize(const aiNode * pNode, CHierarchyNode* pParent
 	return S_OK;
 }
 
+HRESULT CHierarchyNode::Bin_Initialize(DATA_BINNODE * pNode)
+{
+	strcpy_s(m_szName, pNode->cName);
+	strcpy_s(m_szParentName, pNode->cParent);
+
+	XMStoreFloat4x4(&m_OffsetMatrix, XMMatrixIdentity());
+
+	memcpy(&m_TransformationMatrix, &pNode->mTransform, sizeof(_float4x4));
+
+	XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMMatrixIdentity());
+
+	return S_OK;
+}
+
 void CHierarchyNode::Invalidate_CombinedTransformationmatrix()
 {
 	if (nullptr != m_pParent)
 		XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMLoadFloat4x4(&m_TransformationMatrix) * XMLoadFloat4x4(&m_pParent->m_CombinedTransformationMatrix));
+}
+
+void CHierarchyNode::Set_FindParent(CHierarchyNode * pNode)
+{
+	const char* pName = pNode->Get_Name();
+	if (!strcmp(m_szParentName, pName))
+	{
+		m_pParent = pNode;
+		Safe_AddRef(m_pParent);
+		return;
+	}
+	m_pParent = nullptr;
 }
 
 CHierarchyNode * CHierarchyNode::Create(const aiNode* pNode, CHierarchyNode* pParent)
@@ -43,6 +69,19 @@ CHierarchyNode * CHierarchyNode::Create(const aiNode* pNode, CHierarchyNode* pPa
 		Safe_Release(pInstance);
 	}
 	return pInstance;	
+}
+
+CHierarchyNode * CHierarchyNode::Bin_Create(DATA_BINNODE * pNode)
+{
+	CHierarchyNode*			pInstance = new CHierarchyNode();
+
+	if (FAILED(pInstance->Bin_Initialize(pNode)))
+	{
+		ERR_MSG(TEXT("Failed To Created : CHierarchyNode_Bin"));
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
 }
 
 void CHierarchyNode::Free()

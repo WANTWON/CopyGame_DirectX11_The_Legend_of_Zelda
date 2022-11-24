@@ -40,6 +40,28 @@ HRESULT CNonAnim::Initialize(void * pArg)
 			m_pTransformCom->Turn(XMLoadFloat3(&m_ModelDesc.vRotation), m_ModelDesc.m_fAngle);
 	}
 
+
+
+	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	//
+	//	/* For.Com_Model*/
+	//	_tchar			szModeltag[MAX_PATH] = TEXT("");
+	//	MultiByteToWideChar(CP_ACP, 0, m_ModelDesc.pModeltag, (int)strlen(m_ModelDesc.pModeltag), szModeltag, MAX_PATH);
+
+
+	//	CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
+	//	char cName[MAX_PATH];
+	//	ZeroMemory(cName, sizeof(char) * MAX_PATH);
+	//	pData_Manager->TCtoC(szModeltag, cName);
+	//	pData_Manager->Conv_Bin_Model(m_pModelCom, cName, CData_Manager::DATA_NONANIM);
+	//	//ERR_MSG(TEXT("Save_Bin_Model"));
+	//	RELEASE_INSTANCE(CData_Manager);
+	//
+
+	//RELEASE_INSTANCE(CGameInstance);
+
+
 	return S_OK;
 }
 
@@ -47,6 +69,8 @@ int CNonAnim::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
+
+	
 
 	return OBJ_NOEVENT;
 }
@@ -99,8 +123,8 @@ HRESULT CNonAnim::Render()
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS)))
 			return E_FAIL;
 
-	//	if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_SpecularTexture", i, aiTextureType_SPECULAR)))
-		//	return E_FAIL;
+		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_SpecularTexture", i, aiTextureType_SPECULAR)))
+			return E_FAIL;
 		
 
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))

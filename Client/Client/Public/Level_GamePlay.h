@@ -25,6 +25,7 @@ public:
 	HRESULT Ready_Layer_Camera(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Monster(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Object(const _tchar* pLayerTag);
 
 private:
 	CCollision_Manager* m_pCollision_Manager = nullptr;

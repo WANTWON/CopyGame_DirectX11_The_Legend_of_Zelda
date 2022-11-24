@@ -59,6 +59,28 @@ HRESULT CChannel::Initialize(CModel* pModel, aiNodeAnim * pAIChannel)
 	return S_OK;
 }
 
+HRESULT CChannel::Bin_Initialize(DATA_BINCHANNEL * pAIChannel, CModel * pModel)
+{
+	strcpy_s(m_szName, pAIChannel->szName);
+
+	m_iNumKeyframes = pAIChannel->iNumKeyFrames;
+
+	for (_uint i = 0; i < m_iNumKeyframes; ++i)
+	{
+		KEYFRAME			KeyFrame;
+		ZeroMemory(&KeyFrame, sizeof(KEYFRAME));
+
+		KeyFrame = pAIChannel->pKeyFrames[i];
+
+		m_KeyFrames.push_back(KeyFrame);
+	}
+
+	m_pBoneNode = pModel->Get_BonePtr(m_szName);
+	Safe_AddRef(m_pBoneNode);
+
+	return S_OK;
+}
+
 void CChannel::Invalidate_TransformationMatrix(_float fCurrentTime)
 {
 	KEYFRAME		FirstKeyframe = m_KeyFrames.front();
@@ -155,6 +177,19 @@ _bool CChannel::Linear_Interpolation(KEYFRAME NextKeyFrame, _float fLinearCurren
 	return false;
 }
 
+void CChannel::Get_ChannelData(DATA_BINCHANNEL * pChannelData)
+{
+	memcpy(&pChannelData->szName, m_szName, sizeof(char)*MAX_PATH);
+	pChannelData->iNumKeyFrames = m_iNumKeyframes;
+
+	pChannelData->pKeyFrames = new KEYFRAME[m_iNumKeyframes];
+
+	for (_uint i = 0; i < m_iNumKeyframes; ++i)
+	{
+		memcpy(&pChannelData->pKeyFrames[i], &m_KeyFrames[i], sizeof(KEYFRAME));
+	}
+}
+
 CChannel * CChannel::Create( CModel* pModel, aiNodeAnim * pAIChannel)
 {
 	CChannel*	pInstance = new CChannel();
@@ -162,6 +197,19 @@ CChannel * CChannel::Create( CModel* pModel, aiNodeAnim * pAIChannel)
 	if (FAILED(pInstance->Initialize(pModel, pAIChannel)))
 	{
 		ERR_MSG(TEXT("Failed to Created : CChannel"));
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CChannel * CChannel::Bin_Create(DATA_BINCHANNEL * pAIChannel, CModel * pModel)
+{
+	CChannel*			pInstance = new CChannel();
+
+	if (FAILED(pInstance->Bin_Initialize(pAIChannel, pModel)))
+	{
+		ERR_MSG(TEXT("Failed To Created : CChannel_Bin"));
 		Safe_Release(pInstance);
 	}
 

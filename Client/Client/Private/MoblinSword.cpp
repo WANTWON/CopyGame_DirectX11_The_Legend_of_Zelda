@@ -32,6 +32,7 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 	_vector vecPostion = XMLoadFloat3((_float3*)pArg);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
+	m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 
 	return S_OK;
@@ -90,6 +91,8 @@ void CMoblinSword::Late_Tick(_float fTimeDelta)
 		}
 	}
 
+	Check_Navigation(fTimeDelta);
+
 
 }
 
@@ -133,12 +136,12 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 	case Client::CMoblinSword::STANCE_WALK:
 		m_bIsLoop = true;
 		m_bHit = false;
-		m_pTransformCom->Go_Straight(fTimeDelta * 3);
+		m_pTransformCom->Go_Straight(fTimeDelta * 3, m_pNavigationCom);
 		m_pModelCom->Play_Animation(fTimeDelta * 4, m_bIsLoop);
 		break;
 	case Client::CMoblinSword::STAGGER:
 		m_bIsLoop = false;
-		m_pTransformCom->Go_Backward(fTimeDelta);
+		m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
 		if (m_pModelCom->Play_Animation(fTimeDelta * 2, m_bIsLoop))
 		{
 			m_bIsAttacking = false;
@@ -219,6 +222,14 @@ HRESULT CMoblinSword::Ready_Components(void * pArg)
 	//ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	//if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 	//	return E_FAIL;
+
+	/* For.Com_Navigation */
+	CNavigation::NAVIDESC			NaviDesc;
+	ZeroMemory(&NaviDesc, sizeof NaviDesc);
+	NaviDesc.iCurrentCellIndex = 0;
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Field"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Field"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+		return E_FAIL;
+
 
 
 	return S_OK;
@@ -302,7 +313,37 @@ void CMoblinSword::Follow_Target(_float fTimeDelta)
 	m_eState = STATE::WALK;
 	_vector vTargetPos = (m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
 	m_pTransformCom->LookAt(vTargetPos);
-	m_pTransformCom->Go_Straight(fTimeDelta*1.5f);
+	m_pTransformCom->Go_Straight(fTimeDelta*1.5f, m_pNavigationCom);
+}
+
+void CMoblinSword::Check_Navigation(_float fTimeDelta)
+{
+	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
+	{
+		if (m_eState == DAMAGE_F)
+		{
+			m_eState = DEAD_F;
+			return;
+		}
+
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pNavigationCom->Get_CurrentCellCenter();
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection, m_pNavigationCom);
+	}
+	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
+	{
+		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float fHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
+		if (fHeight > XMVectorGetY(vPosition))
+		{
+			vPosition = XMVectorSetY(vPosition, fHeight);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+		}
+
+	}
 }
 
 void CMoblinSword::AI_Behaviour(_float fTimeDelta)
@@ -393,7 +434,7 @@ void CMoblinSword::Patrol(_float fTimeDelta)
 	if (m_eState == STATE::WALK)
 	{
 		Change_Direction();
-		m_pTransformCom->Go_Straight(fTimeDelta);
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
 	}
 }
 

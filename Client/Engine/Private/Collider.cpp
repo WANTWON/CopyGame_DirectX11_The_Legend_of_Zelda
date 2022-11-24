@@ -14,10 +14,12 @@ CCollider::CCollider(const CCollider & rhs)
 	, m_pBatch(rhs.m_pBatch)
 	, m_pEffect(rhs.m_pEffect)
 	, m_pInputLayout(rhs.m_pInputLayout)
+	, m_pDepthStencilState(rhs.m_pDepthStencilState)
 #endif // _DEBUG
 {
 #ifdef _DEBUG
 	Safe_AddRef(m_pInputLayout);
+	Safe_AddRef(m_pDepthStencilState);
 #endif // _DEBUG
 }
 
@@ -37,6 +39,18 @@ HRESULT CCollider::Initialize_Prototype(TYPE eType)
 	m_pEffect->GetVertexShaderBytecode(&pShaderbyteCode, &iShaderByteCodeLength);
 
 	if (FAILED(m_pDevice->CreateInputLayout(VertexPositionColor::InputElements, VertexPositionColor::InputElementCount, pShaderbyteCode, iShaderByteCodeLength, &m_pInputLayout)))
+		return E_FAIL;
+
+
+	D3D11_DEPTH_STENCIL_DESC			DepthStecilDesc;
+	ZeroMemory(&DepthStecilDesc, sizeof(DepthStecilDesc));
+
+	DepthStecilDesc.DepthEnable = TRUE;
+	DepthStecilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	DepthStecilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	DepthStecilDesc.StencilEnable = FALSE;
+
+	if (FAILED(m_pDevice->CreateDepthStencilState(&DepthStecilDesc, &m_pDepthStencilState)))
 		return E_FAIL;
 
 #endif
@@ -108,18 +122,9 @@ HRESULT CCollider::Render()
 	m_pContext->GSSetShader(nullptr, nullptr, 0);
 
 
-	//ID3D11DepthStencilState*			pDepthStencilState = nullptr;
+	m_pContext->OMSetDepthStencilState(m_pDepthStencilState, 0);
 
-	//D3D11_DEPTH_STENCIL_DESC			DepthStecilDesc;
-	//ZeroMemory(&DepthStecilDesc, sizeof(DepthStecilDesc));
-
-	//DepthStecilDesc.DepthEnable = TRUE;
-	//DepthStecilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-
-	//if (FAILED(m_pDevice->CreateDepthStencilState(&DepthStecilDesc, &pDepthStencilState)))
-	//	return E_FAIL;
-
-	//m_pContext->OMSetDepthStencilState(pDepthStencilState, 0);
+	m_pContext->GSSetShader(nullptr, nullptr, 0);
 
 	m_pBatch->Begin();
 
@@ -352,7 +357,7 @@ void CCollider::Free()
 		Safe_Delete(m_pBatch);
 		Safe_Delete(m_pEffect);
 	}
-
+	Safe_Release(m_pDepthStencilState);
 	Safe_Release(m_pInputLayout);
 #endif // _DEBUG
 	for (_uint i = 0; i < BOUNDING_END; ++i)

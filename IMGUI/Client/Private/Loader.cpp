@@ -248,7 +248,7 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 			_tchar*			pModeltag = new _tchar[MAX_PATH];
 			_tchar*			szFilePath = new _tchar[MAX_PATH];
 			wsprintf(pModeltag, TEXT("Field_%02d%c.fbx"), i, j+65);
-			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/Field/Field_%02d%c.fbx"), i, j + 65);
+			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/NonAnim/Field/Field_%02d%c.fbx"), i, j + 65);
 
 			char* FilePath= new char[MAX_PATH];
 			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
@@ -311,31 +311,31 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 	/* Model for Monster */
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MoblinSword.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/MoblinSword/MoblinSword.fbx", PivotMatrix))))
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/MoblinSword/MoblinSword.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Octorock.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Octorock/Octorock.fbx", PivotMatrix))))
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/Octorock/Octorock.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Pawn.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Pawn/Pawn.fbx", PivotMatrix))))
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/Pawn/Pawn.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Rola.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Rola/Rola.fbx", PivotMatrix))))
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/Rola/Rola.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("SmallKey.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/DgnKey/SmallKey/SmallKey.fbx", PivotMatrix))))
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/DgnKey/SmallKey/SmallKey.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("FootSwitch.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Switch/FootSwitch.fbx", PivotMatrix))))
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Switch/FootSwitch.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("TreasureBox.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/TreasureBox/TreasureBox.fbx", PivotMatrix))))
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/TreasureBox/TreasureBox.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Picking_Symbol"), CModel::Create(m_pDevice, m_pContext,
@@ -344,82 +344,82 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 
 	/*For.Prototype_Component_Model_BuzzBlob*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("BuzzBlob.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/BuzzBlob/BuzzBlob.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/BuzzBlob/BuzzBlob.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_TailBoss*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("TailBoss1.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/TailBoss/TailBoss1.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/TailBoss/TailBoss1.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_TailBoss*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Tail1.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Tail/Tail1.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/Tail/Tail1.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_CollapseTile*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("CollapseTile.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/CollapseTile/CollapseTile.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/CollapseTile/CollapseTile.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_ClosedDoor*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("ClosedDoor.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Door/ClosedDoor/ClosedDoor.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Door/ClosedDoor/ClosedDoor.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_RedZol*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("ZolRed.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/ZolRed/ZolRed.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/ZolRed/ZolRed.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_Keese*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Keese.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Keese/Keese.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/Keese/Keese.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_LockDoor*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("LockDoor.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Door/LockDoor/LockDoor.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Door/LockDoor/LockDoor.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_SquareBlock*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("SquareBlock.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/SquareBlock/SquareBlock.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/SquareBlock/SquareBlock.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_Togezo*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Togezo.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Monster/Togezo/Togezo.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/Togezo/Togezo.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_BladeTrap*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("BladeTrap.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/BladeTrap/BladeTrap.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/BladeTrap/BladeTrap.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_Boulder*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Boulder.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Boulder/Boulder.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Boulder/Boulder.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_BossDoor*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("BossDoor.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Door/BossDoor/BossDoor.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Door/BossDoor/BossDoor.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_FullMoonCello*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("FullMoonCello.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/FullMoonCello/FullMoonCello.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/FullMoonCello/FullMoonCello.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_LockBlock*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("LockBlock.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/LockBlock/LockBlock.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/LockBlock/LockBlock.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_Lawn*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Lawn.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Obj/Lawn/Lawn.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Lawn/Lawn.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);

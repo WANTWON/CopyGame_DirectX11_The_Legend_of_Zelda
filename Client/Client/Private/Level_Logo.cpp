@@ -25,17 +25,19 @@ void CLevel_Logo::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);	
 
-	if (GetKeyState(VK_SPACE) & 0x8000)
+	if (CUI_Manager::Get_Instance()->Get_NextLevelFinished())
 	{
 		CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
 		Safe_AddRef(pGameInstance);
-
 		pGameInstance->Set_DestinationLevel(LEVEL_GAMEPLAY);
 		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
 			return;
-
 		Safe_Release(pGameInstance);
 	}
+
+
+	if (GetKeyState(VK_SPACE) & 0x8000)
+		CUI_Manager::Get_Instance()->Set_NextLevel(true);
 
 
 }
@@ -53,9 +55,16 @@ HRESULT CLevel_Logo::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	Safe_AddRef(pGameInstance);
 
 	CBackGround::BACKGROUNDESC BackgroundDesc;
+
 	BackgroundDesc.eVisibleScreen = CBackGround::VISIBLE_LOGO;
 	BackgroundDesc.pTextureTag = TEXT("Prototype_Component_Texture_TitleScreen");
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_LOGO, pLayerTag,
+		&BackgroundDesc)))
+		return E_FAIL;
+
+	BackgroundDesc.eVisibleScreen = CBackGround::VISIBLE_SCREEN;
+	BackgroundDesc.pTextureTag = nullptr;
+	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, TEXT("UI_Screen"),
 		&BackgroundDesc)))
 		return E_FAIL;
 

@@ -83,8 +83,8 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
-
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+
 
 	if (Out.vDiffuse.a <= 0.3f)
 		discard;

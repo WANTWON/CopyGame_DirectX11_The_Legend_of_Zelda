@@ -32,6 +32,7 @@ private:
 	virtual _bool IsDead() override;
 	virtual void Find_Target() override;
 	virtual void Follow_Target(_float fTimeDelta) override;
+	void Check_Navigation(_float fTimeDelta);
 
 private:
 	virtual void AI_Behaviour(_float fTimeDelta) override;

@@ -25,6 +25,7 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevel)
 	if (g_FirstLoading)
 	{
 
+
 		if (FAILED(Ready_Layer_BackGround(TEXT("Layer_UI"))))
 			return E_FAIL;
 	}
@@ -105,6 +106,7 @@ HRESULT CLevel_Loading::Ready_Layer_BackGround(const _tchar * pLayerTag)
 
 
 	CBackGround::BACKGROUNDESC BackgroundDesc;
+
 	BackgroundDesc.eVisibleScreen = CBackGround::VISIBLE_LOADING;
 	BackgroundDesc.pTextureTag = TEXT("Prototype_Component_Texture_LoadingScreen_UI");
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_LOADING, pLayerTag,

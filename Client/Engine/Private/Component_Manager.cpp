@@ -33,6 +33,15 @@ HRESULT CComponent_Manager::Add_Prototype(_uint iLevelIndex, const _tchar * pPro
 	return S_OK;
 }
 
+HRESULT CComponent_Manager::Check_Prototype(_int iLevelIndex, const _tchar * pPrototypeTag)
+{
+	CComponent*		pPrototype = Find_Component(iLevelIndex, pPrototypeTag);
+	if (nullptr == pPrototype)
+		return S_OK;
+
+	return E_FAIL;
+}
+
 CComponent * CComponent_Manager::Clone_Component(_uint iLevelIndex, const _tchar * pPrototypeTag, void * pArg)
 {
 	if (nullptr == m_pPrototypes ||

@@ -47,6 +47,18 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_pModelCom->Set_CurrentAnimIndex(m_eState);
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PLAYER, this);
 	
+	/*CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+		CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
+		char cName[MAX_PATH];
+		ZeroMemory(cName, sizeof(char) * MAX_PATH);
+		pData_Manager->TCtoC(TEXT("Link"), cName);
+		pData_Manager->Conv_Bin_Model(m_pModelCom, cName, CData_Manager::DATA_ANIM);
+		ERR_MSG(TEXT("Save_Bin_Model"));
+		RELEASE_INSTANCE(CData_Manager);
+
+	RELEASE_INSTANCE(CGameInstance);*/
+
 	return S_OK;
 }
 
@@ -435,7 +447,7 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 		return E_FAIL;
 
 	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Link"), (CComponent**)&m_pModelCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Link"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
 	/* For.Com_OBB*/
