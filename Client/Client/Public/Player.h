@@ -95,6 +95,7 @@ private:
 	_bool					m_bIsLoop = true;
 	_bool					m_bPressed = false;
 	_bool					m_bUpDown = false;
+	_bool					m_bCarry = false;
 
 	_float					m_fTime = 0.f;
 	_float					m_fStartHeight = 2.2f;

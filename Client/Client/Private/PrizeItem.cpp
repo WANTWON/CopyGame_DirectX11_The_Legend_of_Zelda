@@ -166,6 +166,34 @@ void CPrizeItem::LateTick_DefaultModeItem(_float fTimeDelta)
 
 void CPrizeItem::LateTick_CarryableModeItem(_float fTimeDelta)
 {
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom))
+	{
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
+		{
+			pPlayer->Set_AnimState(CPlayer::ITEM_CARRY);
+			m_bGet = true;
+		}
+		
+	}
+		
+
+
+	if (m_bGet)
+	{
+		_vector pPlayerPostion = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
+		pPlayerPostion = XMVectorSetY(pPlayerPostion, XMVectorGetY(pPlayerPostion) + 3.f);
+		m_pTransformCom->Go_PosTarget(fTimeDelta, pPlayerPostion);
+
+
+		if (pPlayer->Get_AnimState() != CPlayer::IDLE_CARRY && pPlayer->Get_AnimState() != CPlayer::WALK_CARRY && pPlayer->Get_AnimState() != CPlayer::ITEM_CARRY)
+		{
+			m_bGet = false;
+			m_bDead = true; 
+		}
+			
+	}
 }
 
 HRESULT CPrizeItem::Ready_Components(void * pArg)
