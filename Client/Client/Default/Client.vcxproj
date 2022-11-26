@@ -181,12 +181,14 @@
     <ClInclude Include="..\Public\FootSwitch.h" />
     <ClInclude Include="..\Public\Grass.h" />
     <ClInclude Include="..\Public\Keese.h" />
+    <ClInclude Include="..\Public\Level_Room.h" />
     <ClInclude Include="..\Public\MessageBox.h" />
     <ClInclude Include="..\Public\MonsterBullet.h" />
     <ClInclude Include="..\Public\CameraManager.h" />
     <ClInclude Include="..\Public\Camera_Dynamic.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Collision_Manger.h" />
+    <ClInclude Include="..\Public\Npc.h" />
     <ClInclude Include="..\Public\PlayerState.h" />
     <ClInclude Include="..\Public\InvenItem.h" />
     <ClInclude Include="..\Public\InvenTile.h" />
@@ -208,6 +210,7 @@
     <ClInclude Include="..\Public\PrizeItem.h" />
     <ClInclude Include="..\Public\RedZol.h" />
     <ClInclude Include="..\Public\Rola.h" />
+    <ClInclude Include="..\Public\ShopNpc.h" />
     <ClInclude Include="..\Public\SquareBlock.h" />
     <ClInclude Include="..\Public\Tail.h" />
     <ClInclude Include="..\Public\TailBoss.h" />
@@ -235,11 +238,13 @@
     <ClCompile Include="..\Private\FootSwitch.cpp" />
     <ClCompile Include="..\Private\Grass.cpp" />
     <ClCompile Include="..\Private\Keese.cpp" />
+    <ClCompile Include="..\Private\Level_Room.cpp" />
     <ClCompile Include="..\Private\MessageBox.cpp" />
     <ClCompile Include="..\Private\MonsterBullet.cpp" />
     <ClCompile Include="..\Private\CameraManager.cpp" />
     <ClCompile Include="..\Private\Camera_Dynamic.cpp" />
     <ClCompile Include="..\Private\Collision_Manger.cpp" />
+    <ClCompile Include="..\Private\Npc.cpp" />
     <ClCompile Include="..\Private\PlayerState.cpp" />
     <ClCompile Include="..\Private\InvenItem.cpp" />
     <ClCompile Include="..\Private\InvenTile.cpp" />
@@ -261,6 +266,7 @@
     <ClCompile Include="..\Private\PrizeItem.cpp" />
     <ClCompile Include="..\Private\RedZol.cpp" />
     <ClCompile Include="..\Private\Rola.cpp" />
+    <ClCompile Include="..\Private\ShopNpc.cpp" />
     <ClCompile Include="..\Private\SquareBlock.cpp" />
     <ClCompile Include="..\Private\Tail.cpp" />
     <ClCompile Include="..\Private\TailBoss.cpp" />

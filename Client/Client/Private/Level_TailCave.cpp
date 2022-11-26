@@ -25,7 +25,9 @@
 
 CLevel_TailCave::CLevel_TailCave(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
+	, m_pCollision_Manager(CCollision_Manager::Get_Instance())
 {
+	Safe_AddRef(m_pCollision_Manager);
 }
 
 HRESULT CLevel_TailCave::Initialize()
@@ -48,6 +50,7 @@ HRESULT CLevel_TailCave::Initialize()
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
 		return E_FAIL;
 
+	
 	if (FAILED(Ready_Layer_Object(TEXT("Layer_Object"))))
 		return E_FAIL;
 
@@ -59,7 +62,7 @@ HRESULT CLevel_TailCave::Initialize()
 	pCameraManager->Ready_Camera(LEVEL::LEVEL_TAILCAVE);
 
 	CCamera* pCamera = pCameraManager->Get_CurrentCamera();
-	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TAILCAVE);
+	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TERRAIN);
 	CUI_Manager::Get_Instance()->Set_NextLevel(false);
 
 	return S_OK;
@@ -71,6 +74,24 @@ void CLevel_TailCave::Tick(_float fTimeDelta)
 
 	CUI_Manager::Get_Instance()->Tick_UI();
 
+	if (CUI_Manager::Get_Instance()->Get_NextLevelFinished())
+	{
+		CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
+		Safe_AddRef(pGameInstance);
+
+		LEVEL eNextLevel = CUI_Manager::Get_Instance()->Get_NextLevelIndex();
+
+		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_MONSTER);
+		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_BLOCK);
+		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_INTERACT);
+		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_TRAP);
+		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_MBULLET);
+		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_ITEM);
+		pGameInstance->Set_DestinationLevel(eNextLevel);
+		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, eNextLevel))))
+			return;
+		Safe_Release(pGameInstance);
+	}
 }
 
 void CLevel_TailCave::Late_Tick(_float fTimeDelta)
@@ -82,6 +103,17 @@ void CLevel_TailCave::Late_Tick(_float fTimeDelta)
 
 	CCollision_Manager::Get_Instance()->Update_Collider();
 	CCollision_Manager::Get_Instance()->CollisionwithBullet();
+
+
+	if (CGameInstance::Get_Instance()->Key_Up(DIK_6))
+	{
+		CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
+
+		pUI_Manager->Set_NextLevelIndex(LEVEL_GAMEPLAY);
+		pUI_Manager->Set_NextLevel(true);
+
+		RELEASE_INSTANCE(CUI_Manager);
+	}
 	
 	
 }
@@ -446,7 +478,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 			CPrizeItem::ITEMDESC ItemDesc;
 			ItemDesc.vPosition = ModelDesc.vPosition;
 			ItemDesc.eType = CPrizeItem::CELLO;
-			ItemDesc.m_bPrize = true;
+			ItemDesc.eInteractType = CPrizeItem::PRIZE;
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_TAILCAVE, pLayerTag, &ItemDesc)))
 				return E_FAIL;
 		}
@@ -565,6 +597,7 @@ CLevel_TailCave * CLevel_TailCave::Create(ID3D11Device* pDevice, ID3D11DeviceCon
 void CLevel_TailCave::Free()
 {
 	__super::Free();
+	Safe_Release(m_pCollision_Manager);
 
 
 }

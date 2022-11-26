@@ -29,6 +29,8 @@ HRESULT CPlayer::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3, m_fStartHeight, 46.8, 1.f));
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 4.2f, 10.f, 1.f));
+	
 	Compute_CurrentIndex(LEVEL_GAMEPLAY);
 
 	m_fWalkingHeight = m_pNavigationCom[CLevel_Manager::Get_Instance()->Get_DestinationLevelIndex()]->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), (Get_Scale().y * 0.5f));
@@ -46,18 +48,18 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 	m_pModelCom->Set_CurrentAnimIndex(m_eState);
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PLAYER, this);
-	
-	/*CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	//
+	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-		CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
-		char cName[MAX_PATH];
-		ZeroMemory(cName, sizeof(char) * MAX_PATH);
-		pData_Manager->TCtoC(TEXT("Link"), cName);
-		pData_Manager->Conv_Bin_Model(m_pModelCom, cName, CData_Manager::DATA_ANIM);
-		ERR_MSG(TEXT("Save_Bin_Model"));
-		RELEASE_INSTANCE(CData_Manager);
+	//	CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
+	//	char cName[MAX_PATH];
+	//	ZeroMemory(cName, sizeof(char) * MAX_PATH);
+	//	pData_Manager->TCtoC(TEXT("Link"), cName);
+	//	pData_Manager->Conv_Bin_Model(m_pModelCom, cName, CData_Manager::DATA_ANIM);
+	//	//ERR_MSG(TEXT("Save_Bin_Model"));
+	//	RELEASE_INSTANCE(CData_Manager);
 
-	RELEASE_INSTANCE(CGameInstance);*/
+	//RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }
@@ -228,10 +230,24 @@ _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 
 void CPlayer::Key_Input(_float fTimeDelta)
 {
+	if (CGameInstance::Get_Instance()->Key_Down(DIK_SPACE))
+	{
+
+		CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+		if (m_iCurrentLevel == LEVEL_GAMEPLAY)
+			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
+		if (m_iCurrentLevel == LEVEL_TAILCAVE || m_iCurrentLevel == LEVEL_ROOM)
+			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TERRAIN);
+		if (m_eState == ITEM_GET_LP)
+			m_eState = ITEM_GET_ED;
+		if (m_bStop)
+			m_bStop = false;
+			
+	}
 
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == FALL_FROMTOP ||
 		m_eState == FALL_HOLE || m_eState == FALL_ANTLION || m_eState == KEY_OPEN ||
-		m_eState == STAIR_DOWN || m_eState == STAIR_UP)
+		m_eState == STAIR_DOWN || m_eState == STAIR_UP || m_bStop)
 		return;
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -251,19 +267,6 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_tInfo.iCurrentHp = 0;
 	}
 
-		
-
-	if (pGameInstance->Key_Down(DIK_SPACE))
-	{
-		
-		CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
-		if(m_iCurrentLevel == LEVEL_GAMEPLAY)
-			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
-		if (m_iCurrentLevel == LEVEL_TAILCAVE)
-			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TAILCAVE);
-		if (m_eState == ITEM_GET_LP)
-			m_eState = ITEM_GET_ED;
-	}
 
 
 	if (m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP)
@@ -478,6 +481,9 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_TailCave"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"), (CComponent**)&m_pNavigationCom[LEVEL_TAILCAVE], &NaviDesc)))
 		return E_FAIL;
 
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Room"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Room"), (CComponent**)&m_pNavigationCom[LEVEL_ROOM], &NaviDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -660,9 +666,11 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	switch (m_eState)
 	{
 	case Client::CPlayer::IDLE:
+	case Client::CPlayer::IDLE_CARRY:
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
 		break;
+	case Client::CPlayer::WALK_CARRY:
 	case Client::CPlayer::RUN:
 	case Client::CPlayer::LADDER_UP:
 	case Client::CPlayer::LADDER_WAIT:
@@ -899,6 +907,15 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 				m_pNavigationCom[m_iCurrentLevel]->Compute_CurrentIndex_byDistance(vPortalPos);
 			}
 			
+		}
+		break;
+	case Client::CPlayer::ITEM_CARRY:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			m_eState = IDLE_CARRY;
+			m_bCarry = true;
 		}
 		break;
 	default:

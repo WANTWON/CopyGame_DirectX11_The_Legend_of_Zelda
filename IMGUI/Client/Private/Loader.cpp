@@ -237,43 +237,43 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	_matrix			PivotMatrix = XMMatrixIdentity();
-
-#pragma region Field
-	for (int i = 0; i < 17; ++i)
-	{
-		for (int j = 0; j < 7; ++j)
-		{
-			//const char* pFilePath = "../Bin/Resources/Meshes/Field/Field_%02d%c.fbx";
-
-			_tchar*			pModeltag = new _tchar[MAX_PATH];
-			_tchar*			szFilePath = new _tchar[MAX_PATH];
-			wsprintf(pModeltag, TEXT("Field_%02d%c.fbx"), i, j+65);
-			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/NonAnim/Field/Field_%02d%c.fbx"), i, j + 65);
-
-			char* FilePath= new char[MAX_PATH];
-			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
-
-			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, pModeltag,
-				CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, FilePath, PivotMatrix))))
-			{
-				delete pModeltag;
-				delete szFilePath;
-				delete FilePath;
-
-				continue;
-			}
-
-			CImgui_Manager::Get_Instance()->Add_TempTag(pModeltag);
-			CImgui_Manager::Get_Instance()->Add_TempTag(szFilePath);
-			
-			delete FilePath;
-				
-		}
-	}
-
-#pragma endregion Field
-
-
+//
+//#pragma region Field
+//	for (int i = 0; i < 17; ++i)
+//	{
+//		for (int j = 0; j < 7; ++j)
+//		{
+//			//const char* pFilePath = "../Bin/Resources/Meshes/Field/Field_%02d%c.fbx";
+//
+//			_tchar*			pModeltag = new _tchar[MAX_PATH];
+//			_tchar*			szFilePath = new _tchar[MAX_PATH];
+//			wsprintf(pModeltag, TEXT("Field_%02d%c.fbx"), i, j+65);
+//			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/NonAnim/Field/Field_%02d%c.fbx"), i, j + 65);
+//
+//			char* FilePath= new char[MAX_PATH];
+//			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
+//
+//			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, pModeltag,
+//				CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, FilePath, PivotMatrix))))
+//			{
+//				delete pModeltag;
+//				delete szFilePath;
+//				delete FilePath;
+//
+//				continue;
+//			}
+//
+//			CImgui_Manager::Get_Instance()->Add_TempTag(pModeltag);
+//			CImgui_Manager::Get_Instance()->Add_TempTag(szFilePath);
+//			
+//			delete FilePath;
+//				
+//		}
+//	}
+//
+//#pragma endregion Field
+//
+//
 //#pragma region TailCave
 //	for (int i = 1; i < 9; ++i)
 //	{
@@ -308,6 +308,19 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 //	}
 //#pragma endregion TailField
 //
+
+/*For.Prototype_Component_Model_MarinHouse*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MarinHouse.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/MarinHouse/MarinHouse.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Shop*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Shop.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Shop/Shop.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+
 	/* Model for Monster */
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MoblinSword.fbx"), CModel::Create(m_pDevice, m_pContext,
@@ -419,17 +432,17 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 
 	/*For.Prototype_Component_Model_Lawn*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Lawn.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Lawn/Lawn.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Lawn/Lawn.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_Lawn*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Grass.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Grass/Grass.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Grass/Grass.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_Lawn*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Grass2x2.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Grass2x2/Grass2x2.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Grass2x2/Grass2x2.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_TailCaveStatue*/
@@ -442,6 +455,38 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Door/TailCaveShutter/TailCaveShutter.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_ShopNpc*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("ShopNpc.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/ShopNpc/ShopNpc.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	
+	/*For.Prototype_Component_Model_Arrow*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Arrow.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Arrow/Arrow.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_DogFood*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("DogFood.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/DogFood/DogFood.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_HeartContainer*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("HeartContainer.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/HeartContainer/HeartContainer.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+	/*For.Prototype_Component_Model_HeartContainer*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MagicRod.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/MagicRod/MagicRod.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_HeartContainer*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Bow.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Link/Bow.fbx", PivotMatrix))))
+		return E_FAIL;
+	
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }

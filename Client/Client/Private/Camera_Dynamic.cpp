@@ -48,7 +48,7 @@ int CCamera_Dynamic::Tick(_float fTimeDelta)
 	case Client::CCamera_Dynamic::CAM_SHAKING:
 		Shaking_Camera(fTimeDelta, m_fPower);
 		break;
-	case Client::CCamera_Dynamic::CAM_TAILCAVE:
+	case Client::CCamera_Dynamic::CAM_TERRAIN:
 		Terrain_Camera(fTimeDelta);
 		break;
 	case Client::CCamera_Dynamic::CAM_ITEMGET:
@@ -121,7 +121,7 @@ void CCamera_Dynamic::Shaking_Camera(_float fTimeDelta, _float fPower)
 		pTarget = (CBaseObj*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 		XMStoreFloat3(&vTargetPos, pTarget->Get_TransformState(CTransform::STATE_POSITION));
 		break;
-	case Client::CCamera_Dynamic::CAM_TAILCAVE:
+	case Client::CCamera_Dynamic::CAM_TERRAIN:
 		XMStoreFloat3(&vTargetPos, XMLoadFloat4(&m_fTargetPos));
 		break;
 	}
@@ -165,8 +165,8 @@ void CCamera_Dynamic::Shaking_Camera(_float fTimeDelta, _float fPower)
 		case Client::CCamera_Dynamic::CAM_PLAYER:
 			m_eCamMode = CAM_PLAYER;
 			break;
-		case Client::CCamera_Dynamic::CAM_TAILCAVE:
-			m_eCamMode = CAM_TAILCAVE;
+		case Client::CCamera_Dynamic::CAM_TERRAIN:
+			m_eCamMode = CAM_TERRAIN;
 			break;
 		}
 		m_ePreCamMode = m_eCamMode;

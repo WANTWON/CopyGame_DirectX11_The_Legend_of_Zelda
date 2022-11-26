@@ -572,25 +572,10 @@ HRESULT CModel::Bin_Ready_Materials(const char * pModelFilePath)
 			char			szFullPath[MAX_PATH] = "";
 			char			szExt[MAX_PATH] = "";
 
+			_splitpath_s(pAIMaterial.cNames[j], nullptr, 0, nullptr, 0, szFullPath, MAX_PATH, szExt, MAX_PATH);
 
-			//if (j == 6)
-			//{
-			//	string str = pAIMaterial.cNames[1];
-			//	str = regex_replace(str, regex("alb"), "nml");
-
-			//	_splitpath_s(pAIMaterial.cNames[j], nullptr, 0, nullptr, 0, szFullPath, MAX_PATH, szExt, MAX_PATH);
-
-			//	strcpy_s(szFullPath, pModelFilePath);
-			//	strcat_s(szFullPath, pAIMaterial.cNames[j]);
-
-			//}
-			//else
-			//{
-				_splitpath_s(pAIMaterial.cNames[j], nullptr, 0, nullptr, 0, szFullPath, MAX_PATH, szExt, MAX_PATH);
-
-				strcpy_s(szFullPath, pModelFilePath);
-				strcat_s(szFullPath, pAIMaterial.cNames[j]);
-		//	}
+			strcpy_s(szFullPath, pModelFilePath);
+			strcat_s(szFullPath, pAIMaterial.cNames[j]);
 
 			_tchar			szWideFullPath[MAX_PATH] = TEXT("");
 
@@ -600,7 +585,7 @@ HRESULT CModel::Bin_Ready_Materials(const char * pModelFilePath)
 
 			MaterialDesc.pMaterials[j] = CTexture::Create(m_pDevice, m_pContext, szWideFullPath);
 			if (nullptr == MaterialDesc.pMaterials[j])
-				return E_FAIL;
+				continue; //return E_FAIL;
 		}
 
 		m_Materials.push_back(MaterialDesc);

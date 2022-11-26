@@ -116,12 +116,16 @@ void CPortal::Portal_Position_Tick(_float fTimeDelta)
 
 void CPortal::Portal_Level_Tick(_float fTimeDelta)
 {
+	CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
+
 	CBaseObj* pTarget = nullptr;
-	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pOBBCom, &pTarget) == true)
+	if (pUI_Manager->Get_NextLevel() == false && CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pOBBCom, &pTarget) == true)
 	{
-		CUI_Manager::Get_Instance()->Set_NextLevelIndex(m_PortalDesc.eConnectLevel);
-		CUI_Manager::Get_Instance()->Set_NextLevel(true);
+		pUI_Manager->Set_NextLevelIndex(m_PortalDesc.eConnectLevel);
+		pUI_Manager->Set_NextLevel(true);
+		pUI_Manager->Set_RoomType((CUI_Manager::ROOMTYPE)m_PortalDesc.eRoomType);
 	}
+	RELEASE_INSTANCE(CUI_Manager)
 }
 
 HRESULT CPortal::Ready_Components(void * pArg)

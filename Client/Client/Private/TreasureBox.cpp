@@ -304,7 +304,7 @@ void CTreasureBox::OpenBox()
 	CPrizeItem::ITEMDESC ItemDesc;
 	XMStoreFloat3(&ItemDesc.vPosition, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
-	ItemDesc.m_bPrize = true;
+	ItemDesc.eInteractType = CPrizeItem::PRIZE;
 
 	switch (m_eTreasureBoxDesc.eItemType)
 	{
@@ -329,7 +329,7 @@ void CTreasureBox::OpenBox()
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	case HEART:
-		ItemDesc.eType = CPrizeItem::HEART;
+		ItemDesc.eType = CPrizeItem::HEART_RECOVERY;
 		//CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::MSG_HEART);
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
@@ -382,5 +382,6 @@ CGameObject * CTreasureBox::Clone(void * pArg)
 void CTreasureBox::Free()
 {
 	__super::Free();
+
 	Safe_Release(m_pModelCom);
 }

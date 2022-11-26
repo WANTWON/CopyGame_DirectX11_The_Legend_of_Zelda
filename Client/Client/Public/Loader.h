@@ -37,6 +37,7 @@ public:
 	HRESULT Loading_ForStaticLevel();
 	HRESULT Loading_ForGamePlayLevel();
 	HRESULT Loading_ForTailCaveLevel();
+	HRESULT Loading_ForRoomLevel();
 
 public:
 	HRESULT Loading_For_ObjectPrototype();

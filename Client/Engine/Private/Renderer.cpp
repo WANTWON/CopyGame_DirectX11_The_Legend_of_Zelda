@@ -164,6 +164,17 @@ HRESULT CRenderer::Add_Debug(CComponent* pDebugCom)
 	return S_OK;
 }
 
+void CRenderer::Debug_Clear()
+{
+	for (auto& pComponent : m_DebugComponents)
+	{
+
+		Safe_Release(pComponent);
+	}
+
+	m_DebugComponents.clear();
+}
+
 
 #endif // _DEBUG
 
@@ -359,6 +370,13 @@ HRESULT CRenderer::Render_NonLight()
 
 HRESULT CRenderer::Render_Debug()
 {
+	if (CLevel_Manager::Get_Instance()->Get_CurrentLevelIndex() == 1)
+	{
+		Debug_Clear();
+		return E_FAIL;
+	}
+	
+
 	if (nullptr == m_pShader ||
 		nullptr == m_pVIBuffer)
 		return E_FAIL;

@@ -9,13 +9,16 @@ BEGIN(Client)
 class CPrizeItem final : public CNonAnim
 {
 public:
-	enum TYPE { SMALL_KEY, COMPASS, MAP, FEATHER, BOSS_KEY, HEART,  RUBY, CELLO };
+	enum TYPE { SMALL_KEY, COMPASS, MAP, FEATHER, BOSS_KEY, HEART_RECOVERY,  RUBY, CELLO ,
+				ARROW, DOGFOOD, HEART_CONTAINER, MAGIC_ROD, BOW };
+
+	enum INTERACTTYPE { DEFAULT, PRIZE, CARRYABLE};
 
 	typedef struct KeyTag
 	{
 		TYPE eType = SMALL_KEY;
 		_float3 vPosition = _float3(0.f, 0.f, 0.f);
-		_bool m_bPrize = false;
+		INTERACTTYPE eInteractType = DEFAULT;
 		
 	}ITEMDESC;
 
@@ -34,7 +37,8 @@ public:
 
 private:
 	void LateTick_PrizeModeItem(_float fTimeDelta);
-	void LateTick_UnPrizeModeItem(_float fTimeDelta);
+	void LateTick_DefaultModeItem(_float fTimeDelta);
+	void LateTick_CarryableModeItem(_float fTimeDelta);
 
 private:
 	ITEMDESC				m_ItemDesc;

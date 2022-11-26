@@ -210,7 +210,7 @@ void CUI_Manager::Tick_Coin()
 
 		CPlayerState::STATEDESC StateDesc;
 		StateDesc.m_eType = CPlayerState::RUBY;
-		StateDesc.fPosition = _float2(500.f, 30.f);
+		StateDesc.fPosition = _float2(300.f, 30.f);
 
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerState"), LEVEL_STATIC, TEXT("Layer_Number"), &StateDesc)))
 			return;
@@ -225,7 +225,7 @@ void CUI_Manager::Tick_Coin()
 
 			CPlayerState::STATEDESC StateDesc;
 			StateDesc.m_eType = CPlayerState::NUMBER;
-			StateDesc.fPosition = _float2(520.f + i * 20.f, 30.f);
+			StateDesc.fPosition = _float2(320.f + i * 20.f, 30.f);
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerState"), LEVEL_STATIC, TEXT("Layer_Number"), &StateDesc)))
 				return;

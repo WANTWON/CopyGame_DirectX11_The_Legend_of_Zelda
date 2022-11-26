@@ -166,6 +166,15 @@
     <Filter Include="02.GameObjects\01.NonAnim\07.Grass">
       <UniqueIdentifier>{7846b7eb-1e36-4ca2-962a-d07170beec4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\04.Room">
+      <UniqueIdentifier>{cf1ac70c-25d7-4a2d-9bd6-7bcbcc16c912}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\06.Npc">
+      <UniqueIdentifier>{53e39c73-5ecb-4f35-816d-7aba84d4a436}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\06.Npc\ShopNpc">
+      <UniqueIdentifier>{02854cb7-cf41-4393-b59d-3869a1b2756b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -330,6 +339,15 @@
     <ClInclude Include="..\Public\Grass.h">
       <Filter>02.GameObjects\01.NonAnim\07.Grass</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_Room.h">
+      <Filter>01.Levels\04.Room</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Npc.h">
+      <Filter>02.GameObjects\06.Npc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ShopNpc.h">
+      <Filter>02.GameObjects\06.Npc\ShopNpc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -478,6 +496,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Grass.cpp">
       <Filter>02.GameObjects\01.NonAnim\07.Grass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Room.cpp">
+      <Filter>01.Levels\04.Room</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Npc.cpp">
+      <Filter>02.GameObjects\06.Npc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ShopNpc.cpp">
+      <Filter>02.GameObjects\06.Npc\ShopNpc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -26,7 +26,7 @@ public:
 #ifdef _DEBUG
 public:
 	HRESULT Add_Debug(class CComponent* pDebugCom);
-
+	void Debug_Clear();
 #endif // _DEBUG
 
 

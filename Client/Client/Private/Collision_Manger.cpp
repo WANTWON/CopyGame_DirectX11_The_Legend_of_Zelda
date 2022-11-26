@@ -37,6 +37,17 @@ void CCollision_Manager::Clear_CollisionGroup(COLLSIONGROUP CollisionGroup)
 	m_GameObjects[CollisionGroup].clear();
 }
 
+void CCollision_Manager::Clear_CollisionGroupExpect(COLLSIONGROUP CollisionGroup)
+{
+	for (_uint i = 0; i < COLLISION_END; ++i)
+	{
+		if (i == CollisionGroup)
+			continue;
+
+		m_GameObjects[i].clear();
+	}
+}
+
 _bool CCollision_Manager::CollisionwithGroup(COLLSIONGROUP CollisionGroup, CCollider* pCollider, CBaseObj** pOut)
 {
 	for (auto& iter : m_GameObjects[CollisionGroup])

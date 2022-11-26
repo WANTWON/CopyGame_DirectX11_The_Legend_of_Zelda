@@ -99,7 +99,12 @@ HRESULT CTerrain::Ready_Components(void* pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Navigation_TailCave"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"), (CComponent**)&m_pNavigationCom)))
 			return E_FAIL;
 	}
-	
+	else if (*(LEVEL*)pArg == LEVEL_ROOM)
+	{
+		/* For.Com_Navigation */
+		if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Room"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Room"), (CComponent**)&m_pNavigationCom)))
+			return E_FAIL;
+	}
 
 
 	return S_OK;

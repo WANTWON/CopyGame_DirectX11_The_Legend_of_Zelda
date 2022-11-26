@@ -193,11 +193,11 @@ HRESULT CMonster::Drop_Items()
 	CPrizeItem::ITEMDESC ItemDesc;
 	XMStoreFloat3(&ItemDesc.vPosition, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	ItemDesc.vPosition.y += 0.5f;
-	ItemDesc.m_bPrize = false;
+	ItemDesc.eInteractType = CPrizeItem::DEFAULT;
 
 	
 	if (iRadomItem == 1)
-		ItemDesc.eType = CPrizeItem::HEART;
+		ItemDesc.eType = CPrizeItem::HEART_RECOVERY;
 	else
 		ItemDesc.eType = CPrizeItem::RUBY;
 

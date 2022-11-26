@@ -40,14 +40,15 @@ public:
 	void SetUp_BillBoard();
 
 
-public:
-	OBJID Get_ObjectID() { return m_eObjectID; }
-	_float3 Get_Scale() { return m_vScale; };
-	_vector Get_TransformState(CTransform::STATE eState);
-	_float2 Get_ProjPosition();
-	void Set_State(CTransform::STATE eState, _fvector vState);
-	void Set_Scale(_float3 vScale);
+public: /* Getter Setter */
+	OBJID		Get_ObjectID() { return m_eObjectID; }
+	_float3		Get_Scale() { return m_vScale; };
+	_vector		Get_TransformState(CTransform::STATE eState);
+	_float2		Get_ProjPosition();
+	void		Set_State(CTransform::STATE eState, _fvector vState);
+	void		Set_Scale(_float3 vScale);
 	CCollider*	Get_Collider();
+	void		Set_Stop(_bool type) { m_bStop = type; }
 	
 protected: /* For.Components */
 	CShader*				m_pShaderCom = nullptr;
@@ -65,6 +66,8 @@ protected:
 
 protected:
 	_bool			m_bIsLoop = true;
+	_bool			m_bStop = false;
+
 	LEVEL			m_iCurrentLevel = LEVEL_END;
 	SHADER_ID		m_eShaderID = SHADER_DEFAULT;
 	OBJID			m_eObjectID = OBJ_END;

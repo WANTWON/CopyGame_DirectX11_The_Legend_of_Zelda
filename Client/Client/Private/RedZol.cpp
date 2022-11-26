@@ -360,5 +360,9 @@ CGameObject * CRedZol::Clone(void * pArg)
 void CRedZol::Free()
 {
 	__super::Free();
+
+	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
+	Safe_Release(m_pSPHERECom);
+	Safe_Release(m_pOBBCom);
 }
 

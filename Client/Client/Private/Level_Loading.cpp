@@ -7,6 +7,7 @@
 #include "Level_GamePlay.h"
 #include "BackGround.h"
 #include "Level_TailCave.h"
+#include "Level_Room.h"
 
 bool g_FirstLoading = false;
 
@@ -62,6 +63,9 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 				break;
 			case LEVEL_TAILCAVE:
 				pNewLevel = CLevel_TailCave::Create(m_pDevice, m_pContext);
+				break;
+			case LEVEL_ROOM:
+				pNewLevel = CLevel_Room::Create(m_pDevice, m_pContext);
 				break;
 			}
 

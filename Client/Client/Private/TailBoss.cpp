@@ -238,8 +238,12 @@ HRESULT CTailBoss::Ready_Components(void * pArg)
 		ColliderDesc.vScale = _float3(0.5f, 1.5f, 0.5f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+
+	
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		return E_FAIL;
+	
+
 
 	/* For.Com_Navigation */
 	CNavigation::NAVIDESC			NaviDesc;
@@ -439,5 +443,18 @@ CGameObject * CTailBoss::Clone(void * pArg)
 void CTailBoss::Free()
 {
 	__super::Free();
+
+	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
+
+	Safe_Release(m_pNavigationCom);
+	Safe_Release(m_pTransformCom);
+	Safe_Release(m_pRendererCom);
+	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pModelCom);
+
+	Safe_Release(m_pAABBCom);
+	Safe_Release(m_pOBBCom);
+	Safe_Release(m_pSPHERECom);
+
 }
 

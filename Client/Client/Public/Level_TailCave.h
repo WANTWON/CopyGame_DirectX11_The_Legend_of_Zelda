@@ -2,7 +2,7 @@
 
 #include "Client_Defines.h"
 #include "Level.h"
-
+#include "Collision_Manger.h"
 BEGIN(Engine)
 class CCollider;
 END
@@ -34,6 +34,9 @@ private:
 
 private:
 	_float							m_fTime = 0.f;
+
+private:
+	CCollision_Manager* m_pCollision_Manager = nullptr;
 
 public:
 	static CLevel_TailCave* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

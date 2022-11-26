@@ -34,7 +34,7 @@ public:
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 	void Set_Visible(_bool type) { m_bShow = type; }
-	void Set_TexType(_uint iNum) { m_ButtonDesc.iTexNum = iNum; }
+	void Set_TexType(_uint iNum);
 
 private:
 	virtual HRESULT Ready_Components(void * pArg = nullptr) override;

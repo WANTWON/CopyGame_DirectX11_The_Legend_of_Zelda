@@ -315,7 +315,7 @@ void CSquareBlock::Tick_TailStatue(_float fTimeDelta)
 		}
 	}
 	else
-		pButton->Set_Visible(true);
+		pButton->Set_Visible(false);
 }
 
 

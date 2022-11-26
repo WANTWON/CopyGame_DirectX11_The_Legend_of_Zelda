@@ -77,11 +77,12 @@ void CPrizeItem::Late_Tick(_float fTimeDelta)
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
-	if (m_ItemDesc.m_bPrize)
+	if (m_ItemDesc.eInteractType == PRIZE)
 		LateTick_PrizeModeItem(fTimeDelta);
-	else
-		LateTick_UnPrizeModeItem(fTimeDelta);
-
+	else if (m_ItemDesc.eInteractType == DEFAULT)
+		LateTick_DefaultModeItem(fTimeDelta);
+	else if (m_ItemDesc.eInteractType == CARRYABLE)
+		LateTick_CarryableModeItem(fTimeDelta);
 	
 }
 
@@ -99,13 +100,13 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 
-	if (m_ItemDesc.m_bPrize && m_pSPHERECom->Collision(pTarget->Get_Collider()))
+	if (m_ItemDesc.eInteractType == PRIZE && m_pSPHERECom->Collision(pTarget->Get_Collider()))
 	{
 		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(90.f));
 
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
 
-		if (m_ItemDesc.m_bPrize && !m_bGet)
+		if (m_ItemDesc.eInteractType == PRIZE && !m_bGet)
 		{
 			dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
 			CUI_Manager::Get_Instance()->Open_Message((CUI_Manager::MESSAGETYPE)m_ItemDesc.eType);
@@ -146,7 +147,7 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-void CPrizeItem::LateTick_UnPrizeModeItem(_float fTimeDelta)
+void CPrizeItem::LateTick_DefaultModeItem(_float fTimeDelta)
 {
 	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom))
 		m_bGet = true;
@@ -157,10 +158,14 @@ void CPrizeItem::LateTick_UnPrizeModeItem(_float fTimeDelta)
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 		if (m_ItemDesc.eType == RUBY)
 			pPlayer->Set_RubyAdd();
-		else if (m_ItemDesc.eType == HEART)
+		else if (m_ItemDesc.eType == HEART_RECOVERY)
 			pPlayer->Set_RecoverHp();
 		m_bDead = true;
 	}
+}
+
+void CPrizeItem::LateTick_CarryableModeItem(_float fTimeDelta)
+{
 }
 
 HRESULT CPrizeItem::Ready_Components(void * pArg)
@@ -204,7 +209,7 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_DgnMap"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
-	case HEART:
+	case HEART_RECOVERY:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_HeartRecovery"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
@@ -224,9 +229,35 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_FullMoonCello"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
+	case ARROW:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Arrow"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case DOGFOOD:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_DogFood"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case HEART_CONTAINER:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_HeartContainer"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case MAGIC_ROD:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_MagicRod"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case BOW:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_ItemBow"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
+	
 
 	CCollider::COLLIDERDESC		ColliderDesc;
 
@@ -234,7 +265,7 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
 	if(m_ItemDesc.eType == CELLO)
 		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
-	if(m_ItemDesc.m_bPrize == false)
+	if(m_ItemDesc.eInteractType == DEFAULT)
 		ColliderDesc.vScale = _float3(0.3f, 0.3f, 0.3f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);

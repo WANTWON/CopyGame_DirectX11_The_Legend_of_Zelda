@@ -13,6 +13,8 @@ public:
 	enum UITYPE { UI_INVEN, UI_MAP, UI_OPTION, UI_END};
 	enum EQUIP_BT { EQUIP_X, EQUIP_Y, EQUIP_END };
 
+	enum ROOMTYPE {MARINHOUSE, SHOP};
+
 private:
 	CUI_Manager();
 	virtual ~CUI_Manager() = default;
@@ -31,14 +33,19 @@ public: /*Getter Setter*/
 	void		Set_NextLevelIndex(LEVEL eLevel) { m_eNextLevel = eLevel; }
 	void		Set_NextLevel(_bool type) { m_bNextLevel = type; m_bFinishedReady = false; }
 	void		Set_NextLevelFinished(_bool type) { m_bFinishedReady = type; }
+	void		Set_RoomType(ROOMTYPE eType) { m_eRoomType = eType; }
+
 	void		Get_Key();
 	_uint		Get_KeySize() { return (_uint)m_KeyList.size(); }
 	CObj_UI*	Get_Button() { return m_pButton; }
 	_bool		Get_UI_Open() { return m_bUIOpen; }
 	_bool		Get_OpenMessage() { return m_bOpenMessage; }
+
 	LEVEL		Get_NextLevelIndex() { return m_eNextLevel; }
 	_bool		Get_NextLevel() { return m_bNextLevel; }
 	_bool		Get_NextLevelFinished() { return m_bFinishedReady; }
+	ROOMTYPE	Get_RoomType() { return m_eRoomType; }
+
 	CObj_UI*	Get_EquipItem(EQUIP_BT eEquipBt) { return m_EquipTile[eEquipBt];}
 	MESSAGETYPE Get_MessageType() { return m_eMessageType; }
 
@@ -54,6 +61,7 @@ public:
 
 private:
 	LEVEL m_eNextLevel = LEVEL_GAMEPLAY;
+	ROOMTYPE m_eRoomType = MARINHOUSE;
 	_bool m_bUIOpen = false;
 	_bool m_bOpenMessage = false;
 	_bool m_bNextLevel = false;

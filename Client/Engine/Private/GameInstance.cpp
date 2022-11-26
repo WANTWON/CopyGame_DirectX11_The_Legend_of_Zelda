@@ -346,6 +346,11 @@ HRESULT CGameInstance::Check_Prototype(_int iLevelIndex, const _tchar * pPrototy
 	return m_pComponent_Manager->Check_Prototype(iLevelIndex, pPrototypeTag);
 }
 
+void CGameInstance::Debug_Render_Clear()
+{
+	
+}
+
 void CGameInstance::Set_Transform(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix)
 {
 	if (nullptr == m_pPipeLine)

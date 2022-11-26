@@ -44,9 +44,11 @@ HRESULT CTail::Initialize(void * pArg)
 
 int CTail::Tick(_float fTimeDelta)
 {
-	if (__super::Tick(fTimeDelta))
+	if (CUI_Manager::Get_Instance()->Get_NextLevel() == true)
 		return OBJ_DEAD;
 
+	if (__super::Tick(fTimeDelta))
+		return OBJ_DEAD;
 
 	AI_Behaviour(fTimeDelta);
 	Check_Navigation(fTimeDelta);
@@ -63,6 +65,10 @@ int CTail::Tick(_float fTimeDelta)
 
 void CTail::Late_Tick(_float fTimeDelta)
 {
+	if (CUI_Manager::Get_Instance()->Get_NextLevel() == true)
+		return;
+
+
 	__super::Late_Tick(fTimeDelta);
 
 	CBaseObj* pCollisionBlock = nullptr;
@@ -278,6 +284,9 @@ _bool CTail::IsDead()
 
 void CTail::AI_Behaviour(_float fTimeDelta)
 {
+	if (CUI_Manager::Get_Instance()->Get_NextLevel() == true)
+		return;
+
 	if (!m_bMove || m_eState == DEAD || m_eState == PIYO)
 		return;
 
@@ -322,6 +331,8 @@ void CTail::Behaviour_Head(_float fTimeDelta)
 
 void CTail::Behaviour_Tail(_float fTimeDelta)
 {
+	
+
 	if (m_eState == DEAD || m_bDead)
 		return;
 
@@ -430,5 +441,9 @@ CGameObject * CTail::Clone(void * pArg)
 void CTail::Free()
 {
 	__super::Free();
+
+	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
+	Safe_Release(m_pSPHERECom);
+
 }
 

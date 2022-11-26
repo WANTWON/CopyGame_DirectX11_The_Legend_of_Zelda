@@ -66,7 +66,11 @@ HRESULT CLevel_GamePlay::Initialize()
 		g_bUIMadefirst = true;
 	}
 	
-	CCameraManager::Get_Instance()->Ready_Camera(LEVEL::LEVEL_GAMEPLAY);
+	CCameraManager* pCameraManager = CCameraManager::Get_Instance();
+
+	pCameraManager->Ready_Camera(LEVEL::LEVEL_GAMEPLAY);
+	CCamera* pCamera = pCameraManager->Get_CurrentCamera();
+	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
 	CUI_Manager::Get_Instance()->Set_NextLevel(false);
 	return S_OK;
 }
@@ -86,7 +90,11 @@ void CLevel_GamePlay::Tick(_float fTimeDelta)
 		LEVEL eNextLevel = CUI_Manager::Get_Instance()->Get_NextLevelIndex();
 
 		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_MONSTER);
+		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_BLOCK);
 		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_INTERACT);
+		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_TRAP);
+		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_MBULLET);
+		m_pCollision_Manager->Clear_CollisionGroup(CCollision_Manager::COLLISION_ITEM);
 		pGameInstance->Set_DestinationLevel(eNextLevel);
 		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, eNextLevel))))
 			return;
@@ -147,14 +155,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Player"), LEVEL_STATIC, pLayerTag, nullptr)))
-		return E_FAIL;	
-
 
 	if (pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")) == nullptr)
 	{
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Player"), LEVEL_STATIC, pLayerTag, nullptr)))
 			return E_FAIL;
+		CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+		LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
+		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 50.f, 46.8f, 1.f));
+		pPlayer->Compute_CurrentIndex(LEVEL_GAMEPLAY);
 	}
 	else
 	{
@@ -164,11 +173,18 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 		switch (ePastLevel)
 		{
 		case Client::LEVEL_TAILCAVE:
-			pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 4.2f, 10.f, 1.f));
+			pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(55.8f, 4.2f, 10.3f, 1.f));
+			break;
+		case Client::LEVEL_ROOM:
+			CUI_Manager::ROOMTYPE eRoomType = CUI_Manager::Get_Instance()->Get_RoomType();
+			if(eRoomType == CUI_Manager::MARINHOUSE)
+				pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 50.f, 46.8f, 1.f));
+			else if(eRoomType == CUI_Manager::SHOP)
+				pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(52.0f, 50.f, 60.f, 1.f));
 			break;
 		}
 
-
+		pPlayer->Compute_CurrentIndex(LEVEL_GAMEPLAY);
 	}
 
 	Safe_Release(pGameInstance);
@@ -191,7 +207,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	CNonAnim::NONANIMDESC  ModelDesc;
 	_uint iNum = 0;
 
-	hFile = CreateFile(TEXT("../../../Bin/Data/Filed_Map2.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	hFile = CreateFile(TEXT("../../../Bin/Data/Filed_Map.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
 		return E_FAIL;
 
@@ -591,7 +607,16 @@ HRESULT CLevel_GamePlay::Ready_Layer_Portal(const _tchar * pLayerTag)
 	PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
 	PortalDesc.vInitPos = ModelDesc.vPosition;
 	PortalDesc.eConnectLevel = LEVEL_ROOM;
+	PortalDesc.eRoomType = CPortal::MARINHOUSE;
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
+		return E_FAIL;
 
+	ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+	PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
+	PortalDesc.vInitPos = ModelDesc.vPosition;
+	PortalDesc.eConnectLevel = LEVEL_ROOM;
+	PortalDesc.eRoomType = CPortal::SHOP;
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
 		return E_FAIL;
 

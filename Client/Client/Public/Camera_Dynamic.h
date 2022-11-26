@@ -11,7 +11,7 @@ BEGIN(Client)
 class CCamera_Dynamic final : public CCamera
 {
 public:
-	enum CAMERAMODE {CAM_PLAYER, CAM_SHAKING, CAM_TAILCAVE, CAM_ITEMGET, CAM_END };
+	enum CAMERAMODE {CAM_PLAYER, CAM_SHAKING, CAM_TERRAIN, CAM_ITEMGET, CAM_END };
 
 	typedef struct tagCameraDesc_Derived
 	{
@@ -30,8 +30,8 @@ public:
 	{
 		if (m_eCamMode == CAM_PLAYER)
 			m_ePreCamMode = CAM_PLAYER;
-		if (m_eCamMode == CAM_TAILCAVE)
-			m_ePreCamMode = CAM_TAILCAVE;
+		if (m_eCamMode == CAM_TERRAIN)
+			m_ePreCamMode = CAM_TERRAIN;
 		if (m_eCamMode == CAM_ITEMGET)
 			m_ePreCamMode = CAM_ITEMGET;
 

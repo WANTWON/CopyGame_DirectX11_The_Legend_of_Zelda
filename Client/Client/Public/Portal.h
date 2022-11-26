@@ -9,6 +9,7 @@ class CPortal final : public CNonAnim
 {
 public:
 	enum TYPE { PORTAL_POSITION , PORTAL_LEVEL};
+	enum ROOMTYPE { MARINHOUSE, SHOP };
 
 	typedef struct Portaltag
 	{
@@ -16,6 +17,7 @@ public:
 		_float3 vInitPos = _float3(0.f, 0.f, 0.f);
 		_float3 vConnectPos = _float3(0.f, 0.f, 0.f);
 		LEVEL   eConnectLevel = LEVEL_GAMEPLAY;
+		ROOMTYPE eRoomType = MARINHOUSE;
 		_bool bConnectPortal2D = false;
 	}PORTALDESC;
 
