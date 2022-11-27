@@ -292,7 +292,11 @@ void CSquareBlock::Tick_TailStatue(_float fTimeDelta)
 	{
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
 		if (m_bDead == false)
+		{
 			pButton->Set_Visible(true);
+			pButton->Set_TexType(CUIButton::OPEN);
+		}
+			
 		_float2 fPosition = pPlayer->Get_ProjPosition();
 		fPosition.y = g_iWinSizeY - fPosition.y;
 		fPosition.x += 50.f;

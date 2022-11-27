@@ -31,6 +31,8 @@ private:
 	virtual HRESULT SetUp_ShaderResources();
 	virtual HRESULT SetUp_ShaderID();
 	virtual void Change_Animation(_float fTimeDelta);
+	void	Change_Message();
+
 
 private:
 	STATE m_eState = IDLE;

@@ -21,8 +21,24 @@ HRESULT CMessageBox::Initialize_Prototype()
 HRESULT CMessageBox::Initialize(void * pArg)
 {
 
-	m_fSize.x = 1166/ 1.5f;
-	m_fSize.y = 365/ 1.5f;
+	if (pArg != nullptr)
+		m_eMsgType = *(MSG_TYPE*)pArg;
+
+	switch (m_eMsgType)
+	{
+	case Client::CMessageBox::GET_ITEM:
+		m_fSize.x = 1166 / 1.5f;
+		m_fSize.y = 365 / 1.5f;
+		break;
+	case Client::CMessageBox::SHOP_TALK:
+		m_fSize.x = 1048 / 1.5f;
+		m_fSize.y = 240 / 1.5f;
+		break;
+	default:
+		break;
+	}
+
+	
 
 
 	m_fPosition.x = g_iWinSizeX * 0.5f;
@@ -38,6 +54,9 @@ HRESULT CMessageBox::Initialize(void * pArg)
 
 int CMessageBox::Tick(_float fTimeDelta)
 {
+	if (m_bDead)
+		return OBJ_DEAD;
+
 	__super::Tick(fTimeDelta);
 
 	return OBJ_NOEVENT;
@@ -66,6 +85,7 @@ void CMessageBox::Late_Tick(_float fTimeDelta)
 		{
 			m_fAlpha = 0.f;
 			m_bRender = false;
+			m_bDead = true;
 		}
 			
 	}
@@ -95,8 +115,20 @@ HRESULT CMessageBox::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_UI"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_GetMessage"), (CComponent**)&m_pTextureCom)))
-		return E_FAIL;
+	switch (m_eMsgType)
+	{
+	case Client::CMessageBox::GET_ITEM:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_GetMessage"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case Client::CMessageBox::SHOP_TALK:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_ShopTalk"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	default:
+		break;
+	}
+	
 
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))

@@ -413,9 +413,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 			return E_FAIL;
 	}
 
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), nullptr)))
-		return E_FAIL;
-
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;

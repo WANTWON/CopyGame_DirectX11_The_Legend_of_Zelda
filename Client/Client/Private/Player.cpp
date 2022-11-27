@@ -43,12 +43,13 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
-	if (FAILED(Ready_Parts()))
+	m_Parts.resize(PARTS_END);
+	if (FAILED(Ready_Parts(CPrizeItem::BOW, PARTS_BOW)))
 		return E_FAIL;
 
 	m_pModelCom->Set_CurrentAnimIndex(m_eState);
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PLAYER, this);
-	//
+	
 	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	//	CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
@@ -87,7 +88,11 @@ int CPlayer::Tick(_float fTimeDelta)
 	Change_Animation(fTimeDelta);
 
 	for (auto& pParts : m_Parts)
-		pParts->Tick(fTimeDelta);
+	{
+		if(pParts != nullptr)
+			pParts->Tick(fTimeDelta);
+	}
+		
 
 	return OBJ_NOEVENT;
 }
@@ -99,13 +104,20 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 
 
 	for (auto& pParts : m_Parts)
-		pParts->Late_Tick(fTimeDelta);
+	{
+		if(pParts != nullptr)
+			pParts->Late_Tick(fTimeDelta);
+	}
+		
 
 
 	if (nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_BOW]);
+
+		if(m_Parts[PARTS_ITEM] != nullptr)
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_ITEM]);
 
 
 #ifdef _DEBUG
@@ -174,6 +186,14 @@ HRESULT CPlayer::Render()
 	return S_OK;
 }
 
+_uint CPlayer::Get_PartsItemType()
+{
+	if (m_Parts[PARTS_ITEM] == nullptr)
+		return CWeapon::NONE;
+
+	return dynamic_cast<CWeapon*>(m_Parts[PARTS_ITEM])->Get_PartsType();
+}
+
 
 
 void CPlayer::Compute_CurrentIndex(LEVEL eLevel)
@@ -228,22 +248,86 @@ _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 	return 0;
 }
 
+HRESULT CPlayer::Ready_Parts(CPrizeItem::TYPE eType, PARTS PartsIndex)
+{
+	if (m_Parts[PartsIndex] != nullptr)
+		return E_FAIL;
+
+	/* For.Weapon */
+	CHierarchyNode*		pSocket = m_pModelCom->Get_BonePtr("itemA_L");
+	if (nullptr == pSocket)
+		return E_FAIL;
+
+
+	CWeapon::WEAPONDESC m_WeaponDesc;
+	m_WeaponDesc.pSocket = pSocket;
+	m_WeaponDesc.SocketPivotMatrix = m_pModelCom->Get_PivotFloat4x4();
+	m_WeaponDesc.pParentWorldMatrix = m_pTransformCom->Get_World4x4Ptr();
+	switch (eType)
+	{
+	case Client::CPrizeItem::ARROW:
+		m_WeaponDesc.eType = CWeapon::ARROW;
+		break;
+	case Client::CPrizeItem::DOGFOOD:
+		m_WeaponDesc.eType = CWeapon::DOGFOOD;
+		break;
+	case Client::CPrizeItem::HEART_CONTAINER:
+		m_WeaponDesc.eType = CWeapon::HEART_CONTAINER;
+		break;
+	case Client::CPrizeItem::MAGIC_ROD:
+		m_WeaponDesc.eType = CWeapon::MAGIC_ROD;
+		break;
+	case Client::CPrizeItem::BOW:
+		m_WeaponDesc.eType = CWeapon::BOW;
+		break;
+	default:
+		break;
+	}
+
+	Safe_AddRef(pSocket);
+
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	m_Parts[PartsIndex] = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &m_WeaponDesc);
+	if (nullptr == m_Parts[PartsIndex])
+		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return S_OK;
+}
+
+
 void CPlayer::Key_Input(_float fTimeDelta)
 {
+	
+	if (CUI_Manager::Get_Instance()->Get_Talking() == true)
+		return;
+
 	if (CGameInstance::Get_Instance()->Key_Down(DIK_SPACE))
 	{
-
-		CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
-		if (m_iCurrentLevel == LEVEL_GAMEPLAY)
-			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
-		if (m_iCurrentLevel == LEVEL_TAILCAVE || m_iCurrentLevel == LEVEL_ROOM)
-			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TERRAIN);
-		if (m_eState == ITEM_GET_LP)
-			m_eState = ITEM_GET_ED;
-		if (m_bStop)
-			m_bStop = false;
-			
+		
+			CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+			if (m_iCurrentLevel == LEVEL_GAMEPLAY)
+				dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
+			if (m_iCurrentLevel == LEVEL_TAILCAVE)
+				dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TERRAIN);
+			if (m_iCurrentLevel == LEVEL_ROOM)
+				dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_ROOM);
+			if (m_eState == ITEM_GET_LP)
+				m_eState = ITEM_GET_ED;
+			if (m_bStop)
+				m_bStop = false;
+			if (m_bCarry)
+			{
+				m_bCarry = false;
+				Safe_Release(m_Parts[PARTS_ITEM]);
+				m_eState = IDLE;
+			}
+			CUI_Manager::Get_Instance()->Open_Message(false);		
 	}
+
+
 
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == FALL_FROMTOP ||
 		m_eState == FALL_HOLE || m_eState == FALL_ANTLION || m_eState == KEY_OPEN ||
@@ -404,32 +488,6 @@ void CPlayer::Key_Input(_float fTimeDelta)
 }
 
 
-HRESULT CPlayer::Ready_Parts()
-{
-	m_Parts.resize(PARTS_END);
-
-	/* For.Weapon */
-	CHierarchyNode*		pSocket = m_pModelCom->Get_BonePtr("itemA_L");
-	if (nullptr == pSocket)
-		return E_FAIL;
-
-	CWeapon::WEAPONDESC		WeaponDesc;
-	WeaponDesc.pSocket = pSocket;
-	WeaponDesc.SocketPivotMatrix = m_pModelCom->Get_PivotFloat4x4();
-	WeaponDesc.pParentWorldMatrix = m_pTransformCom->Get_World4x4Ptr();
-	Safe_AddRef(pSocket);
-
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
-	m_Parts[PARTS_BOW] = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
-	if (nullptr == m_Parts[PARTS_BOW])
-		return E_FAIL;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return S_OK;
-}
-
 HRESULT CPlayer::Ready_Components(void* pArg)
 {
 	/* For.Com_Renderer */
@@ -531,7 +589,8 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 {
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE ||
 		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP || m_eState == FALL_FROMTOP || m_eState == FALL_HOLE ||
-		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP || m_eState == LADDER_UP_ED)
+		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP || 
+		m_eState == LADDER_UP_ED || m_eState == ITEM_CARRY)
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
@@ -562,6 +621,10 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 			m_eState = LADDER_WAIT;
 			m_pTransformCom->LookDir(XMVectorSet(0.f, 0.f, 1.f, 0.f));
 		}
+		else if (m_bCarry)
+		{
+			m_eState = IDLE_CARRY;
+		}
 		else
 		{
 			if (m_eState == RUN) m_eState = IDLE;
@@ -578,6 +641,8 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 				if (m_eState != DASH_LP)
 					m_eState = DASH_ST;
 			}
+			else if (m_bCarry)
+				m_eState = WALK_CARRY;
 			else
 				m_eState = RUN;
 		}
@@ -591,7 +656,6 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 					m_eState = LADDER_UP;
 					m_pTransformCom->LookDir(XMVectorSet(0.f, 0.f, 1.f, 0.f));
 				}
-					
 
 				_vector vDir = XMVectorSet(m_eDir[DIR_X], m_eDir[DIR_Z], 0.f, 0.f);
 				m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom[m_iCurrentLevel]);
@@ -600,7 +664,7 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 				m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
 		}	
 		else
-			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
+			m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
 	}
 
 }

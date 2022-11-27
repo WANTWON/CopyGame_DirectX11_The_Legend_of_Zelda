@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BaseObj.h"
-
+#include "PrizeItem.h"
 
 BEGIN(Engine)
 class CModel;
@@ -27,7 +27,8 @@ public:
 		MESH_SWORD2, MESH_OCARINA, MESH_SHOVEL, MESH_SHOES, MESH_WAND, MESH_BELT, MESH_MOUSE, MESH_FILPPER, MESH_NONE
 	};
 
-	enum PARTS { PARTS_BOW, PARTS_END };
+	enum PARTS { PARTS_BOW, PARTS_ITEM, PARTS_END };
+
 
 private:
 	CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -42,19 +43,23 @@ public:
 	virtual HRESULT Render();
 
 public:
-
 	ANIM	Get_AnimState() { return m_eState; }
 	OBJINFO Get_Info() { return m_tInfo; }
+	_uint	Get_PartsItemType();
 	void	Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void	Set_AnimState(ANIM eAnim) { m_eState = eAnim; }
+	void	Set_Carry(_bool type) { m_bCarry = type; }
 	void	Set_RecoverHp() { m_tInfo.iCurrentHp += 4; if (m_tInfo.iCurrentHp > m_tInfo.iMaxHp) m_tInfo.iCurrentHp = m_tInfo.iMaxHp; }
 	void	Set_RubyAdd() { m_tInfo.iCoin++; }
 	void	Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
 	void	Set_NextPortal(_float3 vPosition, _bool is2D) { m_vPortalPos = vPosition; m_b2D = is2D;}
+
+
+public:
 	void	Compute_CurrentIndex(LEVEL eLevel);
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
-
-
+	HRESULT Ready_Parts(CPrizeItem::TYPE eType, PARTS PartsIndex);
+	
 private:
 	void Key_Input(_float fTimeDelta);
 	void Change_Direction(_float fTimeDelta);
@@ -64,7 +69,6 @@ private:
 	
 
 private:
-	HRESULT Ready_Parts();
 	virtual HRESULT Ready_Components(void* pArg) override;
 	virtual HRESULT SetUp_ShaderResources() override; /* 셰이더 전역변수에 값을 전달한다. */
 	virtual HRESULT SetUp_ShaderID() override;
@@ -81,7 +85,6 @@ private:
 
 private:
 	OBJINFO					m_tInfo;
-
 	CModel*					m_pModelCom = nullptr;
 	ANIM					m_eState = IDLE;
 	ANIM					m_ePreState = IDLE;

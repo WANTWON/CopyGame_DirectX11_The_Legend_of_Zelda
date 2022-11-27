@@ -5,7 +5,8 @@ BEGIN(Client)
 
 class CMessageBox final : public CObj_UI
 {
-
+public:
+	enum MSG_TYPE {GET_ITEM, SHOP_TALK};
 
 private:
 	CMessageBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -25,9 +26,13 @@ private:
 	virtual HRESULT SetUp_ShaderResources()override;  /* 셰이더 전역변수에 값을 전달한다. */
 
 private:
+	vector<_int> m_vecTex;
+
 	_uint		m_iTextureNum = 0;
 	_bool		m_bRender = false;
 	_float		m_fAlpha = 0.0f;
+	MSG_TYPE	m_eMsgType = GET_ITEM;
+
 
 
 public:

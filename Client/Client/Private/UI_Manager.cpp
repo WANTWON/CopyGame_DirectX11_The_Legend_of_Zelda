@@ -250,6 +250,14 @@ void CUI_Manager::Tick_UI()
 	Tick_PlayerState();
 	Tick_Coin();
 
+	if (m_bTalking == true)
+	{
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_SPACE))
+			m_vecMsgTex.pop_front();
+
+		if (m_vecMsgTex.size() == 0)
+			m_bTalking = false;
+	}
 	
 
 }

@@ -3,7 +3,6 @@
 #include "NonAnim.h"
 
 
-
 BEGIN(Client)
 
 class CPrizeItem final : public CNonAnim
@@ -22,7 +21,7 @@ public:
 		
 	}ITEMDESC;
 
-
+	
 private:
 	CPrizeItem(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CPrizeItem(const CPrizeItem& rhs);
@@ -43,6 +42,8 @@ private:
 private:
 	ITEMDESC				m_ItemDesc;
 	_bool					m_bGet = false;
+	
+	_float4x4				m_CombinedWorldMatrix;
 
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;

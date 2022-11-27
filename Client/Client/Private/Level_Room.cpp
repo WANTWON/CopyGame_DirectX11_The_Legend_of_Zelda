@@ -66,7 +66,7 @@ HRESULT CLevel_Room::Initialize()
 
 	pCameraManager->Ready_Camera(LEVEL::LEVEL_ROOM);
 	CCamera* pCamera = pCameraManager->Get_CurrentCamera();
-	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TERRAIN);
+	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_ROOM);
 
 	
 	CUI_Manager::Get_Instance()->Set_NextLevel(false);
@@ -235,7 +235,7 @@ HRESULT CLevel_Room::Ready_Layer_Camera(const _tchar * pLayerTag)
 	ZeroMemory(&CameraDesc, sizeof(CCamera_Dynamic::CAMERADESC_DERIVED));
 
 	CameraDesc.iTest = 10;
-
+	CameraDesc.InitPostion = _float4(0.f, 11.8f, -5.5f, 1.f);
 	CameraDesc.CameraDesc.vEye = _float4(0.f, 11.8f, -5.5f, 1.f);
 	CameraDesc.CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 
@@ -362,6 +362,7 @@ HRESULT CLevel_Room::Ready_Layer_Portal(const _tchar * pLayerTag)
 	PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
 	PortalDesc.vInitPos = _float3(0.f, 0.f, -5.5f);
 	PortalDesc.eConnectLevel = LEVEL_GAMEPLAY;
+	PortalDesc.eRoomType = (CPortal::ROOMTYPE)CUI_Manager::Get_Instance()->Get_RoomType();
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_ROOM, pLayerTag, &PortalDesc)))
 		return E_FAIL;

@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "Player.h"
 #include "UI_Manager.h"
+#include "MessageBox.h"
 
 CDgnKey::CDgnKey(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -64,7 +65,7 @@ int CDgnKey::Tick(_float fTimeDelta)
 		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
 		{
 			m_bDead = true;
-			CUI_Manager::Get_Instance()->Close_Message();
+			CUI_Manager::Get_Instance()->Open_Message(false);
 			CUI_Manager::Get_Instance()->Get_Key();
 		}
 			
@@ -109,10 +110,13 @@ void CDgnKey::Late_Tick(_float fTimeDelta)
 			
 	}
 
-	if (m_pSPHERECom->Collision(pTarget->Get_Collider()))
+	if (m_pSPHERECom->Collision(pTarget->Get_Collider()) && !m_bGet)
 	{
 		m_bGet = true;
-		CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::DGN_KEY);
+		CMessageBox::MSG_TYPE eMsgType = CMessageBox::GET_ITEM;
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &eMsgType);
+		CUI_Manager::Get_Instance()->Add_MessageTex(CUI_Manager::DGN_KEY);
+		CUI_Manager::Get_Instance()->Open_Message(true);
 		dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
 	}
 

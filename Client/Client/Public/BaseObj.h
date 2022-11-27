@@ -49,6 +49,7 @@ public: /* Getter Setter */
 	void		Set_Scale(_float3 vScale);
 	CCollider*	Get_Collider();
 	void		Set_Stop(_bool type) { m_bStop = type; }
+	_bool		Get_IsSocket() { return m_bSocket; }
 	
 protected: /* For.Components */
 	CShader*				m_pShaderCom = nullptr;
@@ -67,6 +68,7 @@ protected:
 protected:
 	_bool			m_bIsLoop = true;
 	_bool			m_bStop = false;
+	_bool			m_bSocket = false;
 
 	LEVEL			m_iCurrentLevel = LEVEL_END;
 	SHADER_ID		m_eShaderID = SHADER_DEFAULT;

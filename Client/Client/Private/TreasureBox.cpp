@@ -310,37 +310,30 @@ void CTreasureBox::OpenBox()
 	{
 	case COMPASS:
 		ItemDesc.eType = CPrizeItem::COMPASS;
-		//CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::COMPOSS);
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	case MAP:
 		ItemDesc.eType = CPrizeItem::MAP;
-		//CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::DGN_MAP);
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	case BOSS_KEY:
 		ItemDesc.eType = CPrizeItem::BOSS_KEY;
-		//CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::BOSS_KEY);
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	case SMALL_KEY:
 		ItemDesc.eType = CPrizeItem::SMALL_KEY;
-		//CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::DGN_KEY);
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	case HEART:
 		ItemDesc.eType = CPrizeItem::HEART_RECOVERY;
-		//CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::MSG_HEART);
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	case RUBY:
 		ItemDesc.eType = CPrizeItem::RUBY;
-		//CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::MGS_RUBY);
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	case FEATHER:
 		ItemDesc.eType = CPrizeItem::FEATHER;
-		//CUI_Manager::Get_Instance()->Open_Message(CUI_Manager::FEATHER);
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	default:

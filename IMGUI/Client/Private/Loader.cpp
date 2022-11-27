@@ -482,7 +482,7 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/MagicRod/MagicRod.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	/*For.Prototype_Component_Model_HeartContainer*/
+	/*For.Prototype_Component_Model_Bow*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Bow.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Link/Bow.fbx", PivotMatrix))))
 		return E_FAIL;

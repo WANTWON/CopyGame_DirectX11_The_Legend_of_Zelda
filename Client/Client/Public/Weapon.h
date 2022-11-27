@@ -16,13 +16,17 @@ BEGIN(Client)
 class CWeapon final : public CBaseObj
 {
 public:
+	enum TYPE { NONE, BOW, ARROW, DOGFOOD, HEART_CONTAINER, MAGIC_ROD};
+
 	typedef struct tagWeaponDesc
 	{
 		CHierarchyNode*		pSocket = nullptr;
 		_float4x4			SocketPivotMatrix;
 		const _float4x4*	pParentWorldMatrix;
+		TYPE				eType = BOW;
 
 	}WEAPONDESC;
+
 private:
 	CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CWeapon(const CWeapon& rhs);
@@ -35,6 +39,9 @@ public:
 	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
+
+public:
+	TYPE Get_PartsType() { return m_WeaponDesc.eType; }
 
 private:
 	CModel*					m_pModelCom = nullptr;

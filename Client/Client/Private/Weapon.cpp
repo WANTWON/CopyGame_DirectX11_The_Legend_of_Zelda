@@ -34,7 +34,7 @@ HRESULT CWeapon::Initialize(void * pArg)
 	//m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(90.0f));
 
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PBULLET, this);
-
+	m_bSocket = true;
 	return S_OK;
 }
 
@@ -109,24 +109,77 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Bow"), (CComponent**)&m_pModelCom)))
-		return E_FAIL;
+	CCollider::COLLIDERDESC		ColliderDesc;
+	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
+
+	switch (m_WeaponDesc.eType)
+	{
+	case ARROW:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_ArrowParts"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+		ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+			return E_FAIL;
+		break;
+	case DOGFOOD:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_DogFoodParts"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+		ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+			return E_FAIL;
+		break;
+	case HEART_CONTAINER:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_HeartContainerParts"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+		ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+			return E_FAIL;
+		break;
+	case MAGIC_ROD:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_MagicRodParts"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(0.7f, 0.2f, 0.2f);
+		ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+			return E_FAIL;
+		break;
+	case BOW:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Bow"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(0.7f, 0.2f, 0.2f);
+		ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+			return E_FAIL;
+		break;
+	default:
+		break;
+	}
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 		return E_FAIL;
 
-	CCollider::COLLIDERDESC		ColliderDesc;
+	
 
-	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
-
-
-	/* For.Com_OBB*/
-	ColliderDesc.vScale = _float3(0.7f, 0.2f, 0.2f);
-	ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
-	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
-		return E_FAIL;
-
+	
+	
 	
 	///* For.Com_SHPERE */
 	//ColliderDesc.vScale = _float3(0.7f, 0.2f, 0.2f);
@@ -192,6 +245,7 @@ void CWeapon::Free()
 {
 	__super::Free();
 
+	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_PBULLET, this);
 	Safe_Release(m_WeaponDesc.pSocket);
 
 	Safe_Release(m_pAABBCom);

@@ -4,6 +4,8 @@
 #include "Player.h"
 #include "UI_Manager.h"
 #include "InvenItem.h"
+#include "MessageBox.h"
+
 
 CPrizeItem::CPrizeItem(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -43,6 +45,8 @@ HRESULT CPrizeItem::Initialize(void * pArg)
 	Set_Scale(_float3(3.f, 3.f, 3.f));
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
 
+	
+
 	return S_OK;
 }
 
@@ -54,7 +58,8 @@ int CPrizeItem::Tick(_float fTimeDelta)
 
 		return OBJ_DEAD;
 	}
-		
+	
+
 	return OBJ_NOEVENT;
 }
 
@@ -109,7 +114,10 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 		if (m_ItemDesc.eInteractType == PRIZE && !m_bGet)
 		{
 			dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
-			CUI_Manager::Get_Instance()->Open_Message((CUI_Manager::MESSAGETYPE)m_ItemDesc.eType);
+			CMessageBox::MSG_TYPE eMsgType = CMessageBox::GET_ITEM;
+			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &eMsgType);
+			CUI_Manager::Get_Instance()->Add_MessageTex(m_ItemDesc.eType);
+			CUI_Manager::Get_Instance()->Open_Message(true);
 		}
 
 		m_bGet = true;
@@ -126,7 +134,7 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 
 		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
 		{
-			CUI_Manager::Get_Instance()->Close_Message();
+			CUI_Manager::Get_Instance()->Open_Message(false);
 			if (m_ItemDesc.eType == SMALL_KEY)
 				CUI_Manager::Get_Instance()->Get_Key();
 
@@ -172,28 +180,14 @@ void CPrizeItem::LateTick_CarryableModeItem(_float fTimeDelta)
 	{
 		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
 		{
-			pPlayer->Set_AnimState(CPlayer::ITEM_CARRY);
-			m_bGet = true;
-		}
-		
-	}
-		
-
-
-	if (m_bGet)
-	{
-		_vector pPlayerPostion = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
-		pPlayerPostion = XMVectorSetY(pPlayerPostion, XMVectorGetY(pPlayerPostion) + 3.f);
-		m_pTransformCom->Go_PosTarget(fTimeDelta, pPlayerPostion);
-
-
-		if (pPlayer->Get_AnimState() != CPlayer::IDLE_CARRY && pPlayer->Get_AnimState() != CPlayer::WALK_CARRY && pPlayer->Get_AnimState() != CPlayer::ITEM_CARRY)
-		{
-			m_bGet = false;
-			m_bDead = true; 
-		}
-			
-	}
+			if (!m_bGet)
+			{
+				pPlayer->Set_AnimState(CPlayer::ITEM_CARRY);
+				pPlayer->Ready_Parts(m_ItemDesc.eType, CPlayer::PARTS_ITEM);
+				m_bDead = true;
+			}
+		}	
+	}		
 }
 
 HRESULT CPrizeItem::Ready_Components(void * pArg)
@@ -334,5 +328,4 @@ CGameObject * CPrizeItem::Clone(void * pArg)
 void CPrizeItem::Free()
 {
 	__super::Free();
-
 }

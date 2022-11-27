@@ -5,6 +5,8 @@
 #include "CameraManager.h"
 #include "PrizeItem.h"
 #include "UIButton.h"
+#include "MessageBox.h"
+#include "Weapon.h"
 
 CShopNpc::CShopNpc(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CNpc(pDevice, pContext)
@@ -81,16 +83,14 @@ void CShopNpc::Late_Tick(_float fTimeDelta)
 		fPosition.y -= 30.f;
 		pButton->Set_Position(fPosition);
 
-		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_A) && m_eState != TALK)
 		{
-			if (m_eState != TALK)
-			{
-				CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
-				dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_ITEMGET);
-				pButton->Set_Visible(false);
-				pPlayer->Set_Stop(true);
-				m_eState = TALK;
-			}
+			CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TALK);
+			pButton->Set_Visible(false);
+			pPlayer->Set_Stop(true);
+			m_eState = TALK;
+			Change_Message();
 		}
 
 	}
@@ -199,6 +199,52 @@ void CShopNpc::Change_Animation(_float fTimeDelta)
 	default:
 		break;
 	}
+}
+
+void CShopNpc::Change_Message()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
+	CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+	pUI_Manager->Set_Talking(true);
+
+		CMessageBox::MSG_TYPE eMsgType = CMessageBox::SHOP_TALK;
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &eMsgType);
+
+		CWeapon::TYPE eItemType = (CWeapon::TYPE)pPlayer->Get_PartsItemType();
+		switch (eItemType)
+		{
+		case Client::CWeapon::BOW:
+			pUI_Manager->Add_MessageTex(CUI_Manager::BOW);
+			pUI_Manager->Add_MessageTex(CUI_Manager::THANKYOU);
+			break;
+		case Client::CWeapon::ARROW:
+			pUI_Manager->Add_MessageTex(CUI_Manager::ARROW);
+			pUI_Manager->Add_MessageTex(CUI_Manager::THANKYOU);
+			break;
+		case Client::CWeapon::DOGFOOD:
+			pUI_Manager->Add_MessageTex(CUI_Manager::DOG_FOOD);
+			pUI_Manager->Add_MessageTex(CUI_Manager::THANKYOU);
+			break;
+		case Client::CWeapon::HEART_CONTAINER:
+			pUI_Manager->Add_MessageTex(CUI_Manager::HEART_CONTAINER);
+			pUI_Manager->Add_MessageTex(CUI_Manager::THANKYOU);
+			break;
+		case Client::CWeapon::MAGIC_ROD:
+			pUI_Manager->Add_MessageTex(CUI_Manager::MAGIC_ROD);
+			pUI_Manager->Add_MessageTex(CUI_Manager::THANKYOU);
+			break;
+		default:
+			pUI_Manager->Add_MessageTex(CUI_Manager::TALK_DEFAULT);
+			break;
+		}
+
+		
+		pUI_Manager->Open_Message(true);
+
+	RELEASE_INSTANCE(CUI_Manager);
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 

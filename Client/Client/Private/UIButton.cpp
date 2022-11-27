@@ -125,21 +125,6 @@ void CUIButton::Set_TexType(_uint iNum)
 {
 	m_ButtonDesc.iTexNum = iNum;
 
-	if (m_ButtonDesc.eState == BTN_A)
-	{
-		if (m_ButtonDesc.iTexNum == OPEN)
-		{
-			m_fSize.x = 96;
-			m_fSize.y = 48;
-		}
-		else if (m_ButtonDesc.iTexNum == TALK)
-		{
-			m_fSize.x = 140;
-			m_fSize.y = 48;
-		}
-		
-	}
-
 }
 
 HRESULT CUIButton::Ready_Components(void * pArg)

@@ -11,7 +11,7 @@ BEGIN(Client)
 class CCamera_Dynamic final : public CCamera
 {
 public:
-	enum CAMERAMODE {CAM_PLAYER, CAM_SHAKING, CAM_TERRAIN, CAM_ITEMGET, CAM_END };
+	enum CAMERAMODE {CAM_PLAYER, CAM_SHAKING, CAM_TERRAIN, CAM_ITEMGET, CAM_TALK, CAM_ROOM, CAM_END };
 
 	typedef struct tagCameraDesc_Derived
 	{
@@ -34,11 +34,15 @@ public:
 			m_ePreCamMode = CAM_TERRAIN;
 		if (m_eCamMode == CAM_ITEMGET)
 			m_ePreCamMode = CAM_ITEMGET;
+		if (m_eCamMode == CAM_TALK)
+			m_ePreCamMode = CAM_TALK;
+		if (m_eCamMode == CAM_ROOM)
+			m_ePreCamMode = CAM_ROOM;
 
 		m_eCamMode = _eCamMode; m_fPower = fPower; m_fVelocity = fVelocity; m_fMinusVelocity = fMinusVelocity;
 	
 	}
-	void Set_CamMode(CAMERAMODE _eCamMode) { m_eCamMode = _eCamMode; m_fTime = 0.f; }
+	void Set_CamMode(CAMERAMODE _eCamMode);
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -51,7 +55,9 @@ public:
 	void Player_Camera(_float fTimeDelta);
 	void Shaking_Camera(_float fTimeDelta, _float fPower);
 	void Terrain_Camera(_float fTimeDelta);
+	void Room_Camera(_float fTimeDelta);
 	void Item_Camera(_float fTimeDelta);
+	void Talk_Camera(_float fTimeDelta);
 	void Set_Position(_vector vPosition);
 
 private:

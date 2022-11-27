@@ -140,11 +140,12 @@ void CCollision_Manager::Update_Collider()
 {
 	for (_uint i = 0; i < COLLISION_END; ++i)
 	{
-		if (i == COLLISION_PBULLET)
-			continue;
-
 		for (auto& iter : m_GameObjects[i])
-			iter->Update_Collider();
+		{
+			if(iter->Get_IsSocket() == false)
+				iter->Update_Collider();
+		}
+			
 	}
 }
 

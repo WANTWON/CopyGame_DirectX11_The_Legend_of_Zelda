@@ -18,6 +18,7 @@ class CData_Manager final : public CBase
 public:
 	enum DATA_TYPE { DATA_ANIM, DATA_NONANIM, DATA_PARTS, DATA_END };
 
+
 public:
 	CData_Manager();
 	virtual ~CData_Manager() = default;

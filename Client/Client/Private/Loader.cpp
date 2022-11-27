@@ -201,6 +201,7 @@ HRESULT CLoader::Loading_ForStaticLevel()
 
 
 	PivotMatrix = XMMatrixIdentity();
+	
 	/*For.Prototype_Component_Model_Arrow*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Arrow"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Arrow/Arrow.fbx", PivotMatrix))))
@@ -273,6 +274,27 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Bow"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Link/Bow.fbx", PivotMatrix))))
 		return E_FAIL;
+
+	/*For.Prototype_Component_Model_DogFood*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_DogFoodParts"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/DogFood/DogFood.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_MagicRod*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_MagicRodParts"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/MagicRod/MagicRod.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Arrow*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_ArrowParts"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Arrow/Arrow.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_HeartContainer*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_HeartContainerParts"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/HeartContainer/HeartContainer.fbx", PivotMatrix))))
+		return E_FAIL;
+
 
 	/*For.Prototype_Component_Model_TreasureBox*/
 	PivotMatrix = XMMatrixIdentity();
@@ -853,6 +875,9 @@ HRESULT CLoader::Loading_For_UITexture()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/MesGetFrame_%02d.dds"), 8))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_ShopTalk"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/ShopTalk_%d.dds"), 8))))
+		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreen_UI"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/LoadingScreen.dds"), 1))))

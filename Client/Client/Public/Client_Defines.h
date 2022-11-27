@@ -21,6 +21,7 @@ namespace Client
 		int iCoin = 30;
 		
 	}OBJINFO;
+
 }
 
 #include <process.h>
