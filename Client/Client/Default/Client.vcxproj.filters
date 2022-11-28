@@ -160,9 +160,6 @@
     <Filter Include="02.GameObjects\01.NonAnim\06.PrizeItem">
       <UniqueIdentifier>{59264d96-cec9-4d0c-a0e1-2ba39fb57a9b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="95.UI\06. Number">
-      <UniqueIdentifier>{2c45e4e9-08d9-4d27-8e10-c9365e914a16}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\01.NonAnim\07.Grass">
       <UniqueIdentifier>{7846b7eb-1e36-4ca2-962a-d07170beec4e}</UniqueIdentifier>
     </Filter>

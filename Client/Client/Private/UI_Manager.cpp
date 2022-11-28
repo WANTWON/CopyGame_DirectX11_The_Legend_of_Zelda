@@ -5,6 +5,8 @@
 #include "InvenTile.h"
 #include "Player.h"
 #include "PlayerState.h"
+#include "UIButton.h"
+#include "Npc.h"
 
 IMPLEMENT_SINGLETON(CUI_Manager)
 
@@ -25,6 +27,9 @@ void CUI_Manager::Initialize_PlayerState()
 			return;
 
 	}
+
+	
+
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -244,6 +249,75 @@ void CUI_Manager::Tick_Coin()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CUI_Manager::Setting_ChoiceButton()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (!m_bChoice)
+	{
+		if (m_vecMsgDecs.front().eChoiceType == BUY_NOBUY)
+		{
+		CUIButton::BUTTONDESC ButtonDesc;
+		ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+		ButtonDesc.iTexNum = CUIButton::BUY;
+		ButtonDesc.vPosition = _float2(1100, 550);
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+			return;
+
+		ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+		ButtonDesc.iTexNum = CUIButton::NOBUY;
+		ButtonDesc.vPosition = _float2(1100, 610);
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+			return;
+
+		m_bChoice = true;
+		}
+	}
+
+	if (pGameInstance->Key_Up(DIK_UP))
+	{
+		m_iChoiceIndex--;
+
+		if (m_iChoiceIndex < 0)
+			m_iChoiceIndex = 0;
+	}
+
+	if (pGameInstance->Key_Up(DIK_DOWN))
+	{
+		m_iChoiceIndex++;
+
+		if (m_iChoiceIndex >= m_vecChoiceButton.size())
+			m_iChoiceIndex = m_vecChoiceButton.size() -1;
+	}
+
+	for (auto& iter : m_vecChoiceButton)
+	{
+		if (iter == m_vecChoiceButton[m_iChoiceIndex])
+			continue;
+
+		iter->Set_Picked(false);
+	}
+	m_vecChoiceButton[m_iChoiceIndex]->Set_Picked(true);
+		
+
+	if (pGameInstance->Key_Up(DIK_SPACE))
+	{
+		m_pTalkingNpc->Send_Answer_toNPC(dynamic_cast<CUIButton*>(m_vecChoiceButton[m_iChoiceIndex])->Get_TextureType());
+
+		m_vecMsgDecs.pop_front();
+		for (auto& iter : m_vecChoiceButton)
+		{
+			dynamic_cast<CUIButton*>(iter)->Set_Visible(false);
+		}
+
+		m_vecChoiceButton.clear();
+		m_iChoiceIndex = 0;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 
 void CUI_Manager::Tick_UI()
 {
@@ -252,11 +326,27 @@ void CUI_Manager::Tick_UI()
 
 	if (m_bTalking == true)
 	{
-		if (CGameInstance::Get_Instance()->Key_Up(DIK_SPACE))
-			m_vecMsgTex.pop_front();
+		if (m_vecMsgDecs.front().eMsgType == MUST_CHOICE)
+		{
+			Setting_ChoiceButton();
+		}
+		else
+		{
+			if (CGameInstance::Get_Instance()->Key_Up(DIK_SPACE))
+				m_vecMsgDecs.pop_front();
+		}
 
-		if (m_vecMsgTex.size() == 0)
+		if (m_vecMsgDecs.size() == 0)
+		{
+			CGameObject* pTarget = CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+			CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+			pPlayer->Set_PlayerState_Defaut();
+
+			m_pTalkingNpc = nullptr;
 			m_bTalking = false;
+			m_bChoice = false;
+		}
+			
 	}
 	
 

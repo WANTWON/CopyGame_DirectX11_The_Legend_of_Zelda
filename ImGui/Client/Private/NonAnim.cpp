@@ -63,8 +63,8 @@ int CNonAnim::Tick(_float fTimeDelta)
 
 void CNonAnim::Late_Tick(_float fTimeDelta)
 {
-	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), Get_Scale().y*2) == false)
-		return;
+	//if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), Get_Scale().y*2) == false)
+	//	return;
 
 	if (nullptr != m_pRendererCom && CImgui_Manager::Get_Instance()->Get_ShowOnlyNavi() == false)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -118,8 +118,8 @@ HRESULT CNonAnim::Render()
 
 _bool CNonAnim::Picking(_float3 * PickingPoint)
 {
-	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), Get_Scale().y * 2) == false)
-		return false;
+	/*if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), Get_Scale().y * 2) == false)
+		return false;*/
 
 	
 	if (true == m_pModelCom->Picking(m_pTransformCom, PickingPoint))

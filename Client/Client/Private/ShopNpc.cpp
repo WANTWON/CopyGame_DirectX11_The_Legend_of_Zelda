@@ -7,6 +7,9 @@
 #include "UIButton.h"
 #include "MessageBox.h"
 #include "Weapon.h"
+#include "UIButton.h"
+#include "InvenTile.h"
+#include "InvenItem.h"
 
 CShopNpc::CShopNpc(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CNpc(pDevice, pContext)
@@ -47,7 +50,7 @@ int CShopNpc::Tick(_float fTimeDelta)
 	Find_Target();
 	if (m_pTarget != nullptr)
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
-		
+
 
 	m_pModelCom->Set_NextAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
@@ -85,6 +88,7 @@ void CShopNpc::Late_Tick(_float fTimeDelta)
 
 		if (CGameInstance::Get_Instance()->Key_Up(DIK_A) && m_eState != TALK)
 		{
+			CUI_Manager::Get_Instance()->Add_TalkingNpc(this);
 			CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
 			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TALK);
 			pButton->Set_Visible(false);
@@ -118,6 +122,83 @@ void CShopNpc::Check_Navigation(_float fTimeDelta)
 		return;
 }
 
+void CShopNpc::Send_Answer_toNPC(_uint iTextureNum)
+{
+	CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+	CWeapon::TYPE eItemType = (CWeapon::TYPE)pPlayer->Get_PartsItemType();
+
+	if (iTextureNum == CUIButton::BUY)
+	{
+		CUI_Manager::MSGDESC eMsgDesc;
+		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
+		if (pPlayer->Set_RubyUse(m_iCoin))
+		{
+
+			switch (eItemType)
+			{
+			case Client::CWeapon::BOW:
+			{
+				list<CGameObject*>* pItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_InvenItem"));
+				for (auto& iter : *pItemList)
+				{
+					if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::ITEM_NONE)
+					{
+						dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::ITEM_BOW);
+						break;
+					}
+					else
+						continue;
+				}
+				break;
+			}
+			case Client::CWeapon::MAGIC_ROD:
+			{
+				list<CGameObject*>* pItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_InvenItem"));
+				for (auto& iter : *pItemList)
+				{
+					if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::ITEM_NONE)
+					{
+						dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::ITEM_WAND);
+						break;
+					}
+					else
+						continue;
+				}
+				break;
+			}
+			case Client::CWeapon::DOGFOOD:
+			{
+				list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_QuestItem"));
+				for (auto& iter : *pQuestItemList)
+				{
+					if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::ITEM_NONE)
+					{
+						dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::DOG_FOOD);
+						break;
+
+					}
+					else
+						continue;
+				}
+				break;
+			}
+			}
+
+			eMsgDesc.iTextureNum = CUI_Manager::THANKYOU;
+		}	
+		else
+			eMsgDesc.iTextureNum = CUI_Manager::SORRY;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+	}
+
+
+	RELEASE_INSTANCE(CUI_Manager);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 HRESULT CShopNpc::Ready_Components(void * pArg)
 {
 	/* For.Com_Renderer */
@@ -142,9 +223,9 @@ HRESULT CShopNpc::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	CCollider::COLLIDERDESC		ColliderDesc;
-	
+
 	/* For.Com_SPHERE */
-	ColliderDesc.vScale = _float3(2.f, 2.f, 2.f);
+	ColliderDesc.vScale = _float3(5.f, 5.f, 5.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
@@ -209,39 +290,57 @@ void CShopNpc::Change_Message()
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
 	pUI_Manager->Set_Talking(true);
 
-		CMessageBox::MSG_TYPE eMsgType = CMessageBox::SHOP_TALK;
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &eMsgType);
+	CMessageBox::MSG_TYPE eMsgType = CMessageBox::SHOP_TALK;
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &eMsgType);
 
-		CWeapon::TYPE eItemType = (CWeapon::TYPE)pPlayer->Get_PartsItemType();
-		switch (eItemType)
-		{
-		case Client::CWeapon::BOW:
-			pUI_Manager->Add_MessageTex(CUI_Manager::BOW);
-			pUI_Manager->Add_MessageTex(CUI_Manager::THANKYOU);
-			break;
-		case Client::CWeapon::ARROW:
-			pUI_Manager->Add_MessageTex(CUI_Manager::ARROW);
-			pUI_Manager->Add_MessageTex(CUI_Manager::THANKYOU);
-			break;
-		case Client::CWeapon::DOGFOOD:
-			pUI_Manager->Add_MessageTex(CUI_Manager::DOG_FOOD);
-			pUI_Manager->Add_MessageTex(CUI_Manager::THANKYOU);
-			break;
-		case Client::CWeapon::HEART_CONTAINER:
-			pUI_Manager->Add_MessageTex(CUI_Manager::HEART_CONTAINER);
-			pUI_Manager->Add_MessageTex(CUI_Manager::THANKYOU);
-			break;
-		case Client::CWeapon::MAGIC_ROD:
-			pUI_Manager->Add_MessageTex(CUI_Manager::MAGIC_ROD);
-			pUI_Manager->Add_MessageTex(CUI_Manager::THANKYOU);
-			break;
-		default:
-			pUI_Manager->Add_MessageTex(CUI_Manager::TALK_DEFAULT);
-			break;
-		}
+	CWeapon::TYPE eItemType = (CWeapon::TYPE)pPlayer->Get_PartsItemType();
+	CUI_Manager::MSGDESC eMsgDesc;
 
-		
-		pUI_Manager->Open_Message(true);
+	switch (eItemType)
+	{
+	case Client::CWeapon::BOW:
+		eMsgDesc.eMsgType = CUI_Manager::MUST_CHOICE;
+		eMsgDesc.iTextureNum = CUI_Manager::BOW;
+		eMsgDesc.eChoiceType = CUI_Manager::BUY_NOBUY;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+		m_iCoin = 100;
+		break;
+	case Client::CWeapon::ARROW:
+		eMsgDesc.eMsgType = CUI_Manager::MUST_CHOICE;
+		eMsgDesc.iTextureNum = CUI_Manager::ARROW;
+		eMsgDesc.eChoiceType = CUI_Manager::BUY_NOBUY;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+		m_iCoin = 3;
+		break;
+	case Client::CWeapon::DOGFOOD:
+		eMsgDesc.eMsgType = CUI_Manager::MUST_CHOICE;
+		eMsgDesc.iTextureNum = CUI_Manager::DOG_FOOD;
+		eMsgDesc.eChoiceType = CUI_Manager::BUY_NOBUY;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+		m_iCoin = 10;
+		break;
+	case Client::CWeapon::HEART_CONTAINER:
+		eMsgDesc.eMsgType = CUI_Manager::MUST_CHOICE;
+		eMsgDesc.iTextureNum = CUI_Manager::HEART_CONTAINER;
+		eMsgDesc.eChoiceType = CUI_Manager::BUY_NOBUY;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+		m_iCoin = 50;
+		break;
+	case Client::CWeapon::MAGIC_ROD:
+		eMsgDesc.eMsgType = CUI_Manager::MUST_CHOICE;
+		eMsgDesc.iTextureNum = CUI_Manager::MAGIC_ROD;
+		eMsgDesc.eChoiceType = CUI_Manager::BUY_NOBUY;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+		m_iCoin = 150;
+		break;
+	default:
+		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
+		eMsgDesc.iTextureNum = CUI_Manager::TALK_DEFAULT;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+		break;
+	}
+
+	pUI_Manager->Open_Message(true);
 
 	RELEASE_INSTANCE(CUI_Manager);
 	RELEASE_INSTANCE(CGameInstance);

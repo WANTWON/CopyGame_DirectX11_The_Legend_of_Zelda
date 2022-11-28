@@ -140,6 +140,7 @@ void CNpc::Find_Target()
 
 
 
+
 void CNpc::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom == nullptr)

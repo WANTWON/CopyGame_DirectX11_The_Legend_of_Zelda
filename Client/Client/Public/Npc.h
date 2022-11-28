@@ -36,6 +36,7 @@ public:
 
 public:
 	virtual void Check_Navigation(_float fTimeDelta);
+	virtual void Send_Answer_toNPC(_uint iTextureNum) {};
 
 protected:
 	virtual HRESULT Ready_Components(void* pArg = nullptr) = 0;
@@ -49,6 +50,7 @@ protected:
 	virtual void AI_Behaviour(_float fTimeDelta) { };
 	virtual void Find_Target();
 	virtual void Follow_Target(_float fTimeDelta) { };
+	
 
 protected:
 	CNavigation*			m_pNavigationCom = nullptr;

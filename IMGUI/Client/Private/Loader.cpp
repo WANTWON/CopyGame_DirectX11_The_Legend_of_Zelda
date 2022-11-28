@@ -486,6 +486,11 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Bow.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Link/Bow.fbx", PivotMatrix))))
 		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Bow*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Mafia_HQ.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Test/Mafia_HQ.fbx", PivotMatrix))))
+		return E_FAIL;
 	
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;

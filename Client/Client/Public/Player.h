@@ -51,6 +51,7 @@ public:
 	void	Set_Carry(_bool type) { m_bCarry = type; }
 	void	Set_RecoverHp() { m_tInfo.iCurrentHp += 4; if (m_tInfo.iCurrentHp > m_tInfo.iMaxHp) m_tInfo.iCurrentHp = m_tInfo.iMaxHp; }
 	void	Set_RubyAdd() { m_tInfo.iCoin++; }
+	_bool	Set_RubyUse(_int iCoin);
 	void	Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
 	void	Set_NextPortal(_float3 vPosition, _bool is2D) { m_vPortalPos = vPosition; m_b2D = is2D;}
 
@@ -59,6 +60,8 @@ public:
 	void	Compute_CurrentIndex(LEVEL eLevel);
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
 	HRESULT Ready_Parts(CPrizeItem::TYPE eType, PARTS PartsIndex);
+	void	Set_PlayerState_Defaut();
+
 	
 private:
 	void Key_Input(_float fTimeDelta);

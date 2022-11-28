@@ -69,13 +69,28 @@ void CMessageBox::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 
-	m_iTextureNum = CUI_Manager::Get_Instance()->Get_MessageType();
-	if (CUI_Manager::Get_Instance()->Get_OpenMessage())
+	if (CUI_Manager::Get_Instance()->Get_Talking())
 	{
-		m_fAlpha += 0.1f;
-		if (m_fAlpha >= 1.f)
-			m_fAlpha = 1.f;
-		m_bRender = true;
+		m_iTextureNum = CUI_Manager::Get_Instance()->Get_MessageType().iTextureNum;
+		if (CUI_Manager::Get_Instance()->Get_OpenMessage())
+		{
+			m_fAlpha += 0.1f;
+			if (m_fAlpha >= 1.f)
+				m_fAlpha = 1.f;
+			m_bRender = true;
+		}
+		else
+		{
+			m_fAlpha -= 0.1f;
+
+			if (m_fAlpha <= 0.f)
+			{
+				m_fAlpha = 0.f;
+				m_bRender = false;
+				m_bDead = true;
+			}
+
+		}
 	}
 	else
 	{
@@ -87,8 +102,8 @@ void CMessageBox::Late_Tick(_float fTimeDelta)
 			m_bRender = false;
 			m_bDead = true;
 		}
-			
 	}
+		
 
 }
 

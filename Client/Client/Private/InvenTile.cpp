@@ -51,9 +51,7 @@ HRESULT CInvenTile::Initialize(void * pArg)
 	if (pItemList != nullptr) //ø÷ Release Mode¿œ ∂ß æ»µ ?
 	{
 		m_pItem = dynamic_cast<CInvenItem*>(pItemList->back());
-		iTextureNum = (_uint)pItemList->size() - 2;
-		if (iTextureNum >= 6)
-			iTextureNum = 0;
+		iTextureNum = 0;
 	}
 	
 

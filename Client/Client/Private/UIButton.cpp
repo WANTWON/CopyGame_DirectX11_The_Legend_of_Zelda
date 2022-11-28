@@ -23,18 +23,24 @@ HRESULT CUIButton::Initialize(void * pArg)
 	if (pArg != nullptr)
 		memcpy(&m_ButtonDesc, pArg, sizeof(BUTTONDESC));
 
-	if (m_ButtonDesc.eState == BTN_A)
+	switch (m_ButtonDesc.eButtonType)
 	{
+	case BTN_INTERACT:
 		m_fSize.x = 96;
 		m_fSize.y = 48;
 		m_eShaderID = UI_ALPHASET;
 		m_bShow = false;
-	}
-	else
-	{
+		break;
+	case BTN_CHOICE:
+		m_fSize.x = 136;
+		m_fSize.y = 68;
+		m_eShaderID = UI_ALPHASET;
+		break;
+	default:
 		m_fSize.x = 30;
 		m_fSize.y = 30;
 		m_eShaderID = UI_ALPHABLEND;
+		break;
 	}
 
 	m_fPosition.x = m_ButtonDesc.vPosition.x;
@@ -43,15 +49,18 @@ HRESULT CUIButton::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (m_ButtonDesc.eState == BTN_A)
+	if (m_ButtonDesc.eButtonType == BTN_INTERACT)
 		CUI_Manager::Get_Instance()->Add_Button(this);
-
+	if (m_ButtonDesc.eButtonType == BTN_CHOICE)
+		CUI_Manager::Get_Instance()->Add_ChoiceButton(this);
 	return S_OK;
 }
 
 int CUIButton::Tick(_float fTimeDelta)
 {
-	__super::Tick(fTimeDelta);
+	if (__super::Tick(fTimeDelta))
+		return OBJ_DEAD;
+
 
 	if (m_ButtonDesc.eButtonType == BTN_INVEN)
 	{
@@ -83,7 +92,7 @@ void CUIButton::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 
-	if (m_ButtonDesc.eButtonType == BTN_INTERACT)
+	if (m_ButtonDesc.eButtonType == BTN_INTERACT || m_ButtonDesc.eButtonType == BTN_CHOICE)
 	{
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fPosition.x - g_iWinSizeX * 0.5f, -m_fPosition.y + g_iWinSizeY * 0.5f, 0.f, 1.f));
 
@@ -100,7 +109,12 @@ void CUIButton::Late_Tick(_float fTimeDelta)
 	{
 		m_fAlpha -= 0.1f;
 		if (m_fAlpha <= 0.f)
+		{
 			m_fAlpha = 0.f;
+			if (m_ButtonDesc.eButtonType == BTN_CHOICE)
+				m_bDead = true;
+		}
+			
 	}
 
 }
@@ -121,11 +135,6 @@ HRESULT CUIButton::Render()
 	return S_OK;
 }
 
-void CUIButton::Set_TexType(_uint iNum)
-{
-	m_ButtonDesc.iTexNum = iNum;
-
-}
 
 HRESULT CUIButton::Ready_Components(void * pArg)
 {
@@ -142,8 +151,6 @@ HRESULT CUIButton::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	
-
-
 	switch (m_ButtonDesc.eState)
 	{
 	case BTN_X:
@@ -163,6 +170,13 @@ HRESULT CUIButton::Ready_Components(void * pArg)
 		break;
 	}
 
+	if (m_ButtonDesc.eButtonType == BTN_CHOICE)
+	{
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_ChoiceButton"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+	}
+		
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
@@ -190,7 +204,7 @@ HRESULT CUIButton::SetUp_ShaderResources()
 			m_ButtonDesc.iTexNum = BTN_BLACK;
 	}
 
-	if (m_ButtonDesc.eButtonType == BTN_INTERACT)
+	if (m_ButtonDesc.eButtonType == BTN_INTERACT || m_ButtonDesc.eButtonType == BTN_CHOICE)
 	{
 		if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 			return E_FAIL;
@@ -198,6 +212,21 @@ HRESULT CUIButton::SetUp_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_ButtonDesc.iTexNum))))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CUIButton::SetUp_ShaderID()
+{
+	if (m_bPicked)
+		m_eShaderID = UI_PICKED;
+	else
+	{
+		if (m_ButtonDesc.eButtonType == BTN_INTERACT || m_ButtonDesc.eButtonType == BTN_CHOICE)
+			m_eShaderID = UI_ALPHASET;
+		else
+			m_eShaderID = UI_ALPHABLEND;
+	}
 
 	return S_OK;
 }

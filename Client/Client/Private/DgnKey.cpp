@@ -115,7 +115,12 @@ void CDgnKey::Late_Tick(_float fTimeDelta)
 		m_bGet = true;
 		CMessageBox::MSG_TYPE eMsgType = CMessageBox::GET_ITEM;
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &eMsgType);
-		CUI_Manager::Get_Instance()->Add_MessageTex(CUI_Manager::DGN_KEY);
+
+		CUI_Manager::MSGDESC MsgDesc;
+		MsgDesc.eMsgType = CUI_Manager::PASSABLE;
+		MsgDesc.iTextureNum = CUI_Manager::DGN_KEY;
+
+		CUI_Manager::Get_Instance()->Add_MessageDesc(MsgDesc);
 		CUI_Manager::Get_Instance()->Open_Message(true);
 		dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
 	}

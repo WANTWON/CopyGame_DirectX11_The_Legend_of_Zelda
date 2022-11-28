@@ -5,6 +5,7 @@
 #include "UI_Manager.h"
 #include "InvenItem.h"
 #include "MessageBox.h"
+#include "UIButton.h"
 
 
 CPrizeItem::CPrizeItem(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -40,6 +41,9 @@ HRESULT CPrizeItem::Initialize(void * pArg)
 		_vector vPosition = XMLoadFloat3(&m_ItemDesc.vPosition);
 		vPosition = XMVectorSetW(vPosition, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+
+		if (m_ItemDesc.eInteractType == CARRYABLE)
+			m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(90.f));
 	}
 
 	Set_Scale(_float3(3.f, 3.f, 3.f));
@@ -116,7 +120,12 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 			dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
 			CMessageBox::MSG_TYPE eMsgType = CMessageBox::GET_ITEM;
 			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &eMsgType);
-			CUI_Manager::Get_Instance()->Add_MessageTex(m_ItemDesc.eType);
+
+			CUI_Manager::MSGDESC MsgDesc;
+			MsgDesc.eMsgType = CUI_Manager::PASSABLE;
+			MsgDesc.iTextureNum = m_ItemDesc.eType;
+
+			CUI_Manager::Get_Instance()->Add_MessageDesc(MsgDesc);
 			CUI_Manager::Get_Instance()->Open_Message(true);
 		}
 
@@ -175,16 +184,31 @@ void CPrizeItem::LateTick_DefaultModeItem(_float fTimeDelta)
 void CPrizeItem::LateTick_CarryableModeItem(_float fTimeDelta)
 {
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
+
 
 	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom))
 	{
+		if (!m_bGet)
+		{
+			pButton->Set_TexType(CUIButton::CARRY);
+			pButton->Set_Visible(true);
+			_float2 fPosition = pPlayer->Get_ProjPosition();
+			fPosition.y = g_iWinSizeY - fPosition.y;
+			fPosition.x += 50.f;
+			fPosition.y -= 30.f;
+			pButton->Set_Position(fPosition);
+		}
+		
 		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
 		{
 			if (!m_bGet)
 			{
+				m_bGet = true;
 				pPlayer->Set_AnimState(CPlayer::ITEM_CARRY);
 				pPlayer->Ready_Parts(m_ItemDesc.eType, CPlayer::PARTS_ITEM);
 				m_bDead = true;
+				pButton->Set_Visible(false);
 			}
 		}	
 	}		
@@ -289,6 +313,8 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
 	if(m_ItemDesc.eInteractType == DEFAULT)
 		ColliderDesc.vScale = _float3(0.3f, 0.3f, 0.3f);
+	if (m_ItemDesc.eInteractType == CARRYABLE)
+		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))

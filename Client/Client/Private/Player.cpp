@@ -116,8 +116,12 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_BOW]);
 
-		if(m_Parts[PARTS_ITEM] != nullptr)
+		if (m_Parts[PARTS_ITEM] != nullptr)
+		{
 			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_ITEM]);
+			dynamic_cast<CWeapon*>(m_Parts[PARTS_ITEM])->Set_Scale(_float3(2.f, 2.f, 2.f));
+		}
+			
 
 
 #ifdef _DEBUG
@@ -192,6 +196,15 @@ _uint CPlayer::Get_PartsItemType()
 		return CWeapon::NONE;
 
 	return dynamic_cast<CWeapon*>(m_Parts[PARTS_ITEM])->Get_PartsType();
+}
+
+_bool CPlayer::Set_RubyUse(_int iCoin)
+{
+	if (m_tInfo.iCoin < iCoin)
+		return false;
+		
+	m_tInfo.iCoin -= iCoin;
+	return true;
 }
 
 
@@ -297,36 +310,35 @@ HRESULT CPlayer::Ready_Parts(CPrizeItem::TYPE eType, PARTS PartsIndex)
 	return S_OK;
 }
 
+void CPlayer::Set_PlayerState_Defaut()
+{
+
+	CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+	if (m_iCurrentLevel == LEVEL_GAMEPLAY)
+		dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
+	if (m_iCurrentLevel == LEVEL_TAILCAVE)
+		dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TERRAIN);
+	if (m_iCurrentLevel == LEVEL_ROOM)
+		dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_ROOM);
+	if (m_eState == ITEM_GET_LP)
+		m_eState = ITEM_GET_ED;
+	if (m_bStop)
+		m_bStop = false;
+	if (m_bCarry)
+	{
+		m_bCarry = false;
+		Safe_Release(m_Parts[PARTS_ITEM]);
+		m_eState = IDLE;
+	}
+	CUI_Manager::Get_Instance()->Open_Message(false);
+}
+
 
 void CPlayer::Key_Input(_float fTimeDelta)
 {
 	
 	if (CUI_Manager::Get_Instance()->Get_Talking() == true)
 		return;
-
-	if (CGameInstance::Get_Instance()->Key_Down(DIK_SPACE))
-	{
-		
-			CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
-			if (m_iCurrentLevel == LEVEL_GAMEPLAY)
-				dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
-			if (m_iCurrentLevel == LEVEL_TAILCAVE)
-				dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TERRAIN);
-			if (m_iCurrentLevel == LEVEL_ROOM)
-				dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_ROOM);
-			if (m_eState == ITEM_GET_LP)
-				m_eState = ITEM_GET_ED;
-			if (m_bStop)
-				m_bStop = false;
-			if (m_bCarry)
-			{
-				m_bCarry = false;
-				Safe_Release(m_Parts[PARTS_ITEM]);
-				m_eState = IDLE;
-			}
-			CUI_Manager::Get_Instance()->Open_Message(false);		
-	}
-
 
 
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == FALL_FROMTOP ||

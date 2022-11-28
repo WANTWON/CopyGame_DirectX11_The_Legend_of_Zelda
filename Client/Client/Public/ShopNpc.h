@@ -25,6 +25,7 @@ public:
 
 public:
 	virtual void Check_Navigation(_float fTimeDelta);
+	virtual void Send_Answer_toNPC(_uint iTextureNum) override;
 
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
@@ -36,6 +37,7 @@ private:
 
 private:
 	STATE m_eState = IDLE;
+	_int  m_iCoin = 0;
 
 public:
 	virtual void Free() override;
