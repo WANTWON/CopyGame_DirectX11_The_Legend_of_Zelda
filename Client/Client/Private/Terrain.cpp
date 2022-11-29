@@ -101,9 +101,25 @@ HRESULT CTerrain::Ready_Components(void* pArg)
 	}
 	else if (*(LEVEL*)pArg == LEVEL_ROOM)
 	{
-		/* For.Com_Navigation */
-		if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Room"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Room"), (CComponent**)&m_pNavigationCom)))
-			return E_FAIL;
+		CUI_Manager::ROOMTYPE eRoomType = CUI_Manager::Get_Instance()->Get_RoomType();
+
+		switch (eRoomType)
+		{
+		case Client::CUI_Manager::MARINHOUSE:
+			/* For.Com_Navigation */
+			if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Room"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Room"), (CComponent**)&m_pNavigationCom)))
+				return E_FAIL;
+			break;
+		case Client::CUI_Manager::SHOP:
+			/* For.Com_Navigation */
+			if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Shop"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Shop"), (CComponent**)&m_pNavigationCom)))
+				return E_FAIL;
+			break;
+		default:
+			break;
+		}
+
+		
 	}
 
 

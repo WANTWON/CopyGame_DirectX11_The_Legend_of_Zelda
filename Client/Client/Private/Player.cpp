@@ -33,7 +33,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	
 	Compute_CurrentIndex(LEVEL_GAMEPLAY);
 
-	m_fWalkingHeight = m_pNavigationCom[CLevel_Manager::Get_Instance()->Get_DestinationLevelIndex()]->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), (Get_Scale().y * 0.5f));
+	m_fWalkingHeight = m_pNavigationCom->Compute_Height(m_pTransformCom->Get_State(CTransform::STATE_POSITION), (Get_Scale().y * 0.5f));
 	m_fStartHeight = m_fWalkingHeight;
 	m_fEndHeight = m_fWalkingHeight;
 
@@ -131,8 +131,8 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 			m_pRendererCom->Add_Debug(m_pOBBCom);
 		if (m_pSPHERECom != nullptr)
 			m_pRendererCom->Add_Debug(m_pSPHERECom);
-		if (m_pNavigationCom[m_iCurrentLevel] != nullptr)
-			m_pRendererCom->Add_Debug(m_pNavigationCom[m_iCurrentLevel]);
+		if (m_pNavigationCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pNavigationCom);
 #endif
 
 	}
@@ -148,7 +148,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
 		else
 			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
-		m_pTransformCom->Go_PosDir(fTimeDelta, vDirection, m_pNavigationCom[m_iCurrentLevel]);
+		m_pTransformCom->Go_PosDir(fTimeDelta, vDirection, m_pNavigationCom);
 	}
 
 	//if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_MONSTER, m_pOBBCom))
@@ -211,7 +211,7 @@ _bool CPlayer::Set_RubyUse(_int iCoin)
 
 void CPlayer::Compute_CurrentIndex(LEVEL eLevel)
 {
-	m_pNavigationCom[eLevel]->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 }
 
 _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
@@ -499,6 +499,32 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CPlayer::Change_Navigation(LEVEL eLevel)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	switch (eLevel)
+	{
+	case Client::LEVEL_GAMEPLAY:
+		m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_Field")));
+		break;
+	case Client::LEVEL_ROOM:
+	{
+		CUI_Manager::ROOMTYPE eRoomType = CUI_Manager::Get_Instance()->Get_RoomType();
+		if (eRoomType == CUI_Manager::MARINHOUSE)
+			m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_Room")));
+		else if (eRoomType == CUI_Manager::SHOP)
+			m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_Shop")));
+		break;
+	}
+	case Client::LEVEL_TAILCAVE:
+		m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_TailCave")));
+		break;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 
 HRESULT CPlayer::Ready_Components(void* pArg)
 {
@@ -544,15 +570,19 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 
 	NaviDesc.iCurrentCellIndex = 0;
 
-	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Field"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Field"), (CComponent**)&m_pNavigationCom[LEVEL_GAMEPLAY], &NaviDesc)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_TailCave"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
 		return E_FAIL;
+	m_vecNavigaitions.push_back(m_pNavigationCom);
 
-
-	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_TailCave"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"), (CComponent**)&m_pNavigationCom[LEVEL_TAILCAVE], &NaviDesc)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Room"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Room"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
 		return E_FAIL;
-
-	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Room"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Room"), (CComponent**)&m_pNavigationCom[LEVEL_ROOM], &NaviDesc)))
+	m_vecNavigaitions.push_back(m_pNavigationCom);
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Shop"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Shop"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
 		return E_FAIL;
+	m_vecNavigaitions.push_back(m_pNavigationCom);
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Field"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Field"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+		return E_FAIL;
+	m_vecNavigaitions.push_back(m_pNavigationCom);
 
 
 	return S_OK;
@@ -670,13 +700,13 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 				}
 
 				_vector vDir = XMVectorSet(m_eDir[DIR_X], m_eDir[DIR_Z], 0.f, 0.f);
-				m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom[m_iCurrentLevel]);
+				m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom);
 			}
 			else
-				m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
+				m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
 		}	
 		else
-			m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom[m_iCurrentLevel]);
+			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
 	}
 
 }
@@ -726,12 +756,12 @@ void CPlayer::SetDirection_Pushing(_float fTimeDelta)
 		if (0 > XMVectorGetX(XMVector3Dot(vLook, vNewLook)))
 		{
 			m_eState = PULL_LP;
-			m_pTransformCom->Go_Backward(fTimeDelta*0.1f, m_pNavigationCom[m_iCurrentLevel]);
+			m_pTransformCom->Go_Backward(fTimeDelta*0.1f, m_pNavigationCom);
 		}
 		else
 		{
 			m_eState = PUSH_LP;
-			m_pTransformCom->Go_Straight(fTimeDelta*0.2f, m_pNavigationCom[m_iCurrentLevel]);
+			m_pTransformCom->Go_Straight(fTimeDelta*0.2f, m_pNavigationCom);
 		}
 		
 	}
@@ -813,7 +843,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
-		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -1.f, 0.f, 0.f), m_pNavigationCom[m_iCurrentLevel]);
+		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -1.f, 0.f, 0.f), m_pNavigationCom);
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 		if (m_fWalkingHeight >= XMVectorGetY(vPosition))
@@ -938,7 +968,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
 			m_eState = FALL_FROMTOP;
-			m_pTransformCom->Go_Backward(fTimeDelta * 20, m_pNavigationCom[m_iCurrentLevel]);
+			m_pTransformCom->Go_Backward(fTimeDelta * 20, m_pNavigationCom);
 		}
 		break;
 	case Client::CPlayer::FALL_FROMTOP:
@@ -971,7 +1001,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 					dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_Position(vPortalPos);
 				}
 					
-				m_pNavigationCom[m_iCurrentLevel]->Set_2DNaviGation(false);
+				m_pNavigationCom->Set_2DNaviGation(false);
 			}
 			else
 			{
@@ -979,8 +1009,8 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 				vPortalPos = XMVectorSetY(vPortalPos, XMVectorGetY(vPortalPos) - 1.f);
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPortalPos);
 				CCameraManager::Get_Instance()->Set_CamState(CCameraManager::CAM_2D);
-				m_pNavigationCom[m_iCurrentLevel]->Set_2DNaviGation(true);
-				m_pNavigationCom[m_iCurrentLevel]->Compute_CurrentIndex_byDistance(vPortalPos);
+				m_pNavigationCom->Set_2DNaviGation(true);
+				m_pNavigationCom->Compute_CurrentIndex_byDistance(vPortalPos);
 			}
 			
 		}
@@ -1005,20 +1035,20 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 
 void CPlayer::Check_Navigation(_float fTimeDelta)
 {
-	if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCellIndex() == -1)
+	if (m_pNavigationCom->Get_CurrentCellIndex() == -1)
 		return;
 
 
-	if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::DROP)
+	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
 	{
 		if (m_eState != FALL_ANTLION)
-			m_pTransformCom->Go_Straight(fTimeDelta * 10, m_pNavigationCom[m_iCurrentLevel]);
+			m_pTransformCom->Go_Straight(fTimeDelta * 10, m_pNavigationCom);
 		m_eState = FALL_ANTLION;
 	}
-	else if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::ACCESSIBLE)
+	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		_float m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(vPosition, 0.f);
+		_float m_fWalkingHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
 		
 		if(m_eState != D_FALL &&  m_eState != JUMP)
 				m_fStartHeight = m_fWalkingHeight;
@@ -1047,11 +1077,11 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 
 
 	}
-	else if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::ONLYJUMP)
+	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ONLYJUMP)
 	{
 		
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		_float m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(vPosition, 0.f);
+		_float m_fWalkingHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
 		
 		m_fStartHeight = m_fWalkingHeight;
 		m_fEndHeight = m_fWalkingHeight -2;
@@ -1069,23 +1099,23 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 		
 		if (m_fWalkingHeight > XMVectorGetY(vPosition))
 		{
-			m_pNavigationCom[m_iCurrentLevel]->Compute_CurrentIndex_byHeight(vPosition);
+			m_pNavigationCom->Compute_CurrentIndex_byHeight(vPosition);
 		}
 	}
 
 
-	if (m_pNavigationCom[m_iCurrentLevel]->Get_CurrentCelltype() == CCell::UPDOWN)
+	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::UPDOWN)
 	{
 		m_bUpDown = true;
 
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-		_float m_fWalkingHeight = m_pNavigationCom[m_iCurrentLevel]->Compute_Height(vPosition, 0.f);
+		_float m_fWalkingHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
 		m_fStartHeight = m_fWalkingHeight;
 		m_fEndHeight = m_fWalkingHeight;
 
 		if (m_fWalkingHeight > XMVectorGetY(vPosition))
 		{
-			m_pNavigationCom[m_iCurrentLevel]->Compute_CurrentIndex_byHeight(vPosition);
+			m_pNavigationCom->Compute_CurrentIndex_byHeight(vPosition);
 		}
 	}	
 	else
@@ -1134,11 +1164,11 @@ void CPlayer::Free()
 	Safe_Release(m_pOBBCom);
 	Safe_Release(m_pSPHERECom);
 
-	for (int i = 0; i < LEVEL_END; ++i)
-	{
-		Safe_Release(m_pNavigationCom[i]);
-	}
+	for (auto& iter : m_vecNavigaitions)
+		Safe_Release(iter);
+	m_vecNavigaitions.clear();
 
+	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pTransformCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);

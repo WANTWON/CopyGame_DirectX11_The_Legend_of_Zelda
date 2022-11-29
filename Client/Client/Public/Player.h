@@ -57,6 +57,7 @@ public:
 
 
 public:
+	void	Change_Navigation(LEVEL eLevel);
 	void	Compute_CurrentIndex(LEVEL eLevel);
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
 	HRESULT Ready_Parts(CPrizeItem::TYPE eType, PARTS PartsIndex);
@@ -65,6 +66,7 @@ public:
 	
 private:
 	void Key_Input(_float fTimeDelta);
+
 	void Change_Direction(_float fTimeDelta);
 	void Change_Animation(_float fTimeDelta);
 	void Check_Navigation(_float fTimeDelta);
@@ -83,7 +85,8 @@ private:
 
 private:
 	vector<class CGameObject*>			m_Parts;
-	CNavigation*			m_pNavigationCom[LEVEL_END] = { nullptr };
+	vector<CNavigation*>				m_vecNavigaitions;
+	CNavigation*						m_pNavigationCom =  nullptr ;
 	
 
 private:

@@ -170,9 +170,16 @@ HRESULT CLoader::Loading_ForStaticLevel()
 
 	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
 	/* For.Prototype_Component_Navigation */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Shop"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Shop_Navi.dat")))))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
+	/* For.Prototype_Component_Navigation */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Room"),
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Room_Navi.dat")))))
 		return E_FAIL;
+
 
 
 	/*For.Prototype_Component_Model_Link*/

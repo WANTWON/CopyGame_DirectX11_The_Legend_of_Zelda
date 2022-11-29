@@ -163,12 +163,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 		CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 		LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
 		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 50.f, 46.8f, 1.f));
+		pPlayer->Change_Navigation(LEVEL_GAMEPLAY);
 		pPlayer->Compute_CurrentIndex(LEVEL_GAMEPLAY);
 	}
 	else
 	{
 		CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
-
+		pPlayer->Change_Navigation(LEVEL_GAMEPLAY);
 		LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
 		switch (ePastLevel)
 		{
@@ -337,7 +338,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 			InvenDesc.eEquipKey = CInvenTile::EQUIP_NONE;
 			InvenDesc.vPosition = _float2(_float(780 + j*110), _float(260 + i*120));
 
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_InvenTile_UI"), LEVEL_STATIC, pLayerTag, &InvenDesc)))
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_InvenTile_UI"), LEVEL_STATIC, TEXT("Layer_Ineventile"), &InvenDesc)))
 				return E_FAIL;
 		}
 	}

@@ -141,12 +141,12 @@ void CShopNpc::Send_Answer_toNPC(_uint iTextureNum)
 			{
 			case Client::CWeapon::BOW:
 			{
-				list<CGameObject*>* pItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_InvenItem"));
+				list<CGameObject*>* pItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_Ineventile"));
 				for (auto& iter : *pItemList)
 				{
-					if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::ITEM_NONE)
+					if (dynamic_cast<CInvenTile*>(iter)->Get_TextureNum() == CInvenItem::ITEM_NONE)
 					{
-						dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::ITEM_BOW);
+						dynamic_cast<CInvenTile*>(iter)->Set_TextureNum(CInvenItem::ITEM_BOW);
 						break;
 					}
 					else
@@ -156,12 +156,12 @@ void CShopNpc::Send_Answer_toNPC(_uint iTextureNum)
 			}
 			case Client::CWeapon::MAGIC_ROD:
 			{
-				list<CGameObject*>* pItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_InvenItem"));
+				list<CGameObject*>* pItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_Ineventile"));
 				for (auto& iter : *pItemList)
 				{
-					if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::ITEM_NONE)
+					if (dynamic_cast<CInvenTile*>(iter)->Get_TextureNum() == CInvenItem::ITEM_NONE)
 					{
-						dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::ITEM_WAND);
+						dynamic_cast<CInvenTile*>(iter)->Set_TextureNum(CInvenItem::ITEM_WAND);
 						break;
 					}
 					else
@@ -193,7 +193,53 @@ void CShopNpc::Send_Answer_toNPC(_uint iTextureNum)
 			eMsgDesc.iTextureNum = CUI_Manager::SORRY;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 	}
+	else if (iTextureNum == CUIButton::NOBUY)
+	{
+		CPrizeItem::ITEMDESC ItemDesc;
 
+		switch (eItemType)
+		{
+		case Client::CWeapon::NONE:
+			break;
+		case Client::CWeapon::BOW:
+			ItemDesc.eType = CPrizeItem::BOW;
+			ItemDesc.eInteractType = CPrizeItem::CARRYABLE;
+			ItemDesc.vPosition = _float3(4.14f, 1.5f, 1.5f);
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, TEXT("Layer_Object"), &ItemDesc)))
+				return;
+			break;
+		case Client::CWeapon::ARROW:
+			ItemDesc.eType = CPrizeItem::ARROW;
+			ItemDesc.eInteractType = CPrizeItem::CARRYABLE;
+			ItemDesc.vPosition = _float3(1.79f, 1.5f, 1.5f);
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, TEXT("Layer_Object"), &ItemDesc)))
+				return;
+			break;
+		case Client::CWeapon::DOGFOOD:
+			ItemDesc.eType = CPrizeItem::DOGFOOD;
+			ItemDesc.eInteractType = CPrizeItem::CARRYABLE;
+			ItemDesc.vPosition = _float3(-0.24f, 1.5f, 1.5f);
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, TEXT("Layer_Object"), &ItemDesc)))
+				return;
+			break;
+		case Client::CWeapon::HEART_CONTAINER:
+			ItemDesc.eType = CPrizeItem::HEART_CONTAINER;
+			ItemDesc.eInteractType = CPrizeItem::CARRYABLE;
+			ItemDesc.vPosition = _float3(-2.39f, 1.5f, 1.5f);
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, TEXT("Layer_Object"), &ItemDesc)))
+				return;
+			break;
+		case Client::CWeapon::MAGIC_ROD:
+			ItemDesc.eType = CPrizeItem::MAGIC_ROD;
+			ItemDesc.eInteractType = CPrizeItem::CARRYABLE;
+			ItemDesc.vPosition = _float3(-4.22f, 1.5f, 1.5f);
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, TEXT("Layer_Object"), &ItemDesc)))
+				return;
+			break;
+		default:
+			break;
+		}
+	}
 
 	RELEASE_INSTANCE(CUI_Manager);
 	RELEASE_INSTANCE(CGameInstance);
