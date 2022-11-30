@@ -118,8 +118,9 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 		if (m_ItemDesc.eInteractType == PRIZE && !m_bGet)
 		{
 			dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
-			CMessageBox::MSG_TYPE eMsgType = CMessageBox::GET_ITEM;
-			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &eMsgType);
+			CMessageBox::MSGDESC MessageDesc;
+			MessageDesc.m_eMsgType = CMessageBox::GET_ITEM;
+			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &MessageDesc);
 
 			CUI_Manager::MSGDESC MsgDesc;
 			MsgDesc.eMsgType = CUI_Manager::PASSABLE;

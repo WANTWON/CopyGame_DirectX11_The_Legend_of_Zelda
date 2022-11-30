@@ -7,6 +7,7 @@
 #include "PlayerState.h"
 #include "UIButton.h"
 #include "Npc.h"
+#include "MarinNpc.h"
 
 IMPLEMENT_SINGLETON(CUI_Manager)
 
@@ -249,6 +250,85 @@ void CUI_Manager::Tick_Coin()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CUI_Manager::Tick_Message()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (m_bTalking == true)
+	{
+		if (m_vecMsgDecs.front().eMsgType == MUST_CHOICE)
+		{
+			Setting_ChoiceButton();
+
+			if (pGameInstance->Key_Up(DIK_UP))
+			{
+				m_iChoiceIndex--;
+
+				if (m_iChoiceIndex < 0)
+					m_iChoiceIndex = 0;
+			}
+
+			if (pGameInstance->Key_Up(DIK_DOWN))
+			{
+				m_iChoiceIndex++;
+
+				if (m_iChoiceIndex >= m_vecChoiceButton.size())
+					m_iChoiceIndex = m_vecChoiceButton.size() - 1;
+			}
+
+			if (m_vecChoiceButton.size() != 0)
+			{
+				for (auto& iter : m_vecChoiceButton)
+				{
+					if (iter == m_vecChoiceButton[m_iChoiceIndex])
+						continue;
+
+					iter->Set_Picked(false);
+				}
+				if (m_vecChoiceButton[m_iChoiceIndex] != nullptr)
+					m_vecChoiceButton[m_iChoiceIndex]->Set_Picked(true);
+
+			}
+			
+			if (pGameInstance->Key_Up(DIK_SPACE) && m_vecChoiceButton.size() != 0)
+			{
+				m_pTalkingNpc->Send_Answer_toNPC(dynamic_cast<CUIButton*>(m_vecChoiceButton[m_iChoiceIndex])->Get_TextureType());
+				m_vecMsgDecs.pop_front();
+			
+			}
+		}
+		else
+		{
+			if (CGameInstance::Get_Instance()->Key_Up(DIK_SPACE))
+				m_vecMsgDecs.pop_front();
+
+			if (m_vecMsgDecs.size() == 0)
+			{
+				if (m_pTalkingNpc != nullptr && m_pTalkingNpc->Get_NpcID() == CNpc::MARIN)
+				{
+					m_bNpcGet = true;
+					if (dynamic_cast<CMarinNpc*>(m_pTalkingNpc)->Get_IsGet() == true)
+						dynamic_cast<CMarinNpc*>(m_pTalkingNpc)->Set_GetMode();
+				}
+			}
+		}
+
+		if (m_vecMsgDecs.size() == 0)
+		{
+			CGameObject* pTarget = CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+			CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+			pPlayer->Set_PlayerState_Defaut();
+
+			
+			m_pTalkingNpc = nullptr;
+			m_bTalking = false;
+			m_bChoice = false;
+			m_bNpcGet = false;
+		}
+
+	}
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 void CUI_Manager::Setting_ChoiceButton()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -270,50 +350,195 @@ void CUI_Manager::Setting_ChoiceButton()
 
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
 			return;
-
-		m_bChoice = true;
 		}
-	}
-
-	if (pGameInstance->Key_Up(DIK_UP))
-	{
-		m_iChoiceIndex--;
-
-		if (m_iChoiceIndex < 0)
-			m_iChoiceIndex = 0;
-	}
-
-	if (pGameInstance->Key_Up(DIK_DOWN))
-	{
-		m_iChoiceIndex++;
-
-		if (m_iChoiceIndex >= m_vecChoiceButton.size())
-			m_iChoiceIndex = m_vecChoiceButton.size() -1;
-	}
-
-	for (auto& iter : m_vecChoiceButton)
-	{
-		if (iter == m_vecChoiceButton[m_iChoiceIndex])
-			continue;
-
-		iter->Set_Picked(false);
-	}
-	m_vecChoiceButton[m_iChoiceIndex]->Set_Picked(true);
-		
-
-	if (pGameInstance->Key_Up(DIK_SPACE))
-	{
-		m_pTalkingNpc->Send_Answer_toNPC(dynamic_cast<CUIButton*>(m_vecChoiceButton[m_iChoiceIndex])->Get_TextureType());
-
-		m_vecMsgDecs.pop_front();
-		for (auto& iter : m_vecChoiceButton)
+		else if (m_vecMsgDecs.front().eChoiceType == TALK_NOTTALK)
 		{
-			dynamic_cast<CUIButton*>(iter)->Set_Visible(false);
-		}
+			CUIButton::BUTTONDESC ButtonDesc;
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::NPC_TALK;
+			ButtonDesc.vPosition = _float2(1100, 550);
 
-		m_vecChoiceButton.clear();
-		m_iChoiceIndex = 0;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::LOVEU;
+			ButtonDesc.vPosition = _float2(1100, 610);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::BACK;
+			ButtonDesc.vPosition = _float2(1100, 670);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+		}
+		else if (m_vecMsgDecs.front().eChoiceType == MARIN_PERFUME)
+		{
+			CUIButton::BUTTONDESC ButtonDesc;
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::PERFUME_COMPLETE;
+			ButtonDesc.vPosition = _float2(1100, 490);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::PERFUME_FAIL1;
+			ButtonDesc.vPosition = _float2(1100, 550);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::PERFUME_FAIL2;
+			ButtonDesc.vPosition = _float2(1100, 610);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::PERFUME_FAIL3;
+			ButtonDesc.vPosition = _float2(1100, 670);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+		}
+		else if (m_vecMsgDecs.front().eChoiceType == MARIN_CHANGE)
+		{
+			CUIButton::BUTTONDESC ButtonDesc;
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::CHANGE_COMPLETE;
+			ButtonDesc.vPosition = _float2(1100, 490);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::CHANGE_FAIL1;
+			ButtonDesc.vPosition = _float2(1100, 550);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::CHANGE_FAIL2;
+			ButtonDesc.vPosition = _float2(1100, 610);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::CHANGE_FAIL3;
+			ButtonDesc.vPosition = _float2(1100, 670);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+		}
+		else if (m_vecMsgDecs.front().eChoiceType == MARIN_VECTOR)
+		{
+			CUIButton::BUTTONDESC ButtonDesc;
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::CROSS_FAIL1;
+			ButtonDesc.vPosition = _float2(1100, 490);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::CROSS_COMPLETE;
+			ButtonDesc.vPosition = _float2(1100, 550);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::CROSS_FAIL2;
+			ButtonDesc.vPosition = _float2(1100, 610);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+		}
+		else if (m_vecMsgDecs.front().eChoiceType == MARIN_DOT)
+		{
+			CUIButton::BUTTONDESC ButtonDesc;
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::DOT_FAIL1;
+			ButtonDesc.vPosition = _float2(1100, 490);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::DOT_COMPLETE;
+			ButtonDesc.vPosition = _float2(1100, 550);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::DOT_FAIL2;
+			ButtonDesc.vPosition = _float2(1100, 610);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+		}
+		else if (m_vecMsgDecs.front().eChoiceType == MARIN_CHARM)
+		{
+			CUIButton::BUTTONDESC ButtonDesc;
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::CHARM_1;
+			ButtonDesc.vPosition = _float2(1100, 490);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::CHARM_2;
+			ButtonDesc.vPosition = _float2(1100, 550);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::CHARM_3;
+			ButtonDesc.vPosition = _float2(1100, 610);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::CHARM_4;
+			ButtonDesc.vPosition = _float2(1100, 670);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+		}
+		else if (m_vecMsgDecs.front().eChoiceType == MARIN_DATEME)
+		{
+		
+			CUIButton::BUTTONDESC ButtonDesc;
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::DATE_WITH_ME;
+			ButtonDesc.vPosition = _float2(1100, 550);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::SORRY;
+			ButtonDesc.vPosition = _float2(1100, 610);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+		}
+		m_bChoice = true;
 	}
+
+	
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -323,31 +548,7 @@ void CUI_Manager::Tick_UI()
 {
 	Tick_PlayerState();
 	Tick_Coin();
-
-	if (m_bTalking == true)
-	{
-		if (m_vecMsgDecs.front().eMsgType == MUST_CHOICE)
-		{
-			Setting_ChoiceButton();
-		}
-		else
-		{
-			if (CGameInstance::Get_Instance()->Key_Up(DIK_SPACE))
-				m_vecMsgDecs.pop_front();
-		}
-
-		if (m_vecMsgDecs.size() == 0)
-		{
-			CGameObject* pTarget = CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
-			CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
-			pPlayer->Set_PlayerState_Defaut();
-
-			m_pTalkingNpc = nullptr;
-			m_bTalking = false;
-			m_bChoice = false;
-		}
-			
-	}
+	Tick_Message();
 	
 
 }
@@ -386,6 +587,18 @@ void CUI_Manager::Use_Key()
 {
 	m_KeyList.back()->Set_Dead(true);
 	m_KeyList.pop_back();
+}
+
+void CUI_Manager::Clear_ChoiceButton()
+{
+	for (auto& iter : m_vecChoiceButton)
+	{
+		dynamic_cast<CUIButton*>(iter)->Set_Visible(false);
+	}
+
+	m_vecChoiceButton.clear();
+	m_iChoiceIndex = 0;
+	m_bChoice = false;
 }
 
 

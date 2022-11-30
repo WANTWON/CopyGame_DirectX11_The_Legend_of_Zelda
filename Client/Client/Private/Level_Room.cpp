@@ -353,6 +353,43 @@ HRESULT CLevel_Room::Ready_Layer_ShopObject(const _tchar * pLayerTag)
 
 HRESULT CLevel_Room::Ready_Layer_MarinObject(const _tchar * pLayerTag)
 {
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	HANDLE hFile = 0;
+	_ulong dwByte = 0;
+	CNonAnim::NONANIMDESC  ModelDesc;
+	_uint iNum = 0;
+
+	hFile = CreateFile(TEXT("../../../Bin/Data/Marin_Object.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
+		return E_FAIL;
+
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+	for (_uint i = 0; i < iNum; ++i)
+	{
+		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+		_tchar pModeltag[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, MAX_PATH, pModeltag, MAX_PATH);
+		if (!wcscmp(pModeltag, TEXT("Marin.fbx")))
+		{
+			CNpc::NPCDESC NpcDesc;
+			NpcDesc.vInitPos = ModelDesc.vPosition;
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MarinNpc"), LEVEL_ROOM, pLayerTag, &NpcDesc)))
+				return E_FAIL;
+		}
+
+	}
+
+
+	CloseHandle(hFile);
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
 	return S_OK;
 }
 

@@ -172,6 +172,9 @@
     <Filter Include="02.GameObjects\06.Npc\ShopNpc">
       <UniqueIdentifier>{02854cb7-cf41-4393-b59d-3869a1b2756b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\06.Npc\MarinNpc">
+      <UniqueIdentifier>{ec869e40-566e-4cb6-ade4-be3539948f03}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -345,6 +348,9 @@
     <ClInclude Include="..\Public\ShopNpc.h">
       <Filter>02.GameObjects\06.Npc\ShopNpc</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MarinNpc.h">
+      <Filter>02.GameObjects\06.Npc\MarinNpc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -502,6 +508,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\ShopNpc.cpp">
       <Filter>02.GameObjects\06.Npc\ShopNpc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MarinNpc.cpp">
+      <Filter>02.GameObjects\06.Npc\MarinNpc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

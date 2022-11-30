@@ -22,15 +22,16 @@ HRESULT CMessageBox::Initialize(void * pArg)
 {
 
 	if (pArg != nullptr)
-		m_eMsgType = *(MSG_TYPE*)pArg;
+		memcpy(&m_MsgDesc, pArg, sizeof(MSGDESC));
 
-	switch (m_eMsgType)
+	switch (m_MsgDesc.m_eMsgType)
 	{
 	case Client::CMessageBox::GET_ITEM:
 		m_fSize.x = 1166 / 1.5f;
 		m_fSize.y = 365 / 1.5f;
 		break;
 	case Client::CMessageBox::SHOP_TALK:
+	case Client::CMessageBox::MARIN_TALK:
 		m_fSize.x = 1048 / 1.5f;
 		m_fSize.y = 240 / 1.5f;
 		break;
@@ -41,8 +42,7 @@ HRESULT CMessageBox::Initialize(void * pArg)
 	
 
 
-	m_fPosition.x = g_iWinSizeX * 0.5f;
-	m_fPosition.y = 600;
+	m_fPosition = m_MsgDesc.fPosition;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -68,6 +68,10 @@ void CMessageBox::Late_Tick(_float fTimeDelta)
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+
+	if (m_MsgDesc.m_eMsgType == MARIN_TALK && CUI_Manager::Get_Instance()->Get_NpcGet())
+		m_bDead = true;
+
 
 	if (CUI_Manager::Get_Instance()->Get_Talking())
 	{
@@ -130,7 +134,7 @@ HRESULT CMessageBox::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_UI"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	switch (m_eMsgType)
+	switch (m_MsgDesc.m_eMsgType)
 	{
 	case Client::CMessageBox::GET_ITEM:
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_GetMessage"), (CComponent**)&m_pTextureCom)))
@@ -140,10 +144,13 @@ HRESULT CMessageBox::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_ShopTalk"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
+	case Client::CMessageBox::MARIN_TALK:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_MarinTalk"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
-	
 
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))

@@ -32,8 +32,8 @@ HRESULT CUIButton::Initialize(void * pArg)
 		m_bShow = false;
 		break;
 	case BTN_CHOICE:
-		m_fSize.x = 136;
-		m_fSize.y = 68;
+		m_fSize.x = 306;
+		m_fSize.y = 58;
 		m_eShaderID = UI_ALPHASET;
 		break;
 	default:

@@ -27,6 +27,7 @@
 
 //for NPC
 #include "ShopNpc.h"
+#include "MarinNpc.h"
 
 //for UI
 #include "BackGround.h"
@@ -180,14 +181,18 @@ HRESULT CLoader::Loading_ForStaticLevel()
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Room_Navi.dat")))))
 		return E_FAIL;
 
-
-
 	/*For.Prototype_Component_Model_Link*/
 	_matrix			PivotMatrix = XMMatrixIdentity();
 	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Link"),
 	//CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Link/Link_Anim.fbx", PivotMatrix))))
 	//return E_FAIL;
+
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Marin"),
+	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Marin/Marin.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("Link"), LEVEL_STATIC, CData_Manager::DATA_ANIM);
 
 	PivotMatrix = XMMatrixIdentity();
@@ -694,7 +699,12 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	/*For.Prototype_GameObject_Grass*/
+	/*For.Prototype_GameObject_MarinNpc*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MarinNpc"),
+		CMarinNpc::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_ShopNpc*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_ShopNpc"),
 		CShopNpc::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -870,6 +880,10 @@ HRESULT CLoader::Loading_For_UITexture()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_MarinTalk"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/MarinTalk_%d.dds"), 21))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rupee"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Ruby/Rupee_00.dds"), 1))))
 		return E_FAIL;
@@ -879,7 +893,7 @@ HRESULT CLoader::Loading_For_UITexture()
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_GetMessage"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/MesGetFrame_%02d.dds"), 8))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/MesGetFrame_%02d.dds"), 9))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_ShopTalk"),
@@ -919,7 +933,7 @@ HRESULT CLoader::Loading_For_UITexture()
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_ChoiceButton"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Button/ChoiceBT_%d.png"), 2))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Button/ChoiceBT_%d.dds"), 25))))
 		return E_FAIL;
 	
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_EquipItem"),

@@ -11,9 +11,9 @@ class CUI_Manager final : public CBase
 public:
 	/* For Message*/
 	enum MSG_TYPE { PASSABLE, MUST_CHOICE };
-	enum MSGTEX_GETITEM { DGN_KEY, COMPOSS, DGN_MAP, FEATHER, BOSS_KEY, MSG_HEART, MGS_RUBY, CELLO, MSG_END };
-	enum MSGTEX_SHOPTALK { TALK_DEFAULT, BOW, MAGIC_ROD, HEART_CONTAINER, DOG_FOOD, ARROW, GIVE_MONEY, THANKYOU, SORRY };
-	enum CHOICE_TYPE { BUY_NOBUY };
+	enum MSGTEX_GETITEM { DGN_KEY, COMPOSS, DGN_MAP, FEATHER, BOSS_KEY, MSG_HEART, MGS_RUBY, CELLO, MARIN, MSG_END };
+	
+	enum CHOICE_TYPE { BUY_NOBUY, TALK_NOTTALK, MARIN_PERFUME, MARIN_CHANGE, MARIN_VECTOR, MARIN_DOT, MARIN_CHARM, MARIN_DATEME};
 	
 	typedef struct MessageTag
 	{
@@ -40,6 +40,7 @@ public:
 	void Tick_Inventory();
 	void Tick_PlayerState();
 	void Tick_Coin();
+	void Tick_Message();
 	void Setting_ChoiceButton();
 	
 public: /*Getter Setter*/
@@ -57,6 +58,7 @@ public: /*Getter Setter*/
 	_bool		Get_UI_Open() { return m_bUIOpen; }
 	_bool		Get_OpenMessage() { return m_bOpenMessage; }
 	_bool		Get_Talking() { return m_bTalking; }
+	_bool		Get_NpcGet() { return m_bNpcGet; }
 
 	LEVEL		Get_NextLevelIndex() { return m_eNextLevel; }
 	_bool		Get_NextLevel() { return m_bNextLevel; }
@@ -77,6 +79,7 @@ public:
 	void		Use_Key();
 	void		Add_MessageDesc(MSGDESC eType) { m_vecMsgDecs.push_back(eType); }
 	void		Open_Message(_bool type) { m_bOpenMessage = type;}
+	void		Clear_ChoiceButton();
 
 private:
 	LEVEL				m_eNextLevel = LEVEL_GAMEPLAY;
@@ -93,6 +96,7 @@ private:
 	vector<CObj_UI*>	m_vecChoiceButton;
 	_int				m_iChoiceIndex = 0;
 	CNpc*				m_pTalkingNpc = nullptr;
+	_bool				m_bNpcGet = false;
 	
 	/*For Inventory*/
 	_int				m_iPickedIndex = 0;

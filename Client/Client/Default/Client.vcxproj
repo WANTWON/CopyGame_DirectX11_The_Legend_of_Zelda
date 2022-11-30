@@ -182,6 +182,7 @@
     <ClInclude Include="..\Public\Grass.h" />
     <ClInclude Include="..\Public\Keese.h" />
     <ClInclude Include="..\Public\Level_Room.h" />
+    <ClInclude Include="..\Public\MarinNpc.h" />
     <ClInclude Include="..\Public\MessageBox.h" />
     <ClInclude Include="..\Public\MonsterBullet.h" />
     <ClInclude Include="..\Public\CameraManager.h" />
@@ -239,6 +240,7 @@
     <ClCompile Include="..\Private\Grass.cpp" />
     <ClCompile Include="..\Private\Keese.cpp" />
     <ClCompile Include="..\Private\Level_Room.cpp" />
+    <ClCompile Include="..\Private\MarinNpc.cpp" />
     <ClCompile Include="..\Private\MessageBox.cpp" />
     <ClCompile Include="..\Private\MonsterBullet.cpp" />
     <ClCompile Include="..\Private\CameraManager.cpp" />

@@ -39,7 +39,7 @@ HRESULT CShopNpc::Initialize(void* pArg)
 
 	_vector vPosition = XMVectorSetW(XMLoadFloat3(&m_NpcDesc.vInitPos), 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-
+	m_eNPCID = SHOP;
 	return S_OK;
 }
 
@@ -130,6 +130,8 @@ void CShopNpc::Send_Answer_toNPC(_uint iTextureNum)
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
 	CWeapon::TYPE eItemType = (CWeapon::TYPE)pPlayer->Get_PartsItemType();
 
+	pUI_Manager->Clear_ChoiceButton();
+
 	if (iTextureNum == CUIButton::BUY)
 	{
 		CUI_Manager::MSGDESC eMsgDesc;
@@ -187,10 +189,10 @@ void CShopNpc::Send_Answer_toNPC(_uint iTextureNum)
 			}
 			}
 
-			eMsgDesc.iTextureNum = CUI_Manager::THANKYOU;
+			eMsgDesc.iTextureNum = THANKYOU;
 		}	
 		else
-			eMsgDesc.iTextureNum = CUI_Manager::SORRY;
+			eMsgDesc.iTextureNum = SORRY;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 	}
 	else if (iTextureNum == CUIButton::NOBUY)
@@ -336,8 +338,11 @@ void CShopNpc::Change_Message()
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
 	pUI_Manager->Set_Talking(true);
 
-	CMessageBox::MSG_TYPE eMsgType = CMessageBox::SHOP_TALK;
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &eMsgType);
+	CMessageBox::MSGDESC MessageDesc;
+	MessageDesc.m_eMsgType = CMessageBox::SHOP_TALK;
+	MessageDesc.fPosition.x -= 150.f;
+	
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &MessageDesc);
 
 	CWeapon::TYPE eItemType = (CWeapon::TYPE)pPlayer->Get_PartsItemType();
 	CUI_Manager::MSGDESC eMsgDesc;
@@ -346,42 +351,42 @@ void CShopNpc::Change_Message()
 	{
 	case Client::CWeapon::BOW:
 		eMsgDesc.eMsgType = CUI_Manager::MUST_CHOICE;
-		eMsgDesc.iTextureNum = CUI_Manager::BOW;
+		eMsgDesc.iTextureNum = BOW;
 		eMsgDesc.eChoiceType = CUI_Manager::BUY_NOBUY;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		m_iCoin = 100;
 		break;
 	case Client::CWeapon::ARROW:
 		eMsgDesc.eMsgType = CUI_Manager::MUST_CHOICE;
-		eMsgDesc.iTextureNum = CUI_Manager::ARROW;
+		eMsgDesc.iTextureNum = ARROW;
 		eMsgDesc.eChoiceType = CUI_Manager::BUY_NOBUY;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		m_iCoin = 3;
 		break;
 	case Client::CWeapon::DOGFOOD:
 		eMsgDesc.eMsgType = CUI_Manager::MUST_CHOICE;
-		eMsgDesc.iTextureNum = CUI_Manager::DOG_FOOD;
+		eMsgDesc.iTextureNum = DOG_FOOD;
 		eMsgDesc.eChoiceType = CUI_Manager::BUY_NOBUY;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		m_iCoin = 10;
 		break;
 	case Client::CWeapon::HEART_CONTAINER:
 		eMsgDesc.eMsgType = CUI_Manager::MUST_CHOICE;
-		eMsgDesc.iTextureNum = CUI_Manager::HEART_CONTAINER;
+		eMsgDesc.iTextureNum = HEART_CONTAINER;
 		eMsgDesc.eChoiceType = CUI_Manager::BUY_NOBUY;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		m_iCoin = 50;
 		break;
 	case Client::CWeapon::MAGIC_ROD:
 		eMsgDesc.eMsgType = CUI_Manager::MUST_CHOICE;
-		eMsgDesc.iTextureNum = CUI_Manager::MAGIC_ROD;
+		eMsgDesc.iTextureNum = MAGIC_ROD;
 		eMsgDesc.eChoiceType = CUI_Manager::BUY_NOBUY;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		m_iCoin = 150;
 		break;
 	default:
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
-		eMsgDesc.iTextureNum = CUI_Manager::TALK_DEFAULT;
+		eMsgDesc.iTextureNum = TALK_DEFAULT;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		break;
 	}

@@ -113,8 +113,9 @@ void CDgnKey::Late_Tick(_float fTimeDelta)
 	if (m_pSPHERECom->Collision(pTarget->Get_Collider()) && !m_bGet)
 	{
 		m_bGet = true;
-		CMessageBox::MSG_TYPE eMsgType = CMessageBox::GET_ITEM;
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &eMsgType);
+		CMessageBox::MSGDESC MessageDesc;
+		MessageDesc.m_eMsgType = CMessageBox::GET_ITEM;
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &MessageDesc);
 
 		CUI_Manager::MSGDESC MsgDesc;
 		MsgDesc.eMsgType = CUI_Manager::PASSABLE;

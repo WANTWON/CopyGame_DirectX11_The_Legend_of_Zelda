@@ -487,6 +487,13 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Link/Bow.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_Link*/
+	PivotMatrix = XMMatrixIdentity();
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Marin.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Marin/Marin.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }

@@ -6,7 +6,14 @@ BEGIN(Client)
 class CMessageBox final : public CObj_UI
 {
 public:
-	enum MSG_TYPE {GET_ITEM, SHOP_TALK};
+	enum MSG_TYPE {GET_ITEM, SHOP_TALK, MARIN_TALK };
+
+	typedef struct MessageBoxtag
+	{
+		_float2		fPosition = _float2(g_iWinSizeX * 0.5f, 600);
+		MSG_TYPE	m_eMsgType = GET_ITEM;
+
+	}MSGDESC;
 
 private:
 	CMessageBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -31,7 +38,7 @@ private:
 	_uint		m_iTextureNum = 0;
 	_bool		m_bRender = false;
 	_float		m_fAlpha = 0.0f;
-	MSG_TYPE	m_eMsgType = GET_ITEM;
+	MSGDESC		m_MsgDesc;
 
 
 

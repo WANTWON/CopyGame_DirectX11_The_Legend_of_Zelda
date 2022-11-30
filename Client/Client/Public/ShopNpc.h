@@ -11,6 +11,8 @@ class CShopNpc final : public CNpc
 public:
 	enum STATE {LASER, LASER_ST, TALK, IDLE};
 
+	enum MSGTEX_SHOPTALK { TALK_DEFAULT, BOW, MAGIC_ROD, HEART_CONTAINER, DOG_FOOD, ARROW, GIVE_MONEY, THANKYOU, SORRY };
+
 private:
 	CShopNpc(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CShopNpc(const CShopNpc& rhs);
