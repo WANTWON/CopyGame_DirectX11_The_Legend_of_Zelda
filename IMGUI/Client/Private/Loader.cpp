@@ -513,11 +513,27 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/MovingFloorCrane/MovingFloorCrane.fbx", PivotMatrix))))
 		return E_FAIL;
 
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("CraneGameButton.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/CraneGameButton/CraneGameButton.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Necklace.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Necklace/Necklace.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("YoshiDoll.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/YoshiDoll/YoshiDoll.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MagicPowder.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/MagicPowder/MagicPowder.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("RubyPurple.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Ruby/RubyPurple.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
