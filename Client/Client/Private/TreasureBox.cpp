@@ -329,7 +329,7 @@ void CTreasureBox::OpenBox()
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	case RUBY:
-		ItemDesc.eType = CPrizeItem::RUBY;
+		ItemDesc.eType = CPrizeItem::RUBY_GREEN;
 		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 		break;
 	case FEATHER:

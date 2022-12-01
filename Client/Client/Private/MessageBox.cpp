@@ -32,6 +32,7 @@ HRESULT CMessageBox::Initialize(void * pArg)
 		break;
 	case Client::CMessageBox::SHOP_TALK:
 	case Client::CMessageBox::MARIN_TALK:
+	case Client::CMessageBox::CRANEGAME_TALK:
 		m_fSize.x = 1048 / 1.5f;
 		m_fSize.y = 240 / 1.5f;
 		break;
@@ -146,6 +147,10 @@ HRESULT CMessageBox::Ready_Components(void * pArg)
 		break;
 	case Client::CMessageBox::MARIN_TALK:
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_MarinTalk"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case Client::CMessageBox::CRANEGAME_TALK:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_CraneGameTalk"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
 	default:

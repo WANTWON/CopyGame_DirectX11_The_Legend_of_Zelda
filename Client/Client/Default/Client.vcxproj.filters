@@ -175,6 +175,9 @@
     <Filter Include="02.GameObjects\06.Npc\MarinNpc">
       <UniqueIdentifier>{ec869e40-566e-4cb6-ade4-be3539948f03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\06.Npc\CraneGameNpc">
+      <UniqueIdentifier>{2aaa7c1d-1d00-4c8d-8dfa-c9c511ee790b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -351,6 +354,9 @@
     <ClInclude Include="..\Public\MarinNpc.h">
       <Filter>02.GameObjects\06.Npc\MarinNpc</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CraneGameNpc.h">
+      <Filter>02.GameObjects\06.Npc\CraneGameNpc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -511,6 +517,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MarinNpc.cpp">
       <Filter>02.GameObjects\06.Npc\MarinNpc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CraneGameNpc.cpp">
+      <Filter>02.GameObjects\06.Npc\CraneGameNpc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

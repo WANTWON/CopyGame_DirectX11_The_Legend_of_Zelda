@@ -43,6 +43,9 @@ HRESULT CSquareBlock::Initialize(void * pArg)
 
 	Set_Scale(_float3(3.f, 3.f, 3.f));
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+	
+	if (m_BlockDesc.eType == CRANEGAME_FENCE)
+		m_bOpen = true;
 
 	return S_OK;
 }
@@ -77,6 +80,9 @@ void CSquareBlock::Late_Tick(_float fTimeDelta)
 	case TAIL_STATUE:
 		Tick_TailStatue(fTimeDelta);
 		break;
+	case CRANEGAME_FENCE:
+		Tick_CraneGameFence(fTimeDelta);
+		break;
 	}
 
 }
@@ -108,41 +114,83 @@ HRESULT CSquareBlock::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
+	CCollider::COLLIDERDESC		ColliderDesc;
+
 	switch (m_BlockDesc.eType)
 	{
 	case SQUARE_BLOCK:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_SquareBlock"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
+
+		/* For.Com_AABB*/
+		ColliderDesc.vScale = _float3(0.5f, 0.2f, 0.5f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
+			return E_FAIL;
+
+		/* For.Com_SHPERE */
+		ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+		ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
+			return E_FAIL;
 		break;
 	case LOCK_BLOCK:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_LockBlock"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_AABB*/
+		ColliderDesc.vScale = _float3(0.5f, 0.2f, 0.5f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
+			return E_FAIL;
+
+		/* For.Com_SHPERE */
+		ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+		ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 			return E_FAIL;
 		break;
 	case TAIL_STATUE:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_TailStatue"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
+
+		/* For.Com_AABB*/
+		ColliderDesc.vScale = _float3(0.5f, 0.2f, 0.5f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
+			return E_FAIL;
+
+		/* For.Com_SHPERE */
+		ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+		ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
+			return E_FAIL;
+		break;
+	case CRANEGAME_FENCE:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_ROOM, TEXT("Prototype_Component_Model_CraneFence"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_AABB*/
+		ColliderDesc.vScale = _float3(0.2f, 0.5f, 0.8f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
+			return E_FAIL;
+
 		break;
 	}
 	
 
-	CCollider::COLLIDERDESC		ColliderDesc;
-
-	/* For.Com_AABB*/
-	ColliderDesc.vScale = _float3(0.5f, 0.2f, 0.5f);
-	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
-		return E_FAIL;
-
-	/* For.Com_SHPERE */
-	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
-	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
-		return E_FAIL;
 
 	return S_OK;
 }
@@ -320,6 +368,59 @@ void CSquareBlock::Tick_TailStatue(_float fTimeDelta)
 	}
 	else
 		pButton->Set_Visible(false);
+}
+
+void CSquareBlock::Tick_CraneGameFence(_float fTimeDelta)
+{
+	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) == false)
+		return;
+
+	if (nullptr != m_pRendererCom)
+	{
+#ifdef _DEBUG
+		if (m_pAABBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pAABBCom);
+		if (m_pOBBCom != nullptr)
+			m_pRendererCom->Add_Debug(m_pOBBCom);
+		if (m_pSPHERECom != nullptr)
+			m_pRendererCom->Add_Debug(m_pSPHERECom);
+#endif
+
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
+	}
+
+	if (m_bOpen)
+	{
+		_float fPositionY = XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		if(!m_bCollisionSet)
+			m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -1.f, 0.f, 0.f));
+		
+		if (fPositionY < -1 && !m_bCollisionSet)
+		{
+			m_bCollisionSet = true;
+			CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+		}
+	}
+	else
+	{
+		_float fPositionY = XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		if (!m_bCollisionSet)
+			m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+
+		if (fPositionY > -0.2f && !m_bCollisionSet)
+		{
+			m_bCollisionSet = true;
+			CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+		}
+	}
+
+
+	if (CGameInstance::Get_Instance()->Key_Up(DIK_7))
+		Set_Open(!m_bOpen);
+
+
+	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
 }
 
 

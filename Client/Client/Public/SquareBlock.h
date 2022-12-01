@@ -8,7 +8,7 @@ BEGIN(Client)
 class CSquareBlock final : public CNonAnim
 {
 public:
-	enum TYPE {SQUARE_BLOCK , LOCK_BLOCK, TAIL_STATUE };
+	enum TYPE {SQUARE_BLOCK , LOCK_BLOCK, TAIL_STATUE, CRANEGAME_FENCE };
 
 	typedef struct BlockTag
 	{
@@ -28,16 +28,19 @@ public:
 	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
+	void Set_Open(_bool type) { m_bOpen = type; m_bCollisionSet = false; }
 
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;
 	void Tick_SquareBlock(_float fTimeDelta);
 	void Tick_LockBlock(_float fTimeDelta);
 	void Tick_TailStatue(_float fTimeDelta);
+	void Tick_CraneGameFence(_float fTimeDelta);
 
 private:
 	BLOCKDESC m_BlockDesc;
 	_bool	  m_bOpen = false;
+	_bool	  m_bCollisionSet = false;
 
 public:
 	static CSquareBlock* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

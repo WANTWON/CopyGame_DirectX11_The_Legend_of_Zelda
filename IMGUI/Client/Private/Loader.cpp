@@ -237,7 +237,7 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	_matrix			PivotMatrix = XMMatrixIdentity();
-//
+
 //#pragma region Field
 //	for (int i = 0; i < 17; ++i)
 //	{
@@ -272,7 +272,7 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 //	}
 //
 //#pragma endregion Field
-//
+
 //
 //#pragma region TailCave
 //	for (int i = 1; i < 9; ++i)
@@ -533,6 +533,9 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Ruby/RubyPurple.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("GameShopOwner.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/GameShopOwner/GameShopOwner.fbx", PivotMatrix))))
+		return E_FAIL;
 	
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;

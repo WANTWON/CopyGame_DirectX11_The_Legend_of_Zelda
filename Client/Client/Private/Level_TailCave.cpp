@@ -22,6 +22,7 @@
 #include "Portal.h"
 #include "SquareBlock.h"
 #include "PrizeItem.h"
+#include "CollapseTile.h"
 
 CLevel_TailCave::CLevel_TailCave(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -423,7 +424,10 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 		}
 		else if (!wcscmp(pModeltag, TEXT("CollapseTile.fbx")))
 		{
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CollapeTile"), LEVEL_TAILCAVE, pLayerTag, &ModelDesc.vPosition)))
+			CCollapseTile::TILEDESC TileDesc;
+			TileDesc.eTileType = CCollapseTile::COLLAPSE;
+			TileDesc.vInitPosition = ModelDesc.vPosition;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CollapeTile"), LEVEL_TAILCAVE, pLayerTag, &TileDesc)))
 				return E_FAIL;
 		}
 		else if (!wcscmp(pModeltag, TEXT("SquareBlock.fbx")))

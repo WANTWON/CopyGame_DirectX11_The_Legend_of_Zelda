@@ -174,7 +174,7 @@ void CPrizeItem::LateTick_DefaultModeItem(_float fTimeDelta)
 	if (m_bGet)
 	{
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-		if (m_ItemDesc.eType == RUBY)
+		if (m_ItemDesc.eType == RUBY_GREEN)
 			pPlayer->Set_RubyAdd();
 		else if (m_ItemDesc.eType == HEART_RECOVERY)
 			pPlayer->Set_RecoverHp();
@@ -261,7 +261,7 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_HeartRecovery"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
-	case RUBY:
+	case RUBY_GREEN:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Ruby"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
@@ -299,6 +299,26 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 	case BOW:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_ItemBow"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case RUBYPURPLE:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RubyPurple"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case MAGICPOWDER:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_MagicPowder"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case YOSHIDOLL:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_YoshiDoll"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case NECKLACE:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Necklace"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
 	default:

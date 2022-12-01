@@ -21,7 +21,9 @@ HRESULT CCollapseTile::Initialize_Prototype()
 
 HRESULT CCollapseTile::Initialize(void * pArg)
 {
-	
+	if (pArg != nullptr)
+		memcpy(&m_TileDesc, pArg, sizeof(TILEDESC));
+
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
@@ -36,7 +38,7 @@ HRESULT CCollapseTile::Initialize(void * pArg)
 	}
 
 	Set_Scale(_float3(3.f, 3.f, 3.f));
-	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
+	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_TRAP, this);
 
 	return S_OK;
 }
@@ -45,7 +47,7 @@ int CCollapseTile::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
-		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
+		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_TRAP, this);
 		return OBJ_DEAD;
 	}
 	
@@ -72,18 +74,18 @@ void CCollapseTile::Late_Tick(_float fTimeDelta)
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-	if (m_pOBBCom != nullptr && m_pOBBCom->Collision(pTarget->Get_Collider()))
+	switch (m_TileDesc.eTileType)
 	{
-		m_fAlpha -= 0.05f;
-
-		if (m_fAlpha <= 0.f)
-			m_bDead = true;	
+	case COLLAPSE:
+		CollapseTile_Tick(fTimeDelta);
+		break;
+	case CRANE_TILE:
+		CraneTile_Tick(fTimeDelta);
+		break;
+	default:
+		break;
 	}
 
-
-	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CCollapseTile::Render()
@@ -104,7 +106,7 @@ HRESULT CCollapseTile::Ready_Components(void * pArg)
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
-	TransformDesc.fSpeedPerSec = 4.0f;
+	TransformDesc.fSpeedPerSec = 1.0f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
@@ -113,9 +115,27 @@ HRESULT CCollapseTile::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_Model*/
-	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_CollapseTile"), (CComponent**)&m_pModelCom)))
-		return E_FAIL;
+	switch (m_TileDesc.eTileType)
+	{
+	case COLLAPSE:
+
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_CollapseTile"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case CRANE_TILE:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_ROOM, TEXT("Prototype_Component_Model_MovingFloorCrane"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_Navigation */
+		if (FAILED(__super::Add_Components(TEXT("Com_Navigation_CraneGame"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_CraneGame"), (CComponent**)&m_pNavigationCom)))
+			return E_FAIL;
+		break;
+	default:
+		break;
+	}
+
 
 	CCollider::COLLIDERDESC		ColliderDesc;
 
@@ -123,11 +143,42 @@ HRESULT CCollapseTile::Ready_Components(void * pArg)
 	ColliderDesc.vScale = _float3(0.5f, 0.2f, 0.5f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
 
 	return S_OK;
+}
+
+void CCollapseTile::CollapseTile_Tick(_float fTimeDelta)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	if (m_pOBBCom != nullptr && m_pOBBCom->Collision(pTarget->Get_Collider()))
+	{
+		m_fAlpha -= 0.05f;
+
+		if (m_fAlpha <= 0.f)
+			m_bDead = true;
+	}
+
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CCollapseTile::CraneTile_Tick(_float fTimeDelta)
+{
+
+	if (m_pTransformCom->Go_PosDir(fTimeDelta, m_vDir, m_pNavigationCom) == false)
+	{
+		
+		m_vDir *= -1.f;
+	}
+
+	//if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_TRAP, m_pOBBCom))
+//	{
+	//	m_vDir *= -1.f;
+	//}
 }
 
 
@@ -160,5 +211,7 @@ CGameObject * CCollapseTile::Clone(void * pArg)
 void CCollapseTile::Free()
 {
 	__super::Free();
+
+	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_TRAP, this);
 
 }

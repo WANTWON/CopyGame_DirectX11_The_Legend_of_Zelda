@@ -535,6 +535,25 @@ void CUI_Manager::Setting_ChoiceButton()
 				return;
 
 		}
+		else if (m_vecMsgDecs.front().eChoiceType == DO_UNDO)
+		{
+
+			CUIButton::BUTTONDESC ButtonDesc;
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::DO;
+			ButtonDesc.vPosition = _float2(1100, 550);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+			ButtonDesc.eButtonType = CUIButton::BTN_CHOICE;
+			ButtonDesc.iTexNum = CUIButton::UNDO;
+			ButtonDesc.vPosition = _float2(1100, 610);
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, TEXT("Layer_UIChoice"), &ButtonDesc)))
+				return;
+
+		}
 		m_bChoice = true;
 	}
 

@@ -6,7 +6,7 @@ BEGIN(Client)
 class CMessageBox final : public CObj_UI
 {
 public:
-	enum MSG_TYPE {GET_ITEM, SHOP_TALK, MARIN_TALK };
+	enum MSG_TYPE {GET_ITEM, SHOP_TALK, MARIN_TALK , CRANEGAME_TALK};
 
 	typedef struct MessageBoxtag
 	{

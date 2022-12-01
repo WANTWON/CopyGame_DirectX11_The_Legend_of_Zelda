@@ -28,6 +28,7 @@
 //for NPC
 #include "ShopNpc.h"
 #include "MarinNpc.h"
+#include "CraneGameNpc.h"
 
 //for UI
 #include "BackGround.h"
@@ -181,6 +182,11 @@ HRESULT CLoader::Loading_ForStaticLevel()
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Room_Navi.dat")))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Navigation */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_CraneGame"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/CraneGame_Navi.dat")))))
+		return E_FAIL;
+
 	/*For.Prototype_Component_Model_Link*/
 	_matrix			PivotMatrix = XMMatrixIdentity();
 	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
@@ -277,6 +283,24 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	/*For.Prototype_Component_Model_FullMoonCello*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_FullMoonCello"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/FullMoonCello/FullMoonCello.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Necklace"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Necklace/Necklace.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_YoshiDoll"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/YoshiDoll/YoshiDoll.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_MagicPowder"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/MagicPowder/MagicPowder.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_RubyPurple"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Ruby/RubyPurple.fbx", PivotMatrix))))
 		return E_FAIL;
 
 
@@ -673,6 +697,10 @@ HRESULT CLoader::Loading_ForRoomLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/ShopNpc/ShopNpc.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_GameShopOwner*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("Prototype_Component_Model_GameShopOwner"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/GameShopOwner/GameShopOwner.fbx", PivotMatrix))))
+		return E_FAIL;
 
 	PivotMatrix = XMMatrixIdentity();
 	
@@ -686,7 +714,36 @@ HRESULT CLoader::Loading_ForRoomLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Shop/Shop.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_CraneGame*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("CraneGame.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/CraneGame/CraneGame.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+	/*For.Prototype_Component_Model_Crane*/
+	PivotMatrix = XMMatrixIdentity();
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("Crane.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Crane/Crane.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Crane*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("Prototype_Component_Model_CraneFence"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/CraneFence/CraneFence.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("Prototype_Component_Model_MovingFloorCrane"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/MovingFloorCrane/MovingFloorCrane.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("CraneGameButton.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/CraneGameButton/CraneGameButton.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	
+
+
 	RELEASE_INSTANCE(CGameInstance);
+
 
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 
@@ -698,6 +755,11 @@ HRESULT CLoader::Loading_ForRoomLevel()
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/*For.Prototype_GameObject_MarinNpc*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CraneGameNpc"),
+		CCraneGameNpc::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	/*For.Prototype_GameObject_MarinNpc*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MarinNpc"),
@@ -880,6 +942,10 @@ HRESULT CLoader::Loading_For_UITexture()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_CraneGameTalk"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/CraneGameTalk_%d.dds"), 6))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_MarinTalk"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/MarinTalk_%d.dds"), 21))))
 		return E_FAIL;
@@ -933,7 +999,7 @@ HRESULT CLoader::Loading_For_UITexture()
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_ChoiceButton"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Button/ChoiceBT_%d.dds"), 25))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Button/ChoiceBT_%d.dds"), 27))))
 		return E_FAIL;
 	
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_EquipItem"),

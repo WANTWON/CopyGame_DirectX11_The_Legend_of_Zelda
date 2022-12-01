@@ -271,7 +271,10 @@ void CCamera_Dynamic::Room_Camera(_float fTimeDelta)
 		}
 	}
 
-	m_pTransform->LookAt(XMVectorSet(0.f,0.f,0.f,1.f));
+	//m_fTargetPos.x = 0.f;
+	m_pTransform->LookAt(XMLoadFloat4(&m_fTargetPos));
+	//_vector Position = XMVectorSet(0.f, 11.8f, -5.5f, 1.f);
+	//m_pTransform->Go_PosLerp(fTimeDelta, Position, 1.f);
 	m_pTransform->Go_PosLerp(fTimeDelta, XMLoadFloat4(&m_fTargetPos), 1.f, XMVectorSet(m_vDistance.x, m_vDistance.y, m_vDistance.z, 0.f));
 
 

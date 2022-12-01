@@ -199,7 +199,7 @@ HRESULT CMonster::Drop_Items()
 	if (iRadomItem == 1)
 		ItemDesc.eType = CPrizeItem::HEART_RECOVERY;
 	else
-		ItemDesc.eType = CPrizeItem::RUBY;
+		ItemDesc.eType = CPrizeItem::RUBY_GREEN;
 
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
 

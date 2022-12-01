@@ -350,13 +350,13 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 	if (CGameInstance::Get_Instance()->Key_Pressing(DIK_0))
 		m_tInfo.iCoin++;
-	if (CGameInstance::Get_Instance()->Key_Pressing(DIK_8))
+	if (CGameInstance::Get_Instance()->Key_Pressing(DIK_MINUS))
 	{
 		m_tInfo.iCoin--;
 		if(m_tInfo.iCoin < 0)
 			m_tInfo.iCoin = 0;
 	}
-	if (CGameInstance::Get_Instance()->Key_Up(DIK_7))
+	if (CGameInstance::Get_Instance()->Key_Up(DIK_8))
 	{
 		m_tInfo.iCurrentHp--;
 		if (m_tInfo.iCurrentHp < 0)
@@ -515,6 +515,8 @@ void CPlayer::Change_Navigation(LEVEL eLevel)
 			m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_Room")));
 		else if (eRoomType == CUI_Manager::SHOP)
 			m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_Shop")));
+		else if (eRoomType == CUI_Manager::CRANEGAME)
+			m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_CraneGame")));
 		break;
 	}
 	case Client::LEVEL_TAILCAVE:
@@ -584,6 +586,9 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 		return E_FAIL;
 	m_vecNavigaitions.push_back(m_pNavigationCom);
 
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_CraneGame"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_CraneGame"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+		return E_FAIL;
+	m_vecNavigaitions.push_back(m_pNavigationCom);
 
 	return S_OK;
 }

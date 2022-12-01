@@ -179,9 +179,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 		case Client::LEVEL_ROOM:
 			CUI_Manager::ROOMTYPE eRoomType = CUI_Manager::Get_Instance()->Get_RoomType();
 			if(eRoomType == CUI_Manager::MARINHOUSE)
-				pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 50.f, 46.8f, 1.f));
+				pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 0.f, 46.8f, 1.f));
 			else if(eRoomType == CUI_Manager::SHOP)
-				pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(52.0f, 50.f, 60.f, 1.f));
+				pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(52.0f, 0.f, 60.f, 1.f));
+			else if (eRoomType == CUI_Manager::CRANEGAME)
+				pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(53.9f, 0.f, 34.38f, 1.f));
 			break;
 		}
 
@@ -499,7 +501,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Object(const _tchar * pLayerTag)
 		else if (!wcscmp(pModeltag, TEXT("TailCaveStatue.fbx")))
 		{
 
-			CDoor::DOORDESC DoorDesc;
 			CSquareBlock::BLOCKDESC BlockDesc;
 			BlockDesc.eType = CSquareBlock::TAIL_STATUE;
 			BlockDesc.vInitPosition = ModelDesc.vPosition;
@@ -618,6 +619,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_Portal(const _tchar * pLayerTag)
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
 		return E_FAIL;
 
+
+	ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+	PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
+	PortalDesc.vInitPos = ModelDesc.vPosition;
+	PortalDesc.eConnectLevel = LEVEL_ROOM;
+	PortalDesc.eRoomType = CPortal::CRANE_GAME;
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
+		return E_FAIL;
 
 	CloseHandle(hFile);
 	RELEASE_INSTANCE(CGameInstance);
