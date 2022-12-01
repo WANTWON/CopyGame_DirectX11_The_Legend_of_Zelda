@@ -8,6 +8,14 @@ texture2D		g_NormalTexture;
 texture2D		g_SpecularTexture;
 
 
+inline float4 UnpackNormal(float4 packednormal)
+{
+	float4 normal;
+	normal.xy = packednormal.wy * 2 - 1;
+	normal.z = sqrt(1 - normal.x*normal.x - normal.y * normal.y);
+	return normal;
+}
+
 
 struct VS_IN
 {
@@ -20,9 +28,12 @@ struct VS_IN
 struct VS_OUT
 {
 	float4		vPosition : SV_POSITION;
-	float4		vNormal : NORMAL;
+	float3		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
 	float4		vProjPos : TEXCOORD1;
+
+	float3		vTangent : TANGENT;
+	float3		vBinormal : BINORMAL;
 };
 
 /* DrawIndexed함수를 호출하면. */
@@ -43,9 +54,12 @@ VS_OUT VS_MAIN(VS_IN In)
 	/* 정점의 위치에 월드 뷰 투영행렬을 곱한다. 현재 정점은 ViewSpace에 존재하낟. */
 	/* 투영행렬까지 곱하면 정점위치의 w에 뷰스페이스 상의 z를 보관한다. == Out.vPosition이 반드시 float4이어야하는 이유. */
 	Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
-	Out.vNormal = vNormal;
+	Out.vNormal = vNormal.xyz;
 	Out.vTexUV = In.vTexUV;
 	Out.vProjPos = Out.vPosition;
+
+	Out.vTangent = normalize(mul(vector(In.vTangent, 0.f), g_WorldMatrix)).xyz;
+	Out.vBinormal = cross(Out.vNormal, Out.vTangent);
 	return Out;
 }
 
@@ -53,9 +67,12 @@ VS_OUT VS_MAIN(VS_IN In)
 struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
-	float4		vNormal : NORMAL;
+	float3		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
 	float4		vProjPos : TEXCOORD1;
+
+	float3		vTangent : TANGENT;
+	float3		vBinormal : BINORMAL;
 };
 
 struct PS_OUT
@@ -73,7 +90,27 @@ PS_OUT PS_MAIN(PS_IN In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
+
+	float3	vNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
+
+	/*float4  vNormalTemp;
+	vNormalTemp.xyz = vNormal.xyz;
+	vNormalTemp.w = 1.f;
+	float4 normal;
+	normal.xy = vNormalTemp.wy * 2 - 1;
+	normal.z = sqrt(1 - normal.x*normal.x - normal.y * normal.y);
+	vNormal = normal.xyz;*/
+
+	vNormal = vNormal * 2.f - 1.f;
+
+
+
+	float3x3	WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+	vNormal = mul(vNormal, WorldMatrix);
+	Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
+
+
 	Out.vDepth = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
 	//Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f) ;

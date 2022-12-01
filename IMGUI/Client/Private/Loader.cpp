@@ -319,6 +319,11 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Shop/Shop.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_CraneGame*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("CraneGame.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/CraneGame/CraneGame.fbx", PivotMatrix))))
+		return E_FAIL;
+
 
 
 	/* Model for Monster */
@@ -487,11 +492,30 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Link/Bow.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	/*For.Prototype_Component_Model_Link*/
+	/*For.Prototype_Component_Model_Marin*/
 	PivotMatrix = XMMatrixIdentity();
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Marin.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Marin/Marin.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Crane*/
+	PivotMatrix = XMMatrixIdentity();
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Crane.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Crane/Crane.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("CraneFence.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/CraneFence/CraneFence.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MovingFloorCrane.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/MovingFloorCrane/MovingFloorCrane.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("CraneGameButton.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/CraneGameButton/CraneGameButton.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
