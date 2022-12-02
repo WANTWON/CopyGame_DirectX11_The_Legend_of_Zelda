@@ -51,6 +51,8 @@ public: /*Getter Setter*/
 	void		Set_NextLevelFinished(_bool type) { m_bFinishedReady = type; }
 	void		Set_RoomType(ROOMTYPE eType) { m_eRoomType = eType; }
 	void		Set_Talking(_bool type) { m_bTalking = type; }
+	void		Set_PlayGame(_bool type) { m_bPlayGame = type; }
+
 
 	void		Get_Key();
 	_uint		Get_KeySize() { return (_uint)m_KeyList.size(); }
@@ -59,6 +61,10 @@ public: /*Getter Setter*/
 	_bool		Get_OpenMessage() { return m_bOpenMessage; }
 	_bool		Get_Talking() { return m_bTalking; }
 	_bool		Get_NpcGet() { return m_bNpcGet; }
+	_bool 		Get_PlayGame() { return m_bPlayGame; }
+	CNpc*		Get_TalkingNpc() { return m_pTalkingNpc; }
+
+
 
 	LEVEL		Get_NextLevelIndex() { return m_eNextLevel; }
 	_bool		Get_NextLevel() { return m_bNextLevel; }
@@ -97,6 +103,7 @@ private:
 	_int				m_iChoiceIndex = 0;
 	CNpc*				m_pTalkingNpc = nullptr;
 	_bool				m_bNpcGet = false;
+	_bool				m_bPlayGame = false;
 	
 	/*For Inventory*/
 	_int				m_iPickedIndex = 0;

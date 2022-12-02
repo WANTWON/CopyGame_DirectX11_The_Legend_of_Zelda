@@ -48,6 +48,7 @@ public: /* Getter Setter */
 	void		Set_State(CTransform::STATE eState, _fvector vState);
 	void		Set_Scale(_float3 vScale);
 	CCollider*	Get_Collider();
+	_bool		Get_Stop() { return m_bStop; }
 	void		Set_Stop(_bool type) { m_bStop = type; }
 	_bool		Get_IsSocket() { return m_bSocket; }
 	

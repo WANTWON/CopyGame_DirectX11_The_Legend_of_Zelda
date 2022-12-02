@@ -51,6 +51,8 @@
 #include "Portal.h"
 #include "PrizeItem.h"
 #include "Grass.h"
+#include "CraneButton.h"
+#include "Crane.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -722,7 +724,7 @@ HRESULT CLoader::Loading_ForRoomLevel()
 
 	/*For.Prototype_Component_Model_Crane*/
 	PivotMatrix = XMMatrixIdentity();
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("Crane.fbx"),
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("Prototype_Component_Model_Crane"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Crane/Crane.fbx", PivotMatrix))))
 		return E_FAIL;
 
@@ -735,7 +737,7 @@ HRESULT CLoader::Loading_ForRoomLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/MovingFloorCrane/MovingFloorCrane.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("CraneGameButton.fbx"),
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("Prototype_Component_Model_CraneGameButton"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/CraneGameButton/CraneGameButton.fbx", PivotMatrix))))
 		return E_FAIL;
 
@@ -756,7 +758,17 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	/*For.Prototype_GameObject_MarinNpc*/
+	/*For.Prototype_GameObject_Crane*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Crane"),
+		CCrane::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_CraneButton*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CraneButton"),
+		CCraneButton::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_CraneGameNpc*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CraneGameNpc"),
 		CCraneGameNpc::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -943,7 +955,7 @@ HRESULT CLoader::Loading_For_UITexture()
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_CraneGameTalk"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/CraneGameTalk_%d.dds"), 6))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/CraneGameTalk_%d.dds"), 7))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_MarinTalk"),
@@ -995,7 +1007,7 @@ HRESULT CLoader::Loading_For_UITexture()
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_InteractButton"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Button/InteractBT_%d.png"), 3))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Button/InteractBT_%d.dds"), 4))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_ChoiceButton"),

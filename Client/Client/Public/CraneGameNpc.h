@@ -11,7 +11,7 @@ class CCraneGameNpc final : public CNpc
 public:
 	enum STATE {FALL, FALL_ED, FALL_ED_LP, RAGE, TALK, IDLE};
 
-	enum MSGTEX_SHOPTALK { TALK_DEFAULT, HOW_TO_PLAY, LETS_GO, ONE_MORE_TIME, FIGHTING, GOODBYE };
+	enum MSGTEX_SHOPTALK { TALK_DEFAULT, HOW_TO_PLAY, LETS_GO, ONE_MORE_TIME, FIGHTING, GOODBYE , SORRY };
 
 private:
 	CCraneGameNpc(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -28,6 +28,7 @@ public:
 public:
 	virtual void Check_Navigation(_float fTimeDelta);
 	virtual void Send_Answer_toNPC(_uint iTextureNum) override;
+	_bool	Get_GameStart() { return m_bGameStart; };
 
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
@@ -41,6 +42,7 @@ private:
 	STATE m_eState = IDLE;
 	_int  m_iCoin = 0;
 	_bool m_bGameStart = false;
+	_bool m_bFirst = false;
 
 public:
 	virtual void Free() override;

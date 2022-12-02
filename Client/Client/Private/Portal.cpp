@@ -47,7 +47,7 @@ int CPortal::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
-		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
+		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_INTERACT, this);
 		return OBJ_DEAD;
 	}
 	

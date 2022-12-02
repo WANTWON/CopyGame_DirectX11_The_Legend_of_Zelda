@@ -175,6 +175,8 @@
     <ClInclude Include="..\Public\BladeTrap.h" />
     <ClInclude Include="..\Public\Camera_2D.h" />
     <ClInclude Include="..\Public\CollapseTile.h" />
+    <ClInclude Include="..\Public\Crane.h" />
+    <ClInclude Include="..\Public\CraneButton.h" />
     <ClInclude Include="..\Public\CraneGameNpc.h" />
     <ClInclude Include="..\Public\Data_Manager.h" />
     <ClInclude Include="..\Public\DgnKey.h" />
@@ -234,6 +236,8 @@
     <ClCompile Include="..\Private\BladeTrap.cpp" />
     <ClCompile Include="..\Private\Camera_2D.cpp" />
     <ClCompile Include="..\Private\CollapseTile.cpp" />
+    <ClCompile Include="..\Private\Crane.cpp" />
+    <ClCompile Include="..\Private\CraneButton.cpp" />
     <ClCompile Include="..\Private\CraneGameNpc.cpp" />
     <ClCompile Include="..\Private\Data_Manager.cpp" />
     <ClCompile Include="..\Private\DgnKey.cpp" />

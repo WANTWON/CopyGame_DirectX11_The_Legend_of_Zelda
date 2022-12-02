@@ -28,7 +28,7 @@ public:
 	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
-	void Set_Open(_bool type) { m_bOpen = type; m_bCollisionSet = false; }
+	void Set_Open(_bool type) { m_bOpen = type; }
 
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;

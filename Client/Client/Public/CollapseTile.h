@@ -30,6 +30,8 @@ public:
 	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
+	CBaseObj* Get_CollisionObj() { return m_pCollisionObj; }
+	void Set_Check(_bool type) { m_bCheck = type; }
 
 
 private:
@@ -41,6 +43,8 @@ private:
 	TILEDESC m_TileDesc;
 	_vector					m_vDir = XMVectorSet(1.f, 0.f, 0.f, 0.f);
 	CNavigation*			m_pNavigationCom = nullptr;
+	CBaseObj*				m_pCollisionObj = nullptr;
+	_bool					m_bCheck = false;
 public:
 	static CCollapseTile* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

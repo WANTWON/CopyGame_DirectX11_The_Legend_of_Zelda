@@ -8,6 +8,7 @@
 #include "UIButton.h"
 #include "Npc.h"
 #include "MarinNpc.h"
+#include "CraneGameNpc.h"
 
 IMPLEMENT_SINGLETON(CUI_Manager)
 
@@ -308,6 +309,10 @@ void CUI_Manager::Tick_Message()
 					m_bNpcGet = true;
 					if (dynamic_cast<CMarinNpc*>(m_pTalkingNpc)->Get_IsGet() == true)
 						dynamic_cast<CMarinNpc*>(m_pTalkingNpc)->Set_GetMode();
+				}
+				else if (m_pTalkingNpc != nullptr && m_pTalkingNpc->Get_NpcID() == CNpc::CRANE_GAME)
+				{
+					m_bPlayGame = dynamic_cast<CCraneGameNpc*>(m_pTalkingNpc)->Get_GameStart();
 				}
 			}
 		}

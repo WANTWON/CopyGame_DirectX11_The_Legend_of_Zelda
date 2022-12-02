@@ -43,7 +43,6 @@ private:
 private:
 	ITEMDESC				m_ItemDesc;
 	_bool					m_bGet = false;
-	
 	_float4x4				m_CombinedWorldMatrix;
 
 private:

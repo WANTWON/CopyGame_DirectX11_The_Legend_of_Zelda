@@ -5,6 +5,8 @@
 #include "UI_Manager.h"
 #include "UIButton.h"
 #include "Door.h"
+#include "Npc.h"
+#include "CraneGameNpc.h"
 
 CSquareBlock::CSquareBlock(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -188,6 +190,7 @@ HRESULT CSquareBlock::Ready_Components(void * pArg)
 			return E_FAIL;
 
 		break;
+		
 	}
 	
 
@@ -404,22 +407,30 @@ void CSquareBlock::Tick_CraneGameFence(_float fTimeDelta)
 	else
 	{
 		_float fPositionY = XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-		if (!m_bCollisionSet)
+		if (m_bCollisionSet)
 			m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 1.f, 0.f, 0.f));
 
-		if (fPositionY > -0.2f && !m_bCollisionSet)
+		if (fPositionY > -0.2f && m_bCollisionSet)
 		{
-			m_bCollisionSet = true;
+			m_bCollisionSet = false;
 			CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
 		}
 	}
 
-
-	if (CGameInstance::Get_Instance()->Key_Up(DIK_7))
-		Set_Open(!m_bOpen);
+	CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
+	if (pUI_Manager->Get_Talking() == false)
+	{
+		if(pUI_Manager->Get_PlayGame() == true)
+			Set_Open(false);
+		else
+			Set_Open(true);
+	}
+		
 
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+	RELEASE_INSTANCE(CUI_Manager);
 
 }
 

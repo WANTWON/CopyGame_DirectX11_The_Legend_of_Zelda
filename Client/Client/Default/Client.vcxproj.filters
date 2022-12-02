@@ -178,6 +178,12 @@
     <Filter Include="02.GameObjects\06.Npc\CraneGameNpc">
       <UniqueIdentifier>{2aaa7c1d-1d00-4c8d-8dfa-c9c511ee790b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\05.Object\04.CraneButton">
+      <UniqueIdentifier>{afdfe9d9-9ae0-453f-8f2e-722bbeace43b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.NonAnim\08.Crane">
+      <UniqueIdentifier>{a54f2e90-1238-43cc-bac3-c11f8e240973}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -357,6 +363,12 @@
     <ClInclude Include="..\Public\CraneGameNpc.h">
       <Filter>02.GameObjects\06.Npc\CraneGameNpc</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CraneButton.h">
+      <Filter>02.GameObjects\05.Object\04.CraneButton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Crane.h">
+      <Filter>02.GameObjects\01.NonAnim\08.Crane</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -520,6 +532,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\CraneGameNpc.cpp">
       <Filter>02.GameObjects\06.Npc\CraneGameNpc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CraneButton.cpp">
+      <Filter>02.GameObjects\05.Object\04.CraneButton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Crane.cpp">
+      <Filter>02.GameObjects\01.NonAnim\08.Crane</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

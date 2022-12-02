@@ -171,14 +171,32 @@ void CCollapseTile::CraneTile_Tick(_float fTimeDelta)
 
 	if (m_pTransformCom->Go_PosDir(fTimeDelta, m_vDir, m_pNavigationCom) == false)
 	{
-		
+
 		m_vDir *= -1.f;
 	}
 
-	//if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_TRAP, m_pOBBCom))
-//	{
-	//	m_vDir *= -1.f;
-	//}
+	if (!m_bCheck &&  CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_INTERACT, m_pOBBCom, &m_pCollisionObj))
+	{
+		m_bCheck = true;
+		
+	}
+
+	if (!m_bCheck && m_pCollisionObj == nullptr && CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_ITEM, m_pOBBCom, &m_pCollisionObj))
+	{
+		if (m_pCollisionObj != nullptr)
+		{
+			_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			vPosition = XMVectorSetY(vPosition, 1.f);
+			m_pCollisionObj->Set_State(CTransform::STATE_POSITION, vPosition);
+		}
+	}
+
+	if (!m_bCheck && m_pCollisionObj != nullptr)
+	{
+		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vPosition = XMVectorSetY(vPosition, 1.f);
+		m_pCollisionObj->Set_State(CTransform::STATE_POSITION, vPosition);
+	}
 }
 
 
@@ -214,4 +232,5 @@ void CCollapseTile::Free()
 
 	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_TRAP, this);
 
+	Safe_Release(m_pNavigationCom);
 }

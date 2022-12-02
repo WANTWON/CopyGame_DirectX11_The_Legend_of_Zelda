@@ -69,7 +69,7 @@ void CCraneGameNpc::Late_Tick(_float fTimeDelta)
 
 
 	CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
-
+	
 	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom))
 	{
 		if (m_eState == IDLE)
@@ -94,12 +94,13 @@ void CCraneGameNpc::Late_Tick(_float fTimeDelta)
 			m_eState = TALK;
 			Change_Message();
 		}
-
+		m_bFirst = false;
 	}
-	else
+	else if(!m_bFirst)
 	{
 		pButton->Set_Visible(false);
 		m_eState = IDLE;
+		m_bFirst = true;
 	}
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -132,15 +133,26 @@ void CCraneGameNpc::Send_Answer_toNPC(_uint iTextureNum)
 
 	if (iTextureNum == CUIButton::DO)
 	{
-		CUI_Manager::MSGDESC eMsgDesc;
-		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
-		eMsgDesc.iTextureNum = HOW_TO_PLAY;
-		pUI_Manager->Add_MessageDesc(eMsgDesc);
+		if (pPlayer->Set_RubyUse(10))
+		{
+			CUI_Manager::MSGDESC eMsgDesc;
+			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
+			eMsgDesc.iTextureNum = HOW_TO_PLAY;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
 
-		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
-		eMsgDesc.iTextureNum = LETS_GO;
-		pUI_Manager->Add_MessageDesc(eMsgDesc);
-		m_bGameStart = true;
+
+			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
+			eMsgDesc.iTextureNum = LETS_GO;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
+			m_bGameStart = true;
+		}
+		else
+		{
+			CUI_Manager::MSGDESC eMsgDesc;
+			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
+			eMsgDesc.iTextureNum = SORRY;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
+		}
 	}
 
 	RELEASE_INSTANCE(CUI_Manager);
@@ -230,6 +242,12 @@ void CCraneGameNpc::Change_Message()
 	CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
 	pUI_Manager->Set_Talking(true);
+
+
+	/*if (CUI_Manager::Get_Instance()->Get_PlayGame() == false)
+	{
+	m_bGameStart = false;
+	}*/
 
 	CMessageBox::MSGDESC MessageDesc;
 	MessageDesc.m_eMsgType = CMessageBox::CRANEGAME_TALK;

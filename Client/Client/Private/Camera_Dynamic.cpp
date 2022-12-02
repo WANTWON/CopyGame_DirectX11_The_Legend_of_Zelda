@@ -66,6 +66,9 @@ int CCamera_Dynamic::Tick(_float fTimeDelta)
 	case Client::CCamera_Dynamic::CAM_ROOM:
 		Room_Camera(fTimeDelta);
 		break;
+	case Client::CCamera_Dynamic::CAM_CRANE_GAME:
+		CraneGame_Camera(fTimeDelta);
+		break;
 	default:
 		break;
 	}
@@ -304,6 +307,40 @@ void CCamera_Dynamic::Talk_Camera(_float fTimeDelta)
 
 	m_pTransform->LookAt(m_TargetPos);
 	m_pTransform->Go_PosLerp(fTimeDelta, vOffsetPos, 0.1f);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CCamera_Dynamic::CraneGame_Camera(_float fTimeDelta)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
+
+	list<CGameObject*>*  pBackgroundList = pGameInstance->Get_ObjectList(iLevel, TEXT("Layer_BackGround"));
+	CBaseObj* pPlayer = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+
+	_vector pPlayerPos = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
+
+	_float fMinDistance = 9999;
+
+
+	for (auto& iter : *pBackgroundList)
+	{
+		_float fDistance = XMVectorGetX(XMVector3Length(pPlayerPos - dynamic_cast<CBaseObj*>(iter)->Get_TransformState(CTransform::STATE_POSITION)));
+
+		if (fDistance < fMinDistance)
+		{
+			fMinDistance = fDistance;
+			XMStoreFloat4(&m_fTargetPos, dynamic_cast<CBaseObj*>(iter)->Get_TransformState(CTransform::STATE_POSITION));
+
+		}
+	}
+	m_fTargetPos.x -= 2.f;
+	m_fTargetPos.z += m_vDistance.z + 3.f;
+	m_fTargetPos.y += 11.f;
+
+	m_pTransform->Go_PosLerp(fTimeDelta, XMLoadFloat4(&m_fTargetPos), 1.f);
+
 
 	RELEASE_INSTANCE(CGameInstance);
 }

@@ -109,7 +109,7 @@ void CLevel_Room::Late_Tick(_float fTimeDelta)
 	__super::Late_Tick(fTimeDelta);
 
 	//SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
-	SetWindowText(g_hWnd, TEXT("GamePlaye Level."));
+	SetWindowText(g_hWnd, TEXT("Room Level."));
 
 	m_pCollision_Manager->Update_Collider();
 	m_pCollision_Manager->CollisionwithBullet();
@@ -443,7 +443,7 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 		{
 			CPrizeItem::ITEMDESC ItemDesc;
 			ItemDesc.eType = CPrizeItem::NECKLACE;
-			ItemDesc.eInteractType = CPrizeItem::CARRYABLE;
+			ItemDesc.eInteractType = CPrizeItem::DEFAULT;
 			ItemDesc.vPosition = ModelDesc.vPosition;
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, pLayerTag, &ItemDesc)))
@@ -453,7 +453,7 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 		{
 			CPrizeItem::ITEMDESC ItemDesc;
 			ItemDesc.eType = CPrizeItem::YOSHIDOLL;
-			ItemDesc.eInteractType = CPrizeItem::CARRYABLE;
+			ItemDesc.eInteractType = CPrizeItem::DEFAULT;
 			ItemDesc.vPosition = ModelDesc.vPosition;
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, pLayerTag, &ItemDesc)))
@@ -463,7 +463,7 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 		{
 			CPrizeItem::ITEMDESC ItemDesc;
 			ItemDesc.eType = CPrizeItem::RUBYPURPLE;
-			ItemDesc.eInteractType = CPrizeItem::CARRYABLE;
+			ItemDesc.eInteractType = CPrizeItem::DEFAULT;
 			ItemDesc.vPosition = ModelDesc.vPosition;
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, pLayerTag, &ItemDesc)))
@@ -473,7 +473,7 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 		{
 			CPrizeItem::ITEMDESC ItemDesc;
 			ItemDesc.eType = CPrizeItem::HEART_CONTAINER;
-			ItemDesc.eInteractType = CPrizeItem::CARRYABLE;
+			ItemDesc.eInteractType = CPrizeItem::DEFAULT;
 			ItemDesc.vPosition = ModelDesc.vPosition;
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, pLayerTag, &ItemDesc)))
@@ -483,7 +483,7 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 		{
 			CPrizeItem::ITEMDESC ItemDesc;
 			ItemDesc.eType = CPrizeItem::MAGICPOWDER;
-			ItemDesc.eInteractType = CPrizeItem::CARRYABLE;
+			ItemDesc.eInteractType = CPrizeItem::DEFAULT;
 			ItemDesc.vPosition = ModelDesc.vPosition;
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, pLayerTag, &ItemDesc)))
@@ -512,13 +512,22 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 			TileDesc.eTileType = CCollapseTile::CRANE_TILE;
 			TileDesc.vInitPosition = ModelDesc.vPosition;
 
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CollapeTile"), LEVEL_TAILCAVE, pLayerTag, &TileDesc)))
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CollapeTile"), LEVEL_ROOM, pLayerTag, &TileDesc)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("CraneGameButton.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CraneButton"), LEVEL_ROOM, pLayerTag, &ModelDesc.vPosition)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("Crane.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Crane"), LEVEL_ROOM, TEXT("Layer_Crane"), &ModelDesc.vPosition)))
 				return E_FAIL;
 		}
 
 	}
 	
-
 	CloseHandle(hFile);
 
 
