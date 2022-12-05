@@ -33,7 +33,7 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-
+	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
 
 	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 

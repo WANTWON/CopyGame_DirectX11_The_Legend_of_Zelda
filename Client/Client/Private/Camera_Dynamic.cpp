@@ -17,8 +17,15 @@ CCamera_Dynamic::CCamera_Dynamic(const CCamera_Dynamic & rhs)
 
 void CCamera_Dynamic::Set_CamMode(CAMERAMODE _eCamMode)
 {
+	if (_eCamMode == m_eCamMode)
+		return;
+
+	if (m_ePreCamMode != m_eCamMode)
+		m_ePreCamMode = m_eCamMode;
 	m_eCamMode = _eCamMode; 
 	m_fTime = 0.f;
+	m_bSetCamLook = false;
+	m_dwSettingTime = GetTickCount();
 }
 
 HRESULT CCamera_Dynamic::Initialize_Prototype()
@@ -100,8 +107,6 @@ void CCamera_Dynamic::Player_Camera(_float fTimeDelta)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	
-
 	if (pGameInstance->Key_Pressing(DIK_F1))
 	{
 		m_vDistance.y -= 0.03f;
@@ -116,8 +121,18 @@ void CCamera_Dynamic::Player_Camera(_float fTimeDelta)
 	_vector m_TargetPos = pTarget->Get_TransformState(CTransform::STATE_POSITION);
 
 	Safe_Release(pTarget);
-	//m_pTransform->LookAt(m_TargetPos);
-	m_pTransform->Go_PosLerp(fTimeDelta, m_TargetPos, 1.f, XMVectorSet(m_vDistance.x , m_vDistance.y, m_vDistance.z, 0.f));
+	
+	m_pTransform->Go_PosLerp(fTimeDelta, m_TargetPos, 1.f, XMVectorSet(m_vDistance.x, m_vDistance.y, m_vDistance.z, 0.f));
+	
+	if (m_dwSettingTime + 2000 < GetTickCount())
+		m_bSetCamLook = true;
+		
+	if (m_bSetCamLook == false)
+	{
+		m_TargetPos = XMVectorSetX(m_TargetPos, XMVectorGetX(m_pTransform->Get_State(CTransform::STATE_POSITION)));
+		m_pTransform->LookAt(m_TargetPos);
+			
+	}
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -303,7 +318,9 @@ void CCamera_Dynamic::Talk_Camera(_float fTimeDelta)
 
 	CPlayer* pTarget = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	_vector m_TargetPos = pTarget->Get_TransformState(CTransform::STATE_POSITION);
-	_vector vOffsetPos = m_TargetPos + XMVectorSet(0, 4, -4, 0.f);
+	m_TargetPos = m_TargetPos + XMVectorSet(0.f, 2.f, 0.f, 0.f);
+
+	_vector vOffsetPos = m_TargetPos + XMVectorSet(0, 2, -6, 0.f);
 
 	m_pTransform->LookAt(m_TargetPos);
 	m_pTransform->Go_PosLerp(fTimeDelta, vOffsetPos, 0.1f);

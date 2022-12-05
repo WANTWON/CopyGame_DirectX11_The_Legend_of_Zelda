@@ -33,6 +33,7 @@ HRESULT COctorock::Initialize(void * pArg)
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
 
 	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
@@ -89,12 +90,14 @@ void COctorock::Change_Animation(_float fTimeDelta)
 	{
 	case Client::COctorock::IDLE:
 	case Client::COctorock::WALK:
+		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
-		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;
 	case Client::COctorock::ATTACK_ST:
+		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_eState = ATTACK_ED;
 			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -111,7 +114,8 @@ void COctorock::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::COctorock::ATTACK_ED:
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		m_fAnimSpeed = 2.f;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_bIsAttacking = false;
 			m_eState = IDLE;
@@ -119,8 +123,9 @@ void COctorock::Change_Animation(_float fTimeDelta)
 		}
 		break;
 	case Client::COctorock::DAMAGE:
+		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_eState = IDLE;
 			m_bHit = false;
@@ -129,9 +134,10 @@ void COctorock::Change_Animation(_float fTimeDelta)
 	case Client::COctorock::DEAD:
 	case Client::COctorock::DEAD_FIRE:
 		m_bIsLoop = false;
+		m_fAnimSpeed = 2.f;
 		m_pTransformCom->Go_Backward(fTimeDelta*4);
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
-		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_bDead = true;
 		break;
 	default:

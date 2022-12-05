@@ -24,11 +24,13 @@
 #include "Keese.h"
 #include "Tail.h"
 #include "Togezo.h"
+#include "Cucco.h"
 
 //for NPC
 #include "ShopNpc.h"
 #include "MarinNpc.h"
 #include "CraneGameNpc.h"
+#include "CuccoKeeper.h"
 
 //for UI
 #include "BackGround.h"
@@ -53,6 +55,7 @@
 #include "Grass.h"
 #include "CraneButton.h"
 #include "Crane.h"
+#include "FieldDecoObject.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -193,7 +196,7 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	_matrix			PivotMatrix = XMMatrixIdentity();
 	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Link"),
-	//CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Link/Link_Anim.fbx", PivotMatrix))))
+	//CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Link/Link.fbx", PivotMatrix))))
 	//return E_FAIL;
 
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
@@ -402,6 +405,23 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	{
 		for (int j = 0; j < 7; ++j)
 		{
+			/*_tchar*			pModeltag = new _tchar[MAX_PATH];
+			_tchar*			szFilePath = new _tchar[MAX_PATH];
+			wsprintf(pModeltag, TEXT("Field_%02d%c.fbx"), i, j+65);
+			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/NonAnim/Field/Field_%02d%c.fbx"), i, j + 65);
+			
+			char* FilePath= new char[MAX_PATH];
+			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
+			
+			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, pModeltag,
+				CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, FilePath, PivotMatrix))))
+			{
+				delete pModeltag;
+				delete szFilePath;
+				delete FilePath;
+			
+							continue;
+			}*/
 			_tchar*			pModeltag = new _tchar[MAX_PATH];
 			_tchar*			szFilePath = new _tchar[MAX_PATH];
 			wsprintf(pModeltag, TEXT("Field_%02d%c.fbx"), i, j + 65);
@@ -448,6 +468,20 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 		return E_FAIL;
 
 
+	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("CuccoKeeper"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Cucco"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Cucco/Cucco.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Butterfly"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Butterfly/Butterfly.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("MadamMeowMeow"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
+	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("QuadrupletGreen"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
+	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("GrandmaUlrira"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
 
 
 	/* 콜라이더 생성 중. */
@@ -758,6 +792,22 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	/*For.Prototype_GameObject_FieldDecoObject*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FieldDecoObject"),
+		CFieldDecoObject::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+	/*For.Prototype_GameObject_Cucco*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Cucco"),
+		CCucco::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_CuccoKeeper*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CuccoKeeper"),
+		CCuccoKeeperNpc::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	/*For.Prototype_GameObject_Crane*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Crane"),
 		CCrane::Create(m_pDevice, m_pContext))))
@@ -973,6 +1023,11 @@ HRESULT CLoader::Loading_For_UITexture()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_GetMessage"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/MesGetFrame_%02d.dds"), 9))))
 		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FieldNpcMessage"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/FieldNpcTalk_%d.dds"), 1))))
+		return E_FAIL;
+
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_ShopTalk"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/ShopTalk_%d.dds"), 9))))

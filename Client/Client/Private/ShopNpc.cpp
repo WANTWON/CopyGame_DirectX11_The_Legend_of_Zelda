@@ -39,7 +39,7 @@ HRESULT CShopNpc::Initialize(void* pArg)
 
 	_vector vPosition = XMVectorSetW(XMLoadFloat3(&m_NpcDesc.vInitPos), 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-	m_eNPCID = SHOP;
+
 	return S_OK;
 }
 

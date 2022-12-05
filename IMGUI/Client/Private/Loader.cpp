@@ -238,40 +238,40 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	_matrix			PivotMatrix = XMMatrixIdentity();
 
-//#pragma region Field
-//	for (int i = 0; i < 17; ++i)
-//	{
-//		for (int j = 0; j < 7; ++j)
-//		{
-//			//const char* pFilePath = "../Bin/Resources/Meshes/Field/Field_%02d%c.fbx";
-//
-//			_tchar*			pModeltag = new _tchar[MAX_PATH];
-//			_tchar*			szFilePath = new _tchar[MAX_PATH];
-//			wsprintf(pModeltag, TEXT("Field_%02d%c.fbx"), i, j+65);
-//			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/NonAnim/Field/Field_%02d%c.fbx"), i, j + 65);
-//
-//			char* FilePath= new char[MAX_PATH];
-//			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
-//
-//			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, pModeltag,
-//				CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, FilePath, PivotMatrix))))
-//			{
-//				delete pModeltag;
-//				delete szFilePath;
-//				delete FilePath;
-//
-//				continue;
-//			}
-//
-//			CImgui_Manager::Get_Instance()->Add_TempTag(pModeltag);
-//			CImgui_Manager::Get_Instance()->Add_TempTag(szFilePath);
-//			
-//			delete FilePath;
-//				
-//		}
-//	}
-//
-//#pragma endregion Field
+#pragma region Field
+	for (int i = 0; i < 17; ++i)
+	{
+		for (int j = 0; j < 7; ++j)
+		{
+			//const char* pFilePath = "../Bin/Resources/Meshes/Field/Field_%02d%c.fbx";
+
+			_tchar*			pModeltag = new _tchar[MAX_PATH];
+			_tchar*			szFilePath = new _tchar[MAX_PATH];
+			wsprintf(pModeltag, TEXT("Field_%02d%c.fbx"), i, j+65);
+			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/NonAnim/Field/Field_%02d%c.fbx"), i, j + 65);
+
+			char* FilePath= new char[MAX_PATH];
+			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
+
+			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, pModeltag,
+				CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, FilePath, PivotMatrix))))
+			{
+				delete pModeltag;
+				delete szFilePath;
+				delete FilePath;
+
+				continue;
+			}
+
+			CImgui_Manager::Get_Instance()->Add_TempTag(pModeltag);
+			CImgui_Manager::Get_Instance()->Add_TempTag(szFilePath);
+			
+			delete FilePath;
+				
+		}
+	}
+
+#pragma endregion Field
 
 //
 //#pragma region TailCave
@@ -535,6 +535,30 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("GameShopOwner.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/GameShopOwner/GameShopOwner.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("CuccoKeeper.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/CuccoKeeper/CuccoKeeper.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Cucco.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Cucco/Cucco.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Butterfly.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Butterfly/Butterfly.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MadamMeowMeow.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/MadamMeowMeow/MadamMeowMeow.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("QuadrupletGreen.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/QuadrupletGreen/QuadrupletGreen.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("GrandmaUlrira.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/GrandmaUlrira/GrandmaUlrira.fbx", PivotMatrix))))
 		return E_FAIL;
 	
 	RELEASE_INSTANCE(CGameInstance);

@@ -39,6 +39,10 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Prototype_Component()))
 		return E_FAIL;
 
+	// MakeSpriteFont "폰트이름" /FontSize:32 /FastPack /CharacterRegion:0x0020-0x00FF /CharacterRegion:0x3131-0x3163 /CharacterRegion:0xAC00-0xD800 /DefaultCharacter:0xAC00 출력파일이름.spritefont
+	if (FAILED(m_pGameInstance->Add_Fonts(m_pDevice, m_pContext, TEXT("Font_Nexon"), TEXT("../../../Bin/Resources/Fonts/130.spritefont"))))
+		return E_FAIL;
+
 	if (FAILED(Open_Level(LEVEL_LOGO)))
 		return E_FAIL;
 
@@ -71,7 +75,7 @@ HRESULT CMainApp::Render()
 
 	m_pRenderer->Render_GameObjects();
 
-	m_pGameInstance->Present();
+	
 #ifdef _DEBUG
 	++m_iNumRender;
 
@@ -79,12 +83,16 @@ HRESULT CMainApp::Render()
 	{
 		wsprintf(m_szFPS, TEXT("FPS : %d"), m_iNumRender);		
 
-		OutputDebugString(m_szFPS);
+		//OutputDebugString(m_szFPS);
 
 		m_fTimeAcc = 0.f;
 		m_iNumRender = 0;
 	}
+
+	m_pGameInstance->Render_Font(TEXT("Font_Nexon"), m_szFPS, XMVectorSet(0.f, 0.f, 0.f, 1.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.6f);
 #endif // _DEBUG
+
+	m_pGameInstance->Present();
 	return S_OK;
 }
 

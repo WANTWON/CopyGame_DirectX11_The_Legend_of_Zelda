@@ -184,6 +184,15 @@
     <Filter Include="02.GameObjects\01.NonAnim\08.Crane">
       <UniqueIdentifier>{a54f2e90-1238-43cc-bac3-c11f8e240973}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\06.Npc\CuccoKeeper">
+      <UniqueIdentifier>{39707b96-105f-4b83-8003-56dd958cec09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.Monster\10.Cucco">
+      <UniqueIdentifier>{7834f938-0a3d-4887-acab-2bc5b356a5dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\05.Object\05.FieldDecoObject">
+      <UniqueIdentifier>{ee7a90cc-9992-4dc5-8c7f-f79df7c009da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -369,6 +378,15 @@
     <ClInclude Include="..\Public\Crane.h">
       <Filter>02.GameObjects\01.NonAnim\08.Crane</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CuccoKeeper.h">
+      <Filter>02.GameObjects\06.Npc\CuccoKeeper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cucco.h">
+      <Filter>02.GameObjects\03.Monster\10.Cucco</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FieldDecoObject.h">
+      <Filter>02.GameObjects\05.Object\05.FieldDecoObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -538,6 +556,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Crane.cpp">
       <Filter>02.GameObjects\01.NonAnim\08.Crane</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CuccoKeeper.cpp">
+      <Filter>02.GameObjects\06.Npc\CuccoKeeper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cucco.cpp">
+      <Filter>02.GameObjects\03.Monster\10.Cucco</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FieldDecoObject.cpp">
+      <Filter>02.GameObjects\05.Object\05.FieldDecoObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

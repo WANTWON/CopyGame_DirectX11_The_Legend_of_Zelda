@@ -359,7 +359,7 @@ HRESULT CLevel_Room::Ready_Layer_ShopObject(const _tchar * pLayerTag)
 		{
 			CNpc::NPCDESC NpcDesc;
 			NpcDesc.vInitPos = ModelDesc.vPosition;
-
+			NpcDesc.eNpcType = CNpc::SHOP;
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ShopNpc"), LEVEL_ROOM, pLayerTag, &NpcDesc)))
 				return E_FAIL;
 		}
@@ -401,7 +401,7 @@ HRESULT CLevel_Room::Ready_Layer_MarinObject(const _tchar * pLayerTag)
 		{
 			CNpc::NPCDESC NpcDesc;
 			NpcDesc.vInitPos = ModelDesc.vPosition;
-
+			NpcDesc.eNpcType = CNpc::MARIN;
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MarinNpc"), LEVEL_ROOM, pLayerTag, &NpcDesc)))
 				return E_FAIL;
 		}

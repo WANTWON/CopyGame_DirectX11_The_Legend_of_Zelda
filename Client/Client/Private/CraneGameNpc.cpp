@@ -41,7 +41,6 @@ HRESULT CCraneGameNpc::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-90.f));
 
-	m_eNPCID = CRANE_GAME;
 	return S_OK;
 }
 
@@ -297,7 +296,7 @@ CCraneGameNpc * CCraneGameNpc::Create(ID3D11Device * pDevice, ID3D11DeviceContex
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		ERR_MSG(TEXT("Failed to Created : CCraneGameNpc"));
+		ERR_MSG(TEXT("Failed to Created : CFieldNpc"));
 		Safe_Release(pInstance);
 	}
 
@@ -310,7 +309,7 @@ CGameObject * CCraneGameNpc::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		ERR_MSG(TEXT("Failed to Cloned : CCraneGameNpc"));
+		ERR_MSG(TEXT("Failed to Cloned : CFieldNpc"));
 		Safe_Release(pInstance);
 	}
 

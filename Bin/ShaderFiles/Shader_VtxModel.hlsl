@@ -8,9 +8,9 @@ texture2D		g_NormalTexture;
 texture2D		g_SpecularTexture;
 
 
-inline float4 UnpackNormal(float4 packednormal)
+inline float3 UnpackNormal(float4 packednormal)
 {
-	float4 normal;
+	float4 normal = float4(0,0,0,0);
 	normal.xy = packednormal.wy * 2 - 1;
 	normal.z = sqrt(1 - normal.x*normal.x - normal.y * normal.y);
 	return normal;
@@ -91,29 +91,28 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 
+	float4 vTexturenormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
 	float3	vNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
 
-	/*float4  vNormalTemp;
-	vNormalTemp.xyz = vNormal.xyz;
-	vNormalTemp.w = 1.f;
-	float4 normal;
-	normal.xy = vNormalTemp.wy * 2 - 1;
-	normal.z = sqrt(1 - normal.x*normal.x - normal.y * normal.y);
-	vNormal = normal.xyz;*/
+	//packednormal.wy * 2 - 1
+	vNormal = float3((vTexturenormal.x) , vTexturenormal.y , sqrt(1 - vTexturenormal.x*vTexturenormal.x - vTexturenormal.y * vTexturenormal.y));
+	
+	//if(vNormal.x == 1.f)
+	vNormal.x += (vTexturenormal.w);
+	//vNormal.xy = vNormal.xy * 2.f - 1.f;
+	
 
-	vNormal = vNormal * 2.f - 1.f;
-
-
+	//vNormal = float3(vTexturenormal.w*2 -1, vTexturenormal.y * 2 - 1, sqrt(1 - vTexturenormal.x*vTexturenormal.x - vTexturenormal.y * vTexturenormal.y));
+	//vNormal = vNormal * 2.f - 1.f;
 
 	float3x3	WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
-
 	vNormal = mul(vNormal, WorldMatrix);
 	Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
 
 
 	Out.vDepth = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
 	//Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
-	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f) ;
+	//Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f) ;
 	
 
 

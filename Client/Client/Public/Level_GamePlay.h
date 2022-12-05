@@ -27,6 +27,7 @@ public:
 	HRESULT Ready_Layer_Monster(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Object(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Portal(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_Npc(const _tchar* pLayerTag);
 
 private:
 	CCollision_Manager* m_pCollision_Manager = nullptr;

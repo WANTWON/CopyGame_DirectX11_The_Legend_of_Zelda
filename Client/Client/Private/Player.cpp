@@ -28,7 +28,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3, m_fStartHeight, 46.8, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, m_fStartHeight, 46.8f, 1.f));
 	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(10.f, 4.2f, 10.f, 1.f));
 	
 	Compute_CurrentIndex(LEVEL_GAMEPLAY);
@@ -37,7 +37,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_fStartHeight = m_fWalkingHeight;
 	m_fEndHeight = m_fWalkingHeight;
 
-	Set_Scale(_float3(1.2, 1.2, 1.2));
+	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
 	
 	m_tInfo.iMaxHp = 52;
 	m_tInfo.iDamage = 20;
@@ -71,7 +71,7 @@ int CPlayer::Tick(_float fTimeDelta)
 	if (m_iCurrentLevel == LEVEL_LOADING)
 		return OBJ_NOEVENT;
 
-	if (CUI_Manager::Get_Instance()->Get_UI_Open() != true)
+	if (CUI_Manager::Get_Instance()->Get_UI_Open() != true )
 	{
 		Key_Input(fTimeDelta);
 		Change_Direction(fTimeDelta);
@@ -85,7 +85,8 @@ int CPlayer::Tick(_float fTimeDelta)
 		m_ePreState = m_eState;
 	}
 
-	Change_Animation(fTimeDelta);
+	if(!m_bDead)
+		Change_Animation(fTimeDelta);
 
 	for (auto& pParts : m_Parts)
 	{
@@ -93,6 +94,9 @@ int CPlayer::Tick(_float fTimeDelta)
 			pParts->Tick(fTimeDelta);
 	}
 		
+
+	if (m_dwHitTime + 100 < GetTickCount())
+		m_bHit = false;
 
 	return OBJ_NOEVENT;
 }
@@ -151,8 +155,19 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		m_pTransformCom->Go_PosDir(fTimeDelta, vDirection, m_pNavigationCom);
 	}
 
-	//if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_MONSTER, m_pOBBCom))
-		//Take_Damage(1.f, nullptr, nullptr);
+	CBaseObj* pCollisionTrap = nullptr;
+	if ( CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_TRAP, m_pOBBCom, &pCollisionTrap))
+	{
+		CMonsterBullet::BULLETDESC eBulletDesc;
+
+		eBulletDesc.eOwner = CMonster::MONSTER_CUCCO;
+		eBulletDesc.eBulletType = CMonsterBullet::DEFAULT;
+		eBulletDesc.vLook = pCollisionTrap->Get_TransformState(CTransform::STATE_LOOK);
+
+		if(m_eState != DMG_B && m_eState != DMG_F)
+			Take_Damage(1.f, &eBulletDesc, nullptr);
+	}
+		
 }
 
 HRESULT CPlayer::Render()
@@ -216,20 +231,28 @@ void CPlayer::Compute_CurrentIndex(LEVEL eLevel)
 
 _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
-	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE)
+	if (m_eState == DMG_B || m_eState == DMG_F ||
+		m_eState == DMG_PRESS || m_eState == DMG_QUAKE ||
+		m_eState == DEAD  || m_bHit)
 		return 0;
 
 	if (fDamage <= 0 || m_bDead)
 		return 0;
 
 	m_tInfo.iCurrentHp -= (int)fDamage;
+	m_bHit = true;
+	m_dwHitTime = GetTickCount();
 
 	if (m_tInfo.iCurrentHp <= 0)
+	{
 		m_tInfo.iCurrentHp = 0;
+		m_eState = DEAD;
+	}
+	
 
 	if (DamageType == nullptr)
 	{
-		m_eState = CPlayer::DMG_QUAKE;
+		m_eState = CPlayer::DMG_F;
 		return 0;
 	}
 		
@@ -336,7 +359,7 @@ void CPlayer::Set_PlayerState_Defaut()
 
 void CPlayer::Key_Input(_float fTimeDelta)
 {
-	
+
 	if (CUI_Manager::Get_Instance()->Get_Talking() == true)
 		return;
 
@@ -348,15 +371,29 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (CGameInstance::Get_Instance()->Key_Pressing(DIK_0))
+	if (m_bDead)
+	{
+		if (pGameInstance->Key_Up(DIK_SPACE))
+		{
+			m_eState = IDLE;
+			m_bDead = false;
+			m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
+		}
+
+		RELEASE_INSTANCE(CGameInstance);
+		return;
+	}
+
+
+	if (pGameInstance->Key_Pressing(DIK_0))
 		m_tInfo.iCoin++;
-	if (CGameInstance::Get_Instance()->Key_Pressing(DIK_MINUS))
+	if (pGameInstance->Key_Pressing(DIK_MINUS))
 	{
 		m_tInfo.iCoin--;
 		if(m_tInfo.iCoin < 0)
 			m_tInfo.iCoin = 0;
 	}
-	if (CGameInstance::Get_Instance()->Key_Up(DIK_8))
+	if (pGameInstance->Key_Up(DIK_8))
 	{
 		m_tInfo.iCurrentHp--;
 		if (m_tInfo.iCurrentHp < 0)
@@ -637,7 +674,7 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE ||
 		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP || m_eState == FALL_FROMTOP || m_eState == FALL_HOLE ||
 		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP || 
-		m_eState == LADDER_UP_ED || m_eState == ITEM_CARRY)
+		m_eState == LADDER_UP_ED || m_eState == ITEM_CARRY || m_bDead)
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
@@ -1027,6 +1064,14 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		{
 			m_eState = IDLE_CARRY;
 			m_bCarry = true;
+		}
+		break;
+	case Client::CPlayer::DEAD:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			m_bDead = true;
 		}
 		break;
 	default:

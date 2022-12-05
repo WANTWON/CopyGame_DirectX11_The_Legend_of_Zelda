@@ -40,7 +40,7 @@ HRESULT CMarinNpc::Initialize(void* pArg)
 	_vector vPosition = XMVectorSetW(XMLoadFloat3(&m_NpcDesc.vInitPos), 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
-	m_eNPCID = MARIN;
+
 	return S_OK;
 }
 

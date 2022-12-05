@@ -120,7 +120,7 @@ PS_OUT_LIGHT PS_MAIN_LIGHT_DIRECTIONAL(PS_IN In)
 	vector			vReflect = reflect(normalize(g_vLightDir), normalize(vNormal));
 	vector			vLook = vWorldPos - g_vCamPosition;
 
-	Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), 30.f);
+	Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), 40.f);
 	Out.vSpecular.a = 0.f;
 	return Out;
 }

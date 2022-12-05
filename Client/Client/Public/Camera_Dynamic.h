@@ -68,6 +68,8 @@ private:
 	_float4			m_vDistance = _float4(0, 10, -10, 0.f);
 	_double			m_lMouseWheel = 0;
 	_float4			m_fTargetPos = _float4(0.f, 0.f, 0.f, 1.f);
+	_bool			m_bSetCamLook = true;
+	DWORD			m_dwSettingTime = GetTickCount();
 
 	/* For Shaking Camera */
 	_float m_fPower = 0.f;

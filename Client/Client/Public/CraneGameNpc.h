@@ -42,7 +42,7 @@ private:
 	STATE m_eState = IDLE;
 	_int  m_iCoin = 0;
 	_bool m_bGameStart = false;
-	_bool m_bFirst = false;
+
 
 public:
 	virtual void Free() override;

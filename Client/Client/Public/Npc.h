@@ -12,11 +12,12 @@ BEGIN(Client)
 class CNpc abstract : public CBaseObj
 {
 public:
-	enum NPC_ID { SHOP, MARIN , CRANE_GAME };
+	enum NPC_ID { SHOP, MARIN , CRANE_GAME, CUCCO_KEEPER, MADAM, GRANDMA, CHILD };
 	enum DMG_DIRECTION {FRONT, BACK};
 
 	typedef struct NpcTad
 	{
+		NPC_ID eNpcType = SHOP;
 		_float3 vInitPos = _float3(0.f, 0.f, 0.f); 
 
 	}NPCDESC;
@@ -37,7 +38,7 @@ public:
 public:
 	virtual void Check_Navigation(_float fTimeDelta);
 	virtual void Send_Answer_toNPC(_uint iTextureNum) {};
-	NPC_ID Get_NpcID() { return m_eNPCID; }
+	NPC_ID Get_NpcID() { return m_NpcDesc.eNpcType; }
 protected:
 	virtual HRESULT Ready_Components(void* pArg = nullptr) = 0;
 	virtual HRESULT SetUp_ShaderResources() { return S_OK; };
@@ -59,7 +60,7 @@ protected:
 	_float					m_fDistanceToTarget = 0.f;
 	CModel*					m_pModelCom = nullptr;
 	_float					m_fAnimSpeed = 1.f;
-	NPC_ID					m_eNPCID = SHOP;
+	_bool					m_bFirst = false;
 
 	NPCDESC					m_NpcDesc;
 

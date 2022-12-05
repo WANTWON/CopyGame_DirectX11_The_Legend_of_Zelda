@@ -80,7 +80,7 @@ _bool CCollision_Manager::CollisionwithGroup(COLLSIONGROUP SourGroup, COLLSIONGR
 		for (auto& Dest : m_GameObjects[DestGroup])
 		{
 			CCollider* pDestCollider = Dest->Get_Collider();
-			if (pDestCollider == nullptr)
+			if (pDestCollider == nullptr || Dest == Sour)
 				continue;
 
 		
@@ -135,6 +135,7 @@ void CCollision_Manager::CollisionwithBullet()
 			dynamic_cast<CMonster*>(pMonster)->Take_Damage(1, nullptr, nullptr);
 	}
 }
+
 
 void CCollision_Manager::Update_Collider()
 {

@@ -193,6 +193,7 @@ void CCrane::Input_Dir(DIRINPUT eDIr)
 
 void CCrane::Setting_Default()
 {
+	m_eInputDir = DIR_END;
 	m_bFinished = false;  m_bUp = false;
 	m_pCollisionObj = nullptr;
 	for (_uint i = 0; i < DIR_END; ++i)

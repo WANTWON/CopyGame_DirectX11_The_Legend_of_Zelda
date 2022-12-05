@@ -3,20 +3,26 @@
 
 #include "GameInstance.h"
 #include "Camera_Dynamic.h"
+#include "Level_Loading.h"
+
+/* Manager& UI*/
+#include "CameraManager.h"
 #include "UI_Manager.h"
 #include "InvenTile.h"
-#include "UIButton.h"
 #include "InvenItem.h"
+#include "UIButton.h"
 #include "BackGround.h"
+
+/* Object */
 #include "NonAnim.h"
 #include "Player.h"
-#include "Level_Loading.h"
-#include "CameraManager.h"
 #include "Door.h"
 #include "TreasureBox.h"
 #include "SquareBlock.h"
 #include "Grass.h"
 #include "Portal.h"
+#include "Npc.h"
+#include "FieldDecoObject.h"
 
 _bool g_bUIMadefirst = false;
 
@@ -48,6 +54,9 @@ HRESULT CLevel_GamePlay::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Object(TEXT("Layer_Object"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_Layer_Npc(TEXT("Layer_Deco"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Portal(TEXT("Layer_Portal"))))
@@ -124,8 +133,8 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 
 	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(0.f, -1.f, 0.5f, 0.f);
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 0.7f, 1.f);
+	LightDesc.vDirection = _float4(0.1f, -1.f, 0.1f, 0.f);
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 0.8f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);	
 
@@ -628,6 +637,89 @@ HRESULT CLevel_GamePlay::Ready_Layer_Portal(const _tchar * pLayerTag)
 	PortalDesc.eRoomType = CPortal::CRANE_GAME;
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
 		return E_FAIL;
+
+	CloseHandle(hFile);
+	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_Npc(const _tchar * pLayerTag)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	HANDLE hFile = 0;
+	_ulong dwByte = 0;
+	CNonAnim::NONANIMDESC  ModelDesc;
+	_uint iNum = 0;
+
+	hFile = CreateFile(TEXT("../../../Bin/Data/Filed_Deco.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
+		return E_FAIL;
+
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+	for (_uint i = 0; i < iNum; ++i)
+	{
+		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+		_tchar pModeltag[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, MAX_PATH, pModeltag, MAX_PATH);
+		if (!wcscmp(pModeltag, TEXT("CuccoKeeper.fbx")))
+		{
+			CNpc::NPCDESC NpcDesc;
+			NpcDesc.vInitPos = ModelDesc.vPosition;
+			NpcDesc.eNpcType = CNpc::CUCCO_KEEPER;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CuccoKeeper"), LEVEL_GAMEPLAY, TEXT("Layer_CuccoKeeper"), &NpcDesc)))
+				return E_FAIL;
+
+		}
+		else if (!wcscmp(pModeltag, TEXT("MadamMeowMeow.fbx")))
+		{
+			CNpc::NPCDESC NpcDesc;
+			NpcDesc.vInitPos = ModelDesc.vPosition;
+			NpcDesc.eNpcType = CNpc::MADAM;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CuccoKeeper"), LEVEL_GAMEPLAY, pLayerTag, &NpcDesc)))
+				return E_FAIL;
+
+		}
+		else if (!wcscmp(pModeltag, TEXT("QuadrupletGreen.fbx")))
+		{
+			CNpc::NPCDESC NpcDesc;
+			NpcDesc.vInitPos = ModelDesc.vPosition;
+			NpcDesc.eNpcType = CNpc::CHILD;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CuccoKeeper"), LEVEL_GAMEPLAY, pLayerTag, &NpcDesc)))
+				return E_FAIL;
+
+		}
+		else if (!wcscmp(pModeltag, TEXT("GrandmaUlrira.fbx")))
+		{
+			CNpc::NPCDESC NpcDesc;
+			NpcDesc.vInitPos = ModelDesc.vPosition;
+			NpcDesc.eNpcType = CNpc::GRANDMA;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CuccoKeeper"), LEVEL_GAMEPLAY, pLayerTag, &NpcDesc)))
+				return E_FAIL;
+
+		}
+		else if (!wcscmp(pModeltag, TEXT("Cucco.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Cucco"), LEVEL_GAMEPLAY, TEXT("Layer_Cucco"), &ModelDesc.vPosition)))
+				return E_FAIL;	
+
+		}
+		else if (!wcscmp(pModeltag, TEXT("Butterfly.fbx")))
+		{
+
+			CFieldDecoObject::DECODESC DecoDesc;
+			DecoDesc.eDecoType = CFieldDecoObject::BUTTERFLY;
+			DecoDesc.vInitPos = ModelDesc.vPosition;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FieldDecoObject"), LEVEL_GAMEPLAY, pLayerTag, &DecoDesc)))
+				return E_FAIL;
+			
+
+		}
+
+	}
 
 	CloseHandle(hFile);
 	RELEASE_INSTANCE(CGameInstance);
