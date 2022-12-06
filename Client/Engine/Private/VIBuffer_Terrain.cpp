@@ -185,7 +185,7 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 	VTXNORTEX*		pVertices = new VTXNORTEX[m_iNumVertices];
 	ZeroMemory(pVertices, sizeof(VTXNORTEX) * m_iNumVertices);
 
-	m_pVerticesPosMxM = new _float3[m_iNumVertices];
+	m_pVerticesPos = new _float3[m_iNumVertices];
 
 	for (_uint i = 0; i < m_iNumVerticesZ; ++i)
 	{
@@ -193,7 +193,7 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 		{
 			_int		iIndex = i * m_iNumVerticesX + j;
 
-			pVertices[iIndex].vPosition = m_pVerticesPosMxM[iIndex] = _float3((_float)j, 0.f, (_float)i);
+			pVertices[iIndex].vPosition = m_pVerticesPos[iIndex] = _float3((_float)j, 0.f, (_float)i);
 			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			pVertices[iIndex].vTexture = _float2(j / _float(m_iNumVerticesX - 1), i / _float(m_iNumVerticesZ - 1));
 		}
@@ -344,11 +344,11 @@ _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 			_matrix	WorldMatrix = pTransform->Get_WorldMatrix();
 
 
-			_vector vTemp_1 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[0]]);
+			_vector vTemp_1 = XMLoadFloat3(&m_pVerticesPos[iIndices[0]]);
 			vTemp_1 = XMVectorSetW(vTemp_1, 1.f);
-			_vector vTemp_2 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[1]]);
+			_vector vTemp_2 = XMLoadFloat3(&m_pVerticesPos[iIndices[1]]);
 			vTemp_2 = XMVectorSetW(vTemp_2, 1.f);
-			_vector vTemp_3 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[2]]);
+			_vector vTemp_3 = XMLoadFloat3(&m_pVerticesPos[iIndices[2]]);
 			vTemp_3 = XMVectorSetW(vTemp_3, 1.f);
 			if (true == TriangleTests::Intersects((FXMVECTOR)vRayPos, (FXMVECTOR)vRayDir, (FXMVECTOR)vTemp_1, (GXMVECTOR)vTemp_2, (HXMVECTOR)vTemp_3, fDist))
 			{
@@ -360,11 +360,11 @@ _bool CVIBuffer_Terrain::Picking(CTransform* pTransform, _float3* pOut)
 				return true;
 			}
 
-			vTemp_1 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[0]]);
+			vTemp_1 = XMLoadFloat3(&m_pVerticesPos[iIndices[0]]);
 			vTemp_1 = XMVectorSetW(vTemp_1, 1.f);
-			vTemp_2 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[2]]);
+			vTemp_2 = XMLoadFloat3(&m_pVerticesPos[iIndices[2]]);
 			vTemp_2 = XMVectorSetW(vTemp_2, 1.f);
-			vTemp_3 = XMLoadFloat3(&m_pVerticesPosMxM[iIndices[3]]);
+			vTemp_3 = XMLoadFloat3(&m_pVerticesPos[iIndices[3]]);
 			vTemp_3 = XMVectorSetW(vTemp_3, 1.f);
 			if (true == TriangleTests::Intersects((FXMVECTOR)vRayPos, (FXMVECTOR)vRayDir, (FXMVECTOR)vTemp_1, (GXMVECTOR)vTemp_2, (HXMVECTOR)vTemp_3, fDist))
 			{
@@ -455,7 +455,7 @@ void CVIBuffer_Terrain::Set_Terrain_Buffer(TERRAINDESC TerrainDesc)
 		{
 			_int		iIndex = i * m_iNumVerticesX + j;
 
-			pVertices[iIndex].vPosition = m_pVerticesPosMxM[iIndex] = _float3((_float)TerrainDesc.m_iPositionX + j, TerrainDesc.m_fHeight, (_float)TerrainDesc.m_iPositionZ + i);
+			pVertices[iIndex].vPosition = m_pVerticesPos[iIndex] = _float3((_float)TerrainDesc.m_iPositionX + j, TerrainDesc.m_fHeight, (_float)TerrainDesc.m_iPositionZ + i);
 			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			pVertices[iIndex].vTexture = _float2(j / _float(m_iNumVerticesX - 1), i / _float(m_iNumVerticesZ - 1));
 		}
@@ -508,5 +508,5 @@ CComponent * CVIBuffer_Terrain::Clone(void * pArg)
 void CVIBuffer_Terrain::Free()
 {
 	__super::Free();
-	Safe_Delete_Array(m_pVerticesPosMxM);
+	Safe_Delete_Array(m_pVerticesPos);
 }

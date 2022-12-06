@@ -127,7 +127,11 @@ void CCuccoKeeperNpc::Late_Tick(_float fTimeDelta)
 
 
 	CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
-
+	if (pButton == nullptr)
+	{
+		RELEASE_INSTANCE(CGameInstance);
+		return;
+	}
 	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom))
 	{
 		if (m_eState == m_eIdleState)
@@ -217,10 +221,19 @@ HRESULT CCuccoKeeperNpc::Ready_Components(void * pArg)
 			return E_FAIL;
 		break;
 	case CHILD:
+	{
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("QuadrupletGreen"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
+
+		/* For.Com_Navigation */
+		CNavigation::NAVIDESC			NaviDesc;
+		ZeroMemory(&NaviDesc, sizeof NaviDesc);
+		NaviDesc.iCurrentCellIndex = 0;
+		if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Field"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation_Filed_Navi_forChild"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+			return E_FAIL;
 		break;
+	}
 	default:
 		break;
 	}
@@ -236,12 +249,7 @@ HRESULT CCuccoKeeperNpc::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		return E_FAIL;
 
-	/* For.Com_Navigation */
-	CNavigation::NAVIDESC			NaviDesc;
-	ZeroMemory(&NaviDesc, sizeof NaviDesc);
-	NaviDesc.iCurrentCellIndex = 0;
-	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Field"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Field"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
-		return E_FAIL;
+	
 
 
 	return S_OK;
@@ -432,6 +440,7 @@ int CCuccoKeeperNpc::Grandma_Tick(_float fTimeDelta)
 		
 		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), 0.1f*fAngle);
 
+		m_pTransformCom->LookAt(pTarget->Get_TransformState(CTransform::STATE_POSITION));
 		RELEASE_INSTANCE(CGameInstance);
 	}
 
@@ -483,36 +492,36 @@ int CCuccoKeeperNpc::Child_Tick(_float fTimeDelta)
 	}
 	else
 	{
-		// Switch between Idle and Walk (based on time)
-		if (m_eState == APPEAL)
-		{
-			if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 3 + 1) + 3000)
-			{
-				m_eState = RUN;
-				m_dwWalkTime = GetTickCount();
+		//// Switch between Idle and Walk (based on time)
+		//if (m_eState == APPEAL)
+		//{
+		//	if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 3 + 1) + 3000)
+		//	{
+		//		m_eState = RUN;
+		//		m_dwWalkTime = GetTickCount();
 
-				m_eDir[DIR_X] = (rand() % 300)*0.01f - 1.f;
-				m_eDir[DIR_Z] = (rand() % 300)*0.01f - 1.f;
+		//		m_eDir[DIR_X] = (rand() % 300)*0.01f - 1.f;
+		//		m_eDir[DIR_Z] = (rand() % 300)*0.01f - 1.f;
 
-			}
-		}
-		else if (m_eState == RUN)
-		{
-			if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 3 + 1) + 1500)
-			{
-				m_eState = APPEAL;
-				m_dwIdleTime = GetTickCount();
-			}
-		}
+		//	}
+		//}
+		//else if (m_eState == RUN)
+		//{
+		//	if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 3 + 1) + 1500)
+		//	{
+		//		m_eState = APPEAL;
+		//		m_dwIdleTime = GetTickCount();
+		//	}
+		//}
 
-		// Movement
-		if (m_eState == RUN)
-		{
-			Change_Direction();
-			m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
-		}
+		//// Movement
+		//if (m_eState == RUN)
+		//{
+		//	Change_Direction();
+		//	m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+		//}
 
-		/*m_pTarget = dynamic_cast<CBaseObj*>(pChildrenList);
+		m_pTarget = dynamic_cast<CBaseObj*>(pChildrenList);
 		_vector vTargetPos = m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
 		m_fDistanceToTarget = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
 		
@@ -534,7 +543,7 @@ int CCuccoKeeperNpc::Child_Tick(_float fTimeDelta)
 			
 			m_eState = m_eIdleState;
 			
-		}*/
+		}
 		
 	}
 

@@ -43,6 +43,8 @@ HRESULT CFieldDecoObject::Initialize(void * pArg)
 	case BIRD_ORANGE:
 		m_eState = IDLE;
 		Set_Scale(_float3(0.8f, 0.8f, 0.8f));
+		CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+
 		break;
 	default:
 		break;
@@ -52,6 +54,7 @@ HRESULT CFieldDecoObject::Initialize(void * pArg)
 	m_pNavigationCom->Compute_CurrentIndex_byDistance(vecPostion);
 	m_fHeight = XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	
+
 	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	//CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
@@ -115,6 +118,8 @@ void CFieldDecoObject::Late_Tick(_float fTimeDelta)
 	SetUp_ShaderID();
 
 	Check_Navigation(fTimeDelta);
+
+	
 
 }
 
@@ -198,6 +203,7 @@ void CFieldDecoObject::Bird_Tick(_float fTimeDelta)
 	{
 	m_eState = WALK;
 	m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+	vDir = XMVectorSetY(vDir, 0.f);
 	m_pTransformCom->LookDir(XMVector3Normalize(vDir));
 	}
 	else
@@ -231,6 +237,18 @@ void CFieldDecoObject::Bird_Tick(_float fTimeDelta)
 	{
 		Change_Direction();
 		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+	}
+
+	CBaseObj* pCollisionBlock = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pSPHERECom, &pCollisionBlock))
+	{
+
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionBlock->Get_TransformState(CTransform::STATE_POSITION);
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta, vDirection, m_pNavigationCom);
 	}
 
 	RELEASE_INSTANCE(CGameInstance);

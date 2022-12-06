@@ -211,8 +211,14 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	Safe_AddRef(pGameInstance);
 
 	LEVEL eLevel = LEVEL_GAMEPLAY;
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Sky"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, TEXT("Layer_Terrain"), &eLevel)))
 		return E_FAIL;
+
+	
 
 	HANDLE hFile = 0;
 	_ulong dwByte = 0;

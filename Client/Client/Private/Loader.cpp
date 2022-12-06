@@ -56,6 +56,7 @@
 #include "CraneButton.h"
 #include "Crane.h"
 #include "FieldDecoObject.h"
+#include "Sky.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -155,12 +156,23 @@ HRESULT CLoader::Loading_ForStaticLevel()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Terrain/Grass_%d.dds"), 2))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Texture_Sky */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Sky"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/SkyBox/SkyBoxDefault.dds"), 1))))
+		return E_FAIL;
+
 	/* 모델 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("모델 생성 중."));
 	/*For.Prototype_Component_VIBuffer_Terrain*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 30, 30, -0.01f))))
 		return E_FAIL;
+
+	/*For.Prototype_Component_VIBuffer_Terrain*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Cube"),
+		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 
 	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
 	/* For.Prototype_Component_Navigation */
@@ -368,6 +380,11 @@ HRESULT CLoader::Loading_ForStaticLevel()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Shaderfiles/Shader_VtxAnimModel.hlsl"), VTXANIMMODEL_DECLARATION::Elements, VTXANIMMODEL_DECLARATION::iNumElements))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Shader_VtxAnimModel */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxCubeTexture"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Shaderfiles/Shader_VtxCubeTexture.hlsl"), VTXCUBETEX_DECLARATION::Elements, VTXCUBETEX_DECLARATION::iNumElements))))
+		return E_FAIL;
+
 	/* For.Prototype_Component_Collider_AABB */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"),
 		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
@@ -396,6 +413,13 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 		return E_FAIL;
 	CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
 
+	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
+	/* For.Prototype_Component_Navigation */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation_Filed_Navi_forChild"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Filed_Navi_forChild.dat")))))
+		return E_FAIL;
+
+	
 
 	/* 모델 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("모델 생성 중."));
@@ -798,6 +822,13 @@ HRESULT CLoader::Loading_ForRoomLevel()
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/*For.Prototype_GameObject_Sky*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
+		CSky::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 
 	/*For.Prototype_GameObject_FieldDecoObject*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FieldDecoObject"),

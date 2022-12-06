@@ -119,10 +119,20 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Terrain/Grass_%d.dds"), 2))))
 		return E_FAIL;
 
-	/* 모델 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("게임 플레이 모델 로딩 중."));
-	if (FAILED(Loading_ForGamePlayModel()))
+	_matrix			PivotMatrix = XMMatrixIdentity();
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Picking_Symbol"), CModel::Create(m_pDevice, m_pContext,
+		CModel::TYPE_NONANIM, "../Bin/Resources/Picking_Symbol/Picking_Symbol.fbx", PivotMatrix))))
 		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Boulder*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Boulder.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Boulder/Boulder.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	///* 모델 로딩 중. */
+	//lstrcpy(m_szLoadingText, TEXT("게임 플레이 모델 로딩 중."));
+	//if (FAILED(Loading_ForGamePlayModel()))
+	//	return E_FAIL;
 
 	/*lstrcpy(m_szLoadingText, TEXT("던전 모델 로딩 중."));
 	if (FAILED(Loading_ForDungeonModel()))
@@ -131,6 +141,10 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	lstrcpy(m_szLoadingText, TEXT("룸 모델 로딩 중."));
 	if (FAILED(Loading_ForRoomModel()))
 		return E_FAIL;*/
+
+	lstrcpy(m_szLoadingText, TEXT("타워 모델 로딩 중."));
+	if (FAILED(Loading_ForTowerModel()))
+		return E_FAIL; 
 
 
 	/* 셰이더 로딩 중. */
@@ -149,7 +163,7 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	/* 객체 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("객체 생성 중."));
 
-
+	
 	/*For.Prototype_GameObject_Player*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NonAnim"),
 		CNonAnim::Create(m_pDevice, m_pContext))))
@@ -371,16 +385,7 @@ HRESULT CLoader::Loading_ForGamePlayModel()
 		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/TreasureBox/TreasureBox.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Picking_Symbol"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../Bin/Resources/Picking_Symbol/Picking_Symbol.fbx", PivotMatrix))))
-		return E_FAIL;
 
-	
-
-	/*For.Prototype_Component_Model_Boulder*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Boulder.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Boulder/Boulder.fbx", PivotMatrix))))
-		return E_FAIL;
 
 	/*For.Prototype_Component_Model_Lawn*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Lawn.fbx"),
@@ -538,6 +543,21 @@ HRESULT CLoader::Loading_ForRoomModel()
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("GameShopOwner.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/GameShopOwner/GameShopOwner.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_ForTowerModel()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	_matrix			PivotMatrix = XMMatrixIdentity();
+
+	/*For.Prototype_Component_Model_MarinHouse*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Tower.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Tower/Tower.fbx", PivotMatrix))))
 		return E_FAIL;
 
 

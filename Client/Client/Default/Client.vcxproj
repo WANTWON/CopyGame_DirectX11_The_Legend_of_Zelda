@@ -218,6 +218,7 @@
     <ClInclude Include="..\Public\RedZol.h" />
     <ClInclude Include="..\Public\Rola.h" />
     <ClInclude Include="..\Public\ShopNpc.h" />
+    <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\SquareBlock.h" />
     <ClInclude Include="..\Public\Tail.h" />
     <ClInclude Include="..\Public\TailBoss.h" />
@@ -281,6 +282,7 @@
     <ClCompile Include="..\Private\RedZol.cpp" />
     <ClCompile Include="..\Private\Rola.cpp" />
     <ClCompile Include="..\Private\ShopNpc.cpp" />
+    <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\SquareBlock.cpp" />
     <ClCompile Include="..\Private\Tail.cpp" />
     <ClCompile Include="..\Private\TailBoss.cpp" />

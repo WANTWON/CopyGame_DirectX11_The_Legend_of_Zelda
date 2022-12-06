@@ -38,7 +38,7 @@ protected:
 	D3D11_SUBRESOURCE_DATA		m_SubResourceData;
 
 protected:
-	_float3*		m_pVerticesPosMxM = nullptr;
+	_float3*		m_pVerticesPos = nullptr;
 
 protected:
 	HRESULT Create_VertexBuffer();

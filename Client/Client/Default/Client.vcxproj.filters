@@ -103,9 +103,6 @@
     <Filter Include="02.GameObjects\05.Object">
       <UniqueIdentifier>{0dd72c5c-1e22-492a-8380-0dd9ba87836a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\01.NonAnim\01.Terrain">
-      <UniqueIdentifier>{6cd33bd8-14ca-4499-8f92-7d7ff986c039}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\01.NonAnim\02.DgnKey">
       <UniqueIdentifier>{a763ca3b-af19-4589-8029-c83bf2105c38}</UniqueIdentifier>
     </Filter>
@@ -193,6 +190,9 @@
     <Filter Include="02.GameObjects\05.Object\05.FieldDecoObject">
       <UniqueIdentifier>{ee7a90cc-9992-4dc5-8c7f-f79df7c009da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\01.NonAnim\01.Background">
+      <UniqueIdentifier>{6cd33bd8-14ca-4499-8f92-7d7ff986c039}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -229,7 +229,7 @@
       <Filter>01.Levels\01.Logo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
-      <Filter>02.GameObjects\01.NonAnim\01.Terrain</Filter>
+      <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Camera_Dynamic.h">
       <Filter>96.Camera\Dynamic</Filter>
@@ -387,6 +387,9 @@
     <ClInclude Include="..\Public\FieldDecoObject.h">
       <Filter>02.GameObjects\05.Object\05.FieldDecoObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Sky.h">
+      <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -411,7 +414,7 @@
       <Filter>01.Levels\01.Logo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
-      <Filter>02.GameObjects\01.NonAnim\01.Terrain</Filter>
+      <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Dynamic.cpp">
       <Filter>96.Camera\Dynamic</Filter>
@@ -565,6 +568,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\FieldDecoObject.cpp">
       <Filter>02.GameObjects\05.Object\05.FieldDecoObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sky.cpp">
+      <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

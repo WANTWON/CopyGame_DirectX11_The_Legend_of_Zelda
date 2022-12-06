@@ -39,7 +39,7 @@ public:
 	HRESULT Loading_ForDungeonModel();
 	HRESULT Loading_ForGamePlayModel();
 	HRESULT Loading_ForRoomModel();
-
+	HRESULT Loading_ForTowerModel();
 
 private:
 	LEVEL					m_eNextLevel = LEVEL_END;
