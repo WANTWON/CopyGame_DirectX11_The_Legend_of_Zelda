@@ -10,7 +10,7 @@ BEGIN(Client)
 class CFieldDecoObject final : public CBaseObj
 {
 public:
-	enum TYPE { BUTTERFLY };
+	enum TYPE { BUTTERFLY, BIRD_GREEN, BIRD_ORANGE, };
 	enum STATE { IDLE, WALK };
 
 	typedef struct DecoObjectTag
@@ -38,6 +38,8 @@ private:
 
 private:
 	void Change_Animation(_float fTimeDelta);
+	void Butterfly_Tick(_float fTimeDelta);
+	void Bird_Tick(_float fTimeDelta);
 
 private:
 	CNavigation*			m_pNavigationCom = nullptr;
@@ -47,7 +49,8 @@ private:
 	_float					m_fAngle = 0.f;
 	_float					m_fHeight = 0.f;
 
-	DWORD					m_dwTime = GetTickCount();
+	DWORD					m_dwIdleTime = GetTickCount();
+	DWORD					m_dwWalkTime = GetTickCount();
 	DECODESC				m_DecoDesc;
 	
 public:

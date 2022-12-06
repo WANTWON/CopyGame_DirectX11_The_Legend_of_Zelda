@@ -483,6 +483,13 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("QuadrupletGreen"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("GrandmaUlrira"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_BirdGreen"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/BirdGreen/BirdGreen.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_BirdOrange"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/BirdOrange/BirdOrange.fbx", PivotMatrix))))
+		return E_FAIL;
 
 	/* 콜라이더 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("콜라이더 생성 중."));

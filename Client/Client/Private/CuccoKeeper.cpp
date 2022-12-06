@@ -236,6 +236,14 @@ HRESULT CCuccoKeeperNpc::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		return E_FAIL;
 
+	/* For.Com_Navigation */
+	CNavigation::NAVIDESC			NaviDesc;
+	ZeroMemory(&NaviDesc, sizeof NaviDesc);
+	NaviDesc.iCurrentCellIndex = 0;
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Field"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Field"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
@@ -433,35 +441,106 @@ int CCuccoKeeperNpc::Grandma_Tick(_float fTimeDelta)
 
 int CCuccoKeeperNpc::Child_Tick(_float fTimeDelta)
 {
-
-	// Switch between Idle and Walk (based on time)
-	if (m_eState == APPEAL)
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pChildrenList =  pGameInstance->Get_Object(LEVEL_GAMEPLAY, TEXT("Layer_Children"));
+	if (pChildrenList == nullptr)
 	{
-		if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 3 + 1) + 3000)
+		RELEASE_INSTANCE(CGameInstance);
+		return OBJ_NOEVENT;
+	}
+
+	if (this == pChildrenList)
+	{
+		// Switch between Idle and Walk (based on time)
+		if (m_eState == APPEAL)
+		{
+			if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 3 + 1) + 3000)
+			{
+				m_eState = RUN;
+				m_dwWalkTime = GetTickCount();
+
+				m_eDir[DIR_X] = (rand() % 300)*0.01f - 1.f;
+				m_eDir[DIR_Z] = (rand() % 300)*0.01f - 1.f;
+
+			}
+		}
+		else if (m_eState == RUN)
+		{
+			if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 3 + 1) + 1500)
+			{
+				m_eState = APPEAL;
+				m_dwIdleTime = GetTickCount();
+			}
+		}
+
+		// Movement
+		if (m_eState == RUN)
+		{
+			Change_Direction();
+			m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+		}
+
+	}
+	else
+	{
+		// Switch between Idle and Walk (based on time)
+		if (m_eState == APPEAL)
+		{
+			if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 3 + 1) + 3000)
+			{
+				m_eState = RUN;
+				m_dwWalkTime = GetTickCount();
+
+				m_eDir[DIR_X] = (rand() % 300)*0.01f - 1.f;
+				m_eDir[DIR_Z] = (rand() % 300)*0.01f - 1.f;
+
+			}
+		}
+		else if (m_eState == RUN)
+		{
+			if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 3 + 1) + 1500)
+			{
+				m_eState = APPEAL;
+				m_dwIdleTime = GetTickCount();
+			}
+		}
+
+		// Movement
+		if (m_eState == RUN)
+		{
+			Change_Direction();
+			m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+		}
+
+		/*m_pTarget = dynamic_cast<CBaseObj*>(pChildrenList);
+		_vector vTargetPos = m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		m_fDistanceToTarget = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vTargetPos));
+		
+
+		if (m_fDistanceToTarget > 3)
 		{
 			m_eState = RUN;
-			m_dwWalkTime = GetTickCount();
-
-			m_eDir[DIR_X] = (rand() % 300)*0.01f - 1.f;
-			m_eDir[DIR_Z] = (rand() % 300)*0.01f - 1.f;
-
+			m_pTransformCom->LookAt(vTargetPos);
+			m_pTransformCom->Go_StraightSliding(fTimeDelta*0.5f, m_pNavigationCom);
+			
+			int iRandNum = rand() % 2;
+			if (iRandNum == 0)
+				m_eIdleState = APPEAL;
+			else
+				m_eIdleState = TEASE;
 		}
-	}
-	else if (m_eState == RUN)
-	{
-		if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 3 + 1) + 1500)
+		else
 		{
-			m_eState = APPEAL;
-			m_dwIdleTime = GetTickCount();
-		}
+			
+			m_eState = m_eIdleState;
+			
+		}*/
+		
 	}
 
-	// Movement
-	if (m_eState == RUN)
-	{
-		Change_Direction();
-		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
-	}
+	
+	RELEASE_INSTANCE(CGameInstance);
+
 	return OBJ_NOEVENT;
 }
 

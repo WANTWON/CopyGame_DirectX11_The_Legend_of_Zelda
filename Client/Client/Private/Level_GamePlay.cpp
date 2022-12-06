@@ -688,7 +688,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Npc(const _tchar * pLayerTag)
 			CNpc::NPCDESC NpcDesc;
 			NpcDesc.vInitPos = ModelDesc.vPosition;
 			NpcDesc.eNpcType = CNpc::CHILD;
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CuccoKeeper"), LEVEL_GAMEPLAY, pLayerTag, &NpcDesc)))
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CuccoKeeper"), LEVEL_GAMEPLAY, TEXT("Layer_Children"), &NpcDesc)))
 				return E_FAIL;
 
 		}
@@ -715,8 +715,24 @@ HRESULT CLevel_GamePlay::Ready_Layer_Npc(const _tchar * pLayerTag)
 			DecoDesc.vInitPos = ModelDesc.vPosition;
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FieldDecoObject"), LEVEL_GAMEPLAY, pLayerTag, &DecoDesc)))
 				return E_FAIL;
-			
+		}
+		else if (!wcscmp(pModeltag, TEXT("BirdGreen.fbx")))
+		{
 
+			CFieldDecoObject::DECODESC DecoDesc;
+			DecoDesc.eDecoType = CFieldDecoObject::BIRD_GREEN;
+			DecoDesc.vInitPos = ModelDesc.vPosition;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FieldDecoObject"), LEVEL_GAMEPLAY, pLayerTag, &DecoDesc)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("BirdOrange.fbx")))
+		{
+
+			CFieldDecoObject::DECODESC DecoDesc;
+			DecoDesc.eDecoType = CFieldDecoObject::BIRD_ORANGE;
+			DecoDesc.vInitPos = ModelDesc.vPosition;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FieldDecoObject"), LEVEL_GAMEPLAY, pLayerTag, &DecoDesc)))
+				return E_FAIL;
 		}
 
 	}

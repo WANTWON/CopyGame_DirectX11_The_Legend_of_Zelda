@@ -35,7 +35,10 @@ public:
 
 	HRESULT Loading_ForLogoLevel();
 	HRESULT Loading_ForGamePlayLevel();
-	HRESULT Loading_ForModel(_tchar* cFolderPath);
+
+	HRESULT Loading_ForDungeonModel();
+	HRESULT Loading_ForGamePlayModel();
+	HRESULT Loading_ForRoomModel();
 
 
 private:

@@ -37,6 +37,12 @@ HRESULT CFieldDecoObject::Initialize(void * pArg)
 	case BUTTERFLY:
 		vecPostion = XMVectorSetY(vecPostion, XMVectorGetY(vecPostion)+ 2.f);
 		m_eState = IDLE;
+		Set_Scale(_float3(1.2f, 1.2f, 1.2f));
+		break;
+	case BIRD_GREEN:
+	case BIRD_ORANGE:
+		m_eState = IDLE;
+		Set_Scale(_float3(0.8f, 0.8f, 0.8f));
 		break;
 	default:
 		break;
@@ -44,8 +50,8 @@ HRESULT CFieldDecoObject::Initialize(void * pArg)
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	m_pNavigationCom->Compute_CurrentIndex_byDistance(vecPostion);
-	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
 	m_fHeight = XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	
 	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	//CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
@@ -74,25 +80,21 @@ int CFieldDecoObject::Tick(_float fTimeDelta)
 	m_pModelCom->Set_NextAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
 
-	if (m_dwTime + rand()%5000 < GetTickCount())
+	switch (m_DecoDesc.eDecoType)
 	{
-		m_fAngle = (rand() % 5000)*0.001f;
-		m_dwTime = GetTickCount();
+	case BUTTERFLY:
+		Butterfly_Tick(fTimeDelta);
+		break;
+	case BIRD_GREEN:
+	case BIRD_ORANGE:
+		Bird_Tick(fTimeDelta);
+		break;
+	default:
+		break;
 	}
 
 
-	m_fAngle -= 0.1f;
-	if (m_fAngle <= 0.f)
-	{
-		m_fAngle = 0.f;
-		m_fHeight += rand()%2 == 0 ? 0.002f : - 0.002f ;
-	}
-	
-	_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	vPosition = XMVectorSetY(vPosition, m_fHeight);
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-	m_pTransformCom->Turn(XMVectorSet(0.f,1.f,0.f,0.f), m_fAngle);
 
 	return OBJ_NOEVENT;
 }
@@ -149,10 +151,89 @@ void CFieldDecoObject::Change_Animation(_float fTimeDelta)
 	case Client::CFieldDecoObject::WALK:
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
-		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;
 	}
+}
+
+void CFieldDecoObject::Butterfly_Tick(_float fTimeDelta)
+{
+	if (m_dwIdleTime + rand() % 5000 < GetTickCount())
+	{
+		m_fAngle = (rand() % 5000)*0.001f;
+		m_dwIdleTime = GetTickCount();
+	}
+
+
+	m_fAngle -= 0.1f;
+	if (m_fAngle <= 0.f)
+	{
+		m_fAngle = 0.f;
+		m_fHeight += rand() % 2 == 0 ? 0.002f : -0.002f;
+	}
+
+	_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	vPosition = XMVectorSetY(vPosition, m_fHeight);
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fAngle);
+	m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+}
+
+void CFieldDecoObject::Bird_Tick(_float fTimeDelta)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CBaseObj* m_pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	if (m_pTarget == nullptr)
+	{
+		RELEASE_INSTANCE(CGameInstance);
+		return;
+	}
+
+	_vector vTargetPos = m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+	_vector vDir = Get_TransformState(CTransform::STATE_POSITION) - vTargetPos;
+	_float fDistanceToTarget = XMVectorGetX(XMVector3Length(vDir));
+
+	if (fDistanceToTarget < 3)
+	{
+	m_eState = WALK;
+	m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+	m_pTransformCom->LookDir(XMVector3Normalize(vDir));
+	}
+	else
+	{
+		// Switch between Idle and Walk (based on time)
+		if (m_eState == STATE::IDLE)
+		{
+			if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 3 + 1) + 3000)
+			{
+				m_eState = STATE::WALK;
+				m_dwWalkTime = GetTickCount();
+
+				m_eDir[DIR_X] = (rand() % 300)*0.01f - 1.f;
+				m_eDir[DIR_Z] = (rand() % 300)*0.01f - 1.f;
+
+			}
+		}
+		else if (m_eState == STATE::WALK)
+		{
+			if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 3 + 1) + 1500)
+			{
+				m_eState = STATE::IDLE;
+				m_dwIdleTime = GetTickCount();
+			}
+		}
+	}
+
+
+	// Movement
+	if (m_eState == STATE::WALK)
+	{
+		Change_Direction();
+		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CFieldDecoObject::Ready_Components(void * pArg)
@@ -165,7 +246,19 @@ HRESULT CFieldDecoObject::Ready_Components(void * pArg)
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
-	TransformDesc.fSpeedPerSec = 3.f;
+	switch (m_DecoDesc.eDecoType)
+	{
+	case BUTTERFLY:
+		TransformDesc.fSpeedPerSec = 3.f;
+		break;
+	case BIRD_GREEN:
+	case BIRD_ORANGE:
+		TransformDesc.fSpeedPerSec = 1.f;
+		break;
+	default:
+		break;
+	}
+	
 	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
@@ -179,6 +272,16 @@ HRESULT CFieldDecoObject::Ready_Components(void * pArg)
 	case BUTTERFLY:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Butterfly"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case BIRD_GREEN:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_BirdGreen"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case BIRD_ORANGE:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_BirdOrange"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
 	default:

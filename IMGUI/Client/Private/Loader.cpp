@@ -56,7 +56,7 @@ HRESULT CLoader::Initialize(LEVEL eNextLevel)
 	m_hThread = (HANDLE)_beginthreadex(nullptr, 0, Thread_Main, this, 0, nullptr);
 	if (0 == m_hThread)
 		return E_FAIL;
-		
+
 	return S_OK;
 }
 
@@ -73,28 +73,28 @@ HRESULT CLoader::Loading_ForLogoLevel()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_BackGround"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Default%d.jpg"), 2))))
 		return E_FAIL;
-	
+
 	/* 모델 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("모델 로딩 중."));
-	
+
 
 	/* 셰이더 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("셰이더 로딩 중."));
-	
 
-	
+
+
 
 	// CShader::Create(m_pDevice, m_pContext, TEXT(""), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements);
-	
 
-	
+
+
 
 	/* 객체 원형 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("객체 생성 중."));
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround"),
 		CBackGround::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-	
+
 
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 
@@ -113,59 +113,25 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	/* 텍스쳐 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐 로딩 중."));
 
-	///*For.Prototype_Component_Texture_UI */
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI"),
-	//	CTexture::Create(m_pGraphic_Device, CTexture::TYPE_DEFAULT, TEXT("../Bin/Resources/Textures/Default%d.jpg"), 2))))
-	//	return E_FAIL;
 
 	/*For.Prototype_Component_Texture_Terrain*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Terrain"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Terrain/Grass_%d.dds"), 2))))
 		return E_FAIL;
 
-	///*For.Prototype_Component_Texture_Sky */
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Sky"),
-	//	CTexture::Create(m_pGraphic_Device, CTexture::TYPE_CUBEMAP, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
-	//	return E_FAIL;
-
-	///*For.Prototype_Component_Texture_Explosion */
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Explosion"),
-	//	CTexture::Create(m_pGraphic_Device, CTexture::TYPE_DEFAULT, TEXT("../Bin/Resources/Textures/Explosion/Explosion%d.png"), 90))))
-	//	return E_FAIL;	
-	//
-
 	/* 모델 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("모델 로딩 중."));
-
-	
-
-	if (FAILED(Loading_ForModel(TEXT("../../../Bin/Resources/Meshes/Field/"))))
+	lstrcpy(m_szLoadingText, TEXT("게임 플레이 모델 로딩 중."));
+	if (FAILED(Loading_ForGamePlayModel()))
 		return E_FAIL;
 
-	/*For.Prototype_Component_Model_Fiona*/
-	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Fiona/Fiona.fbx", PivotMatrix))))
+	/*lstrcpy(m_szLoadingText, TEXT("던전 모델 로딩 중."));
+	if (FAILED(Loading_ForDungeonModel()))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("룸 모델 로딩 중."));
+	if (FAILED(Loading_ForRoomModel()))
 		return E_FAIL;*/
 
-	///*For.Prototype_Component_Model_ForkLift*/
-	//PivotMatrix = XMMatrixScaling(0.11f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_ForkLift"),
-	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/ForkLift/ForkLift.fbx", PivotMatrix))))
-	//	return E_FAIL;
-
-	/*For.Prototype_Component_Model_Field05*/
-	/*PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	if (pModelManager->Create_Model_Prototype(LEVEL_GAMEPLAY, TEXT("Model_Field05%c"),
-		m_pDevice, m_pContext, CModel::TYPE_NONANIM, TEXT("../Bin/Resources/Meshes/Test/Field_05%c.fbx"), PivotMatrix, 16))
-		return E_FAIL;*/
-
-
-	///*For.Prototype_Component_VIBuffer_Cube */
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"),
-	//	CVIBuffer_Cube::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
-	//
 
 	/* 셰이더 로딩 중. */
 	lstrcpy(m_szLoadingText, TEXT("셰이더 로딩 중."));
@@ -183,15 +149,6 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	/* 객체 생성 중. */
 	lstrcpy(m_szLoadingText, TEXT("객체 생성 중."));
 
-	///*For.Prototype_GameObject_UI */
-	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI"),
-	//	CUI::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
-
-	///*For.Prototype_GameObject_Sky */
-	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
-	//	CSky::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
 
 	/*For.Prototype_GameObject_Player*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NonAnim"),
@@ -212,13 +169,6 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Dynamic"),
 		CCamera_Dynamic::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-	
-
-
-	///*For.Prototype_GameObject_Effect */
-	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect"),
-	//	CEffect::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
 
 
 
@@ -233,13 +183,13 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	return S_OK;
 }
 
-HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
+HRESULT CLoader::Loading_ForDungeonModel()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	_matrix			PivotMatrix = XMMatrixIdentity();
 
-#pragma region Field
-	for (int i = 0; i < 17; ++i)
+#pragma region TailCave
+	for (int i = 1; i < 9; ++i)
 	{
 		for (int j = 0; j < 7; ++j)
 		{
@@ -247,10 +197,10 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 
 			_tchar*			pModeltag = new _tchar[MAX_PATH];
 			_tchar*			szFilePath = new _tchar[MAX_PATH];
-			wsprintf(pModeltag, TEXT("Field_%02d%c.fbx"), i, j+65);
-			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/NonAnim/Field/Field_%02d%c.fbx"), i, j + 65);
+			wsprintf(pModeltag, TEXT("Lv01TailCave_%02d%c.fbx"), i, j + 65);
+			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/TailCave/Lv01TailCave_%02d%c.fbx"), i, j + 65);
 
-			char* FilePath= new char[MAX_PATH];
+			char* FilePath = new char[MAX_PATH];
 			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
 
 			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, pModeltag,
@@ -265,99 +215,21 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 
 			CImgui_Manager::Get_Instance()->Add_TempTag(pModeltag);
 			CImgui_Manager::Get_Instance()->Add_TempTag(szFilePath);
-			
+
 			delete FilePath;
-				
+
 		}
 	}
-
-#pragma endregion Field
-
-//
-//#pragma region TailCave
-//	for (int i = 1; i < 9; ++i)
-//	{
-//		for (int j = 0; j < 7; ++j)
-//		{
-//			//const char* pFilePath = "../Bin/Resources/Meshes/Field/Field_%02d%c.fbx";
-//
-//			_tchar*			pModeltag = new _tchar[MAX_PATH];
-//			_tchar*			szFilePath = new _tchar[MAX_PATH];
-//			wsprintf(pModeltag, TEXT("Lv01TailCave_%02d%c.fbx"), i, j + 65);
-//			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/TailCave/Lv01TailCave_%02d%c.fbx"), i, j + 65);
-//
-//			char* FilePath = new char[MAX_PATH];
-//			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
-//
-//			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, pModeltag,
-//				CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, FilePath, PivotMatrix))))
-//			{
-//				delete pModeltag;
-//				delete szFilePath;
-//				delete FilePath;
-//
-//				continue;
-//			}
-//
-//			CImgui_Manager::Get_Instance()->Add_TempTag(pModeltag);
-//			CImgui_Manager::Get_Instance()->Add_TempTag(szFilePath);
-//
-//			delete FilePath;
-//
-//		}
-//	}
-//#pragma endregion TailField
-//
-
-/*For.Prototype_Component_Model_MarinHouse*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MarinHouse.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/MarinHouse/MarinHouse.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	/*For.Prototype_Component_Model_Shop*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Shop.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Shop/Shop.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	/*For.Prototype_Component_Model_CraneGame*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("CraneGame.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/CraneGame/CraneGame.fbx", PivotMatrix))))
-		return E_FAIL;
+#pragma endregion TailField
 
 
-
-	/* Model for Monster */
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MoblinSword.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/MoblinSword/MoblinSword.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Octorock.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Octorock/Octorock.fbx", PivotMatrix))))
-		return E_FAIL;
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Pawn.fbx"), CModel::Create(m_pDevice, m_pContext,
 		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/Pawn/Pawn.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Rola.fbx"), CModel::Create(m_pDevice, m_pContext,
 		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Monster/Rola/Rola.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("SmallKey.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/DgnKey/SmallKey/SmallKey.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("FootSwitch.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Switch/FootSwitch.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("TreasureBox.fbx"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/TreasureBox/TreasureBox.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Picking_Symbol"), CModel::Create(m_pDevice, m_pContext,
-		CModel::TYPE_NONANIM, "../Bin/Resources/Picking_Symbol/Picking_Symbol.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_BuzzBlob*/
@@ -415,11 +287,6 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/BladeTrap/BladeTrap.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	/*For.Prototype_Component_Model_Boulder*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Boulder.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Boulder/Boulder.fbx", PivotMatrix))))
-		return E_FAIL;
-
 	/*For.Prototype_Component_Model_BossDoor*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("BossDoor.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Door/BossDoor/BossDoor.fbx", PivotMatrix))))
@@ -433,6 +300,86 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 	/*For.Prototype_Component_Model_LockBlock*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("LockBlock.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/LockBlock/LockBlock.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_ForGamePlayModel()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	_matrix			PivotMatrix = XMMatrixIdentity();
+
+#pragma region Field
+	for (int i = 0; i < 17; ++i)
+	{
+		for (int j = 0; j < 7; ++j)
+		{
+			//const char* pFilePath = "../Bin/Resources/Meshes/Field/Field_%02d%c.fbx";
+
+			_tchar*			pModeltag = new _tchar[MAX_PATH];
+			_tchar*			szFilePath = new _tchar[MAX_PATH];
+			wsprintf(pModeltag, TEXT("Field_%02d%c.fbx"), i, j + 65);
+			wsprintf(szFilePath, TEXT("../../../Bin/Resources/Meshes/NonAnim/Field/Field_%02d%c.fbx"), i, j + 65);
+
+			char* FilePath = new char[MAX_PATH];
+			WideCharToMultiByte(CP_ACP, 0, szFilePath, MAX_PATH, FilePath, MAX_PATH, NULL, NULL);
+
+			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, pModeltag,
+				CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, FilePath, PivotMatrix))))
+			{
+				delete pModeltag;
+				delete szFilePath;
+				delete FilePath;
+
+				continue;
+			}
+
+			CImgui_Manager::Get_Instance()->Add_TempTag(pModeltag);
+			CImgui_Manager::Get_Instance()->Add_TempTag(szFilePath);
+
+			delete FilePath;
+
+		}
+	}
+
+#pragma endregion Field
+
+	
+	/* Model for Monster */
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MoblinSword.fbx"), CModel::Create(m_pDevice, m_pContext,
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/MoblinSword/MoblinSword.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Octorock.fbx"), CModel::Create(m_pDevice, m_pContext,
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Octorock/Octorock.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("SmallKey.fbx"), CModel::Create(m_pDevice, m_pContext,
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/DgnKey/SmallKey/SmallKey.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("FootSwitch.fbx"), CModel::Create(m_pDevice, m_pContext,
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Switch/FootSwitch.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("TreasureBox.fbx"), CModel::Create(m_pDevice, m_pContext,
+		CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/TreasureBox/TreasureBox.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Picking_Symbol"), CModel::Create(m_pDevice, m_pContext,
+		CModel::TYPE_NONANIM, "../Bin/Resources/Picking_Symbol/Picking_Symbol.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	
+
+	/*For.Prototype_Component_Model_Boulder*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Boulder.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Boulder/Boulder.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_Lawn*/
@@ -460,12 +407,69 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Obj/Door/TailCaveShutter/TailCaveShutter.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("CuccoKeeper.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/CuccoKeeper/CuccoKeeper.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Cucco.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Cucco/Cucco.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Butterfly.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Butterfly/Butterfly.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MadamMeowMeow.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/MadamMeowMeow/MadamMeowMeow.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("QuadrupletGreen.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/QuadrupletGreen/QuadrupletGreen.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("GrandmaUlrira.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/GrandmaUlrira/GrandmaUlrira.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("BirdGreen.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/BirdGreen/BirdGreen.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("BirdOrange.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/BirdOrange/BirdOrange.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_ForRoomModel()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	_matrix			PivotMatrix = XMMatrixIdentity();
+
+	/*For.Prototype_Component_Model_MarinHouse*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MarinHouse.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/MarinHouse/MarinHouse.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Shop*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Shop.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Shop/Shop.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_CraneGame*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("CraneGame.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/CraneGame/CraneGame.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	/*For.Prototype_Component_Model_ShopNpc*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("ShopNpc.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/ShopNpc/ShopNpc.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	
 	/*For.Prototype_Component_Model_Arrow*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Arrow.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Arrow/Arrow.fbx", PivotMatrix))))
@@ -480,7 +484,6 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("HeartContainer.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/HeartContainer/HeartContainer.fbx", PivotMatrix))))
 		return E_FAIL;
-
 
 	/*For.Prototype_Component_Model_HeartContainer*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MagicRod.fbx"),
@@ -537,30 +540,7 @@ HRESULT CLoader::Loading_ForModel(_tchar* cFolderPath)
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/GameShopOwner/GameShopOwner.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("CuccoKeeper.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/CuccoKeeper/CuccoKeeper.fbx", PivotMatrix))))
-		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Cucco.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Cucco/Cucco.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Butterfly.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Butterfly/Butterfly.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MadamMeowMeow.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/MadamMeowMeow/MadamMeowMeow.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("QuadrupletGreen.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/QuadrupletGreen/QuadrupletGreen.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("GrandmaUlrira.fbx"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/GrandmaUlrira/GrandmaUlrira.fbx", PivotMatrix))))
-		return E_FAIL;
-	
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }

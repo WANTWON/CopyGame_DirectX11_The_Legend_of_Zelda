@@ -308,6 +308,9 @@ void CImgui_Manager::BrowseForFolder()
 
 			for (auto& iter : *plistClone)
 			{
+				if (iter == nullptr)
+					continue;
+
 				ModelDesc = dynamic_cast<CNonAnim*>(iter)->Get_ModelDesc();
 				WriteFile(hFile, &ModelDesc, sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
 
