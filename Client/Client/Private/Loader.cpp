@@ -30,7 +30,7 @@
 #include "ShopNpc.h"
 #include "MarinNpc.h"
 #include "CraneGameNpc.h"
-#include "CuccoKeeper.h"
+#include "FieldNpc.h"
 
 //for UI
 #include "BackGround.h"
@@ -86,6 +86,9 @@ unsigned int APIENTRY Thread_Main(void* pArg)
 		break;
 	case LEVEL_ROOM:
 		pLoader->Loading_ForRoomLevel();
+		break;
+	case LEVEL_TOWER:
+		pLoader->Loading_ForTowerLevel();
 		break;
 	}
 
@@ -173,27 +176,22 @@ HRESULT CLoader::Loading_ForStaticLevel()
 		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-
 	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
 	/* For.Prototype_Component_Navigation */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Field"),
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Filed_Navi.dat")))))
 		return E_FAIL;
-
-
-	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
+	
 	/* For.Prototype_Component_Navigation */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"),
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/TailCave_Navi.dat")))))
 		return E_FAIL;
-
-	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
+	
 	/* For.Prototype_Component_Navigation */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Shop"),
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Shop_Navi.dat")))))
 		return E_FAIL;
 
-	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
 	/* For.Prototype_Component_Navigation */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Room"),
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Room_Navi.dat")))))
@@ -203,6 +201,14 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_CraneGame"),
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/CraneGame_Navi.dat")))))
 		return E_FAIL;
+
+	/* For.Prototype_Component_Navigation */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Tower"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Tower_Navi.dat")))))
+		return E_FAIL;
+
+
+
 
 	/*For.Prototype_Component_Model_Link*/
 	_matrix			PivotMatrix = XMMatrixIdentity();
@@ -819,6 +825,51 @@ HRESULT CLoader::Loading_ForRoomLevel()
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_ForTowerLevel()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/* 콜라이더 생성 중. */
+	lstrcpy(m_szLoadingText, TEXT("콜라이더 생성 중."));
+
+	/* For.Prototype_Component_Collider_AABB */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TOWER, TEXT("Prototype_Component_Collider_AABB"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Collider_OBB */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TOWER, TEXT("Prototype_Component_Collider_OBB"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Collider_SPHERE */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TOWER, TEXT("Prototype_Component_Collider_SPHERE"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
+		return E_FAIL;
+
+
+	_matrix			PivotMatrix = XMMatrixIdentity();
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	
+
+	PivotMatrix = XMMatrixIdentity();
+
+	/*For.Prototype_Component_Model_MarinHouse*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TOWER, TEXT("Tower.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Tower/Tower.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
+
+	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
+
+	m_isFinished = true;
+
+	return S_OK;
+}
+
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -827,7 +878,6 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
 		CSky::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-
 
 
 	/*For.Prototype_GameObject_FieldDecoObject*/
@@ -843,7 +893,7 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 
 	/*For.Prototype_GameObject_CuccoKeeper*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CuccoKeeper"),
-		CCuccoKeeperNpc::Create(m_pDevice, m_pContext))))
+		CFieldNpc::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	/*For.Prototype_GameObject_Crane*/
@@ -1063,7 +1113,7 @@ HRESULT CLoader::Loading_For_UITexture()
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FieldNpcMessage"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/FieldNpcTalk_%d.dds"), 1))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/FieldNpcTalk_%d.dds"), 4))))
 		return E_FAIL;
 
 

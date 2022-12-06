@@ -6,7 +6,7 @@
 
 
 BEGIN(Client)
-class CCuccoKeeperNpc final : public CNpc
+class CFieldNpc final : public CNpc
 {
 public:
 	enum STATE_CUCCOKEEPER { HANG_MOVE, TALK_CUCCO, IDLE_CUCCO };
@@ -16,13 +16,13 @@ public:
 
 
 
-	enum MSGTEX_SHOPTALK { TALK_DEFAULT };
+	enum MSGTEX_SHOPTALK { TALKMSG_CUCCO, TALKMSG_MADAM, TALKMSG_GRANDMA, TALKMSG_CHILD };
 
 
 private:
-	CCuccoKeeperNpc(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CCuccoKeeperNpc(const CCuccoKeeperNpc& rhs);
-	virtual ~CCuccoKeeperNpc() = default;
+	CFieldNpc(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CFieldNpc(const CFieldNpc& rhs);
+	virtual ~CFieldNpc() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -58,7 +58,7 @@ private:
 
 public:
 	virtual void Free() override;
-	static CCuccoKeeperNpc* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CFieldNpc* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);
 };
 END

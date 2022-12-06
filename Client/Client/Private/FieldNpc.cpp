@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "..\Public\CuccoKeeper.h"
+#include "..\Public\FieldNpc.h"
 #include "Player.h"
 #include "Level_Manager.h"
 #include "CameraManager.h"
@@ -11,17 +11,17 @@
 #include "InvenTile.h"
 #include "InvenItem.h"
 
-CCuccoKeeperNpc::CCuccoKeeperNpc(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CFieldNpc::CFieldNpc(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CNpc(pDevice, pContext)
 {
 }
 
-CCuccoKeeperNpc::CCuccoKeeperNpc(const CCuccoKeeperNpc & rhs)
+CFieldNpc::CFieldNpc(const CFieldNpc & rhs)
 	: CNpc(rhs)
 {
 }
 
-HRESULT CCuccoKeeperNpc::Initialize_Prototype()
+HRESULT CFieldNpc::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
@@ -29,7 +29,7 @@ HRESULT CCuccoKeeperNpc::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CCuccoKeeperNpc::Initialize(void* pArg)
+HRESULT CFieldNpc::Initialize(void* pArg)
 {
 	if (pArg != nullptr)
 		memcpy(&m_NpcDesc, pArg, sizeof(NPCDESC));
@@ -83,7 +83,7 @@ HRESULT CCuccoKeeperNpc::Initialize(void* pArg)
 	return S_OK;
 }
 
-int CCuccoKeeperNpc::Tick(_float fTimeDelta)
+int CFieldNpc::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
@@ -115,7 +115,7 @@ int CCuccoKeeperNpc::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CCuccoKeeperNpc::Late_Tick(_float fTimeDelta)
+void CFieldNpc::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
@@ -169,7 +169,7 @@ void CCuccoKeeperNpc::Late_Tick(_float fTimeDelta)
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-HRESULT CCuccoKeeperNpc::Render()
+HRESULT CFieldNpc::Render()
 {
 	__super::Render();
 
@@ -177,14 +177,14 @@ HRESULT CCuccoKeeperNpc::Render()
 }
 
 
-void CCuccoKeeperNpc::Check_Navigation(_float fTimeDelta)
+void CFieldNpc::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom == nullptr)
 		return;
 }
 
 
-HRESULT CCuccoKeeperNpc::Ready_Components(void * pArg)
+HRESULT CFieldNpc::Ready_Components(void * pArg)
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))
@@ -255,7 +255,7 @@ HRESULT CCuccoKeeperNpc::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CCuccoKeeperNpc::SetUp_ShaderResources()
+HRESULT CFieldNpc::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -276,17 +276,17 @@ HRESULT CCuccoKeeperNpc::SetUp_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CCuccoKeeperNpc::SetUp_ShaderID()
+HRESULT CFieldNpc::SetUp_ShaderID()
 {
 	return S_OK;
 }
 
-void CCuccoKeeperNpc::Change_Animation(_float fTimeDelta)
+void CFieldNpc::Change_Animation(_float fTimeDelta)
 {
 	switch (m_eState)
 	{
-	case Client::CCuccoKeeperNpc::TALK_CUCCO:
-	case Client::CCuccoKeeperNpc::IDLE_CUCCO:
+	case Client::CFieldNpc::TALKMSG_CUCCO:
+	case Client::CFieldNpc::IDLE_CUCCO:
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
@@ -299,7 +299,7 @@ void CCuccoKeeperNpc::Change_Animation(_float fTimeDelta)
 	}
 }
 
-void CCuccoKeeperNpc::Change_Message()
+void CFieldNpc::Change_Message()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
@@ -317,22 +317,22 @@ void CCuccoKeeperNpc::Change_Message()
 	{
 	case CUCCO_KEEPER:
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
-		eMsgDesc.iTextureNum = TALK_DEFAULT;
+		eMsgDesc.iTextureNum = TALKMSG_CUCCO;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		break;
 	case MADAM:
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
-		eMsgDesc.iTextureNum = TALK_DEFAULT;
+		eMsgDesc.iTextureNum = TALKMSG_MADAM;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		break;
 	case GRANDMA:
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
-		eMsgDesc.iTextureNum = TALK_DEFAULT;
+		eMsgDesc.iTextureNum = TALKMSG_GRANDMA;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		break;
 	case CHILD:
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
-		eMsgDesc.iTextureNum = TALK_DEFAULT;
+		eMsgDesc.iTextureNum = TALKMSG_CHILD;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		break;
 	default:
@@ -345,7 +345,7 @@ void CCuccoKeeperNpc::Change_Message()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-int CCuccoKeeperNpc::CuccoKeeper_Tick(_float fTimeDelta)
+int CFieldNpc::CuccoKeeper_Tick(_float fTimeDelta)
 {
 	if (m_eState != TALK_CUCCO)
 	{
@@ -382,7 +382,7 @@ int CCuccoKeeperNpc::CuccoKeeper_Tick(_float fTimeDelta)
 }
 
 
-int CCuccoKeeperNpc::Madam_Tick(_float fTimeDelta)
+int CFieldNpc::Madam_Tick(_float fTimeDelta)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
@@ -393,7 +393,7 @@ int CCuccoKeeperNpc::Madam_Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-int CCuccoKeeperNpc::Grandma_Tick(_float fTimeDelta)
+int CFieldNpc::Grandma_Tick(_float fTimeDelta)
 {
 	if (m_eState == m_eTalkState)
 		return OBJ_NOEVENT;
@@ -448,7 +448,7 @@ int CCuccoKeeperNpc::Grandma_Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-int CCuccoKeeperNpc::Child_Tick(_float fTimeDelta)
+int CFieldNpc::Child_Tick(_float fTimeDelta)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pChildrenList =  pGameInstance->Get_Object(LEVEL_GAMEPLAY, TEXT("Layer_Children"));
@@ -554,7 +554,7 @@ int CCuccoKeeperNpc::Child_Tick(_float fTimeDelta)
 }
 
 
-void CCuccoKeeperNpc::Free()
+void CFieldNpc::Free()
 {
 	__super::Free();
 
@@ -573,9 +573,9 @@ void CCuccoKeeperNpc::Free()
 
 }
 
-CCuccoKeeperNpc * CCuccoKeeperNpc::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CFieldNpc * CFieldNpc::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CCuccoKeeperNpc*	pInstance = new CCuccoKeeperNpc(pDevice, pContext);
+	CFieldNpc*	pInstance = new CFieldNpc(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
@@ -586,9 +586,9 @@ CCuccoKeeperNpc * CCuccoKeeperNpc::Create(ID3D11Device * pDevice, ID3D11DeviceCo
 	return pInstance;
 }
 
-CGameObject * CCuccoKeeperNpc::Clone(void * pArg)
+CGameObject * CFieldNpc::Clone(void * pArg)
 {
-	CCuccoKeeperNpc*	pInstance = new CCuccoKeeperNpc(*this);
+	CFieldNpc*	pInstance = new CFieldNpc(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{

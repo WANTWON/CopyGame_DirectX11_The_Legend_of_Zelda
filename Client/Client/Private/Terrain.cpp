@@ -126,6 +126,12 @@ HRESULT CTerrain::Ready_Components(void* pArg)
 		
 		
 	}
+	else if (*(LEVEL*)pArg == LEVEL_TOWER)
+	{
+		/* For.Com_Navigation */
+		if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Tower"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Tower"), (CComponent**)&m_pNavigationCom)))
+			return E_FAIL;
+	}
 
 
 	return S_OK;

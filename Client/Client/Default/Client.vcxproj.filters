@@ -181,9 +181,6 @@
     <Filter Include="02.GameObjects\01.NonAnim\08.Crane">
       <UniqueIdentifier>{a54f2e90-1238-43cc-bac3-c11f8e240973}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\06.Npc\CuccoKeeper">
-      <UniqueIdentifier>{39707b96-105f-4b83-8003-56dd958cec09}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\03.Monster\10.Cucco">
       <UniqueIdentifier>{7834f938-0a3d-4887-acab-2bc5b356a5dd}</UniqueIdentifier>
     </Filter>
@@ -192,6 +189,12 @@
     </Filter>
     <Filter Include="02.GameObjects\01.NonAnim\01.Background">
       <UniqueIdentifier>{6cd33bd8-14ca-4499-8f92-7d7ff986c039}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\05.Tower">
+      <UniqueIdentifier>{e2affbcc-6e32-48ec-ba3c-2fe90b8f676f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\06.Npc\FieldNpc">
+      <UniqueIdentifier>{39707b96-105f-4b83-8003-56dd958cec09}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -378,9 +381,6 @@
     <ClInclude Include="..\Public\Crane.h">
       <Filter>02.GameObjects\01.NonAnim\08.Crane</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\CuccoKeeper.h">
-      <Filter>02.GameObjects\06.Npc\CuccoKeeper</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Cucco.h">
       <Filter>02.GameObjects\03.Monster\10.Cucco</Filter>
     </ClInclude>
@@ -389,6 +389,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Sky.h">
       <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Tower.h">
+      <Filter>01.Levels\05.Tower</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FieldNpc.h">
+      <Filter>02.GameObjects\06.Npc\FieldNpc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -560,9 +566,6 @@
     <ClCompile Include="..\Private\Crane.cpp">
       <Filter>02.GameObjects\01.NonAnim\08.Crane</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\CuccoKeeper.cpp">
-      <Filter>02.GameObjects\06.Npc\CuccoKeeper</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Cucco.cpp">
       <Filter>02.GameObjects\03.Monster\10.Cucco</Filter>
     </ClCompile>
@@ -571,6 +574,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Sky.cpp">
       <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Tower.cpp">
+      <Filter>01.Levels\05.Tower</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FieldNpc.cpp">
+      <Filter>02.GameObjects\06.Npc\FieldNpc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -55,7 +55,7 @@ public:
 	_bool	Set_RubyUse(_int iCoin);
 	void	Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
 	void	Set_NextPortal(_float3 vPosition, _bool is2D) { m_vPortalPos = vPosition; m_b2D = is2D;}
-
+	void	Set_2DMode(_bool type);
 
 public:
 	void	Change_Navigation(LEVEL eLevel);

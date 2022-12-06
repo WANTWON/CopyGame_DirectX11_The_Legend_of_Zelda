@@ -83,7 +83,10 @@ void CNonAnim::Late_Tick(_float fTimeDelta)
 	_float fCullingRadius = max( max(vScale.x, vScale.y), vScale.z);
 
 	if (pGameInstance->Get_CurrentLevelIndex() == LEVEL_GAMEPLAY)
-		fCullingRadius += 5;
+		fCullingRadius += 8;
+
+	if (pGameInstance->Get_CurrentLevelIndex() == LEVEL_TOWER)
+		fCullingRadius += 10.f;
 
 	if (nullptr != m_pRendererCom && true == pGameInstance->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 4))
 	{

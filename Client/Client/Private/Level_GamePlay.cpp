@@ -611,7 +611,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Portal(const _tchar * pLayerTag)
 	CPortal::PORTALDESC PortalDesc;
 	PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
 	PortalDesc.vInitPos = ModelDesc.vPosition;
-	PortalDesc.eConnectLevel = LEVEL_FOREST;
+	PortalDesc.eConnectLevel = LEVEL_TOWER;
+	PortalDesc.bConnectPortal2D = true;
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
 		return E_FAIL;

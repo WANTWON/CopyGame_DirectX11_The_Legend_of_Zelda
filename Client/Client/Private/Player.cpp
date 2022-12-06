@@ -222,6 +222,13 @@ _bool CPlayer::Set_RubyUse(_int iCoin)
 	return true;
 }
 
+void CPlayer::Set_2DMode(_bool type)
+{
+	 m_b2D = type;  
+	 m_pNavigationCom->Set_2DNaviGation(type); 
+	 m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+}
+
 
 
 void CPlayer::Compute_CurrentIndex(LEVEL eLevel)
@@ -559,6 +566,9 @@ void CPlayer::Change_Navigation(LEVEL eLevel)
 	case Client::LEVEL_TAILCAVE:
 		m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_TailCave")));
 		break;
+	case Client::LEVEL_TOWER:
+		m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_Tower")));
+		break;
 	}
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -624,6 +634,10 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 	m_vecNavigaitions.push_back(m_pNavigationCom);
 
 	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_CraneGame"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_CraneGame"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+		return E_FAIL;
+	m_vecNavigaitions.push_back(m_pNavigationCom);
+
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Tower"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Tower"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
 		return E_FAIL;
 	m_vecNavigaitions.push_back(m_pNavigationCom);
 
@@ -888,12 +902,12 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -1.f, 0.f, 0.f), m_pNavigationCom);
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-		if (m_fWalkingHeight >= XMVectorGetY(vPosition))
+	/*	if (m_fWalkingHeight >= XMVectorGetY(vPosition))
 		{
 			vPosition = XMVectorSetY(vPosition, m_fWalkingHeight);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 			m_eState = LAND;
-		}
+		}*/
 		break;
 	}
 	case Client::CPlayer::SLASH_HOLD_ST:
@@ -1124,7 +1138,7 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 		}
 		
-
+		int a= 0; 
 
 	}
 	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ONLYJUMP)
