@@ -48,12 +48,34 @@ int CMarinNpc::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	Find_Target();
-	if (m_pTarget != nullptr && m_eState != MARIN_GET && m_eState != MARIN_GETED)
-		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
+	// Switch between Idle and Walk (based on time)
+	if (m_eState == IDLE)
+	{
+		if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 3 + 1) + 3000)
+		{
+			m_eState = WALK;
+			m_dwWalkTime = GetTickCount();
 
-	m_pModelCom->Set_NextAnimIndex(m_eState);
-	Change_Animation(fTimeDelta);
+			m_eDir[DIR_X] = (rand() % 3) - 1.f;
+			m_eDir[DIR_Z] = (rand() % 3) - 1.f;
+
+		}
+	}
+	else if (m_eState == WALK)
+	{
+		if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 3 + 1) + 1500)
+		{
+			m_eState = IDLE;
+			m_dwIdleTime = GetTickCount();
+		}
+	}
+
+	// Movement
+	if (m_eState == WALK)
+	{
+		Change_Direction();
+		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+	}
 
 
 	if (m_eState == MARIN_GET)
@@ -70,6 +92,10 @@ int CMarinNpc::Tick(_float fTimeDelta)
 			m_eState = MARIN_GETED;
 		}
 	}
+
+
+	m_pModelCom->Set_NextAnimIndex(m_eState);
+	Change_Animation(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -112,6 +138,7 @@ void CMarinNpc::Late_Tick(_float fTimeDelta)
 			CUI_Manager::Get_Instance()->Add_TalkingNpc(this);
 			CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
 			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TALK);
+			m_pTransformCom->LookAt(pPlayer->Get_TransformState(CTransform::STATE_POSITION));
 			pButton->Set_Visible(false);
 			pPlayer->Set_Stop(true);
 			m_eState = TALK;
@@ -122,7 +149,6 @@ void CMarinNpc::Late_Tick(_float fTimeDelta)
 	else
 	{
 		pButton->Set_Visible(false);
-		m_eState = IDLE;
 	}
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -383,7 +409,7 @@ HRESULT CMarinNpc::Ready_Components(void * pArg)
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
-	TransformDesc.fSpeedPerSec = 3.f;
+	TransformDesc.fSpeedPerSec = 1.f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
@@ -404,6 +430,14 @@ HRESULT CMarinNpc::Ready_Components(void * pArg)
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		return E_FAIL;
+
+	/* For.Com_Navigation */
+	CNavigation::NAVIDESC			NaviDesc;
+	ZeroMemory(&NaviDesc, sizeof NaviDesc);
+	NaviDesc.iCurrentCellIndex = 0;
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Room"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Room"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -440,6 +474,7 @@ void CMarinNpc::Change_Animation(_float fTimeDelta)
 	{
 	case Client::CMarinNpc::TALK:
 	case Client::CMarinNpc::IDLE:
+	case Client::CMarinNpc::WALK:
 	case Client::CMarinNpc::EXCITING:
 	case Client::CMarinNpc::DEPRESS:
 	case Client::CMarinNpc::TREMBLE:

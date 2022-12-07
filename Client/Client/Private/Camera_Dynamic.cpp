@@ -76,6 +76,9 @@ int CCamera_Dynamic::Tick(_float fTimeDelta)
 	case Client::CCamera_Dynamic::CAM_CRANE_GAME:
 		CraneGame_Camera(fTimeDelta);
 		break;
+	case Client::CCamera_Dynamic::CAM_TARGET:
+		Target_Camera(fTimeDelta);
+		break;
 	default:
 		break;
 	}
@@ -358,6 +361,26 @@ void CCamera_Dynamic::CraneGame_Camera(_float fTimeDelta)
 
 	m_pTransform->Go_PosLerp(fTimeDelta, XMLoadFloat4(&m_fTargetPos), 1.f);
 
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CCamera_Dynamic::Target_Camera(_float fTimeDelta)
+{
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+
+
+	m_pTransform->Go_PosLerp(fTimeDelta, XMLoadFloat4(&m_fTargetPos), 0.8f, XMVectorSet(m_vDistance.x, 0.f, m_vDistance.z, 0.f));
+	if (m_dwSettingTime + 2000 < GetTickCount())
+		m_bSetCamLook = true;
+
+	if (m_bSetCamLook == false)
+	{
+		_vector m_TargetPos = XMVectorSetX(XMLoadFloat4(&m_fTargetPos), XMVectorGetX(m_pTransform->Get_State(CTransform::STATE_POSITION)));
+		m_pTransform->LookAt(m_TargetPos);
+
+	}
 
 	RELEASE_INSTANCE(CGameInstance);
 }

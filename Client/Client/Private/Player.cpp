@@ -688,7 +688,7 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE ||
 		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP || m_eState == FALL_FROMTOP || m_eState == FALL_HOLE ||
 		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP || 
-		m_eState == LADDER_UP_ED || m_eState == ITEM_CARRY || m_bDead)
+		m_eState == LADDER_UP_ED || m_eState == ITEM_CARRY || m_bDead )
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
@@ -1137,8 +1137,6 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 			vPosition = XMVectorSetY(vPosition, m_fWalkingHeight);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 		}
-		
-		int a= 0; 
 
 	}
 	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ONLYJUMP)
@@ -1173,14 +1171,42 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 		m_bUpDown = true;
 
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		m_pNavigationCom->Compute_CurrentIndex_byHeight(vPosition);
 		_float m_fWalkingHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
 		m_fStartHeight = m_fWalkingHeight;
 		m_fEndHeight = m_fWalkingHeight;
 
-		if (m_fWalkingHeight > XMVectorGetY(vPosition))
+		
+		if (m_iCurrentLevel == LEVEL_TOWER)
 		{
-			m_pNavigationCom->Compute_CurrentIndex_byHeight(vPosition);
+			
+			if (m_fWalkingHeight > XMVectorGetY(vPosition))
+			{
+				if (XMVectorGetY(vPosition)< 5.6)
+				{
+					vPosition = XMVectorSetY(vPosition, 5.4f);
+					m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+				}
+				else
+				{
+					m_pNavigationCom->Compute_CurrentIndex_byHeight(vPosition);
+				}
+
+			}
+			 if (XMVectorGetY(vPosition) > 16.1)
+			{
+				m_fWalkingHeight = 16.1f;
+				vPosition = XMVectorSetY(vPosition, m_fWalkingHeight);
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+			}
+			
 		}
+		else 
+		{
+			if (m_fWalkingHeight > XMVectorGetY(vPosition))
+				m_pNavigationCom->Compute_CurrentIndex_byHeight(vPosition);
+		}
+
 	}	
 	else
 		m_bUpDown = false;

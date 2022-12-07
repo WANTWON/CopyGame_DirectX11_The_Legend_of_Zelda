@@ -170,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Bin\ShaderFiles\Client_Shader_Defines.hpp" />
+    <ClInclude Include="..\Public\Albatoss.h" />
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\BaseObj.h" />
     <ClInclude Include="..\Public\BladeTrap.h" />
@@ -236,6 +237,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\Albatoss.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\BaseObj.cpp" />
     <ClCompile Include="..\Private\BladeTrap.cpp" />

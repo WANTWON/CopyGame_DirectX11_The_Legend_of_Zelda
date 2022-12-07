@@ -11,7 +11,8 @@ BEGIN(Client)
 class CCamera_Dynamic final : public CCamera
 {
 public:
-	enum CAMERAMODE {CAM_PLAYER, CAM_SHAKING, CAM_TERRAIN, CAM_ITEMGET, CAM_TALK, CAM_ROOM, CAM_CRANE_GAME, CAM_END };
+	enum CAMERAMODE {CAM_PLAYER, CAM_SHAKING, CAM_TERRAIN, CAM_ITEMGET, 
+		CAM_TALK, CAM_ROOM, CAM_CRANE_GAME, CAM_TARGET,  CAM_END };
 
 	typedef struct tagCameraDesc_Derived
 	{
@@ -59,7 +60,11 @@ public:
 	void Item_Camera(_float fTimeDelta);
 	void Talk_Camera(_float fTimeDelta);
 	void CraneGame_Camera(_float fTimeDelta);
+	void Target_Camera(_float fTimeDelta);
+
+public:
 	void Set_Position(_vector vPosition);
+	void Set_TargetPosition(_vector vPosition) { XMStoreFloat4(&m_fTargetPos, vPosition); }
 	
 
 private:
@@ -68,6 +73,7 @@ private:
 	_float4			m_vDistance = _float4(0, 10, -10, 0.f);
 	_double			m_lMouseWheel = 0;
 	_float4			m_fTargetPos = _float4(0.f, 0.f, 0.f, 1.f);
+
 	_bool			m_bSetCamLook = true;
 	DWORD			m_dwSettingTime = GetTickCount();
 

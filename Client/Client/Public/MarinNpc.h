@@ -56,7 +56,8 @@ private:
 	_float4  m_vLastPosition;
 	_float3  m_vLastLook;
 
-
+	DWORD	m_dwIdleTime = GetTickCount();
+	DWORD	m_dwWalkTime = GetTickCount();
 public:
 	virtual void Free() override;
 	static CMarinNpc* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -405,6 +405,16 @@ HRESULT CLevel_Room::Ready_Layer_MarinObject(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MarinNpc"), LEVEL_ROOM, pLayerTag, &NpcDesc)))
 				return E_FAIL;
 		}
+		else if (!wcscmp(pModeltag, TEXT("Bed.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), LEVEL_ROOM, pLayerTag, &ModelDesc)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("Pot.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), LEVEL_ROOM, pLayerTag, &ModelDesc)))
+				return E_FAIL;
+		}
 
 	}
 

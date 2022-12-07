@@ -49,7 +49,7 @@ public: /* Getter Setter */
 	void		Set_Scale(_float3 vScale);
 	CCollider*	Get_Collider();
 	_bool		Get_Stop() { return m_bStop; }
-	void		Set_Stop(_bool type) { m_bStop = type; }
+	void		Set_Stop(_bool type) { m_bStop = type; m_eDir[DIR_X] = 0;  m_eDir[DIR_Z] = 0; }
 	_bool		Get_IsSocket() { return m_bSocket; }
 	
 protected: /* For.Components */

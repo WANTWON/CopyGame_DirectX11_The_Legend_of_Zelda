@@ -196,6 +196,9 @@
     <Filter Include="02.GameObjects\06.Npc\FieldNpc">
       <UniqueIdentifier>{39707b96-105f-4b83-8003-56dd958cec09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\03.Monster\11.Albatoss">
+      <UniqueIdentifier>{a4498069-8626-4373-aa89-38db76ac8b33}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -396,6 +399,9 @@
     <ClInclude Include="..\Public\FieldNpc.h">
       <Filter>02.GameObjects\06.Npc\FieldNpc</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Albatoss.h">
+      <Filter>02.GameObjects\03.Monster\11.Albatoss</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -580,6 +586,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\FieldNpc.cpp">
       <Filter>02.GameObjects\06.Npc\FieldNpc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Albatoss.cpp">
+      <Filter>02.GameObjects\03.Monster\11.Albatoss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -25,6 +25,7 @@
 #include "Tail.h"
 #include "Togezo.h"
 #include "Cucco.h"
+#include "Albatoss.h"
 
 //for NPC
 #include "ShopNpc.h"
@@ -799,7 +800,15 @@ HRESULT CLoader::Loading_ForRoomLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/CraneGameButton/CraneGameButton.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	
+	/*For.Prototype_Component_Model_TailCaveStatue*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("Bed.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Bed/Bed.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_TailCaveStatue*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_ROOM, TEXT("Pot.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Pot/Pot.fbx", PivotMatrix))))
+		return E_FAIL;
 
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -841,11 +850,16 @@ HRESULT CLoader::Loading_ForTowerLevel()
 
 	PivotMatrix = XMMatrixIdentity();
 
-	/*For.Prototype_Component_Model_MarinHouse*/
+	/*For.Prototype_Component_Model_Tower*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TOWER, TEXT("Tower.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Tower/Tower.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	/*For.Prototype_Component_Model_Albatoss*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_TOWER, TEXT("Albatoss"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Albatoss/Albatoss.fbx", PivotMatrix))))
+		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -860,6 +874,12 @@ HRESULT CLoader::Loading_ForTowerLevel()
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/*For.Prototype_GameObject_Albatoss*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Albatoss"),
+		CAlbatoss::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 
 	/*For.Prototype_GameObject_Sky*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),

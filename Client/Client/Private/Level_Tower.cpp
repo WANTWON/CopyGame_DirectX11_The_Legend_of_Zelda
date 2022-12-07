@@ -43,9 +43,9 @@ HRESULT CLevel_Tower::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	/*if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
 		return E_FAIL;
-
+	/*
 	if (FAILED(Ready_Layer_Object(TEXT("Layer_Object"))))
 		return E_FAIL;
 
@@ -90,7 +90,7 @@ void CLevel_Tower::Late_Tick(_float fTimeDelta)
 	__super::Late_Tick(fTimeDelta);
 
 	//SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
-	SetWindowText(g_hWnd, TEXT("GamePlaye Level."));
+	SetWindowText(g_hWnd, TEXT("Tower Level."));
 
 	m_pCollision_Manager->Update_Collider();
 	m_pCollision_Manager->CollisionwithBullet();
@@ -231,194 +231,14 @@ HRESULT CLevel_Tower::Ready_Layer_Monster(const _tchar * pLayerTag)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	HANDLE hFile = 0;
-	_ulong dwByte = 0;
-	CNonAnim::NONANIMDESC  ModelDesc;
-	_uint iNum = 0;
-
-	hFile = CreateFile(TEXT("../../../Bin/Data/Filed_Monster.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Albatoss"), LEVEL_TOWER, pLayerTag, &_float3(-1.27f, 16.f, 1.4f))))
 		return E_FAIL;
-
-	/* 타일의 개수 받아오기 */
-	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
-
-	for (_uint i = 0; i < iNum; ++i)
-	{
-		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
-
-		_tchar pModeltag[MAX_PATH];
-		MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, MAX_PATH, pModeltag, MAX_PATH);
-		if (!wcscmp(pModeltag, TEXT("Octorock.fbx")))
-		{
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Octorock"), LEVEL_GAMEPLAY, pLayerTag, &ModelDesc.vPosition)))
-				return E_FAIL;
-		}
-		else if (!wcscmp(pModeltag, TEXT("MoblinSword.fbx")))
-		{
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MoblinSword"), LEVEL_GAMEPLAY, pLayerTag, &ModelDesc.vPosition)))
-				return E_FAIL;
-		}
-
-	}
-
-	CloseHandle(hFile);
-
-	RELEASE_INSTANCE(CGameInstance);
-	return S_OK;
-}
-
-HRESULT CLevel_Tower::Ready_Layer_Object(const _tchar * pLayerTag)
-{
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	HANDLE hFile = 0;
-	_ulong dwByte = 0;
-	CNonAnim::NONANIMDESC  ModelDesc;
-	_uint iNum = 0;
-
-	hFile = CreateFile(TEXT("../../../Bin/Data/Filed_Object.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
-		return E_FAIL;
-
-	/* 타일의 개수 받아오기 */
-	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
-
-	for (_uint i = 0; i < iNum; ++i)
-	{
-		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
-
-		_tchar pModeltag[MAX_PATH];
-		MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, MAX_PATH, pModeltag, MAX_PATH);
-		if (!wcscmp(pModeltag, TEXT("TailCaveShutter.fbx")))
-		{
-
-			CDoor::DOORDESC DoorDesc;
-			DoorDesc.eType = CDoor::DOOR_TAIL;
-			DoorDesc.InitPosition = ModelDesc.vPosition;
-			DoorDesc.fAngle = ModelDesc.m_fAngle;
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Door"), LEVEL_GAMEPLAY, TEXT("Layer_Shutter"), &DoorDesc)))
-				return E_FAIL;
-
-		}
-		else if (!wcscmp(pModeltag, TEXT("TailCaveStatue.fbx")))
-		{
-
-			CDoor::DOORDESC DoorDesc;
-			CSquareBlock::BLOCKDESC BlockDesc;
-			BlockDesc.eType = CSquareBlock::TAIL_STATUE;
-			BlockDesc.vInitPosition = ModelDesc.vPosition;
-			BlockDesc.fAngle = ModelDesc.m_fAngle;
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_SquareBlock"), LEVEL_GAMEPLAY, pLayerTag, &BlockDesc)))
-				return E_FAIL;
-
-		}
-		else if (!wcscmp(pModeltag, TEXT("Lawn.fbx")))
-		{
-
-			CGrass::GRASSDESC GrassDesc;
-			GrassDesc.eType = CGrass::LAWN;
-			GrassDesc.vPosition = ModelDesc.vPosition;
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Grass"), LEVEL_GAMEPLAY, pLayerTag, &GrassDesc)))
-				return E_FAIL;
-
-		}
-		else if (!wcscmp(pModeltag, TEXT("Grass.fbx")))
-		{
-
-			CGrass::GRASSDESC GrassDesc;
-			GrassDesc.eType = CGrass::GRASS;
-			GrassDesc.vPosition = ModelDesc.vPosition;
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Grass"), LEVEL_GAMEPLAY, pLayerTag, &GrassDesc)))
-				return E_FAIL;
-
-		}
-		else if (!wcscmp(pModeltag, TEXT("Grass2x2.fbx")))
-		{
-
-			CGrass::GRASSDESC GrassDesc;
-			GrassDesc.eType = CGrass::GRASS2x2;
-			GrassDesc.vPosition = ModelDesc.vPosition;
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Grass"), LEVEL_GAMEPLAY, pLayerTag, &GrassDesc)))
-				return E_FAIL;
-
-		}
-
-	}
-
-	CloseHandle(hFile);
-
-
-	hFile = 0;
-	dwByte = 0;
-	CTreasureBox::BOXTAG  TreasureBoxDesc;
-	iNum = 0;
-
-	hFile = CreateFile(TEXT("../../../Bin/Data/Field_TreasureBox.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
-		return E_FAIL;
-
-	/* 타일의 개수 받아오기 */
-	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
-
-	for (_uint i = 0; i < iNum; ++i)
-	{
-		ReadFile(hFile, &(TreasureBoxDesc), sizeof(CTreasureBox::BOXTAG), &dwByte, nullptr);
-
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_GAMEPLAY, pLayerTag, &TreasureBoxDesc)))
-			return E_FAIL;
-
-	}
-
-	CloseHandle(hFile);
-
-
-	RELEASE_INSTANCE(CGameInstance);
-	return S_OK;
-}
-
-HRESULT CLevel_Tower::Ready_Layer_Portal(const _tchar * pLayerTag)
-{
-	HANDLE hFile = 0;
-	_ulong dwByte = 0;
-	CNonAnim::NONANIMDESC  ModelDesc;
-	_uint iNum = 0;
-
-
-	hFile = CreateFile(TEXT("../../../Bin/Data/Field_Portal.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
-		return E_FAIL;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	/* 타일의 개수 받아오기 */
-	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
-
-
-	ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
 	
-	CPortal::PORTALDESC PortalDesc;
-	PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
-	PortalDesc.vInitPos = ModelDesc.vPosition;
-	PortalDesc.eConnectLevel = LEVEL_TOWER;
-
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
-		return E_FAIL;
-
-	ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
-
-	PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
-	PortalDesc.vInitPos = ModelDesc.vPosition;
-	PortalDesc.eConnectLevel = LEVEL_ROOM;
-
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
-		return E_FAIL;
-
-
-	CloseHandle(hFile);
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
+
+
 
 CLevel_Tower * CLevel_Tower::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

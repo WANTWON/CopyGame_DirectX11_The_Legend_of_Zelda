@@ -129,22 +129,22 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Boulder/Boulder.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	/* 모델 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("게임 플레이 모델 로딩 중."));
-	if (FAILED(Loading_ForGamePlayModel()))
-		return E_FAIL;
+	///* 모델 로딩 중. */
+	//lstrcpy(m_szLoadingText, TEXT("게임 플레이 모델 로딩 중."));
+	//if (FAILED(Loading_ForGamePlayModel()))
+	//	return E_FAIL;
 
 	/*lstrcpy(m_szLoadingText, TEXT("던전 모델 로딩 중."));
 	if (FAILED(Loading_ForDungeonModel()))
-		return E_FAIL;
+		return E_FAIL; */
 
-	lstrcpy(m_szLoadingText, TEXT("룸 모델 로딩 중."));
+	/*lstrcpy(m_szLoadingText, TEXT("룸 모델 로딩 중."));
 	if (FAILED(Loading_ForRoomModel()))
 		return E_FAIL;*/
 
-	/*lstrcpy(m_szLoadingText, TEXT("타워 모델 로딩 중."));
+	lstrcpy(m_szLoadingText, TEXT("타워 모델 로딩 중."));
 	if (FAILED(Loading_ForTowerModel()))
-		return E_FAIL; */
+		return E_FAIL; 
 
 
 	/* 셰이더 로딩 중. */
@@ -562,6 +562,16 @@ HRESULT CLoader::Loading_ForRoomModel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/GameShopOwner/GameShopOwner.fbx", PivotMatrix))))
 		return E_FAIL;
 
+
+	/*For.Prototype_Component_Model_TailCaveStatue*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Bed.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Bed/Bed.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_TailCaveStatue*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Pot.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Pot/Pot.fbx", PivotMatrix))))
+		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
