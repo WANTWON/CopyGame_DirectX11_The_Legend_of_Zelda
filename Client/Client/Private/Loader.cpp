@@ -468,15 +468,8 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 	/*For.Prototype_Component_Model_Octorock*/
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Octorock"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Octorock/Octorock.fbx", PivotMatrix))))
-		return E_FAIL;*/
+	
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("Octorock"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
-
-	/*For.Prototype_Component_Model_MoblinSword*/
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("MoblinSword"),
-	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/MoblinSword/MoblinSword.fbx", PivotMatrix))))
-	//	return E_FAIL;
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("MoblinSword"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
 
 
@@ -499,26 +492,20 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("CuccoKeeper"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
-
-
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Cucco"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Cucco/Cucco.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Butterfly"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Butterfly/Butterfly.fbx", PivotMatrix))))
-		return E_FAIL;
-
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("MadamMeowMeow"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("QuadrupletGreen"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("GrandmaUlrira"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
+	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("QuadrupletsMother"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
+	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("Fox"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
+	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("WeatherClock"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
+	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("BirdGreen"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
+	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("BirdOrange"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
+	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("Moosh"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
+	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("Cucco"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
 
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_BirdGreen"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/BirdGreen/BirdGreen.fbx", PivotMatrix))))
-		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_BirdOrange"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/BirdOrange/BirdOrange.fbx", PivotMatrix))))
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Butterfly"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Butterfly/Butterfly.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/* 콜라이더 생성 중. */

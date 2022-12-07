@@ -40,7 +40,7 @@ HRESULT CCucco::Initialize(void * pArg)
 	//CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
 	//char cName[MAX_PATH];
 	//ZeroMemory(cName, sizeof(char) * MAX_PATH);
-	//pData_Manager->TCtoC(TEXT("Octorock"), cName);
+	//pData_Manager->TCtoC(TEXT("Cucco"), cName);
 	//pData_Manager->Conv_Bin_Model(m_pModelCom, cName, CData_Manager::DATA_ANIM);
 	////ERR_MSG(TEXT("Save_Bin_Model"));
 	//RELEASE_INSTANCE(CData_Manager);

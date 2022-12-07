@@ -64,6 +64,11 @@ HRESULT CFieldNpc::Initialize(void* pArg)
 		m_eIdleState = APPEAL;
 		m_eTalkState = TALK_CHILD;
 		break;
+	case MOTHER:
+		m_eState = IDLE_MOTHER;
+		m_eIdleState = IDLE_MOTHER;
+		m_eTalkState = TALK_MOTHER;
+		break;
 	default:
 		break;
 	}
@@ -73,7 +78,7 @@ HRESULT CFieldNpc::Initialize(void* pArg)
 	//	CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
 	//	char cName[MAX_PATH];
 	//	ZeroMemory(cName, sizeof(char) * MAX_PATH);
-	//	pData_Manager->TCtoC(TEXT("GrandmaUlrira"), cName);
+	//	pData_Manager->TCtoC(TEXT("QuadrupletsMother"), cName);
 	//	pData_Manager->Conv_Bin_Model(m_pModelCom, cName, CData_Manager::DATA_ANIM);
 	//	//ERR_MSG(TEXT("Save_Bin_Model"));
 	//	RELEASE_INSTANCE(CData_Manager);
@@ -101,6 +106,9 @@ int CFieldNpc::Tick(_float fTimeDelta)
 		break;
 	case CHILD:
 		Child_Tick(fTimeDelta);
+		break;
+	case MOTHER:
+		Madam_Tick(fTimeDelta);
 		break;
 	default:
 		break;
@@ -234,6 +242,11 @@ HRESULT CFieldNpc::Ready_Components(void * pArg)
 			return E_FAIL;
 		break;
 	}
+	case MOTHER:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("QuadrupletsMother"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
@@ -331,6 +344,11 @@ void CFieldNpc::Change_Message()
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		break;
 	case CHILD:
+		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
+		eMsgDesc.iTextureNum = TALKMSG_CHILD;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+		break;
+	case MOTHER:
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = TALKMSG_CHILD;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);

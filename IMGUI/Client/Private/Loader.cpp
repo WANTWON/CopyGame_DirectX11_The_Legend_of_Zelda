@@ -129,10 +129,10 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Boulder/Boulder.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	///* 모델 로딩 중. */
-	//lstrcpy(m_szLoadingText, TEXT("게임 플레이 모델 로딩 중."));
-	//if (FAILED(Loading_ForGamePlayModel()))
-	//	return E_FAIL;
+	/* 모델 로딩 중. */
+	lstrcpy(m_szLoadingText, TEXT("게임 플레이 모델 로딩 중."));
+	if (FAILED(Loading_ForGamePlayModel()))
+		return E_FAIL;
 
 	/*lstrcpy(m_szLoadingText, TEXT("던전 모델 로딩 중."));
 	if (FAILED(Loading_ForDungeonModel()))
@@ -142,9 +142,9 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	if (FAILED(Loading_ForRoomModel()))
 		return E_FAIL;*/
 
-	lstrcpy(m_szLoadingText, TEXT("타워 모델 로딩 중."));
+	/*lstrcpy(m_szLoadingText, TEXT("타워 모델 로딩 중."));
 	if (FAILED(Loading_ForTowerModel()))
-		return E_FAIL; 
+		return E_FAIL; */
 
 
 	/* 셰이더 로딩 중. */
@@ -445,6 +445,23 @@ HRESULT CLoader::Loading_ForGamePlayModel()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("BirdOrange.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/BirdOrange/BirdOrange.fbx", PivotMatrix))))
 		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Moosh.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Moosh/Moosh.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("WeatherClock.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/WeatherClock/WeatherClock.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Fox.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/Fox/Fox.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("QuadrupletsMother.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Anim/QuadrupletsMother/QuadrupletsMother.fbx", PivotMatrix))))
+		return E_FAIL;
+
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;

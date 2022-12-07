@@ -720,6 +720,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Npc(const _tchar * pLayerTag)
 			CFieldDecoObject::DECODESC DecoDesc;
 			DecoDesc.eDecoType = CFieldDecoObject::BUTTERFLY;
 			DecoDesc.vInitPos = ModelDesc.vPosition;
+			DecoDesc.fAngle = ModelDesc.m_fAngle;
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FieldDecoObject"), LEVEL_GAMEPLAY, pLayerTag, &DecoDesc)))
 				return E_FAIL;
 		}
@@ -729,6 +730,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Npc(const _tchar * pLayerTag)
 			CFieldDecoObject::DECODESC DecoDesc;
 			DecoDesc.eDecoType = CFieldDecoObject::BIRD_GREEN;
 			DecoDesc.vInitPos = ModelDesc.vPosition;
+			DecoDesc.fAngle = ModelDesc.m_fAngle;
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FieldDecoObject"), LEVEL_GAMEPLAY, pLayerTag, &DecoDesc)))
 				return E_FAIL;
 		}
@@ -738,7 +740,45 @@ HRESULT CLevel_GamePlay::Ready_Layer_Npc(const _tchar * pLayerTag)
 			CFieldDecoObject::DECODESC DecoDesc;
 			DecoDesc.eDecoType = CFieldDecoObject::BIRD_ORANGE;
 			DecoDesc.vInitPos = ModelDesc.vPosition;
+			DecoDesc.fAngle = ModelDesc.m_fAngle;
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FieldDecoObject"), LEVEL_GAMEPLAY, pLayerTag, &DecoDesc)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("WeatherClock.fbx")))
+		{
+			CFieldDecoObject::DECODESC DecoDesc;
+			DecoDesc.eDecoType = CFieldDecoObject::WEATHER_CLOCK;
+			DecoDesc.vInitPos = ModelDesc.vPosition;
+			DecoDesc.fAngle = ModelDesc.m_fAngle;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FieldDecoObject"), LEVEL_GAMEPLAY, pLayerTag, &DecoDesc)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("Moosh.fbx")))
+		{
+
+			CFieldDecoObject::DECODESC DecoDesc;
+			DecoDesc.eDecoType = CFieldDecoObject::MOOSH;
+			DecoDesc.vInitPos = ModelDesc.vPosition;
+			DecoDesc.fAngle = ModelDesc.m_fAngle;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FieldDecoObject"), LEVEL_GAMEPLAY, pLayerTag, &DecoDesc)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("Fox.fbx")))
+		{
+
+			CFieldDecoObject::DECODESC DecoDesc;
+			DecoDesc.eDecoType = CFieldDecoObject::FOX;
+			DecoDesc.vInitPos = ModelDesc.vPosition;
+			DecoDesc.fAngle = ModelDesc.m_fAngle;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FieldDecoObject"), LEVEL_GAMEPLAY, pLayerTag, &DecoDesc)))
+				return E_FAIL;
+		}
+		else if (!wcscmp(pModeltag, TEXT("QuadrupletsMother.fbx")))
+		{
+			CNpc::NPCDESC NpcDesc;
+			NpcDesc.vInitPos = ModelDesc.vPosition;
+			NpcDesc.eNpcType = CNpc::MOTHER;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CuccoKeeper"), LEVEL_GAMEPLAY, pLayerTag, &NpcDesc)))
 				return E_FAIL;
 		}
 

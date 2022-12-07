@@ -12,7 +12,7 @@ BEGIN(Client)
 class CNpc abstract : public CBaseObj
 {
 public:
-	enum NPC_ID { SHOP, MARIN , CRANE_GAME, CUCCO_KEEPER, MADAM, GRANDMA, CHILD };
+	enum NPC_ID { SHOP, MARIN , CRANE_GAME, CUCCO_KEEPER, MADAM, GRANDMA, CHILD, MOTHER };
 	enum DMG_DIRECTION {FRONT, BACK};
 
 	typedef struct NpcTad

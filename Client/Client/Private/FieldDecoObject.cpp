@@ -44,12 +44,23 @@ HRESULT CFieldDecoObject::Initialize(void * pArg)
 		m_eState = IDLE;
 		Set_Scale(_float3(0.8f, 0.8f, 0.8f));
 		CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
-
+		break;
+	case WEATHER_CLOCK:
+	case MOOSH:
+		m_eState = IDLE;
+		Set_Scale(_float3(1.2f, 1.2f, 1.2f));
+		CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+		break;
+	case FOX:
+		m_eState = FOX_IDLE;
+		Set_Scale(_float3(1.2f, 1.2f, 1.2f));
+		CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
 		break;
 	default:
 		break;
 	}
 
+	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(m_DecoDesc.fAngle));
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	m_pNavigationCom->Compute_CurrentIndex_byDistance(vecPostion);
 	m_fHeight = XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
@@ -60,7 +71,7 @@ HRESULT CFieldDecoObject::Initialize(void * pArg)
 	//CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
 	//char cName[MAX_PATH];
 	//ZeroMemory(cName, sizeof(char) * MAX_PATH);
-	//pData_Manager->TCtoC(TEXT("Octorock"), cName);
+	//pData_Manager->TCtoC(TEXT("Moosh"), cName);
 	//pData_Manager->Conv_Bin_Model(m_pModelCom, cName, CData_Manager::DATA_ANIM);
 	////ERR_MSG(TEXT("Save_Bin_Model"));
 	//RELEASE_INSTANCE(CData_Manager);
@@ -158,6 +169,12 @@ void CFieldDecoObject::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;
+	default:
+		m_fAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		break;
+
 	}
 }
 
@@ -273,6 +290,8 @@ HRESULT CFieldDecoObject::Ready_Components(void * pArg)
 	case BIRD_ORANGE:
 		TransformDesc.fSpeedPerSec = 1.f;
 		break;
+	case WEATHER_CLOCK:
+		break;
 	default:
 		break;
 	}
@@ -285,21 +304,31 @@ HRESULT CFieldDecoObject::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
+	/* For.Com_Model*/
 	switch (m_DecoDesc.eDecoType)
 	{
 	case BUTTERFLY:
-		/* For.Com_Model*/
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Butterfly"), (CComponent**)&m_pModelCom)))
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Butterfly"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
 	case BIRD_GREEN:
-		/* For.Com_Model*/
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_BirdGreen"), (CComponent**)&m_pModelCom)))
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("BirdGreen"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
 	case BIRD_ORANGE:
-		/* For.Com_Model*/
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_BirdOrange"), (CComponent**)&m_pModelCom)))
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("BirdOrange"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case WEATHER_CLOCK:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("WeatherClock"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case MOOSH:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Moosh"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case FOX:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Fox"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
 	default:
@@ -307,7 +336,6 @@ HRESULT CFieldDecoObject::Ready_Components(void * pArg)
 	}
 
 	
-
 	/* For.Com_SPHERE*/
 	CCollider::COLLIDERDESC		ColliderDesc;
 	ColliderDesc.vScale = _float3(1.0f, 1.0f, 1.0f);

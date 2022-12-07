@@ -10,13 +10,14 @@ BEGIN(Client)
 class CFieldDecoObject final : public CBaseObj
 {
 public:
-	enum TYPE { BUTTERFLY, BIRD_GREEN, BIRD_ORANGE, };
-	enum STATE { IDLE, WALK };
+	enum TYPE { BUTTERFLY, BIRD_GREEN, BIRD_ORANGE, WEATHER_CLOCK, MOOSH, FOX };
+	enum STATE { IDLE, WALK, FOX_IDLE };
 
 	typedef struct DecoObjectTag
 	{
 		TYPE eDecoType = BUTTERFLY;
 		_float3 vInitPos = _float3(0.f, 0.f, 0.f);
+		_float fAngle = 0.f;
 
 	}DECODESC;
 
