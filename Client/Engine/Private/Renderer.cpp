@@ -389,8 +389,11 @@ HRESULT CRenderer::Render_Debug()
 
 	for (auto& pComponent : m_DebugComponents)
 	{
-		if (nullptr != pComponent)
-			pComponent->Render();
+		if (m_bRenderComponentDebug)
+		{
+			if (nullptr != pComponent)
+				pComponent->Render();
+		}
 
 		Safe_Release(pComponent);
 	}
@@ -400,6 +403,8 @@ HRESULT CRenderer::Render_Debug()
 
 	if (CGameInstance::Get_Instance()->Key_Up(DIK_TAB))
 		m_bRenderDebug = !m_bRenderDebug;
+	if (CGameInstance::Get_Instance()->Key_Up(DIK_CAPSLOCK))
+		m_bRenderComponentDebug = !m_bRenderComponentDebug;
 
 	if (m_bRenderDebug)
 	{

@@ -69,7 +69,7 @@ void CRola::Late_Tick(_float fTimeDelta)
 	if (m_pTarget != nullptr && true == m_pOBBCom->Collision(m_pTarget->Get_Collider()) && m_eState == JUMP_ED)
 	{
 		CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(m_pTarget)->Get_AnimState();
-		if (ePlayerState == CPlayer::SHIELD_LP || ePlayerState == CPlayer::SHIELD_ST)
+		if (ePlayerState == CPlayer::SHIELD_HOLD_LP || ePlayerState == CPlayer::SHIELD)
 		{
 			Take_Damage(1.f, nullptr, nullptr);
 			dynamic_cast<CPlayer*>(m_pTarget)->Set_AnimState(CPlayer::SHIELD_HIT);

@@ -83,16 +83,13 @@ HRESULT CFieldDecoObject::Initialize(void * pArg)
 
 int CFieldDecoObject::Tick(_float fTimeDelta)
 {
-	_float3 vScale = Get_Scale();
-	_float fCullingRadius = max(max(vScale.x, vScale.y), vScale.z);
-	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 2) == false)
+	if (Check_IsinFrustum() == false)
 		return OBJ_NOEVENT;
 
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
 
-	m_pModelCom->Set_NextAnimIndex(m_eState);
-	Change_Animation(fTimeDelta);
+	
 
 	switch (m_DecoDesc.eDecoType)
 	{
@@ -107,8 +104,12 @@ int CFieldDecoObject::Tick(_float fTimeDelta)
 		break;
 	}
 
+	
+	m_pModelCom->Set_NextAnimIndex(m_eState);
+	Change_Animation(fTimeDelta);
 
-
+	
+	
 
 	return OBJ_NOEVENT;
 }
@@ -300,9 +301,12 @@ HRESULT CFieldDecoObject::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
 
+
+	
 	/* For.Com_Shader */
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
+	
 
 	/* For.Com_Model*/
 	switch (m_DecoDesc.eDecoType)

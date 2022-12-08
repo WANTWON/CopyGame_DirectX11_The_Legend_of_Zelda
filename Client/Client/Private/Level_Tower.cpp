@@ -145,7 +145,7 @@ HRESULT CLevel_Tower::Ready_Layer_Player(const _tchar * pLayerTag)
 	else
 	{
 		CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
-		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 5.4f, -3.76, 1.f));
+		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 5.4f, -3.76f, 1.f));
 		pPlayer->Change_Navigation(LEVEL_TOWER);
 		pPlayer->Set_JumpingHeight(0.1f);
 		pPlayer->Compute_CurrentIndex(LEVEL_TOWER);

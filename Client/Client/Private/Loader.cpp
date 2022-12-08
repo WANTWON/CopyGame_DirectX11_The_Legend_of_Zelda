@@ -491,6 +491,10 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Bullet/Octorock/Octorock.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("EaglesTower.fbx"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/EaglesTower/EaglesTower.fbx", PivotMatrix))))
+		return E_FAIL;
+
 
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("CuccoKeeper"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("MadamMeowMeow"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);

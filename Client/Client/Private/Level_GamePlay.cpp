@@ -783,6 +783,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Npc(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CuccoKeeper"), LEVEL_GAMEPLAY, pLayerTag, &NpcDesc)))
 				return E_FAIL;
 		}
+		else if (!wcscmp(pModeltag, TEXT("EaglesTower.fbx")))
+		{
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), LEVEL_GAMEPLAY, pLayerTag, &ModelDesc)))
+				return E_FAIL;
+		}
 
 	}
 

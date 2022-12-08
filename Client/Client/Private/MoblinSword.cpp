@@ -85,7 +85,7 @@ void CMoblinSword::Late_Tick(_float fTimeDelta)
 		&& true == m_pOBBCom->Collision((m_pTarget)->Get_Collider()))
 	{
 		CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(m_pTarget)->Get_AnimState();
-		if (ePlayerState == CPlayer::SHIELD_LP || ePlayerState == CPlayer::SHIELD_ST)
+		if (ePlayerState == CPlayer::SHIELD_HOLD_LP || ePlayerState == CPlayer::SHIELD)
 		{
 			m_eState = STAGGER;
 			dynamic_cast<CPlayer*>(m_pTarget)->Set_AnimState(CPlayer::SHIELD_HIT);

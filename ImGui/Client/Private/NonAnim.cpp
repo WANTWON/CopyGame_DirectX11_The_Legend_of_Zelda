@@ -122,8 +122,8 @@ _bool CNonAnim::Picking(_float3 * PickingPoint)
 		return false;*/
 
 	
-	//if (true == m_pModelCom->Picking(m_pTransformCom, PickingPoint))
-		//return true; 
+	if (true == m_pModelCom->Picking(m_pTransformCom, PickingPoint))
+		return true; 
 
 	return false;
 }

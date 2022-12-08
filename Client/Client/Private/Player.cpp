@@ -476,22 +476,10 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_eState = ANIM::SLASH_HOLD_ED;
 		else
 		{
-			switch (m_eRightHand)
-			{
-			case Client::CPlayer::MESH_SWORD:
-			case Client::CPlayer::MESH_SWORD2:
-			{
-				m_eState = SLASH;
-				break;
-			}
-			case Client::CPlayer::MESH_WAND:
+			if(m_b2D)
 				m_eState = S_SLASH;
-				break;
-			case Client::CPlayer::MESH_NONE:
-				break;
-			default:
-				break;
-			}
+			else
+				m_eState = SLASH;
 			m_pModelCom->Set_AnimationReset();
 		}
 	}
@@ -504,10 +492,10 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	}
 	else if (pGameInstance->Key_Up(DIK_Y))
 	{
-		if (m_eState == ANIM::SHIELD_LP)
-			m_eState = SHIELD_ED;
-		else if (m_eState != ANIM::SHIELD_LP)
-			m_eState = ANIM::SHIELD_ST;
+		if (m_eState == ANIM::SHIELD_HOLD_LP)
+			m_eState = SHIELD_HOLD_ED;
+		else if (m_eState != ANIM::SHIELD_HOLD_LP)
+			m_eState = ANIM::SHIELD;
 	}
 
 
@@ -771,7 +759,7 @@ void CPlayer::SetDirection_byPosition(_float fTimeDelta)
 {
 
 	CTransform::TRANSFORMDESC TransformDesc = m_pTransformCom->Get_TransformDesc();
-	TransformDesc.fSpeedPerSec = 2.f;
+	TransformDesc.fSpeedPerSec = 2.5f;
 	m_pTransformCom->Set_TransformDesc(TransformDesc);
 
 	///////////////// 이 부분에서 나의 룩벡터와 Direction Vector를 통해 각도로 방향 세팅 예정
@@ -916,12 +904,12 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = SLASH_HOLD_LP;
 		break;
-	case Client::CPlayer::SHIELD_ST:
+	case Client::CPlayer::SHIELD:
 	case Client::CPlayer::SHIELD_HIT:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
-			m_eState = SHIELD_LP;
+			m_eState = SHIELD_HOLD_LP;
 		break;
 	case Client::CPlayer::LAND:
 	case Client::CPlayer::D_LAND:
@@ -1003,7 +991,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		break;
 	}
 	case Client::CPlayer::DASH_ED:
-	case Client::CPlayer::SHIELD_ED:
+	case Client::CPlayer::SHIELD_HOLD_ED:
 	case Client::CPlayer::SLASH_HOLD_ED:
 		m_eAnimSpeed = 4.f;
 		m_bIsLoop = false;

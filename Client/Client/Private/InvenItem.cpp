@@ -84,13 +84,13 @@ void CInvenItem::Late_Tick(_float fTimeDelta)
 
 		if (!m_bCompass)
 		{
-			m_falpha += 0.025;
+			m_falpha += 0.025f;
 			if (m_falpha >= 1.f)
 				m_falpha = 1.f;
 		}
 		else
 		{
-			m_falpha -= 0.025;
+			m_falpha -= 0.025f;
 			if (m_falpha <= 0.f)
 				m_falpha = 0.f;
 

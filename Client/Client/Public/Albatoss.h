@@ -15,7 +15,7 @@ public:
 		WEAK_HOVERING, WEAK_HOVERING_ST
 	};
 
-	enum ATTACK_STATE { RUSH_STATE, CLAW_STATE , ATTACK_2 };
+	enum ATTACK_STATE { RUSH_STATE, CLAW_STATE , FLAPPING };
 
 private:
 	CAlbatoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -46,6 +46,7 @@ private:
 	void Opening_Motion(_float fTimeDelta);
 	void Rush_Attack(_float fTimeDelta);
 	void Claw_Attack(_float fTimeDelta);
+	void Flapping_Attack(_float fTimeDelta);
 
 private:
 	STATE m_eState = PICCOLO_WAIT;
@@ -54,17 +55,22 @@ private:
 	_bool m_bDownHovering = false;
 
 	DWORD m_dwOpeningTime = GetTickCount();
+	DWORD m_dwFlappingTime = GetTickCount();
+	_vector m_vLastDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+
+	STATE m_eHoverState = HOVERING_LP_FAST;
+	STATE m_eHoverStState = HOVERING_ST;
 
 	_float3			m_vTargetDistance = _float3(0.f, 0.f, 0.f);
 	_float4			m_ClawingPos = _float4(0.f, 30.f, 0.f, 1.f);
-	_float4			m_RushRightPos = _float4(10.f, 19.f, 0.f, 1.f);
-	_float4			m_RushLeftPos = _float4(-10.f, 19.f, 0.f, 1.f);
+	_float4			m_RushRightPos = _float4(10.f, 20.f, 0.f, 1.f);
+	_float4			m_RushLeftPos = _float4(-10.f, 20.f, 0.f, 1.f);
 
 	_uint	m_eAttackMode = RUSH_STATE;
-	_vector m_vLastDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);
-
 	_uint	m_iRushCount = 0;
 	_uint	m_iClawCount = 0;
+
+	
 
 public:
 	static CAlbatoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

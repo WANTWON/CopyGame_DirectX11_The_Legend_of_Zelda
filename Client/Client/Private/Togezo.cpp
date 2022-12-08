@@ -69,7 +69,7 @@ void CTogezo::Late_Tick(_float fTimeDelta)
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pTarget);
 		CPlayer::ANIM ePlayerState = pPlayer->Get_AnimState();
 		
-		if (ePlayerState == CPlayer::SHIELD_LP)
+		if (ePlayerState == CPlayer::SHIELD_HOLD_LP)
 		{
 			if (m_eState != REBOUND_ST)
 			{

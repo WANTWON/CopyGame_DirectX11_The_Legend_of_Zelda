@@ -8,14 +8,6 @@ texture2D		g_NormalTexture;
 texture2D		g_SpecularTexture;
 
 
-inline float3 UnpackNormal(float4 packednormal)
-{
-	float4 normal = float4(0,0,0,0);
-	normal.xy = packednormal.wy * 2 - 1;
-	normal.z = sqrt(1 - normal.x*normal.x - normal.y * normal.y);
-	return normal;
-}
-
 
 struct VS_IN
 {
@@ -92,7 +84,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 
 	float4 vTexturenormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
-	float3	vNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
+	float3	vNormal;
 
 	//packednormal.wy * 2 - 1
 	vNormal = float3((vTexturenormal.x) , vTexturenormal.y , sqrt(1 - vTexturenormal.x*vTexturenormal.x - vTexturenormal.y * vTexturenormal.y));

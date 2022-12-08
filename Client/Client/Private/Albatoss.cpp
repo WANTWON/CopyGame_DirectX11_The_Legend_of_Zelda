@@ -87,7 +87,9 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 	case Client::CAlbatoss::PICCOLO_WAIT:
 	case Client::CAlbatoss::HOVERING_LP:
 	case Client::CAlbatoss::HOVERING_LP_FAST:
+	case Client::CAlbatoss::WEAK_HOVERING:
 	case Client::CAlbatoss::RUSH:
+	case Client::CAlbatoss::ATTACK_FLAPPING:
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
@@ -127,8 +129,11 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_vLastDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-			if (XMVectorGetY(m_vLastDir) < 0 )
+			if (XMVectorGetY(m_vLastDir) <= -0.5)
+				m_vLastDir = XMVectorSetY(m_vLastDir, XMVectorGetY(m_vLastDir) + 0.3f);
+			else if (XMVectorGetY(m_vLastDir) < 0 )
 				m_vLastDir = XMVectorSetY(m_vLastDir, XMVectorGetY(m_vLastDir) + 0.1f);
+			
 			m_pTransformCom->LookDir(m_vLastDir);
 			m_eState = RUSH;
 		}
@@ -141,6 +146,7 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_eState = HOVERING_LP;
+
 		}
 		break;
 	case Client::CAlbatoss::ATTACK_CLAW_ST:
@@ -166,10 +172,33 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CAlbatoss::HOVERING_ST:
+	case Client::CAlbatoss::WEAK_HOVERING_ST:
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
-			m_eState = HOVERING_LP_FAST;
+			m_eState = m_eHoverState;
+		break;
+	case Client::CAlbatoss::ATTACK_FLAPPING_ST:
+		m_fAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+		{
+			m_dwFlappingTime = GetTickCount();
+			m_eState = ATTACK_FLAPPING;
+			m_bIsAttacking = true;
+		}
+		break;
+	case Client::CAlbatoss::ATTACK_FLAPPING_ED:
+		m_fAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+		{
+			m_eState = HOVERING_LP;
+			m_bIsAttacking = false;
+			m_bDownHovering = false;
+			m_eAttackMode = RUSH_STATE;
+
+		}
 		break;
 	default:
 		m_bIsLoop = true;
@@ -207,14 +236,14 @@ HRESULT CAlbatoss::Ready_Components(void * pArg)
 	CCollider::COLLIDERDESC		ColliderDesc;
 	ColliderDesc.vScale = _float3(1.5f, 1.5f, 1.5f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.0f, 0.f);
+	ColliderDesc.vPosition = _float3(0.f, 1.5f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TOWER, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 		return E_FAIL;
 
 	/* For.Com_SHPERE */
-	ColliderDesc.vScale = _float3(5.f, 5.f, 5.f);
+	ColliderDesc.vScale = _float3(3.f, 3.f, 3.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.vPosition = _float3(0.f, 1.5f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_TOWER, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		return E_FAIL;
 
@@ -334,6 +363,9 @@ void CAlbatoss::AI_Behaviour(_float fTimeDelta)
 	case CLAW_STATE:
 		Claw_Attack(fTimeDelta);
 		break;
+	case FLAPPING:
+		Flapping_Attack(fTimeDelta);
+		break;
 	default:
 		break;
 	}
@@ -346,6 +378,22 @@ void CAlbatoss::AI_Behaviour(_float fTimeDelta)
 
 void CAlbatoss::Opening_Motion(_float fTimeDelta)
 {
+	
+	if (CGameInstance::Get_Instance()->Key_Up(DIK_SPACE))
+	{
+		m_bFirst = false;
+		m_bOpening = true;
+		m_eState = HOVERING_LP;
+		CCamera_Dynamic* pCamera = dynamic_cast<CCamera_Dynamic*>(CCameraManager::Get_Instance()->Get_CurrentCamera());
+		pCamera->Set_TargetPosition(XMVectorSet(0.f, 19.f, 0.f, 1.f));
+		dynamic_cast<CPlayer*>(m_pTarget)->Set_Stop(false);
+
+		_vector vPosition = XMLoadFloat4(&m_RushLeftPos);
+		vPosition = XMVectorSetZ(vPosition, 3.f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+		m_bIsAttacking = false;
+	}
+
 	Find_Target();
 
 	_vector vPlayerPos = m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
@@ -357,7 +405,7 @@ void CAlbatoss::Opening_Motion(_float fTimeDelta)
 			CCamera_Dynamic* pCamera = dynamic_cast<CCamera_Dynamic*>(CCameraManager::Get_Instance()->Get_CurrentCamera());
 			pCamera->Set_CamMode(CCamera_Dynamic::CAM_TARGET);
 			dynamic_cast<CPlayer*>(m_pTarget)->Set_Stop(true);
-			m_vTargetDistance.y = 3.f;
+			m_vTargetDistance.y = 2.f;
 			m_vTargetDistance.z = 7.f;
 			m_bFirst = true;
 		}
@@ -403,8 +451,8 @@ void CAlbatoss::Rush_Attack(_float fTimeDelta)
 
 	if (!m_bIsAttacking)
 	{
-		if (m_eState != HOVERING_LP_FAST && m_eState != HOVERING_ST)
-			m_eState = HOVERING_ST;
+		if (m_eState != m_eHoverState && m_eState != m_eHoverStState)
+			m_eState = m_eHoverStState;
 
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(-1.f, 1.f, 0.f, 0.f));
 		if (XMVectorGetX(vPosition) < m_RushLeftPos.x)
@@ -427,7 +475,8 @@ void CAlbatoss::Rush_Attack(_float fTimeDelta)
 
 			if (m_eState == RUSH || m_eState == RUSH_RETURN)
 			{
-				if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) <= XMVectorGetY(vTargetPos) + 1)
+				if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) <= XMVectorGetY(vTargetPos) ||
+					XMVectorGetY(Get_TransformState(CTransform::STATE_LOOK)) <= -0.5)
 				{
 					m_eState = RUSH_RETURN;
 				}
@@ -456,11 +505,11 @@ void CAlbatoss::Rush_Attack(_float fTimeDelta)
 				if (m_iRushCount % 6 == 5)
 				{
 					m_bIsAttacking = false;
-					m_eAttackMode++;
+					m_eAttackMode = CLAW_STATE;
+					m_iRushCount = 0;
 				}
 			}
 		}
-
 	}
 }
 
@@ -473,15 +522,17 @@ void CAlbatoss::Claw_Attack(_float fTimeDelta)
 	{
 		if (!m_bDownHovering)
 		{
-			if (m_eState != HOVERING_LP_FAST && m_eState != HOVERING_ST)
-				m_eState = HOVERING_ST;
+			if (m_eState != m_eHoverState && m_eState != m_eHoverStState)
+				m_eState = m_eHoverStState;
 
-			if (m_eState == HOVERING_LP_FAST)
+			if (m_eState == m_eHoverState)
 			{
 				m_pTransformCom->Go_PosDir(fTimeDelta*0.5f, XMVectorSet(0.f, 1.f, 0.f, 0.f));
 				if (XMVectorGetY(vPosition) > m_ClawingPos.y)
 				{
-					m_pTransformCom->LookAt(vTargetPos);
+					_vector vDir = vTargetPos - vPosition;
+					vDir = XMVectorSetY(vDir, 0.f);
+					m_pTransformCom->LookDir(vDir);
 					vPosition = XMVectorSetX(vPosition, rand() % 2 == 0 ? 5.f : -5.f);
 					m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 					m_bDownHovering = true;
@@ -491,10 +542,12 @@ void CAlbatoss::Claw_Attack(_float fTimeDelta)
 		}
 		else if (m_bDownHovering)
 		{
-			if (m_eState == HOVERING_LP_FAST)
+			if (m_eState == m_eHoverState)
 			{
-				m_pTransformCom->LookAt(vTargetPos);
-				m_pTransformCom->Go_PosDir(fTimeDelta*0.5, XMVectorSet(0.f, -1.f, 0.f, 0.f));
+				_vector vDir = vTargetPos - vPosition;
+				vDir = XMVectorSetY(vDir, 0.f);
+				m_pTransformCom->LookDir(vDir);
+				m_pTransformCom->Go_PosDir(fTimeDelta*0.5f, XMVectorSet(0.f, -1.f, 0.f, 0.f));
 				if (XMVectorGetY(vPosition) < XMVectorGetY(vTargetPos) + 5)
 				{
 					m_eState = ATTACK_CLAW_ST;
@@ -513,14 +566,20 @@ void CAlbatoss::Claw_Attack(_float fTimeDelta)
 		}
 		else
 		{
-			m_eState = ATTACK_CLAW_LP;
+			if (m_eState == ATTACK_CLAW)
+			{
+				m_bIsAttacking = false;
+				m_bDownHovering = false;
+			}
+			else
+				m_eState = ATTACK_CLAW_LP;
 		}
 
 		if (m_eState == ATTACK_CLAW_LP)
 		{
 			m_pTransformCom->Go_PosTarget(fTimeDelta, vTargetPos);
 
-			if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) <= XMVectorGetY(vTargetPos) + 1)
+			if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) < XMVectorGetY(vTargetPos))
 			{
 				m_bIsAttacking = false;
 				m_bDownHovering = false;
@@ -530,18 +589,84 @@ void CAlbatoss::Claw_Attack(_float fTimeDelta)
 		{
 			_vector vDir = XMVector3Normalize(vTargetPos - vPosition); 
 			vDir = XMVectorSetY(vDir, 0.f);
-			m_pTransformCom->Go_PosDir(fTimeDelta*0.2, vDir);
+			m_pTransformCom->Go_PosDir(fTimeDelta*0.2f, vDir);
 		}
 
 		if (m_iClawCount % 6 == 5)
 		{
 			m_bIsAttacking = false;
-			m_eAttackMode = RUSH_STATE;
+			m_eAttackMode = FLAPPING;
+			m_iClawCount = 0;
 		}
 		
 	}
 
 	
+}
+
+void CAlbatoss::Flapping_Attack(_float fTimeDelta)
+{
+	_vector vTargetPos = (m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
+	_vector vPosition = Get_TransformState(CTransform::STATE_POSITION);
+
+	if (!m_bIsAttacking)
+	{
+		if (!m_bDownHovering)
+		{
+			if (m_eState != m_eHoverState && m_eState != m_eHoverStState)
+				m_eState = m_eHoverStState;
+
+			if (m_eState == m_eHoverState)
+			{
+				m_pTransformCom->Go_PosDir(fTimeDelta*0.5f, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+				if (XMVectorGetY(vPosition) > m_ClawingPos.y)
+				{
+					_vector vDir = vTargetPos - vPosition;
+					vDir = XMVectorSetY(vDir, 0.f);
+					m_pTransformCom->LookDir(vDir);
+					vPosition = XMVectorSetX(vPosition, rand() % 2 == 0 ? 7.f : -7.f);
+					m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+					m_bDownHovering = true;
+				}
+			}
+
+		}
+		else if (m_bDownHovering)
+		{
+			if (m_eState == m_eHoverState)
+			{
+				_vector vDir = vTargetPos - vPosition;
+				vDir = XMVectorSetY(vDir, 0.f);
+				m_pTransformCom->LookDir(vDir);
+				m_pTransformCom->Go_PosDir(fTimeDelta*0.5f, XMVectorSet(0.f, -1.f, 0.f, 0.f));
+				if (XMVectorGetY(vPosition) < XMVectorGetY(vTargetPos) + 1)
+				{
+					m_eState = ATTACK_FLAPPING_ST;
+				}
+
+			}
+		}
+	}
+
+
+	if (m_bIsAttacking)
+	{
+		
+		if (m_eState == ATTACK_FLAPPING)
+		{
+			_vector vDir = XMVector3Normalize(vTargetPos - vPosition);
+			vDir = XMVectorSetY(vDir, 0.f);
+			m_pTransformCom->LookDir(vDir);
+		}
+		
+
+		if (m_dwFlappingTime + 5000 < GetTickCount())
+		{
+			m_eState = ATTACK_FLAPPING_ED;
+		}
+
+	}
+
 }
 
 
@@ -562,6 +687,17 @@ _uint CAlbatoss::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 				m_eState = STATE::DAMAGE_RUSH;
 			else
 				m_eState = STATE::DAMAGE_HOVERING;
+
+			if (fHp < 10 && m_eHoverState != WEAK_HOVERING)
+			{
+				m_eHoverStState = WEAK_HOVERING_ST;
+				m_eHoverState = WEAK_HOVERING;
+
+				CTransform::TRANSFORMDESC TransformDesc = m_pTransformCom->Get_TransformDesc();
+				TransformDesc.fSpeedPerSec *= 0.5f;
+				m_pTransformCom->Set_TransformDesc(TransformDesc);
+			}
+
 			m_bMove = true;
 		}
 
