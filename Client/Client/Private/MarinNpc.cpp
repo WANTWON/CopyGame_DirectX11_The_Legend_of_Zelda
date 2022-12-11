@@ -83,8 +83,8 @@ int CMarinNpc::Tick(_float fTimeDelta)
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 		_vector pPlayerPostion = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
 
-		pPlayerPostion = XMVectorSetY(pPlayerPostion, XMVectorGetY(pPlayerPostion) + 3.f);
-		m_pTransformCom->Go_PosTarget(fTimeDelta, pPlayerPostion);
+		pPlayerPostion = XMVectorSetY(pPlayerPostion, XMVectorGetY(pPlayerPostion) + 2.f);
+		m_pTransformCom->Go_PosTarget(fTimeDelta*2, pPlayerPostion);
 
 		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
 		{
@@ -133,11 +133,12 @@ void CMarinNpc::Late_Tick(_float fTimeDelta)
 
 	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom))
 	{
-		if (m_eState == IDLE)
+		if (CUI_Manager::Get_Instance()->Get_Talking() == false)
 		{
 			pButton->Set_TexType(CUIButton::TALK);
 			pButton->Set_Visible(true);
 		}
+		
 
 		_float2 fPosition = pPlayer->Get_ProjPosition();
 		fPosition.y = g_iWinSizeY - fPosition.y;
@@ -156,11 +157,14 @@ void CMarinNpc::Late_Tick(_float fTimeDelta)
 			m_eState = TALK;
 			Change_Message();
 		}
+		m_bFirst = false;
 
 	}
-	else
+	else if (!m_bFirst)
 	{
 		pButton->Set_Visible(false);
+		m_bFirst = true;
+		m_eState = IDLE;
 	}
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -181,18 +185,6 @@ void CMarinNpc::Set_GetMode()
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 
 	m_eState = MARIN_GET;
-
-	dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
-	CMessageBox::MSGDESC MessageDesc;
-	MessageDesc.m_eMsgType = CMessageBox::GET_ITEM;
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &MessageDesc);
-
-	CUI_Manager::MSGDESC MsgDesc;
-	MsgDesc.eMsgType = CUI_Manager::PASSABLE;
-	MsgDesc.iTextureNum = CPrizeItem::MSG_MARIN;
-
-	CUI_Manager::Get_Instance()->Add_MessageDesc(MsgDesc);
-	CUI_Manager::Get_Instance()->Open_Message(true);
 
 	m_bGet = false;
 	XMStoreFloat3(&m_vLastLook, m_pTransformCom->Get_State(CTransform::STATE_LOOK));
@@ -411,6 +403,28 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CMarinNpc::GiveItemMode()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+
+	dynamic_cast<CPlayer*>(pTarget)->Set_AnimState(CPlayer::ITEM_GET_ST);
+	CMessageBox::MSGDESC MessageDesc;
+	MessageDesc.m_eMsgType = CMessageBox::GET_ITEM;
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &MessageDesc);
+
+	CUI_Manager::MSGDESC MsgDesc;
+	MsgDesc.eMsgType = CUI_Manager::PASSABLE;
+	MsgDesc.iTextureNum = CPrizeItem::MSG_MARIN;
+	CUI_Manager::Get_Instance()->Add_MessageDesc(MsgDesc);
+	CUI_Manager::Get_Instance()->Open_Message(true);
+	
+	m_bGiveItem = false;
+	m_bGet = false;
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 HRESULT CMarinNpc::Ready_Components(void * pArg)
 {
 	/* For.Com_Renderer */
@@ -496,7 +510,7 @@ void CMarinNpc::Change_Animation(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CMarinNpc::MARIN_GET:
-		m_fAnimSpeed = 1.f;
+		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;

@@ -73,8 +73,8 @@ private:
 	_float4			m_RushLeftPos = _float4(-10.f, 20.f, 0.f, 1.f);
 
 	_uint	m_eAttackMode = RUSH_STATE;
-	_uint	m_iRushCount = 0;
-	_uint	m_iClawCount = 0;
+	DWORD	m_iRushCount = GetTickCount();
+	DWORD	m_iClawCount = GetTickCount();
 
 	
 

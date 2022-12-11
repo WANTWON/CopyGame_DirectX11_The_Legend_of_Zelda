@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "..\Public\PlayerBullet.h"
-
+#include "Weapon.h"
+#include "Player.h"
+#include "GameInstance.h"
 
 CPlayerBullet::CPlayerBullet(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -35,9 +37,10 @@ HRESULT CPlayerBullet::Initialize(void * pArg)
 	switch (m_BulletDesc.eBulletType)
 	{
 	case SWORD:
-		Set_Scale(_float3(1, 1, 1));
+		Set_Scale(_float3(5, 5, 5));
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		m_pTransformCom->LookDir(m_BulletDesc.vLook);
+		m_bSocket = true;
 		break;
 	default:
 		break;
@@ -79,7 +82,9 @@ void CPlayerBullet::Late_Tick(_float fTimeDelta)
 	__super::Late_Tick(fTimeDelta);
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
+
+	Compute_CamDistance(Get_TransformState(CTransform::STATE_POSITION));
 	SetUp_ShaderID();
 }
 
@@ -128,14 +133,27 @@ HRESULT CPlayerBullet::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Model*/
 	switch (m_BulletDesc.eBulletType)
 	{
 	case SWORD:
+	{
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_SwordSlash"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_OBB*/
+		CCollider::COLLIDERDESC		ColliderDesc;
+		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+			return E_FAIL;
 		break;
+	}
 	case BOW:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), iLevel, TEXT("Prototype_Component_Model_Octorock"), (CComponent**)&m_pModelCom)))
@@ -145,13 +163,7 @@ HRESULT CPlayerBullet::Ready_Components(void * pArg)
 		break;
 	}
 
-	/* For.Com_OBB*/
-	CCollider::COLLIDERDESC		ColliderDesc;
-	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
-	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
-		return E_FAIL;
+	
 
 	return S_OK;
 }
@@ -191,6 +203,21 @@ void CPlayerBullet::Moving_SwordBullet(_float fTimeDelta)
 {
 	//if (m_pTarget == nullptr)
 	//	return;
+
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+
+	CWeapon::WEAPONDESC m_WeaponDesc = pPlayer->Get_WeaponDesc();
+
+	_matrix		SocketMatrix = m_WeaponDesc.pSocket->Get_OffsetMatrix() * m_WeaponDesc.pSocket->Get_CombinedTransformationMatrix() *
+		XMLoadFloat4x4(&m_WeaponDesc.SocketPivotMatrix) * XMLoadFloat4x4(m_WeaponDesc.pParentWorldMatrix);
+
+	SocketMatrix.r[0] = XMVector3Normalize(SocketMatrix.r[0]);
+	SocketMatrix.r[1] = XMVector3Normalize(SocketMatrix.r[1]);
+	SocketMatrix.r[2] = XMVector3Normalize(SocketMatrix.r[2]);
+
+	XMStoreFloat4x4(&m_CombinedWorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix);
+	m_pOBBCom->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
+
 	m_fDeadtime += fTimeDelta;
 	
 	if (m_BulletDesc.fDeadTime < m_fDeadtime)

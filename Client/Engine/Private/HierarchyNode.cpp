@@ -34,7 +34,11 @@ HRESULT CHierarchyNode::Bin_Initialize(DATA_BINNODE * pNode)
 
 	XMStoreFloat4x4(&m_OffsetMatrix, XMMatrixIdentity());
 
-	memcpy(&m_TransformationMatrix, &pNode->mTransform, sizeof(_float4x4));
+	if(pNode->mTransform._11 == -431602080.)
+		XMStoreFloat4x4(&m_TransformationMatrix, XMMatrixIdentity());
+	else
+		memcpy(&m_TransformationMatrix, &pNode->mTransform, sizeof(_float4x4));
+
 
 	XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMMatrixIdentity());
 

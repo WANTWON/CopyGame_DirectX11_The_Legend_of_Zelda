@@ -141,7 +141,7 @@ HRESULT CLevel_Room::Ready_Lights()
 
 	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, 0.0f, 0.f);
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 0.7f, 1.f);
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);	
 
@@ -152,10 +152,10 @@ HRESULT CLevel_Room::Ready_Lights()
 	//ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 
 	//LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	//LightDesc.vPosition = _float4(10.f, 3.f, 10.f, 1.f);
-	//LightDesc.fRange = 7.f;	
+	//LightDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+	//LightDesc.fRange = 2.f;	
 	//LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	//LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
+	//LightDesc.vAmbient = _float4(0.0f, 0.0f, 0.0f, 1.f);
 	//LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 
 	//if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))

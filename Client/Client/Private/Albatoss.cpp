@@ -114,6 +114,7 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 			vPosition = XMVectorSetZ(vPosition, 3.f);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 			m_bIsAttacking = false;
+			m_iRushCount = GetTickCount();
 		}
 		break;
 	case Client::CAlbatoss::RUSH_ST:
@@ -133,12 +134,12 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_vLastDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-			if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) < 16.f && XMVectorGetY(m_vLastDir) < -0.5f)
-			{
-				m_vLastDir = XMVectorSetY(m_vLastDir, XMVectorGetY(m_vLastDir) + 0.3f);
-			}
-			else if (XMVectorGetY(m_vLastDir) < 0 )
-				m_vLastDir = XMVectorSetY(m_vLastDir, XMVectorGetY(m_vLastDir) + 0.1f);
+			//if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) < 16.f && XMVectorGetY(m_vLastDir) < -0.5f)
+			//{
+			//	m_vLastDir = XMVectorSetY(m_vLastDir, XMVectorGetY(m_vLastDir) + 0.3f);
+			//}
+			 if (XMVectorGetY(m_vLastDir) < 0 )
+				m_vLastDir = XMVectorSetY(m_vLastDir, XMVectorGetY(m_vLastDir) + 0.5f);
 			
 			m_pTransformCom->LookDir(m_vLastDir);
 			m_eState = RUSH;
@@ -414,7 +415,7 @@ void CAlbatoss::Opening_Motion(_float fTimeDelta)
 		CCamera_Dynamic* pCamera = dynamic_cast<CCamera_Dynamic*>(CCameraManager::Get_Instance()->Get_CurrentCamera());
 		pCamera->Set_TargetPosition(XMVectorSet(0.f, 19.f, 0.f, 1.f));
 		dynamic_cast<CPlayer*>(m_pTarget)->Set_Stop(false);
-
+		m_iRushCount = GetTickCount();
 		_vector vPosition = XMLoadFloat4(&m_RushLeftPos);
 		vPosition = XMVectorSetZ(vPosition, 3.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
@@ -589,15 +590,15 @@ void CAlbatoss::Rush_Attack(_float fTimeDelta)
 						m_pTransformCom->LookDir(m_vLastDir);
 					}
 					
-					m_pTransformCom->Go_Straight(fTimeDelta);
+					m_pTransformCom->Go_Straight(fTimeDelta*2);
 				}
 
 
-				if (m_iRushCount % 5 == 4)
+				if (m_iRushCount + 10000 < GetTickCount() && m_eState == RUSH_ST)
 				{
 					m_bIsAttacking = false;
 					m_eAttackMode = CLAW_STATE;
-					m_iRushCount = 0;
+					m_iClawCount = GetTickCount();
 				}
 			}
 		}
@@ -668,7 +669,7 @@ void CAlbatoss::Claw_Attack(_float fTimeDelta)
 
 		if (m_eState == ATTACK_CLAW_LP)
 		{
-			m_pTransformCom->Go_PosTarget(fTimeDelta, vTargetPos);
+			m_pTransformCom->Go_PosTarget(fTimeDelta*2, vTargetPos);
 
 			if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) < XMVectorGetY(vTargetPos))
 			{
@@ -683,11 +684,12 @@ void CAlbatoss::Claw_Attack(_float fTimeDelta)
 			m_pTransformCom->Go_PosDir(fTimeDelta*0.2f, vDir);
 		}
 
-		if (m_iClawCount % 4 == 3)
+
+		if (m_iClawCount + 15000 < GetTickCount() && m_bIsAttacking == false)
 		{
 			m_bIsAttacking = false;
 			m_eAttackMode = FLAPPING;
-			m_iClawCount = 0;
+
 		}
 		
 	}
@@ -779,6 +781,7 @@ void CAlbatoss::Flapping_Attack(_float fTimeDelta)
 		{
 			m_eState = ATTACK_FLAPPING_ED;
 			m_bMakeBullet = false;
+			m_iRushCount = GetTickCount();
 		}
 
 	}

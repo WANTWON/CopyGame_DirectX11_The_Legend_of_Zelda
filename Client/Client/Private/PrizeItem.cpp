@@ -7,7 +7,7 @@
 #include "MessageBox.h"
 #include "UIButton.h"
 #include "CameraManager.h"
-
+#include "Portal.h"
 
 CPrizeItem::CPrizeItem(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -154,8 +154,18 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 		{
 			pUI_Manager->Open_Message(false);
 			Setting_Get_Item();
-
 			m_bDead = true;
+
+			if (m_ItemDesc.eType == TAIL_KEY)
+			{
+				CPortal::PORTALDESC PortalDesc;
+				PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
+				pPlayer->Set_2DMode(false);
+				XMStoreFloat3(&PortalDesc.vInitPos , pPlayer->Get_TransformState(CTransform::STATE_POSITION));
+				PortalDesc.eConnectLevel = LEVEL_GAMEPLAY;
+				if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_TOWER, TEXT("Layer_Portal"), &PortalDesc)))
+					return;
+			}
 		}
 
 	}
@@ -329,6 +339,20 @@ void CPrizeItem::Setting_Get_Item()
 				continue;
 		}
 	}
+	else if (m_ItemDesc.eType == BELL)
+	{
+		list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_Collect"));
+		for (auto& iter : *pQuestItemList)
+		{
+			if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::COLLECT_NONE)
+			{
+				dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::COLLECT_BELL);
+				break;
+			}
+			else
+				continue;
+		}
+	}
 	else if (m_ItemDesc.eType == YOSHIDOLL)
 	{
 		list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_QuestItem"));
@@ -384,12 +408,31 @@ void CPrizeItem::Setting_TelephoneMessage()
 	CUI_Manager::MSGDESC eMsgDesc;
 	eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 
+	if (pUI_Manager->Get_TellEnd())
+	{
+		eMsgDesc.iTextureNum = 16;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+	}
+	else if(pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_DungeonKey"), CInvenItem::DGN_TAILKEY))
+	{
+		for (int i = 11; i < 16; ++i)
+		{
+			eMsgDesc.iTextureNum = i;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
 
-	if (pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_Collect"), CInvenItem::COLLECT_DRUM) &&
+		}
+		pUI_Manager->Set_TellEnd(true);
+	}
+	else if (pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_Collect"), CInvenItem::COLLECT_DRUM) &&
 		pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_Collect"), CInvenItem::COLLECT_HORN) &&
 		pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_Collect"), CInvenItem::COLLECT_BELL))
 	{
-		int a = 0;
+		for (int i = 6; i < 11; ++i)
+		{
+			eMsgDesc.iTextureNum = i;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
+
+		}
 	}
 	else
 	{
@@ -535,11 +578,16 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_ROOM, TEXT("Prototype_Component_Model_Telephone"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
+	case BELL:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_SeaLilysBell"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
 	
-
+	
 	CCollider::COLLIDERDESC		ColliderDesc;
 
 	/* For.Com_SPHERE */

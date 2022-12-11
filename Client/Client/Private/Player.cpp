@@ -126,6 +126,12 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_ITEM]);
 			dynamic_cast<CWeapon*>(m_Parts[PARTS_ITEM])->Set_Scale(_float3(2.f, 2.f, 2.f));
 		}
+
+		if (m_Parts[PARTS_EFFECT] != nullptr)
+		{
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, m_Parts[PARTS_EFFECT]);
+			dynamic_cast<CWeapon*>(m_Parts[PARTS_EFFECT])->Set_Scale(_float3(3.f, 3.f, 3.f));
+		}
 			
 
 
@@ -185,12 +191,12 @@ HRESULT CPlayer::Render()
 
 	_uint	iNumMeshes = m_pModelCom->Get_NumMeshContainers();
 
-	for (_uint i = 0; i < iNumMeshes; ++i)
-	{
-		Render_Model((MESH_NAME)i);
-	}
+	//for (_uint i = 0; i < iNumMeshes; ++i)
+	//{
+	//Render_Model((MESH_NAME)iRenderNum);
+	//}
 
-	/*Render_Model(MESH_HAIR);
+	Render_Model(MESH_HAIR);
 	Render_Model(MESH_CLOTHES);
 	Render_Model(MESH_EAR);
 	Render_Model(MESH_HAT);
@@ -201,7 +207,7 @@ HRESULT CPlayer::Render()
 
 	Render_Model(m_eLeftHand);
 	Render_Model(m_eRightHand);
-	*/
+	
 
 	return S_OK;
 }
@@ -313,7 +319,7 @@ HRESULT CPlayer::Ready_Parts(CPrizeItem::TYPE eType, PARTS PartsIndex)
 		return E_FAIL;
 
 
-	CWeapon::WEAPONDESC m_WeaponDesc;
+	m_WeaponDesc;
 	m_WeaponDesc.pSocket = pSocket;
 	m_WeaponDesc.SocketPivotMatrix = m_pModelCom->Get_PivotFloat4x4();
 	m_WeaponDesc.pParentWorldMatrix = m_pTransformCom->Get_World4x4Ptr();
@@ -348,6 +354,40 @@ HRESULT CPlayer::Ready_Parts(CPrizeItem::TYPE eType, PARTS PartsIndex)
 	m_Parts[PartsIndex] = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &m_WeaponDesc);
 	if (nullptr == m_Parts[PartsIndex])
 		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return S_OK;
+}
+
+HRESULT CPlayer::Ready_Parts_Bullet(CWeapon::TYPE eType, PARTS PartsIndex)
+{
+	if (m_Parts[PartsIndex] != nullptr)
+		return E_FAIL;
+
+	/* For.Weapon */
+	CHierarchyNode*		pSocket = m_pModelCom->Get_BonePtr("itemA_L");
+	if (nullptr == pSocket)
+		return E_FAIL;
+
+
+	m_WeaponDesc;
+	m_WeaponDesc.pSocket = pSocket;
+	m_WeaponDesc.SocketPivotMatrix = m_pModelCom->Get_PivotFloat4x4();
+	m_WeaponDesc.pParentWorldMatrix = m_pTransformCom->Get_World4x4Ptr();
+	m_WeaponDesc.eType = eType;
+
+	Safe_AddRef(pSocket);
+
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	m_Parts[PartsIndex] = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &m_WeaponDesc);
+	if (nullptr == m_Parts[PartsIndex])
+	{
+		RELEASE_INSTANCE(CGameInstance);
+		return E_FAIL;
+	}
+		
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -426,6 +466,14 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	}
 	if (pGameInstance->Key_Up(DIK_8))
 	{
+		/*_uint	iNumMeshes = m_pModelCom->Get_NumMeshContainers();
+		++iRenderNum;
+
+		if (iRenderNum >= iNumMeshes)
+		{
+			iRenderNum = 0;
+		}*/
+
 		m_tInfo.iCurrentHp--;
 		if (m_tInfo.iCurrentHp < 0)
 			m_tInfo.iCurrentHp = 0;
@@ -506,6 +554,22 @@ void CPlayer::Key_Input(_float fTimeDelta)
 				m_eState = SLASH;
 			m_pModelCom->Set_AnimationReset();
 		}
+
+		CPlayerBullet::BULLETDESC BulletDesc;
+
+		BulletDesc.eBulletType = CPlayerBullet::SWORD;
+		BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+		BulletDesc.vLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
+		BulletDesc.fDeadTime = 0.5f;
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
+
+		/*if (FAILED(Ready_Parts_Bullet(CWeapon::SLASH, PARTS_EFFECT)))
+		{
+			RELEASE_INSTANCE(CGameInstance);
+			return;
+		}*/
+			
+		
 	}
 	else if (pGameInstance->Key_Pressing(DIK_Z))
 	{
@@ -513,6 +577,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_eState = ANIM::SLASH_HOLD_ST;
 		else if (m_eState == SLASH_HOLD_B || m_eState == SLASH_HOLD_F || m_eState == SLASH_HOLD_R || m_eState == SLASH_HOLD_L)
 			m_eState = SLASH_HOLD_LP;
+
 	}
 	else if (pGameInstance->Key_Up(DIK_Y))
 	{
@@ -1044,7 +1109,12 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_eAnimSpeed = 2.5f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			if(m_Parts[PARTS_EFFECT] != nullptr)
+				Safe_Release(m_Parts[PARTS_EFFECT]);
 			m_eState = IDLE;
+		}
+			
 		break;
 	case Client::CPlayer::DASH_ST:
 		m_eAnimSpeed = 2.f;
@@ -1341,6 +1411,7 @@ void CPlayer::Free()
 
 	m_Parts.clear();
 
+	Safe_Release(m_WeaponDesc.pSocket);
 
 	Safe_Release(m_pAABBCom);
 	Safe_Release(m_pOBBCom);

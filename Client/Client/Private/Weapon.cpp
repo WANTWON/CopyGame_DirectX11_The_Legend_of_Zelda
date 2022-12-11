@@ -62,6 +62,7 @@ void CWeapon::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_Debug(m_pOBBCom);
 #endif
 
+	Compute_CamDistance(Get_TransformState(CTransform::STATE_POSITION));
 }
 
 HRESULT CWeapon::Render()
@@ -105,9 +106,20 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
 
-	/* For.Com_Shader */
-	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), (CComponent**)&m_pShaderCom)))
-		return E_FAIL;
+	switch (m_WeaponDesc.eType)
+	{
+	case SLASH:
+		/* For.Com_Shader */
+		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect"), (CComponent**)&m_pShaderCom)))
+			return E_FAIL;
+		break;
+	default:
+		/* For.Com_Shader */
+		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), (CComponent**)&m_pShaderCom)))
+			return E_FAIL;
+		break;
+	}
+	
 
 	CCollider::COLLIDERDESC		ColliderDesc;
 	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
@@ -172,6 +184,17 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 	case TELEPHONE:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_TelephoneParts"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(0.9f, 0.2f, 0.2f);
+		ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+			return E_FAIL;
+		break;
+	case SLASH:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_SwordSlash"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 
 		/* For.Com_OBB*/

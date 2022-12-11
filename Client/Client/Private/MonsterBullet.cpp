@@ -62,7 +62,7 @@ HRESULT CMonsterBullet::Initialize(void * pArg)
 		PosY += 2.f;
 		m_BulletDesc.vInitPositon = XMVectorSetY(m_BulletDesc.vInitPositon, PosY);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
-		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(rand() % 180));
+		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(float(rand() % 180)));
 		break;
 	}
 	default:

@@ -276,7 +276,7 @@ void CUI_Manager::Tick_Message()
 				m_iChoiceIndex++;
 
 				if (m_iChoiceIndex >= m_vecChoiceButton.size())
-					m_iChoiceIndex = m_vecChoiceButton.size() - 1;
+					m_iChoiceIndex = (_int)(m_vecChoiceButton.size() - 1);
 			}
 
 			if (m_vecChoiceButton.size() != 0)
@@ -311,7 +311,11 @@ void CUI_Manager::Tick_Message()
 				{
 					m_bNpcGet = true;
 					if (dynamic_cast<CMarinNpc*>(m_pTalkingNpc)->Get_IsGet() == true)
+					{
 						dynamic_cast<CMarinNpc*>(m_pTalkingNpc)->Set_GetMode();
+						(m_pTalkingNpc)->GiveItemMode();
+					}
+					
 				}
 				else if (m_pTalkingNpc != nullptr && m_pTalkingNpc->Get_NpcID() == CNpc::CRANE_GAME)
 				{
@@ -328,6 +332,11 @@ void CUI_Manager::Tick_Message()
 						(m_pTalkingNpc)->GiveItemMode();
 				}
 				else if (m_pTalkingNpc != nullptr && m_pTalkingNpc->Get_NpcID() == CNpc::SHOP)
+				{
+					if ((m_pTalkingNpc)->Get_GiveItem() == true)
+						(m_pTalkingNpc)->GiveItemMode();
+				}
+				else if (m_pTalkingNpc != nullptr && m_pTalkingNpc->Get_NpcID() == CNpc::TARIN)
 				{
 					if ((m_pTalkingNpc)->Get_GiveItem() == true)
 						(m_pTalkingNpc)->GiveItemMode();

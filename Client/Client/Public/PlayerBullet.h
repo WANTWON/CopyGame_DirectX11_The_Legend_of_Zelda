@@ -54,7 +54,7 @@ protected: /* For.Components */
 	_float					m_fDeadtime = 0.f;
 	_float					m_fAnimSpeed = 1.f;
 	BULLETDESC				m_BulletDesc;
-
+	_float4x4				m_CombinedWorldMatrix;
 public:
 	static CPlayerBullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

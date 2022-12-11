@@ -12,8 +12,7 @@ public:
 	enum MSGTEX_MARINTALK {
 		MARIN_TALK, MARIN_Q1_PERFUME, MARIN_A1_COMPLETE, MARIN_A1_FAIL, MARIN_Q2_CHANGE, MARIN_A2_FAIL, MARIN_A2_COMPLETE,
 		MARIN_Q3_VECTOR, MARIN_Q3_VECTOR_FAIL, MARIN_Q3_FAIL, MARIN_Q3_DOT, MARIN_Q3_DOT_FAIL, MARIN_Q3_COMPLETE, 
-		MARIN_Q4_CHARM, MARIN_A4_COMPLETE, MARIN_Q5_FINAL, MARIN_A5_COMPLETE, MARIN_A5_FAIL, MARIN_LOVEUFAIL, MARIN_TALKEND_FAIL, MARIN_TALKEND_COMPLETE
-	};
+		MARIN_Q4_CHARM, MARIN_A4_COMPLETE, MARIN_Q5_FINAL, MARIN_A5_COMPLETE, MARIN_A5_FAIL, MARIN_LOVEUFAIL, MARIN_TALKEND_FAIL, MARIN_TALKEND_COMPLETE};
 
 	enum TALIKING_MODE { PERFUME, CHANGE, CROSS_DOT, CHARM, FINAL};
 
@@ -37,7 +36,7 @@ public:
 	void	Set_GetMode();
 	virtual void Check_Navigation(_float fTimeDelta);
 	virtual void Send_Answer_toNPC(_uint iTextureNum) override;
-
+	virtual void GiveItemMode() override;
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
 	virtual HRESULT SetUp_ShaderResources();
@@ -49,8 +48,8 @@ private:
 private:
 	STATE	m_eState = IDLE;
 	_int	m_iCoin = 0;
-	_int	m_iHeart = 0;
-	_uint	m_eTalkingMode = PERFUME;
+	_int	m_iHeart = 12;
+	_uint	m_eTalkingMode = FINAL;
 	_bool	m_bEnd = false;
 	_bool	m_bGet = false;
 	_float4  m_vLastPosition;

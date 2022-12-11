@@ -52,6 +52,7 @@ public: /*Getter Setter*/
 	void		Set_Talking(_bool type) { m_bTalking = type; }
 	void		Set_PlayGame(_bool type) { m_bPlayGame = type; }
 	void		Set_NextMessage();
+	void		Set_TellEnd(_bool type) { m_bTellEnd = type; }
 
 	void		Get_Key();
 	_uint		Get_KeySize() { return (_uint)m_KeyList.size(); }
@@ -63,7 +64,7 @@ public: /*Getter Setter*/
 	_bool		Get_NpcGet() { return m_bNpcGet; }
 	_bool 		Get_PlayGame() { return m_bPlayGame; }
 	_bool		Get_Is_HaveItem(LEVEL eLevel, _tchar* LayerTag, _uint ItemtexTureNum);
-
+	_bool		Get_TellEnd() { return m_bTellEnd; }
 	CNpc*		Get_TalkingNpc() { return m_pTalkingNpc; }
 
 
@@ -95,6 +96,7 @@ private:
 	_bool				m_bUIOpen = false;
 	_bool				m_bNextLevel = false;
 	_bool				m_bFinishedReady = false;
+	_bool				m_bTellEnd = false;
 	
 	/*For Message */
 	_bool				m_bOpenMessage = false;

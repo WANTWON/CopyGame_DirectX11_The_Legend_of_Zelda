@@ -73,11 +73,12 @@ void CTarinNpc::Late_Tick(_float fTimeDelta)
 
 	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom))
 	{
-		if (m_eState == IDLE)
+		if (CUI_Manager::Get_Instance()->Get_Talking() == false)
 		{
 			pButton->Set_TexType(CUIButton::TALK);
 			pButton->Set_Visible(true);
 		}
+
 
 		_float2 fPosition = pPlayer->Get_ProjPosition();
 		fPosition.y = g_iWinSizeY - fPosition.y;
@@ -96,11 +97,13 @@ void CTarinNpc::Late_Tick(_float fTimeDelta)
 			m_eState = TALK;
 			Change_Message();
 		}
-
+		m_bFirst = false;
 	}
-	else
+	else if (!m_bFirst)
 	{
 		pButton->Set_Visible(false);
+		m_bFirst = true;
+		m_eState = IDLE;
 	}
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -216,13 +219,47 @@ void CTarinNpc::Change_Message()
 
 	CUI_Manager::MSGDESC eMsgDesc;
 	eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
-	eMsgDesc.iTextureNum = DEFAULT;
-	pUI_Manager->Add_MessageDesc(eMsgDesc);
+
+	if (pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_QuestItem"), CInvenItem::MARIN))
+	{
+		eMsgDesc.iTextureNum = THANK_YOU;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+
+		eMsgDesc.iTextureNum = THISISFORYOU;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+
+		m_bGiveItem = true;
+		m_iGiveItemTexNum = CPrizeItem::BELL;
+	}
+	else
+	{
+		eMsgDesc.iTextureNum = DEFAULT;
+		pUI_Manager->Add_MessageDesc(eMsgDesc);
+	}
+	
+	
 	
 	pUI_Manager->Open_Message(true);
 
 	RELEASE_INSTANCE(CUI_Manager);
 	RELEASE_INSTANCE(CGameInstance);
+}
+
+
+void CTarinNpc::GiveItemMode()
+{
+	//if (m_bGiveItem && CUI_Manager::Get_Instance()->Get_Talking() == false &&
+	//	CUI_Manager::Get_Instance()->Get_OpenMessage() == false && CUI_Manager::Get_Instance()->Get_MessageSize() == 0)
+
+	CPrizeItem::ITEMDESC ItemDesc;
+	ItemDesc.eType = (CPrizeItem::TYPE)m_iGiveItemTexNum;
+	ItemDesc.eInteractType = CPrizeItem::PRIZE;
+	XMStoreFloat3(&ItemDesc.vPosition, Get_TransformState(CTransform::STATE_POSITION));
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, TEXT("Layer_Item"), &ItemDesc)))
+		return;
+	m_bGiveItem = false;
+
 }
 
 

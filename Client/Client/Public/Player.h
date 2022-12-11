@@ -2,6 +2,7 @@
 
 #include "BaseObj.h"
 #include "PrizeItem.h"
+#include "Weapon.h"
 
 BEGIN(Engine)
 class CModel;
@@ -25,11 +26,12 @@ public:
 	};
 
 	enum MESH_NAME {
-		MESH_HAIR, MESH_CLOTHES, MESH_SWORD, MESH_EAR, MESH_HAT, MESH_HOOK, MESH_FACE, MESH_SHEILD,
-		MESH_SWORD2, MESH_OCARINA, MESH_SHOVEL, MESH_SHOES, MESH_WAND, MESH_BELT, MESH_MOUSE, MESH_FILPPER, MESH_NONE
+		MESH_HAT, MESH_RING1, MESH_SHEILD2, MESH_EAR, MESH_HAIR, MESH_ROD, MESH_BELT, MESH_HOOK, MESH_SWORD, MESH_FACE, MESH_CLOTHES, MESH_RING2,
+		MESH_OCARINA, MESH_SHEILD, MESH_MOUSE, MESH_SWORDHAND , MESH_SWORD2, MESH_SHEILD2_DECO, MESH_SHOES, MESH_FILPPER, MESH_NONE
 	};
 
-	enum PARTS { PARTS_BOW, PARTS_ITEM, PARTS_END };
+
+	enum PARTS { PARTS_BOW, PARTS_ITEM, PARTS_EFFECT, PARTS_END };
 
 
 private:
@@ -48,6 +50,8 @@ public:
 	ANIM	Get_AnimState() { return m_eState; }
 	OBJINFO Get_Info() { return m_tInfo; }
 	_uint	Get_PartsItemType();
+	CWeapon::WEAPONDESC Get_WeaponDesc() { return m_WeaponDesc; }
+
 	void	Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void	Set_AnimState(ANIM eAnim);
 	void	Set_Carry(_bool type) { m_bCarry = type; }
@@ -58,11 +62,13 @@ public:
 	void	Set_NextPortal(_float3 vPosition, _bool is2D) { m_vPortalPos = vPosition; m_b2D = is2D;}
 	void	Set_2DMode(_bool type);
 
+
 public:
 	void	Change_Navigation(LEVEL eLevel);
 	void	Compute_CurrentIndex(LEVEL eLevel);
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
 	HRESULT Ready_Parts(CPrizeItem::TYPE eType, PARTS PartsIndex);
+	HRESULT Ready_Parts_Bullet(CWeapon::TYPE eType, PARTS PartsIndex);
 	void	Set_PlayerState_Defaut();
 
 	
@@ -98,6 +104,9 @@ private:
 	ANIM					m_eState = IDLE;
 	ANIM					m_ePreState = IDLE;
 	_float					m_eAnimSpeed = 1.f;
+
+	_int					iRenderNum = 0;
+	CWeapon::WEAPONDESC		m_WeaponDesc;
 
 	_int					m_iDash[DIR_END] = { 0 };
 	//LeftHand : MESH_SHEILD, MESH_OCARINA 

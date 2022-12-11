@@ -75,8 +75,11 @@ void CMessageBox::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 
 	if (m_MsgDesc.m_eMsgType == MARIN_TALK && CUI_Manager::Get_Instance()->Get_NpcGet())
+	{
 		m_bDead = true;
-
+		return;
+	}
+		
 
 	if (CUI_Manager::Get_Instance()->Get_Talking() && !m_bClosing)
 	{

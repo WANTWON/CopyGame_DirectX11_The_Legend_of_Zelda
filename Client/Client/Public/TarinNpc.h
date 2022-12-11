@@ -9,7 +9,7 @@ BEGIN(Client)
 class CTarinNpc final : public CNpc
 {
 public:
-	enum MSGTEX_TARINTALK { DEFAULT};
+	enum MSGTEX_TARINTALK { DEFAULT, THANK_YOU, THISISFORYOU};
 
 	enum STATE { IDLE, WOW, TALK};
 
@@ -28,7 +28,7 @@ public:
 public:
 	virtual void Check_Navigation(_float fTimeDelta);
 	virtual void Send_Answer_toNPC(_uint iTextureNum) override;
-
+	virtual void GiveItemMode() override;
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
 	virtual HRESULT SetUp_ShaderResources();
