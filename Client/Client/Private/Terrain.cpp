@@ -120,6 +120,11 @@ HRESULT CTerrain::Ready_Components(void* pArg)
 			if (FAILED(__super::Add_Components(TEXT("Com_Navigation_CraneGame"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_CraneGame"), (CComponent**)&m_pNavigationCom)))
 				return E_FAIL;
 			break;
+		case Client::CUI_Manager::TELEPHONE:
+			/* For.Com_Navigation */
+			if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Telephone"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Telephone"), (CComponent**)&m_pNavigationCom)))
+				return E_FAIL;
+			break;
 		default:
 			break;
 		}

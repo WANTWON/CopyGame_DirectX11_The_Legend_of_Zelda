@@ -184,9 +184,6 @@
     <Filter Include="02.GameObjects\03.Monster\10.Cucco">
       <UniqueIdentifier>{7834f938-0a3d-4887-acab-2bc5b356a5dd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\05.Object\05.FieldDecoObject">
-      <UniqueIdentifier>{ee7a90cc-9992-4dc5-8c7f-f79df7c009da}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\01.NonAnim\01.Background">
       <UniqueIdentifier>{6cd33bd8-14ca-4499-8f92-7d7ff986c039}</UniqueIdentifier>
     </Filter>
@@ -198,6 +195,12 @@
     </Filter>
     <Filter Include="02.GameObjects\03.Monster\11.Albatoss">
       <UniqueIdentifier>{a4498069-8626-4373-aa89-38db76ac8b33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\05.Object\05.AnimDecoObject">
+      <UniqueIdentifier>{ee7a90cc-9992-4dc5-8c7f-f79df7c009da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\06.Npc\TarinNpc">
+      <UniqueIdentifier>{6aed2e3f-63e4-4bad-a215-8345ffe1dded}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -388,7 +391,7 @@
       <Filter>02.GameObjects\03.Monster\10.Cucco</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FieldDecoObject.h">
-      <Filter>02.GameObjects\05.Object\05.FieldDecoObject</Filter>
+      <Filter>02.GameObjects\05.Object\05.AnimDecoObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Sky.h">
       <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
@@ -401,6 +404,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Albatoss.h">
       <Filter>02.GameObjects\03.Monster\11.Albatoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TarinNpc.h">
+      <Filter>02.GameObjects\06.Npc\TarinNpc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -576,7 +582,7 @@
       <Filter>02.GameObjects\03.Monster\10.Cucco</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FieldDecoObject.cpp">
-      <Filter>02.GameObjects\05.Object\05.FieldDecoObject</Filter>
+      <Filter>02.GameObjects\05.Object\05.AnimDecoObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Sky.cpp">
       <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
@@ -589,6 +595,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Albatoss.cpp">
       <Filter>02.GameObjects\03.Monster\11.Albatoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TarinNpc.cpp">
+      <Filter>02.GameObjects\06.Npc\TarinNpc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

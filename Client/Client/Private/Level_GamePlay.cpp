@@ -127,6 +127,8 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
+	pGameInstance->Clear_Light();
+
 	LIGHTDESC			LightDesc;
 
 	/* For.Directional*/
@@ -171,8 +173,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 			return E_FAIL;
 		CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 		LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
-		//pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 0.f, 46.8f, 1.f));
-		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(2.33f, 3.f, 66.8f, 1.f));
+		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 0.f, 44.8f, 1.f));
 
 		pPlayer->Change_Navigation(LEVEL_GAMEPLAY);
 		pPlayer->Compute_CurrentIndex(LEVEL_GAMEPLAY);
@@ -188,13 +189,20 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 			pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(55.8f, 4.2f, 10.3f, 1.f));
 			break;
 		case Client::LEVEL_ROOM:
+		{
 			CUI_Manager::ROOMTYPE eRoomType = CUI_Manager::Get_Instance()->Get_RoomType();
-			if(eRoomType == CUI_Manager::MARINHOUSE)
+			if (eRoomType == CUI_Manager::MARINHOUSE)
 				pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 0.f, 46.8f, 1.f));
-			else if(eRoomType == CUI_Manager::SHOP)
+			else if (eRoomType == CUI_Manager::SHOP)
 				pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(52.0f, 0.f, 60.f, 1.f));
 			else if (eRoomType == CUI_Manager::CRANEGAME)
 				pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(53.9f, 0.f, 34.38f, 1.f));
+			else if (eRoomType == CUI_Manager::TELEPHONE)
+				pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.45f, 0.f, 33.82f, 1.f));
+			break;
+		}
+		case Client::LEVEL_TOWER:
+			pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(2.33f, 3.f, 66.8f, 1.f));
 			break;
 		}
 
@@ -403,10 +411,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	{
 		CInvenItem::ITEMDESC ItemDesc;
 		ItemDesc.eItemType = CInvenItem::ITEM_DGNKEY;
-		ItemDesc.m_iTextureNum = (CInvenItem::EQUIP_TEXLIST)(i + 1);
+		ItemDesc.m_iTextureNum = 0;
 		ItemDesc.vPosition = _float2(285.f + 55 * i, 545.f);
 
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_DongeonKey"), &ItemDesc)))
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_DungeonKey"), &ItemDesc)))
 			return E_FAIL;
 	}
 
@@ -420,14 +428,14 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 
 		CInvenItem::ITEMDESC ItemDesc;
 		ItemDesc.eItemType = CInvenItem::ITEM_COLLECT;
-		ItemDesc.m_iTextureNum = (CInvenItem::EQUIP_TEXLIST)(i*2 + 1);
+		ItemDesc.m_iTextureNum = CInvenItem::COLLECT_NONE;
 		ItemDesc.vPosition = vPosition;
 
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_Collect"), &ItemDesc)))
 			return E_FAIL;
 
 		vPosition.x = (i == 1 || i == 2) ? 400 - 95.f : 400 - 40.f;
-		ItemDesc.m_iTextureNum = (CInvenItem::EQUIP_TEXLIST)(i*2 + 2);
+		ItemDesc.m_iTextureNum = CInvenItem::COLLECT_NONE;
 		ItemDesc.vPosition = vPosition;
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_Collect"), &ItemDesc)))
 			return E_FAIL;
@@ -644,6 +652,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_Portal(const _tchar * pLayerTag)
 	PortalDesc.vInitPos = ModelDesc.vPosition;
 	PortalDesc.eConnectLevel = LEVEL_ROOM;
 	PortalDesc.eRoomType = CPortal::CRANE_GAME;
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
+		return E_FAIL;
+
+	ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+	PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
+	PortalDesc.vInitPos = ModelDesc.vPosition;
+	PortalDesc.eConnectLevel = LEVEL_ROOM;
+	PortalDesc.eRoomType = CPortal::TELEPHONE;
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
 		return E_FAIL;
 

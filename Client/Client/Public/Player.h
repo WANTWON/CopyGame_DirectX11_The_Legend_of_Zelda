@@ -17,7 +17,8 @@ public:
 	//ST : Start,  LP : Loop, ED : End
 	enum ANIM {
 		IDLE, RUN, WALK, STAIR_DOWN, STAIR_UP,FALL, LADDER_UP, LADDER_UP_ED, LADDER_WAIT, IDLE_CARRY, ITEM_CARRY, WALK_CARRY, 
-		DEAD, D_FALL, D_JUMP, D_LAND, JUMP, LAND, S_SLASH, SLASH, SLASH_HOLD_B, SLASH_HOLD_ED, SLASH_HOLD_F,
+		DEAD, SHIELD_HOLD_B, SHIELD_HOLD_F, SHIELD_HOLD_L, SHIELD_HOLD_R, S_ITEM_GET_ED, S_ITEM_GET_LP, S_ITEM_GET_ST, EV_TELL_ED, EV_TELL_LP, EV_TELL_ST,
+		D_FALL, D_JUMP, D_LAND, JUMP, LAND, S_SLASH, SLASH, SLASH_HOLD_B, SLASH_HOLD_ED, SLASH_HOLD_F,
 		SLASH_HOLD_L, SLASH_HOLD_LP, SLASH_HOLD_R, SLASH_HOLD_ST, SHIELD_HOLD_ED, SHIELD_HOLD_LP, SHIELD, SHIELD_HIT,
 		BOW_ED, BOW_ST, DASH_ED, DASH_LP, DASH_ST, DMG_B, DMG_F, DMG_PRESS, DMG_QUAKE, ITEM_GET_ED, ITEM_GET_LP, ITEM_GET_ST,
 		KEY_OPEN, FALL_ANTLION, FALL_FROMTOP, FALL_HOLE, PULL_LP, PUSH_LP, PUSH_WAIT
@@ -48,7 +49,7 @@ public:
 	OBJINFO Get_Info() { return m_tInfo; }
 	_uint	Get_PartsItemType();
 	void	Set_Info(OBJINFO Info) { m_tInfo = Info; }
-	void	Set_AnimState(ANIM eAnim) { m_eState = eAnim; }
+	void	Set_AnimState(ANIM eAnim);
 	void	Set_Carry(_bool type) { m_bCarry = type; }
 	void	Set_RecoverHp() { m_tInfo.iCurrentHp += 4; if (m_tInfo.iCurrentHp > m_tInfo.iMaxHp) m_tInfo.iCurrentHp = m_tInfo.iMaxHp; }
 	void	Set_RubyAdd() { m_tInfo.iCoin++; }
@@ -80,7 +81,8 @@ private:
 	virtual HRESULT SetUp_ShaderID() override;
 
 	void SetDirection_byLook(_float fTimeDelta);
-	void SetDirection_byPosition(_float fTimeDelta);
+	void SetDirection_byPosition_Slash(_float fTimeDelta);
+	void SetDirection_byPosition_Shield(_float fTimeDelta);
 	void SetDirection_Pushing(_float fTimeDelta);
 	
 

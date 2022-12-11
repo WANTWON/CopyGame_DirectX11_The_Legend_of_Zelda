@@ -308,9 +308,24 @@ void CCamera_Dynamic::Item_Camera(_float fTimeDelta)
 
 	CPlayer* pTarget = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	_vector m_TargetPos = pTarget->Get_TransformState(CTransform::STATE_POSITION);
-	_vector vOffsetPos = m_TargetPos + XMVectorSet(0, m_vDistance.y - 2, m_vDistance.z, 0.f);
+	_vector vOffsetPos = XMVectorSet(0.f,0.f,0.f,1.f);
+
+	if(pGameInstance->Get_CurrentLevelIndex() == LEVEL_TOWER)
+		vOffsetPos = m_TargetPos + XMVectorSet(0, m_vDistance.y + 2, m_vDistance.z, 0.f);
+	else
+		vOffsetPos = m_TargetPos + XMVectorSet(0, m_vDistance.y - 2, m_vDistance.z, 0.f);
 	
 	m_pTransform->Go_PosLerp(fTimeDelta, vOffsetPos, 1.f);
+
+	if (m_dwSettingTime + 2000 < GetTickCount())
+		m_bSetCamLook = true;
+
+	if (m_bSetCamLook == false)
+	{
+		m_TargetPos = XMVectorSetX(m_TargetPos, XMVectorGetX(m_pTransform->Get_State(CTransform::STATE_POSITION)));
+		m_pTransform->LookAt(m_TargetPos);
+
+	}
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -323,7 +338,7 @@ void CCamera_Dynamic::Talk_Camera(_float fTimeDelta)
 	_vector m_TargetPos = pTarget->Get_TransformState(CTransform::STATE_POSITION);
 	m_TargetPos = m_TargetPos + XMVectorSet(0.f, 2.f, 0.f, 0.f);
 
-	_vector vOffsetPos = m_TargetPos + XMVectorSet(0, 2, -6, 0.f);
+	_vector vOffsetPos = m_TargetPos + XMVectorSet(0, 3, -7, 0.f);
 
 	m_pTransform->LookAt(m_TargetPos);
 	m_pTransform->Go_PosLerp(fTimeDelta, vOffsetPos, 0.1f);

@@ -6,6 +6,7 @@
 #include "InvenItem.h"
 #include "MessageBox.h"
 #include "UIButton.h"
+#include "CameraManager.h"
 
 
 CPrizeItem::CPrizeItem(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -92,6 +93,8 @@ void CPrizeItem::Late_Tick(_float fTimeDelta)
 		LateTick_DefaultModeItem(fTimeDelta);
 	else if (m_ItemDesc.eInteractType == CARRYABLE)
 		LateTick_CarryableModeItem(fTimeDelta);
+	else if (m_ItemDesc.eInteractType == TELL)
+		LateTick_TelephoneModeItem(fTimeDelta);
 	
 }
 
@@ -107,11 +110,15 @@ HRESULT CPrizeItem::Render()
 void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
+
+
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 
 	if (m_ItemDesc.eInteractType == PRIZE && m_pSPHERECom->Collision(pTarget->Get_Collider()))
 	{
-		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(90.f));
+		if(pGameInstance->Get_CurrentLevelIndex() != LEVEL_TOWER)
+			m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(90.f));
 
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
 
@@ -125,9 +132,10 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 			CUI_Manager::MSGDESC MsgDesc;
 			MsgDesc.eMsgType = CUI_Manager::PASSABLE;
 			MsgDesc.iTextureNum = m_ItemDesc.eType;
-
-			CUI_Manager::Get_Instance()->Add_MessageDesc(MsgDesc);
-			CUI_Manager::Get_Instance()->Open_Message(true);
+	
+			pUI_Manager->Add_MessageDesc(MsgDesc);
+			pUI_Manager->Set_Talking(true);
+			pUI_Manager->Open_Message(true);
 		}
 
 		m_bGet = true;
@@ -142,26 +150,17 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 		pPlayerPostion = XMVectorSetY(pPlayerPostion, XMVectorGetY(pPlayerPostion) + 3.f);
 		m_pTransformCom->Go_PosTarget(fTimeDelta, pPlayerPostion);
 
-		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
+		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED || pPlayer->Get_AnimState() == CPlayer::S_ITEM_GET_ED)
 		{
-			CUI_Manager::Get_Instance()->Open_Message(false);
-			if (m_ItemDesc.eType == SMALL_KEY)
-				CUI_Manager::Get_Instance()->Get_Key();
+			pUI_Manager->Open_Message(false);
+			Setting_Get_Item();
 
-			if (m_ItemDesc.eType == COMPASS)
-			{
-				CInvenItem::ITEMDESC ItemDesc;
-				ItemDesc.eItemType = CInvenItem::ITEM_PRIZE;
-				ItemDesc.m_iTextureNum = CInvenItem::COMPASS;
-				ItemDesc.vPosition = _float2(1400, 200);
-				if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_Compass"), &ItemDesc)))
-					int a = 0;
-			}
 			m_bDead = true;
 		}
 
 	}
 
+	RELEASE_INSTANCE(CUI_Manager);
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -213,6 +212,201 @@ void CPrizeItem::LateTick_CarryableModeItem(_float fTimeDelta)
 			}
 		}	
 	}		
+}
+
+void CPrizeItem::LateTick_TelephoneModeItem(_float fTimeDelta)
+{
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	CUIButton*		pButton = dynamic_cast<CUIButton*>(CUI_Manager::Get_Instance()->Get_Button());
+
+
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pSPHERECom))
+	{
+		if (!m_bGet)
+		{
+			pButton->Set_TexType(CUIButton::CARRY);
+			pButton->Set_Visible(true);
+			_float2 fPosition = pPlayer->Get_ProjPosition();
+			fPosition.y = g_iWinSizeY - fPosition.y;
+			fPosition.x += 50.f;
+			fPosition.y -= 30.f;
+			pButton->Set_Position(fPosition);
+		}
+
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
+		{
+			if (!m_bGet)
+			{
+				m_bGet = true;
+			
+				pPlayer->Set_AnimState(CPlayer::EV_TELL_ST);
+				pPlayer->Ready_Parts(m_ItemDesc.eType, CPlayer::PARTS_ITEM);
+				m_bDead = true;
+				pButton->Set_Visible(false);
+				Setting_TelephoneMessage();
+
+			}
+		}
+
+	}
+	else
+	{
+		pButton->Set_Visible(false);
+	}
+}
+
+void CPrizeItem::Setting_Get_Item()
+{
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
+
+	if (m_ItemDesc.eType == SMALL_KEY)
+		pUI_Manager->Get_Key();
+
+	else if (m_ItemDesc.eType == COMPASS)
+	{
+		CInvenItem::ITEMDESC ItemDesc;
+		ItemDesc.eItemType = CInvenItem::ITEM_PRIZE;
+		ItemDesc.m_iTextureNum = CInvenItem::COMPASS;
+		ItemDesc.vPosition = _float2(1400, 200);
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_Compass"), &ItemDesc)))
+			int a = 0;
+	}
+	else if (m_ItemDesc.eType == TAIL_KEY)
+	{
+		list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_DungeonKey"));
+		for (auto& iter : *pQuestItemList)
+		{
+			if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::DGN_NONE)
+			{
+				dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::DGN_TAILKEY);
+				break;
+			}
+			else
+				continue;
+		}
+	}
+	else if (m_ItemDesc.eType == CELLO)
+	{
+		list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_Collect"));
+		for (auto& iter : *pQuestItemList)
+		{
+			if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::COLLECT_NONE)
+			{
+				dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::COLLECT_CELLO);
+				break;
+			}
+			else
+				continue;
+		}
+	}
+	else if (m_ItemDesc.eType == DRUM)
+	{
+		list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_Collect"));
+		for (auto& iter : *pQuestItemList)
+		{
+			if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::COLLECT_NONE)
+			{
+				dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::COLLECT_DRUM);
+				break;
+			}
+			else
+				continue;
+		}
+	}
+	else if (m_ItemDesc.eType == HORN)
+	{
+		list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_Collect"));
+		for (auto& iter : *pQuestItemList)
+		{
+			if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::COLLECT_NONE)
+			{
+				dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::COLLECT_HORN);
+				break;
+			}
+			else
+				continue;
+		}
+	}
+	else if (m_ItemDesc.eType == YOSHIDOLL)
+	{
+		list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_QuestItem"));
+		for (auto& iter : *pQuestItemList)
+		{
+			if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::QUEST_NONE)
+			{
+				dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::YOSHI);
+				break;
+			}
+			else
+				continue;
+		}
+	}
+	else if (m_ItemDesc.eType == NECKLACE)
+	{
+		list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_QuestItem"));
+		for (auto& iter : *pQuestItemList)
+		{
+			if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::QUEST_NONE)
+			{
+				dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::NECKLACE);
+				break;
+			}
+			else
+				continue;
+		}
+	}
+
+
+	RELEASE_INSTANCE(CUI_Manager);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CPrizeItem::Setting_TelephoneMessage()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
+
+	//CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+	//dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TALK);
+
+	CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+	pUI_Manager->Set_Talking(true);
+
+
+	CMessageBox::MSGDESC MessageDesc;
+	MessageDesc.m_eMsgType = CMessageBox::TELEPHONE_TALK;
+
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &MessageDesc);
+
+	CUI_Manager::MSGDESC eMsgDesc;
+	eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
+
+
+	if (pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_Collect"), CInvenItem::COLLECT_DRUM) &&
+		pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_Collect"), CInvenItem::COLLECT_HORN) &&
+		pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_Collect"), CInvenItem::COLLECT_BELL))
+	{
+		int a = 0;
+	}
+	else
+	{
+		for (int i = 0; i < 6; ++i)
+		{
+			eMsgDesc.iTextureNum = i;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
+
+		}
+	}
+
+	
+
+	pUI_Manager->Open_Message(true);
+
+	RELEASE_INSTANCE(CUI_Manager);
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CPrizeItem::Ready_Components(void * pArg)
@@ -321,6 +515,26 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Necklace"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
+	case TAIL_KEY:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_TailKey"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case DRUM:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Drum"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case HORN:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_ConchHorn"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case TELEPHONE:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_ROOM, TEXT("Prototype_Component_Model_Telephone"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
@@ -329,13 +543,11 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 	CCollider::COLLIDERDESC		ColliderDesc;
 
 	/* For.Com_SPHERE */
-	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
-	if(m_ItemDesc.eType == CELLO)
 		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
 	if(m_ItemDesc.eInteractType == DEFAULT)
 		ColliderDesc.vScale = _float3(0.3f, 0.3f, 0.3f);
-	if (m_ItemDesc.eInteractType == CARRYABLE)
-		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+	if (m_ItemDesc.eInteractType == TELL)
+		ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))

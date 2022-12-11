@@ -9,7 +9,7 @@ class CPortal final : public CNonAnim
 {
 public:
 	enum TYPE { PORTAL_POSITION , PORTAL_LEVEL};
-	enum ROOMTYPE { MARINHOUSE, SHOP, CRANE_GAME };
+	enum ROOMTYPE { MARINHOUSE, SHOP, CRANE_GAME , TELEPHONE};
 
 	typedef struct Portaltag
 	{

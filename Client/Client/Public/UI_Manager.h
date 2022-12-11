@@ -11,7 +11,6 @@ class CUI_Manager final : public CBase
 public:
 	/* For Message*/
 	enum MSG_TYPE { PASSABLE, MUST_CHOICE };
-	enum MSGTEX_GETITEM { DGN_KEY, COMPOSS, DGN_MAP, FEATHER, BOSS_KEY, MSG_HEART, MGS_RUBY, CELLO, MARIN, MSG_END };
 	
 	enum CHOICE_TYPE { BUY_NOBUY, TALK_NOTTALK, MARIN_PERFUME, MARIN_CHANGE, MARIN_VECTOR, MARIN_DOT, MARIN_CHARM, MARIN_DATEME, DO_UNDO};
 	
@@ -26,7 +25,7 @@ public:
 	enum UITYPE { UI_INVEN, UI_MAP, UI_OPTION, UI_END};
 	enum EQUIP_BT { EQUIP_X, EQUIP_Y, EQUIP_END };
 
-	enum ROOMTYPE {MARINHOUSE, SHOP, CRANEGAME};
+	enum ROOMTYPE {MARINHOUSE, SHOP, CRANEGAME, TELEPHONE};
 
 
 
@@ -52,16 +51,19 @@ public: /*Getter Setter*/
 	void		Set_RoomType(ROOMTYPE eType) { m_eRoomType = eType; }
 	void		Set_Talking(_bool type) { m_bTalking = type; }
 	void		Set_PlayGame(_bool type) { m_bPlayGame = type; }
-
+	void		Set_NextMessage();
 
 	void		Get_Key();
 	_uint		Get_KeySize() { return (_uint)m_KeyList.size(); }
+	_uint		Get_MessageSize() { return (_uint)m_vecMsgDecs.size(); }
 	CObj_UI*	Get_Button() { return m_pInteractButton; }
 	_bool		Get_UI_Open() { return m_bUIOpen; }
 	_bool		Get_OpenMessage() { return m_bOpenMessage; }
 	_bool		Get_Talking() { return m_bTalking; }
 	_bool		Get_NpcGet() { return m_bNpcGet; }
 	_bool 		Get_PlayGame() { return m_bPlayGame; }
+	_bool		Get_Is_HaveItem(LEVEL eLevel, _tchar* LayerTag, _uint ItemtexTureNum);
+
 	CNpc*		Get_TalkingNpc() { return m_pTalkingNpc; }
 
 

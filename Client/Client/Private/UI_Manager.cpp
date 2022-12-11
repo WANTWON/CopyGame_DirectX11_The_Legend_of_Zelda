@@ -9,6 +9,9 @@
 #include "Npc.h"
 #include "MarinNpc.h"
 #include "CraneGameNpc.h"
+#include "InvenItem.h"
+#include "FieldNpc.h"
+#include "Npc.h"
 
 IMPLEMENT_SINGLETON(CUI_Manager)
 
@@ -304,7 +307,7 @@ void CUI_Manager::Tick_Message()
 
 			if (m_vecMsgDecs.size() == 0)
 			{
-				if (m_pTalkingNpc != nullptr && m_pTalkingNpc->Get_NpcID() == CNpc::MARIN)
+  				if (m_pTalkingNpc != nullptr && m_pTalkingNpc->Get_NpcID() == CNpc::MARIN)
 				{
 					m_bNpcGet = true;
 					if (dynamic_cast<CMarinNpc*>(m_pTalkingNpc)->Get_IsGet() == true)
@@ -313,6 +316,21 @@ void CUI_Manager::Tick_Message()
 				else if (m_pTalkingNpc != nullptr && m_pTalkingNpc->Get_NpcID() == CNpc::CRANE_GAME)
 				{
 					m_bPlayGame = dynamic_cast<CCraneGameNpc*>(m_pTalkingNpc)->Get_GameStart();
+				}
+				else if (m_pTalkingNpc != nullptr && m_pTalkingNpc->Get_NpcID() == CNpc::MADAM)
+				{
+					if ((m_pTalkingNpc)->Get_GiveItem() == true)
+						(m_pTalkingNpc)->GiveItemMode();
+				}
+				else if (m_pTalkingNpc != nullptr && m_pTalkingNpc->Get_NpcID() == CNpc::MOTHER)
+				{
+					if ((m_pTalkingNpc)->Get_GiveItem() == true)
+						(m_pTalkingNpc)->GiveItemMode();
+				}
+				else if (m_pTalkingNpc != nullptr && m_pTalkingNpc->Get_NpcID() == CNpc::SHOP)
+				{
+					if ((m_pTalkingNpc)->Get_GiveItem() == true)
+						(m_pTalkingNpc)->GiveItemMode();
 				}
 			}
 		}
@@ -593,6 +611,25 @@ void CUI_Manager::Set_EquipItem(EQUIP_BT eEquipBt, CObj_UI * pObj)
 	m_EquipTile[eEquipBt] = pObj;
 }
 
+void CUI_Manager::Set_NextMessage()
+{
+	 if (m_vecMsgDecs.size() != 0) 
+		 m_vecMsgDecs.pop_front(); 
+
+	 if (m_vecMsgDecs.size() == 0)
+	 {
+		 CGameObject* pTarget = CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+		 CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+		 pPlayer->Set_PlayerState_Defaut();
+
+
+		 m_pTalkingNpc = nullptr;
+		 m_bTalking = false;
+		 m_bChoice = false;
+		 m_bNpcGet = false;
+	 }
+}
+
 void CUI_Manager::Get_Key()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -605,6 +642,20 @@ void CUI_Manager::Get_Key()
 		return;
 
 	RELEASE_INSTANCE(CGameInstance);
+}
+
+_bool CUI_Manager::Get_Is_HaveItem(LEVEL eLevel, _tchar * LayerTag, _uint ItemtexTureNum)
+{
+	list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(eLevel, LayerTag);
+	for (auto& iter : *pQuestItemList)
+	{
+		if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == ItemtexTureNum)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void CUI_Manager::Use_Key()

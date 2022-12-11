@@ -47,10 +47,22 @@ HRESULT CMonsterBullet::Initialize(void * pArg)
 	{
 		Set_Scale(_float3(3, 3, 3));
 		_float PosY = XMVectorGetY(m_BulletDesc.vInitPositon);
-		//PosY += 1.f;
+		//PosY += 2.f;
 		//m_BulletDesc.vInitPositon = XMVectorSetY(m_BulletDesc.vInitPositon, PosY);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		m_pTransformCom->LookDir(m_BulletDesc.vLook);
+		break;
+	}
+	case ALBATOSS:
+	{
+		Set_Scale(_float3(3, 3, 3));
+		m_fSpeed = (rand() % 500)*0.01f + 2;
+		m_BulletDesc.vLook += XMVectorSet(0.f, (rand() % 50)*-0.01f, 0.f, 0.f);
+		_float PosY = XMVectorGetY(m_BulletDesc.vInitPositon);
+		PosY += 2.f;
+		m_BulletDesc.vInitPositon = XMVectorSetY(m_BulletDesc.vInitPositon, PosY);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
+		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(rand() % 180));
 		break;
 	}
 	default:
@@ -82,6 +94,9 @@ int CMonsterBullet::Tick(_float fTimeDelta)
 		break;
 	case ROLA:
 		Moving_RolaBullet(fTimeDelta);
+		break;
+	case ALBATOSS:
+		Moving_AlbatossBullet(fTimeDelta);
 		break;
 	default:
 		break;
@@ -150,6 +165,8 @@ HRESULT CMonsterBullet::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
+	CCollider::COLLIDERDESC		ColliderDesc;
+
 	/* For.Com_Model*/
 	switch (m_BulletDesc.eBulletType)
 	{
@@ -157,25 +174,48 @@ HRESULT CMonsterBullet::Ready_Components(void * pArg)
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), iLevel, TEXT("Prototype_Component_Model_OctorockBullet"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
+
+		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), iLevel, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
+			return E_FAIL;
+
 		break;
 	case ROLA:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), iLevel, TEXT("Prototype_Component_Model_RolaBullet"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(5.f, 0.2f, 0.2f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), iLevel, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+			return E_FAIL;
+
+		break;
+	case ALBATOSS:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), iLevel, TEXT("Albatoss_Feather"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), iLevel, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
+			return E_FAIL;
 		break;
 	default:
+		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), iLevel, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
+			return E_FAIL;
 		break;
 	}
 
-	/* For.Com_OBB*/
-	CCollider::COLLIDERDESC		ColliderDesc;
-	ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
-	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
-	if(m_BulletDesc.eBulletType == ROLA)
-		ColliderDesc.vScale = _float3(5.f, 0.2f, 0.2f);
-	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), iLevel, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
-		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -194,6 +234,10 @@ HRESULT CMonsterBullet::SetUp_ShaderResources()
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
+		return E_FAIL;
+
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -234,6 +278,37 @@ void CMonsterBullet::Moving_RolaBullet(_float fTimeDelta)
 
 	m_pTransformCom->Turn(vAxis, 10.f);
 	m_pTransformCom->Go_PosDir(fTimeDelta*2, m_BulletDesc.vLook);
+}
+
+void CMonsterBullet::Moving_AlbatossBullet(_float fTimeDelta)
+{
+
+	if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) < 16.f)
+	{
+		m_fDeadtime += fTimeDelta;
+		if (m_fDeadtime >= 1.f)
+		{
+			m_fAlpha -= 0.05f;
+
+			if (m_fAlpha <= 0.f)
+				m_bDead = true;
+		}
+	}
+	else
+	{
+		m_pTransformCom->Go_PosDir(fTimeDelta*m_fSpeed, m_BulletDesc.vLook);
+	}
+
+	m_fSpeed -= 0.01f;
+	if (m_fSpeed <= 0.f)
+	{
+		m_fSpeed = 0.f;
+
+		if(XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) >= 16.f)
+			m_bDead = true;
+	}
+		
+
 }
 
 CMonsterBullet * CMonsterBullet::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

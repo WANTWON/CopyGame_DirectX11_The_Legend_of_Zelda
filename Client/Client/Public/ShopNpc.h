@@ -28,6 +28,7 @@ public:
 public:
 	virtual void Check_Navigation(_float fTimeDelta);
 	virtual void Send_Answer_toNPC(_uint iTextureNum) override;
+	virtual void GiveItemMode() override;
 
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);

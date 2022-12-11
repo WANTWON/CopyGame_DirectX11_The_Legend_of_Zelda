@@ -122,6 +122,8 @@ void CCrane::Late_Tick(_float fTimeDelta)
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
+		
+
 	if (m_pCollisionObj == nullptr && CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_ITEM, m_pSPHERECom, &m_pCollisionObj))
 	{
 		if (m_pCollisionObj != nullptr)
@@ -147,6 +149,8 @@ void CCrane::Late_Tick(_float fTimeDelta)
 				_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 				vPosition = XMVectorSetY(vPosition,1.f);
 				m_pCollisionObj->Set_State(CTransform::STATE_POSITION, vPosition);
+				m_pCollisionObj = nullptr;
+				
 			}
 			else
 			{

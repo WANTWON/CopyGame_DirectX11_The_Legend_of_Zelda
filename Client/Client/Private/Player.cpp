@@ -7,6 +7,7 @@
 #include "PipeLine.h"
 #include "Cell.h"
 #include "CameraManager.h"
+#include "Level_Room.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -213,6 +214,16 @@ _uint CPlayer::Get_PartsItemType()
 	return dynamic_cast<CWeapon*>(m_Parts[PARTS_ITEM])->Get_PartsType();
 }
 
+void CPlayer::Set_AnimState(ANIM eAnim)
+{
+	if (eAnim == ITEM_GET_ST && m_b2D)
+	{
+		m_eState = S_ITEM_GET_ST;
+	}
+	else
+		m_eState = eAnim; 
+}
+
 _bool CPlayer::Set_RubyUse(_int iCoin)
 {
 	if (m_tInfo.iCoin < iCoin)
@@ -323,6 +334,9 @@ HRESULT CPlayer::Ready_Parts(CPrizeItem::TYPE eType, PARTS PartsIndex)
 	case Client::CPrizeItem::BOW:
 		m_WeaponDesc.eType = CWeapon::BOW;
 		break;
+	case Client::CPrizeItem::TELEPHONE:
+		m_WeaponDesc.eType = CWeapon::TELEPHONE;
+		break;
 	default:
 		break;
 	}
@@ -352,9 +366,19 @@ void CPlayer::Set_PlayerState_Defaut()
 		dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_ROOM);
 	if (m_eState == ITEM_GET_LP)
 		m_eState = ITEM_GET_ED;
+	if (m_eState == S_ITEM_GET_LP)
+	{
+		m_eState = S_ITEM_GET_ED;
+		if(m_iCurrentLevel == LEVEL_TOWER)
+			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
+	}
+		
 	if (m_bStop)
 		m_bStop = false;
-	if (m_bCarry)
+
+	if (m_eState == EV_TELL_LP && m_eState != EV_TELL_ED)
+		m_eState = EV_TELL_ED;
+	else if (m_bCarry)
 	{
 		m_bCarry = false;
 		Safe_Release(m_Parts[PARTS_ITEM]);
@@ -492,10 +516,18 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	}
 	else if (pGameInstance->Key_Up(DIK_Y))
 	{
-		if (m_eState == ANIM::SHIELD_HOLD_LP)
-			m_eState = SHIELD_HOLD_ED;
-		else if (m_eState != ANIM::SHIELD_HOLD_LP)
+		if (m_eState == ANIM::SHIELD_HOLD_LP || m_eState == ANIM::SHIELD_HOLD_F ||
+			m_eState == ANIM::SHIELD_HOLD_L || m_eState == ANIM::SHIELD_HOLD_B || m_eState == ANIM::SHIELD_HOLD_R)
+			m_eState = ANIM::SHIELD_HOLD_ED;
+		else if (m_eState != ANIM::SHIELD)
 			m_eState = ANIM::SHIELD;
+	}
+	else if (pGameInstance->Key_Pressing(DIK_Y))
+	{
+		if (m_eState == IDLE)
+			m_eState = ANIM::SHIELD_HOLD_LP;
+		else if (m_eState == SHIELD_HOLD_B || m_eState == SHIELD_HOLD_F || m_eState == SHIELD_HOLD_R || m_eState == SHIELD_HOLD_L)
+			m_eState = SHIELD_HOLD_LP;
 	}
 
 
@@ -549,6 +581,8 @@ void CPlayer::Change_Navigation(LEVEL eLevel)
 			m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_Shop")));
 		else if (eRoomType == CUI_Manager::CRANEGAME)
 			m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_CraneGame")));
+		else if (eRoomType == CUI_Manager::TELEPHONE)
+			m_pNavigationCom = dynamic_cast<CNavigation*>(pGameInstance->Get_Component(LEVEL_STATIC, TEXT("Layer_Player"), TEXT("Com_Navigation_Telephone")));
 		break;
 	}
 	case Client::LEVEL_TAILCAVE:
@@ -629,6 +663,10 @@ HRESULT CPlayer::Ready_Components(void* pArg)
 		return E_FAIL;
 	m_vecNavigaitions.push_back(m_pNavigationCom);
 
+	if (FAILED(__super::Add_Components(TEXT("Com_Navigation_Telephone"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Telephone"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+		return E_FAIL;
+	m_vecNavigaitions.push_back(m_pNavigationCom);
+
 	return S_OK;
 }
 
@@ -674,9 +712,10 @@ void CPlayer::Render_Model(MESH_NAME eMeshName)
 void CPlayer::Change_Direction(_float fTimeDelta)
 {
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == DMG_PRESS || m_eState == DMG_QUAKE ||
-		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP || m_eState == FALL_FROMTOP || m_eState == FALL_HOLE ||
-		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP || 
-		m_eState == LADDER_UP_ED || m_eState == ITEM_CARRY || m_bDead )
+		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP || m_eState == ITEM_GET_ED || m_eState == FALL_FROMTOP || m_eState == FALL_HOLE ||
+		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP || m_eState == LADDER_UP_ED ||
+		m_eState == ITEM_CARRY || m_bDead  || m_eState == S_ITEM_GET_ST || m_eState == S_ITEM_GET_LP || m_eState == S_ITEM_GET_ED ||
+		m_eState == EV_TELL_ST || m_eState == EV_TELL_LP || m_eState == EV_TELL_ED)
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
@@ -686,7 +725,10 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 		SetDirection_Pushing(fTimeDelta);
 	else if (m_eState == SLASH_HOLD_LP || m_eState == SLASH_HOLD_ST || m_eState == SLASH_HOLD_B ||
 		m_eState == SLASH_HOLD_F || m_eState == SLASH_HOLD_L || m_eState == SLASH_HOLD_R)
-		SetDirection_byPosition(fTimeDelta);
+		SetDirection_byPosition_Slash(fTimeDelta);
+	else if (m_eState == SHIELD_HOLD_LP || m_eState == SHIELD_HOLD_B ||
+		m_eState == SHIELD_HOLD_F || m_eState == SHIELD_HOLD_L || m_eState == SHIELD_HOLD_R)
+		SetDirection_byPosition_Shield(fTimeDelta);
 	else
 		SetDirection_byLook(fTimeDelta);
 }
@@ -755,7 +797,7 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 
 }
 
-void CPlayer::SetDirection_byPosition(_float fTimeDelta)
+void CPlayer::SetDirection_byPosition_Slash(_float fTimeDelta)
 {
 
 	CTransform::TRANSFORMDESC TransformDesc = m_pTransformCom->Get_TransformDesc();
@@ -777,6 +819,27 @@ void CPlayer::SetDirection_byPosition(_float fTimeDelta)
 	m_pTransformCom->Go_PosDir(fTimeDelta, vDirection);
 
 
+}
+
+void CPlayer::SetDirection_byPosition_Shield(_float fTimeDelta)
+{
+	CTransform::TRANSFORMDESC TransformDesc = m_pTransformCom->Get_TransformDesc();
+	TransformDesc.fSpeedPerSec = 2.5f;
+	m_pTransformCom->Set_TransformDesc(TransformDesc);
+
+	///////////////// 이 부분에서 나의 룩벡터와 Direction Vector를 통해 각도로 방향 세팅 예정
+	if (m_eDir[DIR_X] > 0)
+		m_eState = SHIELD_HOLD_R;
+	else if (m_eDir[DIR_X] < 0)
+		m_eState = SHIELD_HOLD_L;
+
+	if (m_eDir[DIR_Z] > 0)
+		m_eState = SHIELD_HOLD_F;
+	else if (m_eDir[DIR_Z] < 0)
+		m_eState = SHIELD_HOLD_B;
+
+	_vector vDirection = XMVectorSet((_float)m_eDir[DIR_X], 0.f, (_float)m_eDir[DIR_Z], 0.f);
+	m_pTransformCom->Go_PosDir(fTimeDelta, vDirection);
 }
 
 void CPlayer::SetDirection_Pushing(_float fTimeDelta)
@@ -830,9 +893,19 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::SLASH_HOLD_L:
 	case Client::CPlayer::SLASH_HOLD_R:
 	case Client::CPlayer::SLASH_HOLD_LP:
+	case Client::CPlayer::SHIELD_HOLD_F:
+	case Client::CPlayer::SHIELD_HOLD_LP:
 	case Client::CPlayer::ITEM_GET_LP:
 	case Client::CPlayer::PULL_LP:
+	case Client::CPlayer::EV_TELL_LP:
 		m_eAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
+		break;
+	case Client::CPlayer::SHIELD_HOLD_L:
+	case Client::CPlayer::SHIELD_HOLD_R:
+	case Client::CPlayer::SHIELD_HOLD_B:
+		m_eAnimSpeed = 4.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
 		break;
@@ -990,15 +1063,27 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 			m_eState = ITEM_GET_LP;
 		break;
 	}
+	case Client::CPlayer::S_ITEM_GET_ST:
+	{
+		CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+		dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_ITEMGET);
+		m_pTransformCom->LookDir(XMVectorSet(0.f, 0.f, -1.f, 0.f));
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eState = S_ITEM_GET_LP;
+		break;
+	}
 	case Client::CPlayer::DASH_ED:
 	case Client::CPlayer::SHIELD_HOLD_ED:
 	case Client::CPlayer::SLASH_HOLD_ED:
-		m_eAnimSpeed = 4.f;
+		m_eAnimSpeed = 3.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = IDLE;
 		break;
 	case Client::CPlayer::ITEM_GET_ED:
+	case Client::CPlayer::S_ITEM_GET_ED:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
@@ -1066,6 +1151,25 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		{
 			m_eState = IDLE_CARRY;
 			m_bCarry = true;
+		}
+		break;
+	case Client::CPlayer::EV_TELL_ST:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			m_eState = EV_TELL_LP;
+			m_bCarry = true;
+		}
+		break;
+	case Client::CPlayer::EV_TELL_ED:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			Set_PlayerState_Defaut();
+			CLevel* pLevel =  CGameInstance::Get_Instance()->Get_CurrentLevel();
+			dynamic_cast<CLevel_Room*>(pLevel)->Ready_Layer_TelephoneObject(TEXT("Layer_Object"));
 		}
 		break;
 	case Client::CPlayer::DEAD:

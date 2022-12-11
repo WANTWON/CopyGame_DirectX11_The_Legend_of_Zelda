@@ -34,6 +34,7 @@ HRESULT CMessageBox::Initialize(void * pArg)
 	case Client::CMessageBox::MARIN_TALK:
 	case Client::CMessageBox::CRANEGAME_TALK:
 	case Client::CMessageBox::FIELDNPC_TALK:
+	case Client::CMessageBox::ALBATOSS_TALK:
 		m_fSize.x = 1048 / 1.5f;
 		m_fSize.y = 240 / 1.5f;
 		break;
@@ -77,7 +78,7 @@ void CMessageBox::Late_Tick(_float fTimeDelta)
 		m_bDead = true;
 
 
-	if (CUI_Manager::Get_Instance()->Get_Talking())
+	if (CUI_Manager::Get_Instance()->Get_Talking() && !m_bClosing)
 	{
 		m_iTextureNum = CUI_Manager::Get_Instance()->Get_MessageType().iTextureNum;
 		if (CUI_Manager::Get_Instance()->Get_OpenMessage())
@@ -102,6 +103,7 @@ void CMessageBox::Late_Tick(_float fTimeDelta)
 	}
 	else
 	{
+		m_bClosing = true;
 		m_fAlpha -= 0.1f;
 
 		if (m_fAlpha <= 0.f)
@@ -160,9 +162,23 @@ HRESULT CMessageBox::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_FieldNpcMessage"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
+	case Client::CMessageBox::ALBATOSS_TALK:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_AlbatossMessage"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case Client::CMessageBox::TARIN_TALK:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_TarinTalk"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case Client::CMessageBox::TELEPHONE_TALK:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_TelephoneTalk"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
+
+	
 
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))

@@ -43,7 +43,7 @@ HRESULT CFieldDecoObject::Initialize(void * pArg)
 	case BIRD_ORANGE:
 		m_eState = IDLE;
 		Set_Scale(_float3(0.8f, 0.8f, 0.8f));
-		CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+		CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_TRAP, this);
 		break;
 	case WEATHER_CLOCK:
 	case MOOSH:
@@ -234,8 +234,8 @@ void CFieldDecoObject::Bird_Tick(_float fTimeDelta)
 				m_eState = STATE::WALK;
 				m_dwWalkTime = GetTickCount();
 
-				m_eDir[DIR_X] = (rand() % 300)*0.01f - 1.f;
-				m_eDir[DIR_Z] = (rand() % 300)*0.01f - 1.f;
+				m_eDir[DIR_X] = (rand() % 300)*0.01f - 0.9f;
+				m_eDir[DIR_Z] = (rand() % 300)*0.01f - 0.9f;
 
 			}
 		}
@@ -257,17 +257,18 @@ void CFieldDecoObject::Bird_Tick(_float fTimeDelta)
 		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
 	}
 
-	CBaseObj* pCollisionBlock = nullptr;
-	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pSPHERECom, &pCollisionBlock))
+	CBaseObj* pCollisionBird = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_TRAP, m_pSPHERECom, &pCollisionBird))
 	{
 
-		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionBlock->Get_TransformState(CTransform::STATE_POSITION);
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionBird->Get_TransformState(CTransform::STATE_POSITION);
 		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
 			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
 		else
 			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
 		m_pTransformCom->Go_PosDir(fTimeDelta, vDirection, m_pNavigationCom);
 	}
+
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -289,7 +290,7 @@ HRESULT CFieldDecoObject::Ready_Components(void * pArg)
 		break;
 	case BIRD_GREEN:
 	case BIRD_ORANGE:
-		TransformDesc.fSpeedPerSec = 1.f;
+		TransformDesc.fSpeedPerSec = 3.f;
 		break;
 	case WEATHER_CLOCK:
 		break;

@@ -88,6 +88,18 @@ int CMarinNpc::Tick(_float fTimeDelta)
 
 		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED)
 		{
+			list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_QuestItem"));
+			for (auto& iter : *pQuestItemList)
+			{
+				if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::QUEST_NONE)
+				{
+					dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::MARIN );
+					break;
+				}
+				else
+					continue;
+			}
+
 			CUI_Manager::Get_Instance()->Open_Message(false);
 			m_eState = MARIN_GETED;
 		}
@@ -177,7 +189,7 @@ void CMarinNpc::Set_GetMode()
 
 	CUI_Manager::MSGDESC MsgDesc;
 	MsgDesc.eMsgType = CUI_Manager::PASSABLE;
-	MsgDesc.iTextureNum = CUI_Manager::MARIN;
+	MsgDesc.iTextureNum = CPrizeItem::MSG_MARIN;
 
 	CUI_Manager::Get_Instance()->Add_MessageDesc(MsgDesc);
 	CUI_Manager::Get_Instance()->Open_Message(true);

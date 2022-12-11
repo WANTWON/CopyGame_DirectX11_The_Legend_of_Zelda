@@ -164,7 +164,18 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 			return E_FAIL;
 
 		/* For.Com_OBB*/
-		ColliderDesc.vScale = _float3(0.7f, 0.2f, 0.2f);
+		ColliderDesc.vScale = _float3(0.9f, 0.2f, 0.2f);
+		ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+			return E_FAIL;
+		break;
+	case TELEPHONE:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_TelephoneParts"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(0.9f, 0.2f, 0.2f);
 		ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
 		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 			return E_FAIL;
@@ -178,8 +189,7 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 
 	
 
-	
-	
+
 	
 	///* For.Com_SHPERE */
 	//ColliderDesc.vScale = _float3(0.7f, 0.2f, 0.2f);

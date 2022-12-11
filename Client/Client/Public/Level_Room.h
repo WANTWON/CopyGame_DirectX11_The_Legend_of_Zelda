@@ -27,6 +27,7 @@ public:
 	HRESULT Ready_Layer_ShopObject(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_MarinObject(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_CraneGameObject(const _tchar* pLayerTag);
+	HRESULT Ready_Layer_TelephoneObject(const _tchar* pLayerTag);
 
 private:
 	CCollision_Manager* m_pCollision_Manager = nullptr;

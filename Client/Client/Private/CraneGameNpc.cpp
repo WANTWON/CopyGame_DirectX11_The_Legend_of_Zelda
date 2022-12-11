@@ -41,6 +41,7 @@ HRESULT CCraneGameNpc::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(-90.f));
 
+
 	return S_OK;
 }
 

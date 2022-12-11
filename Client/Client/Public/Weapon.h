@@ -16,7 +16,7 @@ BEGIN(Client)
 class CWeapon final : public CBaseObj
 {
 public:
-	enum TYPE { NONE, BOW, ARROW, DOGFOOD, HEART_CONTAINER, MAGIC_ROD};
+	enum TYPE { NONE, BOW, ARROW, DOGFOOD, HEART_CONTAINER, MAGIC_ROD, TELEPHONE};
 
 	typedef struct tagWeaponDesc
 	{

@@ -185,6 +185,8 @@ void CShopNpc::Send_Answer_toNPC(_uint iTextureNum)
 					else
 						continue;
 				}
+				m_bGiveItem = true;
+				m_iGiveItemTexNum = CPrizeItem::DOGFOOD;
 				break;
 			}
 			}
@@ -245,6 +247,21 @@ void CShopNpc::Send_Answer_toNPC(_uint iTextureNum)
 
 	RELEASE_INSTANCE(CUI_Manager);
 	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CShopNpc::GiveItemMode()
+{
+	CGameObject* pTarget = CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+
+	CPrizeItem::ITEMDESC ItemDesc;
+	ItemDesc.eType = (CPrizeItem::TYPE)m_iGiveItemTexNum;
+	ItemDesc.eInteractType = CPrizeItem::PRIZE;
+	XMStoreFloat3(&ItemDesc.vPosition, pPlayer->Get_TransformState(CTransform::STATE_POSITION));
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, TEXT("Layer_Item"), &ItemDesc)))
+		return;
+	m_bGiveItem = false;
 }
 
 HRESULT CShopNpc::Ready_Components(void * pArg)
@@ -337,6 +354,7 @@ void CShopNpc::Change_Message()
 	CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
 	pUI_Manager->Set_Talking(true);
+	m_bGiveItem = false;
 
 	CMessageBox::MSGDESC MessageDesc;
 	MessageDesc.m_eMsgType = CMessageBox::SHOP_TALK;

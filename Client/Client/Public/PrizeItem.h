@@ -10,9 +10,14 @@ class CPrizeItem final : public CNonAnim
 public:
 	enum TYPE { SMALL_KEY, COMPASS, MAP, FEATHER, BOSS_KEY, HEART_RECOVERY,  RUBY_GREEN, CELLO ,
 				ARROW, DOGFOOD, HEART_CONTAINER, MAGIC_ROD, BOW, NECKLACE, YOSHIDOLL, MAGICPOWDER, 
-				RUBYPURPLE };
+				RUBYPURPLE, TAIL_KEY, DRUM, HORN , TELEPHONE };
 
-	enum INTERACTTYPE { DEFAULT, PRIZE, CARRYABLE};
+	enum INTERACTTYPE { DEFAULT, PRIZE, CARRYABLE, TELL };
+	enum MSGTEX_GETITEM { MSG_SMALL_KEY, MSG_COMPOSS, MSG_DGN_MAP, MSG_FEATHER, MSG_BOSS_KEY, MSG_MSG_HEART, MSG_MGS_RUBY, MSG_CELLO, MSG_ARROW,
+		MSG_DOGFOOD, MSG_HEART_CONTAINER, MSG_MAGIC_ROD, MSG_BOW, MSG_NECKLACE, MSG_YOSHIDOLL, MSG_MAGICPOWDER, MSG_RUBYPURPLE,
+		MSG_TAIL_KEY, MSG_DRUM, MSG_HORN, MSG_MARIN, MSG_END };
+
+
 
 	typedef struct KeyTag
 	{
@@ -39,6 +44,9 @@ private:
 	void LateTick_PrizeModeItem(_float fTimeDelta);
 	void LateTick_DefaultModeItem(_float fTimeDelta);
 	void LateTick_CarryableModeItem(_float fTimeDelta);
+	void LateTick_TelephoneModeItem(_float fTimeDelta);
+	void Setting_Get_Item();
+	void Setting_TelephoneMessage();
 
 private:
 	ITEMDESC				m_ItemDesc;

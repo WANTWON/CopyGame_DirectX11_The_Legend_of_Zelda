@@ -12,7 +12,7 @@ BEGIN(Client)
 class CMonsterBullet final : public CBaseObj
 {
 public:
-	enum BULLETTYPE { DEFAULT, OCTOROCK, ROLA, BULLET_END };
+	enum BULLETTYPE { DEFAULT, OCTOROCK, ROLA, ALBATOSS,  BULLET_END };
 
 	typedef struct Bullettag
 	{
@@ -50,6 +50,7 @@ private:
 	void Moving_DefaultBullet(_float fTimeDelta);
 	void Moving_OctorockBullet(_float fTimeDelta);
 	void Moving_RolaBullet(_float fTimeDelta);
+	void Moving_AlbatossBullet(_float fTimeDelta);
 
 protected: /* For.Components */
 	CModel*					m_pModelCom = nullptr;
@@ -57,6 +58,7 @@ protected: /* For.Components */
 
 	_float					m_fDeadtime = 0.f;
 	_float					m_fAnimSpeed = 1.f;
+	_float					m_fSpeed = 0.f;
 	BULLETDESC				m_BulletDesc;
 
 public:

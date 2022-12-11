@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "UI_Manager.h"
 #include "MessageBox.h"
+#include "PrizeItem.h"
 
 CDgnKey::CDgnKey(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -119,7 +120,7 @@ void CDgnKey::Late_Tick(_float fTimeDelta)
 
 		CUI_Manager::MSGDESC MsgDesc;
 		MsgDesc.eMsgType = CUI_Manager::PASSABLE;
-		MsgDesc.iTextureNum = CUI_Manager::DGN_KEY;
+		MsgDesc.iTextureNum = CPrizeItem::MSG_SMALL_KEY;
 
 		CUI_Manager::Get_Instance()->Add_MessageDesc(MsgDesc);
 		CUI_Manager::Get_Instance()->Open_Message(true);

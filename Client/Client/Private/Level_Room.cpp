@@ -58,6 +58,11 @@ HRESULT CLevel_Room::Initialize()
 	case Client::CUI_Manager::CRANEGAME:
 		if (FAILED(Ready_Layer_CraneGameObject(TEXT("Layer_Object"))))
 			return E_FAIL;
+		break;
+	case Client::CUI_Manager::TELEPHONE:
+		if (FAILED(Ready_Layer_TelephoneObject(TEXT("Layer_Object"))))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
@@ -128,14 +133,14 @@ void CLevel_Room::Late_Tick(_float fTimeDelta)
 HRESULT CLevel_Room::Ready_Lights()
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
+	pGameInstance->Clear_Light();
 	LIGHTDESC			LightDesc;
 
 	/* For.Directional*/
 	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 
 	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(0.f, -1.f, 0.5f, 0.f);
+	LightDesc.vDirection = _float4(0.f, -1.f, 0.0f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 0.7f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);	
@@ -225,6 +230,9 @@ HRESULT CLevel_Room::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	case Client::CUI_Manager::CRANEGAME:
 		ModelDesc.vPosition = _float3(1.82f, 0.f, -1.86f);
 		strcpy(ModelDesc.pModeltag, "CraneGame.fbx");
+		break;
+	case Client::CUI_Manager::TELEPHONE:
+		strcpy(ModelDesc.pModeltag, "TelephoneBox.fbx");
 		break;
 	default:
 		break;
@@ -397,6 +405,14 @@ HRESULT CLevel_Room::Ready_Layer_MarinObject(const _tchar * pLayerTag)
 
 		_tchar pModeltag[MAX_PATH];
 		MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, MAX_PATH, pModeltag, MAX_PATH);
+		if (!wcscmp(pModeltag, TEXT("Tarin.fbx")))
+		{
+			CNpc::NPCDESC NpcDesc;
+			NpcDesc.vInitPos = ModelDesc.vPosition;
+			NpcDesc.eNpcType = CNpc::TARIN;
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TarinNpc"), LEVEL_ROOM, pLayerTag, &NpcDesc)))
+				return E_FAIL;
+		}
 		if (!wcscmp(pModeltag, TEXT("Marin.fbx")))
 		{
 			CNpc::NPCDESC NpcDesc;
@@ -453,7 +469,7 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 		{
 			CPrizeItem::ITEMDESC ItemDesc;
 			ItemDesc.eType = CPrizeItem::NECKLACE;
-			ItemDesc.eInteractType = CPrizeItem::DEFAULT;
+			ItemDesc.eInteractType = CPrizeItem::PRIZE;
 			ItemDesc.vPosition = ModelDesc.vPosition;
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, pLayerTag, &ItemDesc)))
@@ -463,7 +479,7 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 		{
 			CPrizeItem::ITEMDESC ItemDesc;
 			ItemDesc.eType = CPrizeItem::YOSHIDOLL;
-			ItemDesc.eInteractType = CPrizeItem::DEFAULT;
+			ItemDesc.eInteractType = CPrizeItem::PRIZE;
 			ItemDesc.vPosition = ModelDesc.vPosition;
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, pLayerTag, &ItemDesc)))
@@ -473,7 +489,7 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 		{
 			CPrizeItem::ITEMDESC ItemDesc;
 			ItemDesc.eType = CPrizeItem::RUBYPURPLE;
-			ItemDesc.eInteractType = CPrizeItem::DEFAULT;
+			ItemDesc.eInteractType = CPrizeItem::PRIZE;
 			ItemDesc.vPosition = ModelDesc.vPosition;
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, pLayerTag, &ItemDesc)))
@@ -483,7 +499,7 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 		{
 			CPrizeItem::ITEMDESC ItemDesc;
 			ItemDesc.eType = CPrizeItem::HEART_CONTAINER;
-			ItemDesc.eInteractType = CPrizeItem::DEFAULT;
+			ItemDesc.eInteractType = CPrizeItem::PRIZE;
 			ItemDesc.vPosition = ModelDesc.vPosition;
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, pLayerTag, &ItemDesc)))
@@ -493,7 +509,7 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 		{
 			CPrizeItem::ITEMDESC ItemDesc;
 			ItemDesc.eType = CPrizeItem::MAGICPOWDER;
-			ItemDesc.eInteractType = CPrizeItem::DEFAULT;
+			ItemDesc.eInteractType = CPrizeItem::PRIZE;
 			ItemDesc.vPosition = ModelDesc.vPosition;
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, pLayerTag, &ItemDesc)))
@@ -512,7 +528,7 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 		{
 			CNpc::NPCDESC NpcDesc;
 			NpcDesc.vInitPos = ModelDesc.vPosition;
-
+			NpcDesc.eNpcType = CNpc::CRANE_GAME;
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CraneGameNpc"), LEVEL_ROOM, pLayerTag, &NpcDesc)))
 				return E_FAIL;
 		}
@@ -543,6 +559,49 @@ HRESULT CLevel_Room::Ready_Layer_CraneGameObject(const _tchar * pLayerTag)
 
 	RELEASE_INSTANCE(CGameInstance);
 
+	return S_OK;
+}
+
+HRESULT CLevel_Room::Ready_Layer_TelephoneObject(const _tchar * pLayerTag)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	HANDLE hFile = 0;
+	_ulong dwByte = 0;
+	CNonAnim::NONANIMDESC  ModelDesc;
+	_uint iNum = 0;
+
+	hFile = CreateFile(TEXT("../../../Bin/Data/Telephone_Object.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
+		return E_FAIL;
+
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+	for (_uint i = 0; i < iNum; ++i)
+	{
+		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+		_tchar pModeltag[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, ModelDesc.pModeltag, MAX_PATH, pModeltag, MAX_PATH);
+		if (!wcscmp(pModeltag, TEXT("Telephone.fbx")))
+		{
+			CPrizeItem::ITEMDESC ItemDesc;
+			ItemDesc.eType = CPrizeItem::TELEPHONE;
+			ItemDesc.eInteractType = CPrizeItem::TELL;
+			ItemDesc.vPosition = ModelDesc.vPosition;
+
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, pLayerTag, &ItemDesc)))
+				return E_FAIL;
+		}
+
+	}
+
+
+	CloseHandle(hFile);
+
+
+	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
 

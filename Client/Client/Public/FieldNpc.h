@@ -13,10 +13,10 @@ public:
 	enum STATE_MADAM { KISS, LAUGH, SCREAM, TALK_MADAM, IDLE_MADAM };
 	enum STATE_GRANDMA { ITEM_GET_LP, TALK_GRANDMA, TALK_BROOM, TALK_BROOM_ED, TALK_BROOM_ST, IDLE_GRANDMA, IDLE_GRANDMA_BROOM};
 	enum STATE_CHILD { APPEAL, CATCH, PANIC, PANIC2, RUN, SHOW, STANDBY, TALK_CHILD, TALK_CATCHBALL, TEASE, THROW, IDLE_CHILD, IDLE_CHILD_CATCHBALL };
-	enum STATE_MOTHER {TALK_MOTHER, IDLE_MOTHER};
+	enum STATE_MOTHER { TALK_MOTHER, IDLE_MOTHER };
 
 
-	enum MSGTEX_SHOPTALK { TALKMSG_CUCCO, TALKMSG_MADAM, TALKMSG_GRANDMA, TALKMSG_CHILD };
+	enum MSGTEX_SHOPTALK { TALKMSG_CUCCO, TALKMSG_MADAM, TALKMSG_GRANDMA, TALKMSG_CHILD, TALKMSG_MOM, THANKYOU_MADAM, THANKYOU_MOM, THISISFORYOU };
 
 
 private:
@@ -33,6 +33,7 @@ public:
 
 public:
 	virtual void Check_Navigation(_float fTimeDelta);
+	virtual void GiveItemMode() override;
 
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
@@ -50,6 +51,8 @@ private:
 	_uint	m_eState = IDLE_CUCCO;
 	_uint	m_eIdleState = IDLE_CUCCO;
 	_uint	m_eTalkState = IDLE_CUCCO;
+
+	
 
 	_float4 m_vTargetPos = _float4(0.f, 0.f, 0.f, 1.f);
 

@@ -122,7 +122,7 @@ void CLevel_TailCave::Late_Tick(_float fTimeDelta)
 HRESULT CLevel_TailCave::Ready_Lights()
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
+	pGameInstance->Clear_Light();
 	LIGHTDESC			LightDesc;
 
 	/* For.Directional*/

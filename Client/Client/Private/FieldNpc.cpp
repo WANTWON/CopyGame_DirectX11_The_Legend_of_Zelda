@@ -154,7 +154,8 @@ void CFieldNpc::Late_Tick(_float fTimeDelta)
 		fPosition.y -= 30.f;
 		pButton->Set_Position(fPosition);
 
-		if (CGameInstance::Get_Instance()->Key_Up(DIK_A) && m_eState != m_eTalkState)
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_A) && m_eState != m_eTalkState
+			&& CUI_Manager::Get_Instance()->Get_TalkingNpc() == nullptr)
 		{
 			CUI_Manager::Get_Instance()->Add_TalkingNpc(this);
 			CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
@@ -189,6 +190,22 @@ void CFieldNpc::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom == nullptr)
 		return;
+}
+
+void CFieldNpc::GiveItemMode()
+{
+	//if (m_bGiveItem && CUI_Manager::Get_Instance()->Get_Talking() == false &&
+	//	CUI_Manager::Get_Instance()->Get_OpenMessage() == false && CUI_Manager::Get_Instance()->Get_MessageSize() == 0)
+	
+		CPrizeItem::ITEMDESC ItemDesc;
+		ItemDesc.eType = (CPrizeItem::TYPE)m_iGiveItemTexNum;
+		ItemDesc.eInteractType = CPrizeItem::PRIZE;
+		XMStoreFloat3(&ItemDesc.vPosition, Get_TransformState(CTransform::STATE_POSITION));
+
+		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_GAMEPLAY, TEXT("Layer_Item"), &ItemDesc)))
+			return;
+		m_bGiveItem = false;
+	
 }
 
 
@@ -334,9 +351,24 @@ void CFieldNpc::Change_Message()
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		break;
 	case MADAM:
-		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
-		eMsgDesc.iTextureNum = TALKMSG_MADAM;
-		pUI_Manager->Add_MessageDesc(eMsgDesc);
+		if (pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_QuestItem"), CInvenItem::DOG_FOOD))
+		{
+			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
+			eMsgDesc.iTextureNum = THANKYOU_MADAM;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
+
+			eMsgDesc.iTextureNum = THISISFORYOU;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
+
+			m_bGiveItem = true;
+			m_iGiveItemTexNum = CPrizeItem::DRUM;
+		}
+		else
+		{
+			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
+			eMsgDesc.iTextureNum = TALKMSG_MADAM;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
+		}
 		break;
 	case GRANDMA:
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
@@ -349,9 +381,24 @@ void CFieldNpc::Change_Message()
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		break;
 	case MOTHER:
-		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
-		eMsgDesc.iTextureNum = TALKMSG_CHILD;
-		pUI_Manager->Add_MessageDesc(eMsgDesc);
+		if (pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_QuestItem"), CInvenItem::YOSHI))
+		{
+			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
+			eMsgDesc.iTextureNum = THANKYOU_MOM;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
+
+			eMsgDesc.iTextureNum = THISISFORYOU;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
+
+			m_bGiveItem = true;
+			m_iGiveItemTexNum = CPrizeItem::HORN;
+		}
+		else
+		{
+			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
+			eMsgDesc.iTextureNum = TALKMSG_MOM;
+			pUI_Manager->Add_MessageDesc(eMsgDesc);
+		}
 		break;
 	default:
 		break;
@@ -570,6 +617,8 @@ int CFieldNpc::Child_Tick(_float fTimeDelta)
 
 	return OBJ_NOEVENT;
 }
+
+
 
 
 void CFieldNpc::Free()
