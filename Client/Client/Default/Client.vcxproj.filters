@@ -423,6 +423,9 @@
     <ClInclude Include="..\Public\PlayerEffect.h">
       <Filter>02.GameObjects\07.Effect\PlayerEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MonsterEffect.h">
+      <Filter>02.GameObjects\07.Effect\MonsterEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -619,6 +622,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\PlayerEffect.cpp">
       <Filter>02.GameObjects\07.Effect\PlayerEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MonsterEffect.cpp">
+      <Filter>02.GameObjects\07.Effect\MonsterEffect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

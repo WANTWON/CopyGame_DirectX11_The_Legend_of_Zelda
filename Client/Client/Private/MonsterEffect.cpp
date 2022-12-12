@@ -1,20 +1,20 @@
 #include "stdafx.h"
-#include "..\Public\PlayerEffect.h"
+#include "..\Public\MonsterEffect.h"
 #include "Weapon.h"
 #include "Player.h"
 #include "GameInstance.h"
 
-CPlayerEffect::CPlayerEffect(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CMonsterEffect::CMonsterEffect(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CEffect(pDevice, pContext)
 {
 }
 
-CPlayerEffect::CPlayerEffect(const CPlayerEffect & rhs)
+CMonsterEffect::CMonsterEffect(const CMonsterEffect & rhs)
 	: CEffect(rhs)
 {
 }
 
-HRESULT CPlayerEffect::Initialize_Prototype()
+HRESULT CMonsterEffect::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
@@ -22,7 +22,7 @@ HRESULT CPlayerEffect::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CPlayerEffect::Initialize(void * pArg)
+HRESULT CMonsterEffect::Initialize(void * pArg)
 {
 
 	if (FAILED(__super::Initialize(pArg)))
@@ -34,13 +34,8 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case FOOTSMOKE:
-		m_fScale = m_EffectDesc.vInitScale.x;
-		m_iTextureNum = rand() % 3;
-		break;
-	case ROLLCUT:
-		m_eShaderID = ROLLCUT;
-		m_fTexUV = 1.f;
+	case HITFLASH:
+		m_eShaderID = SHADER_HITFLASH;
 		break;
 	default:
 		break;
@@ -50,7 +45,7 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 	return S_OK;
 }
 
-int CPlayerEffect::Tick(_float fTimeDelta)
+int CMonsterEffect::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
@@ -61,11 +56,8 @@ int CPlayerEffect::Tick(_float fTimeDelta)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case FOOTSMOKE:
-		Tick_Smoke(fTimeDelta);
-		break;
-	case ROLLCUT:
-		Tick_RollCut(fTimeDelta);
+	case HITFLASH:
+		Tick_HitFlash(fTimeDelta);
 		break;
 	default:
 		break;
@@ -74,12 +66,12 @@ int CPlayerEffect::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CPlayerEffect::Late_Tick(_float fTimeDelta)
+void CMonsterEffect::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 }
 
-HRESULT CPlayerEffect::Render()
+HRESULT CMonsterEffect::Render()
 {
 
 	__super::Render();
@@ -88,7 +80,7 @@ HRESULT CPlayerEffect::Render()
 	return S_OK;
 }
 
-HRESULT CPlayerEffect::Ready_Components(void * pArg)
+HRESULT CMonsterEffect::Ready_Components(void * pArg)
 {
 	LEVEL iLevel = (LEVEL)CGameInstance::Get_Instance()->Get_DestinationLevelIndex();
 
@@ -126,17 +118,8 @@ HRESULT CPlayerEffect::Ready_Components(void * pArg)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case FOOTSMOKE:
-		/* For.Com_VIBuffer */
-		if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
-			return E_FAIL;
-
-		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"), (CComponent**)&m_pTextureCom)))
-			return E_FAIL;
-		break;
-	case ROLLCUT:
-		/* For.Com_Model*/
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut_Blast"), (CComponent**)&m_pModelCom)))
+	case HITFLASH:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_HitFlash"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
 	default:
@@ -147,7 +130,7 @@ HRESULT CPlayerEffect::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CPlayerEffect::SetUp_ShaderResources()
+HRESULT CMonsterEffect::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -180,33 +163,22 @@ HRESULT CPlayerEffect::SetUp_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CPlayerEffect::SetUp_ShaderID()
+HRESULT CMonsterEffect::SetUp_ShaderID()
 {
 	return S_OK;
 }
 
-void CPlayerEffect::Change_Animation(_float fTimeDelta)
+void CMonsterEffect::Change_Animation(_float fTimeDelta)
 {
 }
 
-void CPlayerEffect::Change_Texture(_float fTimeDelta)
+void CMonsterEffect::Change_Texture(_float fTimeDelta)
 {
-	switch (m_EffectDesc.eEffectID)
-	{
-	case FOOTSMOKE:
-		m_iTextureNum++;
 
-		if (m_iTextureNum >= m_pTextureCom->Get_TextureSize())
-		{
-			m_bDead = true;
-			m_iTextureNum--;
-		}
-		break;
-	}
 }
 
 
-void CPlayerEffect::Tick_Smoke(_float fTimeDelta)
+void CMonsterEffect::Tick_Smoke(_float fTimeDelta)
 {
 
 	SetUp_BillBoard();
@@ -220,7 +192,7 @@ void CPlayerEffect::Tick_Smoke(_float fTimeDelta)
 	
 }
 
-void CPlayerEffect::Tick_RollCut(_float fTimeDelta)
+void CMonsterEffect::Tick_HitFlash(_float fTimeDelta)
 {
 	m_fDeadtime += fTimeDelta;
 	m_fTexUV -= 0.07f;
@@ -231,33 +203,33 @@ void CPlayerEffect::Tick_RollCut(_float fTimeDelta)
 		m_bDead = true;
 }
 
-CPlayerEffect * CPlayerEffect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CMonsterEffect * CMonsterEffect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CPlayerEffect*	pInstance = new CPlayerEffect(pDevice, pContext);
+	CMonsterEffect*	pInstance = new CMonsterEffect(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		ERR_MSG(TEXT("Failed to Created : CPlayerEffect"));
+		ERR_MSG(TEXT("Failed to Created : CMonsterEffect"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CPlayerEffect::Clone(void * pArg)
+CGameObject * CMonsterEffect::Clone(void * pArg)
 {
-	CPlayerEffect*	pInstance = new CPlayerEffect(*this);
+	CMonsterEffect*	pInstance = new CMonsterEffect(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		ERR_MSG(TEXT("Failed to Cloned : CPlayerEffect"));
+		ERR_MSG(TEXT("Failed to Cloned : CMonsterEffect"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPlayerEffect::Free()
+void CMonsterEffect::Free()
 {
 	__super::Free();
 }

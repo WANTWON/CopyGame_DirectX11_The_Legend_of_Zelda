@@ -4,6 +4,7 @@
 #include "Level_Manager.h"
 #include "CameraManager.h"
 #include "PrizeItem.h"
+#include "MonsterEffect.h"
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CBaseObj(pDevice, pContext)
@@ -220,6 +221,15 @@ _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageC
 		return m_tInfo.iCurrentHp;
 	}
 
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.eEffectType = CEffect::MESH;
+	EffectDesc.eEffectOwner = CEffect::PLAYER;
+	EffectDesc.eEffectID = CMonsterEffect::HITFLASH;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, 0.5f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 
 	return m_tInfo.iCurrentHp;

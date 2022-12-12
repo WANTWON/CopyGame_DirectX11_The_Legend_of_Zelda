@@ -101,6 +101,24 @@ PS_OUT PS_MAIN_RollCut(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_HitFlash(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.a = Out.vDiffuse.r;
+
+
+	Out.vDiffuse.r = 172.f;
+	Out.vDiffuse.g = 255.f;
+	Out.vDiffuse.b = 255.f;
+
+	//if (1 - g_TexUV < In.vTexUV.x)
+	//	discard;
+
+	return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -124,6 +142,17 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_RollCut();
+	}
+
+	pass HitFlash
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_HitFlash();
 	}
 
 }

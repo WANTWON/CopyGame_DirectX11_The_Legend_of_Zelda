@@ -14,6 +14,7 @@
 #include "Weapon.h"
 
 //for Monster
+#include "MonsterEffect.h"
 #include "Octorock.h"
 #include "MoblinSword.h"
 #include "Rola.h"
@@ -964,6 +965,11 @@ HRESULT CLoader::Loading_ForTowerLevel()
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/*For.Prototype_GameObject_PlayerEffect*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterEffect"),
+		CMonsterEffect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	/*For.Prototype_GameObject_PlayerEffect*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_PlayerEffect"),

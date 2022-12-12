@@ -6,17 +6,17 @@
 
 
 BEGIN(Client)
-class CPlayerEffect final : public CEffect
+class CMonsterEffect final : public CEffect
 {
 public:
-	enum TYPE { FOOTSMOKE, ROLLCUT,};
+	enum TYPE { HITFLASH, HITRING, HITSPARK };
 
 
 
 protected:
-	CPlayerEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CPlayerEffect(const CPlayerEffect& rhs);
-	virtual ~CPlayerEffect() = default;
+	CMonsterEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CMonsterEffect(const CMonsterEffect& rhs);
+	virtual ~CMonsterEffect() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -38,13 +38,13 @@ private:
 
 private:
 	void Tick_Smoke(_float fTimeDelta);
-	void Tick_RollCut(_float fTimeDelta);
+	void Tick_HitFlash(_float fTimeDelta);
 
 private:
 	_float m_fScale = 0.f;
 
 public:
-	static CPlayerEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CMonsterEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);
 	virtual void Free() override;
 };
