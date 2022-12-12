@@ -220,23 +220,6 @@ void CPlayerBullet::Change_Animation(_float fTimeDelta)
 
 void CPlayerBullet::Moving_SwordBullet(_float fTimeDelta)
 {
-	//if (m_pTarget == nullptr)
-	//	return;
-
-	//CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-
-	//CWeapon::WEAPONDESC m_WeaponDesc = pPlayer->Get_WeaponDesc();
-
-	//_matrix		SocketMatrix = m_WeaponDesc.pSocket->Get_OffsetMatrix() * m_WeaponDesc.pSocket->Get_CombinedTransformationMatrix() *
-	//	XMLoadFloat4x4(&m_WeaponDesc.SocketPivotMatrix) * XMLoadFloat4x4(m_WeaponDesc.pParentWorldMatrix);
-
-	//SocketMatrix.r[0] = XMVector3Normalize(SocketMatrix.r[0]);
-	//SocketMatrix.r[1] = XMVector3Normalize(SocketMatrix.r[1]);
-	//SocketMatrix.r[2] = XMVector3Normalize(SocketMatrix.r[2]);
-
-	//XMStoreFloat4x4(&m_CombinedWorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix);
-	////m_pOBBCom->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
-
 	m_fDeadtime += fTimeDelta;
 	m_fTexUV -= 0.07f;
 	if (m_fTexUV <= 0.f)

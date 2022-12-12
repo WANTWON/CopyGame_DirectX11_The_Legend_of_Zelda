@@ -1,32 +1,22 @@
 #pragma once
 #include "Client_Defines.h"
-#include "BaseObj.h"
+#include "Effect.h"
 #include "GameInstance.h"
 
-BEGIN(Engine)
-class CModel;
-class CVIBuffer_Rect;
-class CTexture;
-END
+
 
 BEGIN(Client)
-class CPlayerBullet final : public CBaseObj
+class CPlayerEffect final : public CEffect
 {
 public:
-	enum BULLETTYPE { SLASH, BOW, BOOMERANG, BULLET_END};
+	enum TYPE { FOOTSMOKE, ROLLCUT,};
 
-	typedef struct Bullettag
-	{
-		BULLETTYPE eBulletType = BULLET_END;
-		_vector	   vInitPositon = XMVectorSet(0.f,0.f,0.f,1.f);
-		_vector	   vLook = XMVectorSet(0.f, 0.f, 0.f, 0.f);
-		_float	   fDeadTime = 0.f;
-	}BULLETDESC;
+
 
 protected:
-	CPlayerBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CPlayerBullet(const CPlayerBullet& rhs);
-	virtual ~CPlayerBullet() = default;
+	CPlayerEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CPlayerEffect(const CPlayerEffect& rhs);
+	virtual ~CPlayerEffect() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -44,25 +34,17 @@ private:
 	virtual HRESULT SetUp_ShaderResources();
 	virtual HRESULT SetUp_ShaderID();
 	virtual void Change_Animation(_float fTimeDelta);
+	virtual void Change_Texture(_float fTimeDelta) override;
 
 private:
-	void Moving_SwordBullet(_float fTimeDelta);
-	void Moving_BowBullet(_float fTimeDelta);
+	void Tick_Smoke(_float fTimeDelta);
+	void Tick_RollCut(_float fTimeDelta);
 
-protected: /* For.Components */
-	CModel*					m_pModelCom = nullptr;
-	CVIBuffer_Rect*			m_pVIBufferCom = nullptr;
-	CTexture*				m_pTextureCom = nullptr;
-	CBaseObj*				m_pTarget = nullptr;
+private:
+	_float m_fScale = 0.f;
 
-	_float					m_fDeadtime = 0.f;
-	_float					m_fAnimSpeed = 1.f;
-	_float					m_fTexUV = 0.f;
-
-	BULLETDESC				m_BulletDesc;
-	_float4x4				m_CombinedWorldMatrix;
 public:
-	static CPlayerBullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPlayerEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);
 	virtual void Free() override;
 };

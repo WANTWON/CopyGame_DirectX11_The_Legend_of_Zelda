@@ -1,20 +1,20 @@
 #include "stdafx.h"
-#include "..\Public\PlayerBullet.h"
+#include "..\Public\PlayerEffect.h"
 #include "Weapon.h"
 #include "Player.h"
 #include "GameInstance.h"
 
-CPlayerBullet::CPlayerBullet(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	: CBaseObj(pDevice, pContext)
+CPlayerEffect::CPlayerEffect(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+	: CEffect(pDevice, pContext)
 {
 }
 
-CPlayerBullet::CPlayerBullet(const CPlayerBullet & rhs)
-	: CBaseObj(rhs)
+CPlayerEffect::CPlayerEffect(const CPlayerEffect & rhs)
+	: CEffect(rhs)
 {
 }
 
-HRESULT CPlayerBullet::Initialize_Prototype()
+HRESULT CPlayerEffect::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
@@ -22,116 +22,73 @@ HRESULT CPlayerBullet::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CPlayerBullet::Initialize(void * pArg)
+HRESULT CPlayerEffect::Initialize(void * pArg)
 {
-	if (pArg != nullptr)
-		memcpy(&m_BulletDesc, pArg, sizeof(BULLETDESC));
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Components(pArg)))
-		return E_FAIL;
+	Set_Scale(m_EffectDesc.vInitScale);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.vInitPositon);
+	m_pTransformCom->LookDir(m_EffectDesc.vLook);
 
-
-	switch (m_BulletDesc.eBulletType)
+	switch (m_EffectDesc.eEffectID)
 	{
-	case SLASH:
-		Set_Scale(_float3(3.f, 3.f, 3.f));
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
-		m_pTransformCom->LookDir(m_BulletDesc.vLook);
-		m_eShaderID = SHADER_SLASH;
+	case FOOTSMOKE:
+		m_fScale = m_EffectDesc.vInitScale.x;
+		m_iTextureNum = rand() % 3;
+		break;
+	case ROLLCUT:
+		m_eShaderID = ROLLCUT;
 		m_fTexUV = 1.f;
-		//m_bSocket = true;
 		break;
 	default:
 		break;
 	}
 
-	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PBULLET, this);
 	
 	return S_OK;
 }
 
-int CPlayerBullet::Tick(_float fTimeDelta)
+int CPlayerEffect::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
-		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_PBULLET, this);
 		return OBJ_DEAD;
 	}
 		
-
 	__super::Tick(fTimeDelta);
 
-	switch (m_BulletDesc.eBulletType)
+	switch (m_EffectDesc.eEffectID)
 	{
-	case SLASH:
-		Moving_SwordBullet(fTimeDelta);
+	case FOOTSMOKE:
+		Tick_Smoke(fTimeDelta);
 		break;
-	case BOW:
-		Moving_BowBullet(fTimeDelta);
+	case ROLLCUT:
+		Tick_RollCut(fTimeDelta);
 		break;
 	default:
 		break;
 	}
-
 
 	return OBJ_NOEVENT;
 }
 
-void CPlayerBullet::Late_Tick(_float fTimeDelta)
+void CPlayerEffect::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
-
-	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
-
-	Compute_CamDistance(Get_TransformState(CTransform::STATE_POSITION));
-	SetUp_ShaderID();
-	//SetUp_BillBoard();
 }
 
-HRESULT CPlayerBullet::Render()
+HRESULT CPlayerEffect::Render()
 {
 
-	if (nullptr == m_pShaderCom )
-		return E_FAIL;
-
-	if (FAILED(SetUp_ShaderResources()))
-		return E_FAIL;
-
-	if (m_pModelCom != nullptr)
-	{
-		_uint		iNumMeshes = m_pModelCom->Get_NumMeshContainers();
-
-		for (_uint i = 0; i < iNumMeshes; ++i)
-		{
-			if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
-				return E_FAIL;
-
-			if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))
-				return E_FAIL;
-		}
-
-	}
-	
-	if (m_pTextureCom != nullptr)
-	{
-		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV())))
-			return E_FAIL;
-
-		m_pShaderCom->Begin(m_eShaderID);
-
-		m_pVIBufferCom->Render();
-
-	}
+	__super::Render();
 		
 
 	return S_OK;
 }
 
-HRESULT CPlayerBullet::Ready_Components(void * pArg)
+HRESULT CPlayerEffect::Ready_Components(void * pArg)
 {
 	LEVEL iLevel = (LEVEL)CGameInstance::Get_Instance()->Get_DestinationLevelIndex();
 
@@ -148,43 +105,49 @@ HRESULT CPlayerBullet::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
 
-	/* For.Com_Shader */
-	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect_Model"), (CComponent**)&m_pShaderCom)))
-		return E_FAIL;
 
 	/* For.Com_Model*/
-	switch (m_BulletDesc.eBulletType)
+	switch (m_EffectDesc.eEffectType)
 	{
-	case SLASH:
-	{
-		/* For.Com_Model*/
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut"), (CComponent**)&m_pModelCom)))
-			return E_FAIL;
-
-		/* For.Com_OBB*/
-		CCollider::COLLIDERDESC		ColliderDesc;
-		ColliderDesc.vScale = _float3(1.f, 0.2f, 0.4f);
-		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
-		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.5f);
-		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+	case MESH:
+		/* For.Com_Shader */
+		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect_Model"), (CComponent**)&m_pShaderCom)))
 			return E_FAIL;
 		break;
-	}
-	case BOW:
-		/* For.Com_Model*/
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), iLevel, TEXT("Prototype_Component_Model_Octorock"), (CComponent**)&m_pModelCom)))
+	case VIBUFFER_RECT:
+		/* For.Com_Shader */
+		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect"), (CComponent**)&m_pShaderCom)))
 			return E_FAIL;
 		break;
 	default:
 		break;
 	}
 
+
+	switch (m_EffectDesc.eEffectID)
+	{
+	case FOOTSMOKE:
+		/* For.Com_VIBuffer */
+		if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
+			return E_FAIL;
+
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case ROLLCUT:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut_Blast"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	default:
+		break;
+	}
 	
 
 	return S_OK;
 }
 
-HRESULT CPlayerBullet::SetUp_ShaderResources()
+HRESULT CPlayerEffect::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -200,66 +163,101 @@ HRESULT CPlayerBullet::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Set_RawValue("g_TexUV", &m_fTexUV, sizeof(_float))))
-		return E_FAIL;
+	if (m_EffectDesc.eEffectType == MESH)
+	{
+		if (FAILED(m_pShaderCom->Set_RawValue("g_TexUV", &m_fTexUV, sizeof(_float))))
+			return E_FAIL;
+	}
+	else
+	{
+		if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+			return E_FAIL;
+	}
+		
 
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }
 
-HRESULT CPlayerBullet::SetUp_ShaderID()
+HRESULT CPlayerEffect::SetUp_ShaderID()
 {
 	return S_OK;
 }
 
-void CPlayerBullet::Change_Animation(_float fTimeDelta)
+void CPlayerEffect::Change_Animation(_float fTimeDelta)
 {
 }
 
+void CPlayerEffect::Change_Texture(_float fTimeDelta)
+{
+	switch (m_EffectDesc.eEffectID)
+	{
+	case FOOTSMOKE:
+		m_iTextureNum++;
 
-void CPlayerBullet::Moving_SwordBullet(_float fTimeDelta)
+		if (m_iTextureNum >= m_pTextureCom->Get_TextureSize())
+		{
+			m_bDead = true;
+			m_iTextureNum--;
+		}
+		break;
+	}
+}
+
+
+void CPlayerEffect::Tick_Smoke(_float fTimeDelta)
+{
+
+	SetUp_BillBoard();
+
+	m_fAlpha -= 0.01f;
+	m_fScale -= 0.02f;
+	Set_Scale(_float3(m_fScale, m_fScale, m_fScale));
+
+	if (m_fScale <= 0 || m_fAlpha <= 0)
+		m_bDead = true;
+	
+}
+
+void CPlayerEffect::Tick_RollCut(_float fTimeDelta)
 {
 	m_fDeadtime += fTimeDelta;
 	m_fTexUV -= 0.07f;
 	if (m_fTexUV <= 0.f)
 		m_fTexUV = 0.f;
-	
-	if (m_BulletDesc.fDeadTime < m_fDeadtime)
+
+	if (m_EffectDesc.fDeadTime < m_fDeadtime)
 		m_bDead = true;
 }
 
-void CPlayerBullet::Moving_BowBullet(_float fTimeDelta)
+CPlayerEffect * CPlayerEffect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-}
-
-CPlayerBullet * CPlayerBullet::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-{
-	CPlayerBullet*	pInstance = new CPlayerBullet(pDevice, pContext);
+	CPlayerEffect*	pInstance = new CPlayerEffect(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		ERR_MSG(TEXT("Failed to Created : CPlayerBullet"));
+		ERR_MSG(TEXT("Failed to Created : CPlayerEffect"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CPlayerBullet::Clone(void * pArg)
+CGameObject * CPlayerEffect::Clone(void * pArg)
 {
-	CPlayerBullet*	pInstance = new CPlayerBullet(*this);
+	CPlayerEffect*	pInstance = new CPlayerEffect(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		ERR_MSG(TEXT("Failed to Cloned : CPlayerBullet"));
+		ERR_MSG(TEXT("Failed to Cloned : CPlayerEffect"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPlayerBullet::Free()
+void CPlayerEffect::Free()
 {
 	__super::Free();
 }

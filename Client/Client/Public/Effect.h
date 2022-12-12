@@ -10,23 +10,28 @@ class CTexture;
 END
 
 BEGIN(Client)
-class CPlayerBullet final : public CBaseObj
+class CEffect abstract : public CBaseObj
 {
 public:
-	enum BULLETTYPE { SLASH, BOW, BOOMERANG, BULLET_END};
+	enum EFFECTTYPE { MESH, VIBUFFER_RECT};
+	enum OWNER {PLAYER, MONSTER};
 
-	typedef struct Bullettag
+
+	typedef struct EffectTag
 	{
-		BULLETTYPE eBulletType = BULLET_END;
+		EFFECTTYPE eEffectType = MESH;
+		OWNER		eEffectOwner = PLAYER;
+		_uint		eEffectID = 0;
 		_vector	   vInitPositon = XMVectorSet(0.f,0.f,0.f,1.f);
 		_vector	   vLook = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+		_float3	   vInitScale = _float3(0.f, 0.f, 0.f);
 		_float	   fDeadTime = 0.f;
-	}BULLETDESC;
+	}EFFECTDESC;
 
 protected:
-	CPlayerBullet(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CPlayerBullet(const CPlayerBullet& rhs);
-	virtual ~CPlayerBullet() = default;
+	CEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CEffect(const CEffect& rhs);
+	virtual ~CEffect() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -40,14 +45,11 @@ public:
 
 
 private:
-	virtual HRESULT Ready_Components(void* pArg = nullptr);
-	virtual HRESULT SetUp_ShaderResources();
-	virtual HRESULT SetUp_ShaderID();
-	virtual void Change_Animation(_float fTimeDelta);
-
-private:
-	void Moving_SwordBullet(_float fTimeDelta);
-	void Moving_BowBullet(_float fTimeDelta);
+	virtual HRESULT Ready_Components(void* pArg = nullptr) = 0;
+	virtual HRESULT SetUp_ShaderResources() ;
+	virtual HRESULT SetUp_ShaderID() { return S_OK; };
+	virtual void Change_Animation(_float fTimeDelta) {};
+	virtual void Change_Texture(_float fTimeDelta) {};
 
 protected: /* For.Components */
 	CModel*					m_pModelCom = nullptr;
@@ -58,12 +60,11 @@ protected: /* For.Components */
 	_float					m_fDeadtime = 0.f;
 	_float					m_fAnimSpeed = 1.f;
 	_float					m_fTexUV = 0.f;
+	_uint					m_iTextureNum = 0;
 
-	BULLETDESC				m_BulletDesc;
+	EFFECTDESC				m_EffectDesc;
 	_float4x4				m_CombinedWorldMatrix;
 public:
-	static CPlayerBullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject* Clone(void* pArg = nullptr);
 	virtual void Free() override;
 };
 
