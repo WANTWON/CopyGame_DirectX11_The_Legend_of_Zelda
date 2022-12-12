@@ -10,17 +10,13 @@ texture2D		g_DiffuseTexture;
 struct VS_IN
 {
 	float3		vPosition : POSITION;
-	float3		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
-	float3		vTangent : TANGENT;
 };
 
 struct VS_OUT
 {
 	float4		vPosition : SV_POSITION;
-	float3		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
-	float4		vProjPos : TEXCOORD1;
 };
 
 /* DrawIndexed함수를 호출하면. */
@@ -35,14 +31,10 @@ VS_OUT VS_MAIN(VS_IN In)
 	matWV = mul(g_WorldMatrix, g_ViewMatrix);
 	matWVP = mul(matWV, g_ProjMatrix);
 
-	vector vNormal = normalize(mul(vector(In.vNormal, 0.f), g_WorldMatrix));
-
 	/* 정점의 위치에 월드 뷰 투영행렬을 곱한다. 현재 정점은 ViewSpace에 존재하낟. */
 	/* 투영행렬까지 곱하면 정점위치의 w에 뷰스페이스 상의 z를 보관한다. == Out.vPosition이 반드시 float4이어야하는 이유. */
 	Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
-	Out.vNormal = vNormal.xyz;
 	Out.vTexUV = In.vTexUV;
-	Out.vProjPos = Out.vPosition;
 
 	return Out;
 }
@@ -51,9 +43,7 @@ VS_OUT VS_MAIN(VS_IN In)
 struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
-	float3		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
-	float4		vProjPos : TEXCOORD1;
 };
 
 struct PS_OUT
@@ -69,10 +59,12 @@ PS_OUT PS_MAIN(PS_IN In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vDiffuse.a = Out.vDiffuse.r;
+	Out.vDiffuse.r = 214;
+	Out.vDiffuse.g = 201;
+	Out.vDiffuse.b = 187;
 
-	Out.vDiffuse.rgb = 1.f;
-	Out.vDiffuse.b -= 0.5f;
+	Out.vDiffuse.a *= g_fAlpha;
+
 
 	return Out;
 }
@@ -83,7 +75,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
 technique11 DefaultTechnique
 {
-	pass Default
+	pass FootSmokeEffect
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);

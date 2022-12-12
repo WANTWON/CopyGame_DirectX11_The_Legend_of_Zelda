@@ -8,6 +8,7 @@
 #include "Cell.h"
 #include "CameraManager.h"
 #include "Level_Room.h"
+#include "PlayerEffect.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -366,7 +367,7 @@ HRESULT CPlayer::Ready_Parts_Bullet(CWeapon::TYPE eType, PARTS PartsIndex)
 		return E_FAIL;
 
 	/* For.Weapon */
-	CHierarchyNode*		pSocket = m_pModelCom->Get_BonePtr("itemA_L");
+	CHierarchyNode*		pSocket = m_pModelCom->Get_BonePtr("itemA_L_top_end");
 	if (nullptr == pSocket)
 		return E_FAIL;
 
@@ -470,7 +471,6 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		++iRenderNum;
 
 		if (iRenderNum >= iNumMeshes)
-		{
 			iRenderNum = 0;
 		}*/
 
@@ -555,14 +555,25 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_pModelCom->Set_AnimationReset();
 		}
 
+		m_BulletLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
 		CPlayerBullet::BULLETDESC BulletDesc;
+		BulletDesc.eBulletType = CPlayerBullet::SLASH;
+		BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.5f, 0.f, 0.f);
 
-		BulletDesc.eBulletType = CPlayerBullet::SWORD;
-		BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
-		BulletDesc.vLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
+		BulletDesc.vLook = m_BulletLook;
 		BulletDesc.fDeadTime = 0.5f;
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
 
+		CEffect::EFFECTDESC EffectDesc;
+		EffectDesc.eEffectType = CEffect::MESH;
+		EffectDesc.eEffectOwner = CEffect::PLAYER;
+		EffectDesc.iEffectID = CPlayerEffect::ROLLCUT;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, 0.5f, 0.f, 0.f);
+		EffectDesc.fDeadTime = 0.5f;
+		EffectDesc.vLook = m_BulletLook;
+		EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		
 		/*if (FAILED(Ready_Parts_Bullet(CWeapon::SLASH, PARTS_EFFECT)))
 		{
 			RELEASE_INSTANCE(CGameInstance);
@@ -950,6 +961,28 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CPlayer::WALK_CARRY:
 	case Client::CPlayer::RUN:
+	{
+
+		m_fEffectTime += fTimeDelta;
+		if (m_fEffectTime > 0.2f)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectOwner = CEffect::PLAYER;
+			EffectDesc.iEffectID = CPlayerEffect::FOOTSMOKE;
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+			EffectDesc.fDeadTime = 0.1f;
+			EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			m_fEffectTime = 0.f;
+		}
+
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
+		break;
+
+	}
 	case Client::CPlayer::LADDER_UP:
 	case Client::CPlayer::LADDER_WAIT:
 	case Client::CPlayer::DASH_LP:
@@ -1051,10 +1084,37 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CPlayer::LAND:
 	case Client::CPlayer::D_LAND:
+		if (!m_bFirst)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectOwner = CEffect::PLAYER;
+			EffectDesc.iEffectID = CPlayerEffect::FOOTSMOKE;
+			EffectDesc.fDeadTime = 0.1f;
+			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.2f, 0.5f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.2f, -0.5f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.2f, 0.5f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.2f, -0.5f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			m_bFirst = true;
+		}
+
 		m_eAnimSpeed = 3.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
 			m_eState = IDLE;
+			m_bFirst = false;
+		}
+			
 		break;
 	case Client::CPlayer::DMG_PRESS:
 		m_eAnimSpeed = 2.f;
@@ -1105,17 +1165,41 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CPlayer::SLASH:
 	case Client::CPlayer::S_SLASH:
-	case Client::CPlayer::KEY_OPEN:
+	{
 		m_eAnimSpeed = 2.5f;
 		m_bIsLoop = false;
+
+	/*	m_fEffectTime += fTimeDelta;
+		if (m_fEffectTime > 0.03f)
+		{
+			CPlayerBullet::BULLETDESC BulletDesc;
+			m_YPos += 0.01f;
+			BulletDesc.eBulletType = CPlayerBullet::SWORD;
+			BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(m_BulletLook) + XMVectorSet(0.f, 0.5f, 0.f, 0.f);
+
+			_float RotAngle = 0.2f * (1.f - fTimeDelta);
+			_matrix		RotationMatrix = XMMatrixRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), -RotAngle);
+			m_BulletLook = XMVector3TransformNormal(m_BulletLook, RotationMatrix);
+			BulletDesc.vLook = m_BulletLook;
+
+			BulletDesc.fDeadTime = 0.1f;
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
+			m_fEffectTime = 0.f;
+
+
+		}
+		*/
+
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
-			if(m_Parts[PARTS_EFFECT] != nullptr)
+			if (m_Parts[PARTS_EFFECT] != nullptr)
 				Safe_Release(m_Parts[PARTS_EFFECT]);
 			m_eState = IDLE;
+			m_YPos = 0.f;
 		}
-			
+
 		break;
+	}
 	case Client::CPlayer::DASH_ST:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
@@ -1154,6 +1238,9 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CPlayer::ITEM_GET_ED:
 	case Client::CPlayer::S_ITEM_GET_ED:
+	case Client::CPlayer::KEY_OPEN:
+	case Client::CPlayer::FALL_FROMTOP:
+	case Client::CPlayer::STAIR_UP:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
@@ -1168,16 +1255,6 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		{
 			m_eState = FALL_FROMTOP;
 			m_pTransformCom->Go_Backward(fTimeDelta * 20, m_pNavigationCom);
-		}
-		break;
-	case Client::CPlayer::FALL_FROMTOP:
-	case Client::CPlayer::STAIR_UP:
-		m_eAnimSpeed = 2.f;
-		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
-		{
-			m_eState = IDLE;
-
 		}
 		break;
 	case Client::CPlayer::STAIR_DOWN:

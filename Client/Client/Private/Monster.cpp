@@ -220,6 +220,8 @@ _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageC
 		return m_tInfo.iCurrentHp;
 	}
 
+
+
 	return m_tInfo.iCurrentHp;
 }
 

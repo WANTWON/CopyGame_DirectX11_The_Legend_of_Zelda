@@ -47,6 +47,9 @@ public:
 
 private:
 	CModel*					m_pModelCom = nullptr;
+	_bool					m_bFirst = false;
+	_vector					m_BulletLook = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+	_float					m_Ypos = 0.f;
 
 private:
 	WEAPONDESC				m_WeaponDesc;

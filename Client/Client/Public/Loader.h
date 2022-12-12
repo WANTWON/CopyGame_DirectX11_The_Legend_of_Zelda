@@ -43,7 +43,7 @@ public:
 public:
 	HRESULT Loading_For_ObjectPrototype();
 	HRESULT Loading_For_UITexture();
-
+	HRESULT Loading_For_Effect();
 
 private:
 	LEVEL					m_eNextLevel = LEVEL_END;

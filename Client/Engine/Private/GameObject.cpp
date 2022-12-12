@@ -68,16 +68,11 @@ void CGameObject::Compute_CamDistance(_vector vWorldPos)
 {
 	_float4x4			ViewMatrix;
 
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CPipeLine*			pPipeLine = GET_INSTANCE(CPipeLine);
 
-	_matrix vViewMatrixInv = pGameInstance->Get_TransformMatrix(CPipeLine::D3DTS_VIEW);
-	vViewMatrixInv = XMMatrixInverse(nullptr, vViewMatrixInv);
+	m_fCamDistance = XMVectorGetX(XMVector3Length(XMLoadFloat4(&pPipeLine->Get_CamPosition()) - vWorldPos));
 
-	_vector vCamPosition = vViewMatrixInv.r[3];
-
-	m_fCamDistance = XMVectorGetX(XMVector3Length(vCamPosition - vWorldPos));
-
-	RELEASE_INSTANCE(CGameInstance);
+	RELEASE_INSTANCE(CPipeLine);
 
 }
 

@@ -202,6 +202,15 @@
     <Filter Include="02.GameObjects\06.Npc\TarinNpc">
       <UniqueIdentifier>{6aed2e3f-63e4-4bad-a215-8345ffe1dded}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\07.Effect">
+      <UniqueIdentifier>{0abf4918-cf98-48f3-9c99-83243c37b609}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\07.Effect\PlayerEffect">
+      <UniqueIdentifier>{d00c9424-8da9-4b50-8ac2-060275fc3b44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\07.Effect\MonsterEffect">
+      <UniqueIdentifier>{bdee52db-8683-4483-9131-df1eeace1cfc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -408,6 +417,12 @@
     <ClInclude Include="..\Public\TarinNpc.h">
       <Filter>02.GameObjects\06.Npc\TarinNpc</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect.h">
+      <Filter>02.GameObjects\07.Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerEffect.h">
+      <Filter>02.GameObjects\07.Effect\PlayerEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -599,6 +614,12 @@
     <ClCompile Include="..\Private\TarinNpc.cpp">
       <Filter>02.GameObjects\06.Npc\TarinNpc</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Effect.cpp">
+      <Filter>02.GameObjects\07.Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerEffect.cpp">
+      <Filter>02.GameObjects\07.Effect\PlayerEffect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -630,6 +651,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_Effect.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_EffectModel.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

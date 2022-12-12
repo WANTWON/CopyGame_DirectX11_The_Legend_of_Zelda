@@ -16,9 +16,12 @@ public:
 		return m_SRVs[iIndex];
 	}
 
+	_uint Get_TextureSize() { return (_uint)m_SRVs.size(); }
+
 public:
 	virtual HRESULT Initialize_Prototype(const _tchar* pTextureFilePath, _uint iNumTextures);
 	virtual HRESULT Initialize(void* pArg);
+
 
 private:
 	/* ID3D11ShaderResourceView : ID3D11Texture2D로 생성할 수 있는 객체 타입 */

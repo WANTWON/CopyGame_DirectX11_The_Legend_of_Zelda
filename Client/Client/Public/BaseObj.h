@@ -72,7 +72,7 @@ protected:
 	_bool			m_bSocket = false;
 
 	LEVEL			m_iCurrentLevel = LEVEL_END;
-	SHADER_ID		m_eShaderID = SHADER_DEFAULT;
+	_uint			m_eShaderID = SHADER_DEFAULT;
 	OBJID			m_eObjectID = OBJ_END;
 	_float3			m_vScale = _float3(1.f,1.f,1.f);
 	_float3			m_vMousePickPos;

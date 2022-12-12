@@ -120,6 +120,7 @@ private:
 	_bool					m_bHit = false;
 
 	_float					m_fTime = 0.f;
+	_float					m_fEffectTime = 0.f;
 	_float					m_fStartHeight = 2.2f;
 	_float					m_fDoubleHeight = 2.2f;
 	_float					m_fEndHeight = 2.2f;
@@ -131,6 +132,10 @@ private:
 
 	_float3					m_vPortalPos = _float3(0.f, 0.f, 0.f);
 	_bool					m_b2D = false;
+
+	_vector					m_BulletLook = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+	_float					m_YPos = 0.f;
+	_bool					m_bFirst = false;
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

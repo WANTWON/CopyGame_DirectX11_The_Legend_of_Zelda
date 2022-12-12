@@ -10,6 +10,7 @@
 //for Player
 #include "Player.h"
 #include "PlayerBullet.h"
+#include "PlayerEffect.h"
 #include "Weapon.h"
 
 //for Monster
@@ -59,6 +60,7 @@
 #include "Crane.h"
 #include "FieldDecoObject.h"
 #include "Sky.h"
+
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -132,6 +134,11 @@ HRESULT CLoader::Loading_ForLogoLevel()
 	if (FAILED(Loading_ForStaticLevel()))
 		return E_FAIL;
 
+	/* 捞棋飘 积己 吝. */
+	lstrcpy(m_szLoadingText, TEXT("Effect data 积己 吝."));
+	if (FAILED(Loading_For_Effect()))
+		return E_FAIL;
+
 	/* 按眉 盔屈 积己 吝. */
 	lstrcpy(m_szLoadingText, TEXT("按眉 积己 吝."));
 	if (FAILED(Loading_For_ObjectPrototype()))
@@ -159,6 +166,11 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	/*For.Prototype_Component_Texture_Terrain*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Terrain"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Terrain/Grass_%d.dds"), 2))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Texture_Slash */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Slash"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Meshes/Effect/Slash/slash_00.dds"), 1))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Texture_Sky */
@@ -226,17 +238,14 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	//	return E_FAIL;
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("Link"), LEVEL_STATIC, CData_Manager::DATA_ANIM);
 
-
+	
 
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Marin"),
 	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Marin/Marin.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	/*For.Prototype_Component_Model_SwordSlash*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_SwordSlash"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Slash/SwordSlash_00.fbx", PivotMatrix))))
-		return E_FAIL;
+
 
 	
 	PivotMatrix = XMMatrixIdentity();
@@ -360,6 +369,7 @@ HRESULT CLoader::Loading_ForStaticLevel()
 		return E_FAIL;
 
 
+
 	/*For.Prototype_Component_Model_Bow*/
 	PivotMatrix = XMMatrixIdentity();
 	PivotMatrix = XMMatrixTranslation(0.f, 0.2f, 0.2f);
@@ -378,7 +388,7 @@ HRESULT CLoader::Loading_ForStaticLevel()
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_SwordSlashParts"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Slash/SwordSlash_00.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Slash/SwordSlash_02.fbx", PivotMatrix))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_Arrow*/
@@ -396,6 +406,7 @@ HRESULT CLoader::Loading_ForStaticLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Telephone/Telephone.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	
 
 
 	/*For.Prototype_Component_Model_TreasureBox*/
@@ -437,10 +448,13 @@ HRESULT CLoader::Loading_ForStaticLevel()
 
 	/* For.Prototype_Component_Shader_EffectModel */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/ShaderFiles/Shader_Effect.hlsl"), VTXMODEL_DECLARATION::Elements, VTXMODEL_DECLARATION::iNumElements))))
+		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/ShaderFiles/Shader_Effect.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements))))
 		return E_FAIL;
 
-
+	/* For.Prototype_Component_Shader_EffectModel */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect_Model"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/ShaderFiles/Shader_EffectModel.hlsl"), VTXMODEL_DECLARATION::Elements, VTXMODEL_DECLARATION::iNumElements))))
+		return E_FAIL;
 
 
 
@@ -951,6 +965,11 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	/*For.Prototype_GameObject_PlayerEffect*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_PlayerEffect"),
+		CPlayerEffect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	/*For.Prototype_GameObject_Tarin*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TarinNpc"),
 		CTarinNpc::Create(m_pDevice, m_pContext))))
@@ -1292,6 +1311,61 @@ HRESULT CLoader::Loading_For_UITexture()
 
 	RELEASE_INSTANCE(CGameInstance);
 
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Effect()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	_matrix			PivotMatrix = XMMatrixIdentity();
+
+#pragma region SwordEffect
+
+	PivotMatrix = XMMatrixIdentity();
+	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	/*For.Prototype_Component_Model_SwordSlash*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_SwordSlash"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Slash/SwordSlash_02.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_SwordBeam*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_SwordBeam"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/SwordBeam/SwordBeam.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_RolCut0*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/RollCut/RollCut_2.fbx", PivotMatrix))))
+		return E_FAIL;
+	/*For.Prototype_Component_Model_RolCut1*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut_Blast"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/RollCut/RollCut_1.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+	/*For.Prototype_Component_Model_HitFlash*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_HitFlash"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Hit/HitFlash.fbx", PivotMatrix))))
+		return E_FAIL;
+	/*For.Prototype_Component_Model_HitRing*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_HitRing"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Hit/HitRing_1.fbx", PivotMatrix))))
+		return E_FAIL;
+	/*For.Prototype_Component_Model_HitSpark*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_HitSpark"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Hit/HitSpark.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+
+	/*For.Prototype_Component_Texture_Smoke */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Smoke/Smoke_%d.dds"), 32))))
+		return E_FAIL;
+
+#pragma endregion SwordEffect
+
+	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
 

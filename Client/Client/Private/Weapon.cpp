@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "..\Public\Weapon.h"
-
+#include "Player.h"
 #include "GameInstance.h"
+#include "PlayerBullet.h"
 
 CWeapon::CWeapon(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -61,6 +62,38 @@ void CWeapon::Late_Tick(_float fTimeDelta)
 	if (m_pOBBCom != nullptr)
 		m_pRendererCom->Add_Debug(m_pOBBCom);
 #endif
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	
+	//if (pPlayer->Get_AnimState() == CPlayer::SLASH)
+	//{
+	////	if (!m_bFirst)
+	//	//{
+	//	//	m_BulletLook = *(_vector*)m_CombinedWorldMatrix.m[2];
+	//	//	_matrix		RotationMatrix = XMMatrixRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 90.f);
+	//	//	m_BulletLook = XMVector3TransformNormal(m_BulletLook, RotationMatrix);
+	//	//	m_bFirst = true;
+	//	//}
+	//	CPlayerBullet::BULLETDESC BulletDesc;
+
+	//	BulletDesc.eBulletType = CPlayerBullet::SWORD;
+	//	BulletDesc.vInitPositon = *(_vector*)m_CombinedWorldMatrix.m[3] + XMVector3Normalize(m_BulletLook) + XMVectorSet(0.f, m_Ypos, 0.f,0.f);
+	////	m_Ypos += 0.001f;
+	////	_matrix		RotationMatrix = XMMatrixRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), -0.25f);
+	////	m_BulletLook = XMVector3TransformNormal(m_BulletLook, RotationMatrix);
+	//	BulletDesc.vLook = *(_vector*)m_CombinedWorldMatrix.m[2];
+	////	BulletDesc.vLook = XMVectorSetY(BulletDesc.vLook, 0.f);
+
+	//	BulletDesc.fDeadTime = 0.15f;
+	//	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
+	//	//m_fEffectTime = 0.f;
+	//}
+	//else
+	//{
+	//	m_bFirst = false;
+	//	m_Ypos = 0.f;
+	//}
+	//	
+
 
 	Compute_CamDistance(Get_TransformState(CTransform::STATE_POSITION));
 }
@@ -81,12 +114,16 @@ HRESULT CWeapon::Render()
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
 			return E_FAIL;
 
-		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, 0)))
+		if (m_WeaponDesc.eType == SLASH)
+			m_eShaderID = SHADER_SLASH;
+		else
+			m_eShaderID = SHADER_DEFAULT;
+		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))
 			return E_FAIL;
 	}
 
 
-
+	
 	return S_OK;
 }
 
@@ -110,7 +147,7 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 	{
 	case SLASH:
 		/* For.Com_Shader */
-		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect"), (CComponent**)&m_pShaderCom)))
+		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect_Model"), (CComponent**)&m_pShaderCom)))
 			return E_FAIL;
 		break;
 	default:
