@@ -1339,7 +1339,7 @@ HRESULT CLoader::Loading_For_Effect()
 		return E_FAIL;
 	/*For.Prototype_Component_Model_RolCut1*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut_Blast"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/RollCut/RollCut_3.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/RollCut/RollCut_1.fbx", PivotMatrix))))
 		return E_FAIL;
 
 

@@ -92,6 +92,7 @@ PS_OUT PS_MAIN_RollCut(PS_IN In)
 
 
 	Out.vDiffuse.rg = 1.f;
+	Out.vDiffuse.g -= 0.2f;
 	Out.vDiffuse.b  = (1 - Out.vDiffuse.a);
 
 	if (1 - g_TexUV < In.vTexUV.x)
