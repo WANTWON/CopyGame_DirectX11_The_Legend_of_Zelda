@@ -40,8 +40,7 @@ private:
 	void Tick_Smoke(_float fTimeDelta);
 	void Tick_RollCut(_float fTimeDelta);
 
-private:
-	_float m_fScale = 0.f;
+
 
 public:
 	static CPlayerEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

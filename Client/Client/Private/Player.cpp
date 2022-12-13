@@ -9,6 +9,7 @@
 #include "CameraManager.h"
 #include "Level_Room.h"
 #include "PlayerEffect.h"
+#include "ObjectEffect.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -1043,9 +1044,21 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 			EffectDesc.eEffectID = CPlayerEffect::FOOTSMOKE;
 			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
 			EffectDesc.fDeadTime = 0.1f;
-			EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
+			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 			m_fEffectTime = 0.f;
+
+			
+			for (int i = 0; i < 3; ++i)
+			{
+				EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+				EffectDesc.eEffectID = CObjectEffect::GRASS_TEX;
+				EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
+				EffectDesc.fDeadTime = 0.5f;
+				EffectDesc.iTextureNum = rand() % 3;
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+			}
 		}
 
 		m_eAnimSpeed = 2.f;
@@ -1134,7 +1147,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -1.f, 0.f, 0.f), m_pNavigationCom);
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
-	/*	if (m_fWalkingHeight >= XMVectorGetY(vPosition))
+		/*if (m_fWalkingHeight >= XMVectorGetY(vPosition))
 		{
 			vPosition = XMVectorSetY(vPosition, m_fWalkingHeight);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
@@ -1177,6 +1190,18 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 
 		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.2f, -0.5f, 0.f);
 		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		
+		for (int i = 0; i < 3; ++i)
+		{
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CObjectEffect::GRASS_TEX;
+			EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
+			EffectDesc.fDeadTime = 0.5f;
+			EffectDesc.iTextureNum = rand() % 3;
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+		}
+		
 		m_bFirst = true;
 		}
 

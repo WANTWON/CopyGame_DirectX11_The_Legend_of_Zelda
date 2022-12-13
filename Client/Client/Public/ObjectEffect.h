@@ -6,17 +6,17 @@
 
 
 BEGIN(Client)
-class CPlayerEffect final : public CEffect
+class CObjectEffect final : public CEffect
 {
 public:
-	enum TYPE { FOOTSMOKE, ROLLCUT,};
+	enum TYPE { GRASS, LAWN, GRASS_TEX};
 
 
 
 protected:
-	CPlayerEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CPlayerEffect(const CPlayerEffect& rhs);
-	virtual ~CPlayerEffect() = default;
+	CObjectEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CObjectEffect(const CObjectEffect& rhs);
+	virtual ~CObjectEffect() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -37,14 +37,13 @@ private:
 	virtual void Change_Texture(_float fTimeDelta) override;
 
 private:
-	void Tick_Smoke(_float fTimeDelta);
-	void Tick_RollCut(_float fTimeDelta);
+	void Tick_Grass(_float fTimeDelta);
 
 private:
-	_float m_fScale = 0.f;
+	_float m_fAngle = 0.f;
 
 public:
-	static CPlayerEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CObjectEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);
 	virtual void Free() override;
 };

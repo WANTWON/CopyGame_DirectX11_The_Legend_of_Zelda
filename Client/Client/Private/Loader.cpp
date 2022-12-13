@@ -61,7 +61,7 @@
 #include "Crane.h"
 #include "FieldDecoObject.h"
 #include "Sky.h"
-
+#include "ObjectEffect.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -966,6 +966,11 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	/*For.Prototype_GameObject_ObjectEffect*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_ObjectEffect"),
+		CObjectEffect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	/*For.Prototype_GameObject_PlayerEffect*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterEffect"),
 		CMonsterEffect::Create(m_pDevice, m_pContext))))
@@ -1361,6 +1366,20 @@ HRESULT CLoader::Loading_For_Effect()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Hit/HitSpark.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_GrassLeaf*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GrassLeaf"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Grass/Grass_0.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_LawnLeaf_0*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_LawnLeaf_0"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Grass/Lawn_0.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_LawnLeaf_1*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_LawnLeaf_1"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Grass/Lawn_1.fbx", PivotMatrix))))
+		return E_FAIL;
 
 
 	/*For.Prototype_Component_Texture_Smoke */
@@ -1371,6 +1390,11 @@ HRESULT CLoader::Loading_For_Effect()
 	/*For.Prototype_Component_Texture_Flash */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Flash"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Flash/flash_%02d.dds"), 6))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Texture_Grass */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Grass"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Grass/Grass_%d.dds"), 4))))
 		return E_FAIL;
 
 #pragma endregion SwordEffect

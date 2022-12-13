@@ -82,6 +82,7 @@ PS_OUT PS_HITFLASH(PS_IN In)
 	vector BrownColor = vector(127, 95, 28, 255) /255.f;
 
 	Out.vDiffuse.rgb = BrownColor.rgb * (1 - Out.vDiffuse.r) + OrangeColor.rgb * Out.vDiffuse.r;
+//	Out.vDiffuse.a *= g_fAlpha;
 
 	return Out;
 }
@@ -99,6 +100,42 @@ PS_OUT PS_HITFLASH2(PS_IN In)
 	vector LightOrangeColor = vector(255, 230, 150, 255) / 255.f;
 
 	Out.vDiffuse.rgb = YellowColor.rgb * (1 - Out.vDiffuse.r) + LightOrangeColor.rgb * Out.vDiffuse.r;
+	//Out.vDiffuse.a *= g_fAlpha;
+
+
+	return Out;
+}
+
+PS_OUT PS_HITFLASH3(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.a = Out.vDiffuse.r;
+
+	vector WhiteColor = vector(255, 255, 200, 255) / 255.f;
+	vector OrangeColor = vector(255, 191, 95, 255) / 255.f;
+	vector YellowColor = vector(255, 255, 100, 255) / 255.f;
+	vector LightOrangeColor = vector(255, 230, 150, 255) / 255.f;
+
+	Out.vDiffuse.rgb = YellowColor.rgb * (1 - Out.vDiffuse.r) + WhiteColor.rgb * Out.vDiffuse.r;
+	//Out.vDiffuse.a *= g_fAlpha;
+
+
+	return Out;
+}
+
+PS_OUT PS_GRASS(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+
+	vector GreenColor = vector(80, 153, 36, 255) / 255.f;
+	vector DarkGreenColor = vector(17, 82, 34, 255) / 255.f;
+	
+	Out.vDiffuse.rgb = DarkGreenColor.rgb * (1 - Out.vDiffuse.r) + GreenColor.rgb * Out.vDiffuse.r;
+	Out.vDiffuse.a *= g_fAlpha;
 
 	return Out;
 }
@@ -137,5 +174,27 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_HITFLASH2();
+	}
+
+	pass HitFlashEffect3
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_HITFLASH3();
+	}
+
+	pass Grass
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_GRASS();
 	}
 }

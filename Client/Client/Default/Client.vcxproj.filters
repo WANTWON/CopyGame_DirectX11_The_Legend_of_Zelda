@@ -211,6 +211,9 @@
     <Filter Include="02.GameObjects\07.Effect\MonsterEffect">
       <UniqueIdentifier>{bdee52db-8683-4483-9131-df1eeace1cfc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\07.Effect\ObjectEffect">
+      <UniqueIdentifier>{fdadcf74-4a1a-4072-a8c2-a3eebbc023a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -426,6 +429,9 @@
     <ClInclude Include="..\Public\MonsterEffect.h">
       <Filter>02.GameObjects\07.Effect\MonsterEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\ObjectEffect.h">
+      <Filter>02.GameObjects\07.Effect\ObjectEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -625,6 +631,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MonsterEffect.cpp">
       <Filter>02.GameObjects\07.Effect\MonsterEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ObjectEffect.cpp">
+      <Filter>02.GameObjects\07.Effect\ObjectEffect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

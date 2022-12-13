@@ -51,6 +51,9 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 
 		if(m_EffectDesc.iTextureNum == 1)
 			m_eShaderID = SHADER_HITFLASH_TEX;
+
+		if (m_EffectDesc.iTextureNum == 2)
+			m_eShaderID = SHADER_HITFLASH_TEX3;
 		break;
 	default:
 		break;
@@ -266,13 +269,21 @@ void CMonsterEffect::Tick_HitFlash(_float fTimeDelta)
 	case HITFLASH_TEX:
 		SetUp_BillBoard();
 
-		if (m_fDeadtime < m_EffectDesc.fDeadTime*0.5f)
-			m_fScale += 0.1f;
+		if (m_eShaderID != SHADER_HITFLASH_TEX3)
+		{
+			if (m_fDeadtime < m_EffectDesc.fDeadTime*0.5f)
+				m_fScale += 0.1f;
+			else
+				m_fScale -= 0.1f;
+		}
 		else
+		{
+			m_fAlpha -= 0.1f;
 			m_fScale -= 0.1f;
+		}
+
 		Set_Scale(_float3(m_fScale, m_fScale, m_fScale));
 		break;
-
 	default:
 		break;
 	}

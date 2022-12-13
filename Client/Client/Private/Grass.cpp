@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "UI_Manager.h"
 #include "InvenItem.h"
+#include "ObjectEffect.h"
 
 CGrass::CGrass(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -120,7 +121,32 @@ void CGrass::Late_Tick(_float fTimeDelta)
 		CPlayer::ANIM ePlayerState = pPlayer->Get_AnimState();
 
 		if (ePlayerState == CPlayer::SLASH)
+		{
 			m_bCut = true;
+
+			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::MESH;
+
+			if(m_GrassDesc.eType == GRASS || m_GrassDesc.eType == GRASS2x2)
+				EffectDesc.eEffectID = CObjectEffect::GRASS;
+			else 
+				EffectDesc.eEffectID = CObjectEffect::LAWN;
+			for (int i = 0; i < 4; ++i)
+			{
+				
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+				EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
+				EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, /*(rand() % 20 -10) * 0.1f*/ 1.f, (rand() % 20 - 10)* 0.1f, 0.f);
+				EffectDesc.fDeadTime = 0.5f;
+				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+			}
+
+			RELEASE_INSTANCE(CGameInstance);
+		}
+			
 	}
 
 	//if(m_GrassDesc.eType == LAWN)

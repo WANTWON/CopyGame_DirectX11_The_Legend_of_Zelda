@@ -39,9 +39,6 @@ private:
 private:
 	void Tick_HitFlash(_float fTimeDelta);
 
-private:
-	_float m_fScale = 0.f;
-	_float3 m_vDirection = _float3(0.f, 0.f, 0.f);
 
 public:
 	static CMonsterEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
