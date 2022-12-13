@@ -34,8 +34,16 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 
 	switch (m_EffectDesc.eEffectID)
 	{
+	case HITRING:
 	case HITFLASH:
 		m_eShaderID = SHADER_HITFLASH;
+		break;
+	case HITFLASH_TEX:
+		m_eShaderID = SHADER_HITFLASH_TEX;
+		m_fScale = m_EffectDesc.vInitScale.x;
+
+		if(m_EffectDesc.iTextureNum == 1)
+			m_eShaderID = SHADER_HITFLASH_TEX2;
 		break;
 	default:
 		break;
@@ -57,6 +65,8 @@ int CMonsterEffect::Tick(_float fTimeDelta)
 	switch (m_EffectDesc.eEffectID)
 	{
 	case HITFLASH:
+	case HITRING:
+	case HITFLASH_TEX:
 		Tick_HitFlash(fTimeDelta);
 		break;
 	default:
@@ -122,6 +132,18 @@ HRESULT CMonsterEffect::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_HitFlash"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
+	case HITRING:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_HitRing"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case HITFLASH_TEX:
+		/* For.Com_VIBuffer */
+		if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
+			return E_FAIL;
+
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Flash"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
@@ -178,29 +200,29 @@ void CMonsterEffect::Change_Texture(_float fTimeDelta)
 }
 
 
-void CMonsterEffect::Tick_Smoke(_float fTimeDelta)
-{
-
-	SetUp_BillBoard();
-
-	m_fAlpha -= 0.01f;
-	m_fScale -= 0.02f;
-	Set_Scale(_float3(m_fScale, m_fScale, m_fScale));
-
-	if (m_fScale <= 0 || m_fAlpha <= 0)
-		m_bDead = true;
-	
-}
-
 void CMonsterEffect::Tick_HitFlash(_float fTimeDelta)
 {
 	m_fDeadtime += fTimeDelta;
-	m_fTexUV -= 0.07f;
-	if (m_fTexUV <= 0.f)
-		m_fTexUV = 0.f;
 
 	if (m_EffectDesc.fDeadTime < m_fDeadtime)
 		m_bDead = true;
+
+
+	if(m_EffectDesc.eEffectID == HITRING)
+		SetUp_BillBoard();
+
+
+	if (m_EffectDesc.eEffectType == VIBUFFER_RECT)
+	{
+		SetUp_BillBoard();
+
+		if(m_fDeadtime < m_EffectDesc.fDeadTime*0.5f)
+			m_fScale += 0.1f;
+		else
+			m_fScale -= 0.1f;
+
+		Set_Scale(_float3(m_fScale, m_fScale, m_fScale));
+	}
 }
 
 CMonsterEffect * CMonsterEffect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

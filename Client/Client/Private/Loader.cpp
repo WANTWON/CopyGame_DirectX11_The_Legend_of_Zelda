@@ -449,7 +449,7 @@ HRESULT CLoader::Loading_ForStaticLevel()
 
 	/* For.Prototype_Component_Shader_EffectModel */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/ShaderFiles/Shader_Effect.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements))))
+		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/ShaderFiles/Shader_EffectTexture.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_EffectModel */
@@ -1348,10 +1348,9 @@ HRESULT CLoader::Loading_For_Effect()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/RollCut/RollCut_1.fbx", PivotMatrix))))
 		return E_FAIL;
 
-
 	/*For.Prototype_Component_Model_HitFlash*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_HitFlash"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Hit/HitFlash.fbx", PivotMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Hit/HitFlash_2.fbx", PivotMatrix))))
 		return E_FAIL;
 	/*For.Prototype_Component_Model_HitRing*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_HitRing"),
@@ -1362,9 +1361,16 @@ HRESULT CLoader::Loading_For_Effect()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Hit/HitSpark.fbx", PivotMatrix))))
 		return E_FAIL;
 
+
+
 	/*For.Prototype_Component_Texture_Smoke */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Smoke/Smoke_%d.dds"), 32))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Texture_Flash */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Flash"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Flash/flash_%02d.dds"), 6))))
 		return E_FAIL;
 
 #pragma endregion SwordEffect

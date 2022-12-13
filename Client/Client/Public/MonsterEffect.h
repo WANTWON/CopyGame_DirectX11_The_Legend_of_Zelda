@@ -9,7 +9,7 @@ BEGIN(Client)
 class CMonsterEffect final : public CEffect
 {
 public:
-	enum TYPE { HITFLASH, HITRING, HITSPARK };
+	enum TYPE { HITFLASH, HITFLASH_TEX, HITRING};
 
 
 
@@ -37,7 +37,6 @@ private:
 	virtual void Change_Texture(_float fTimeDelta) override;
 
 private:
-	void Tick_Smoke(_float fTimeDelta);
 	void Tick_HitFlash(_float fTimeDelta);
 
 private:

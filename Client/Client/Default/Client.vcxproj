@@ -321,13 +321,12 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_Effect.hlsl" />
+    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_EffectTexture.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_EffectModel.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_UI.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
-    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -90,7 +90,7 @@ HRESULT CEffect::Render()
 	
 	if (m_pTextureCom != nullptr)
 	{
-		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_iTextureNum))))
+		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_EffectDesc.iTextureNum))))
 			return E_FAIL;
 
 		m_pShaderCom->Begin(m_eShaderID);

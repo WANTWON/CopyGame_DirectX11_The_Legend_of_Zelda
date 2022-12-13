@@ -566,7 +566,6 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 		CEffect::EFFECTDESC EffectDesc;
 		EffectDesc.eEffectType = CEffect::MESH;
-		EffectDesc.eEffectOwner = CEffect::PLAYER;
 		EffectDesc.eEffectID = CPlayerEffect::ROLLCUT;
 		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, 0.5f, 0.f, 0.f);
 		EffectDesc.fDeadTime = 0.5f;
@@ -968,7 +967,6 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		{
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
-			EffectDesc.eEffectOwner = CEffect::PLAYER;
 			EffectDesc.eEffectID = CPlayerEffect::FOOTSMOKE;
 			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
 			EffectDesc.fDeadTime = 0.1f;
@@ -1088,7 +1086,6 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		{
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
-			EffectDesc.eEffectOwner = CEffect::PLAYER;
 			EffectDesc.eEffectID = CPlayerEffect::FOOTSMOKE;
 			EffectDesc.fDeadTime = 0.1f;
 			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);

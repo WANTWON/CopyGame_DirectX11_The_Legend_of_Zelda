@@ -36,7 +36,7 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 	{
 	case FOOTSMOKE:
 		m_fScale = m_EffectDesc.vInitScale.x;
-		m_iTextureNum = rand() % 3;
+		m_EffectDesc.iTextureNum = rand() % 3;
 		break;
 	case ROLLCUT:
 		m_eShaderID = ROLLCUT;
@@ -194,12 +194,12 @@ void CPlayerEffect::Change_Texture(_float fTimeDelta)
 	switch (m_EffectDesc.eEffectID)
 	{
 	case FOOTSMOKE:
-		m_iTextureNum++;
+		m_EffectDesc.iTextureNum++;
 
-		if (m_iTextureNum >= m_pTextureCom->Get_TextureSize())
+		if (m_EffectDesc.iTextureNum >= m_pTextureCom->Get_TextureSize())
 		{
 			m_bDead = true;
-			m_iTextureNum--;
+			m_EffectDesc.iTextureNum--;
 		}
 		break;
 	}

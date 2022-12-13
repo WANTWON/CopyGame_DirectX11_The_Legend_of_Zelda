@@ -14,14 +14,13 @@ class CEffect abstract : public CBaseObj
 {
 public:
 	enum EFFECTTYPE { MESH, VIBUFFER_RECT};
-	enum OWNER {PLAYER, MONSTER};
 
 
 	typedef struct EffectTag
 	{
 		EFFECTTYPE eEffectType = MESH;
-		OWNER		eEffectOwner = PLAYER;
-		_uint		eEffectID = 0;
+		_uint	   eEffectID = 0;
+		_uint	   iTextureNum = 0;
 		_vector	   vInitPositon = XMVectorSet(0.f,0.f,0.f,1.f);
 		_vector	   vLook = XMVectorSet(0.f, 0.f, 0.f, 0.f);
 		_float3	   vInitScale = _float3(0.f, 0.f, 0.f);
@@ -60,7 +59,7 @@ protected: /* For.Components */
 	_float					m_fDeadtime = 0.f;
 	_float					m_fAnimSpeed = 1.f;
 	_float					m_fTexUV = 0.f;
-	_uint					m_iTextureNum = 0;
+	
 
 	EFFECTDESC				m_EffectDesc;
 	_float4x4				m_CombinedWorldMatrix;
