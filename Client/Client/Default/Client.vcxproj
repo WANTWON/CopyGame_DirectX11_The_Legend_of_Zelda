@@ -321,8 +321,8 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_EffectTexture.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_EffectModel.hlsl" />
+    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_EffectTexture.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_UI.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />

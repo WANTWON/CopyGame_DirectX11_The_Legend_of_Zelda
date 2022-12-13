@@ -113,15 +113,49 @@ PS_OUT PS_MAIN_HitFlash(PS_IN In)
 	vector YellowColor = vector(255, 255, 100, 255) / 255.f;
 	vector LightOrangeColor = vector(255, 230, 150, 255) / 255.f;
 
-	Out.vDiffuse.rgb = OrangeColor.rgb * (1 - Out.vDiffuse.r) + LightOrangeColor.rgb * Out.vDiffuse.r;
+	Out.vDiffuse.rgb = BrownColor.rgb * (1 - Out.vDiffuse.r) + OrangeColor.rgb * Out.vDiffuse.r;
 
-
-	//Out.vDiffuse.a = 1.f;
-	//if (1 - g_TexUV < In.vTexUV.x)
-	//	discard;
 
 	return Out;
 }
+
+PS_OUT PS_MAIN_HitRing(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.a = Out.vDiffuse.r;
+
+	vector OrangeColor = vector(255, 121, 0, 255) / 255.f;
+	vector BrownColor = vector(127, 95, 28, 255) / 255.f;
+	vector YellowColor = vector(255, 255, 100, 255) / 255.f;
+	vector LightOrangeColor = vector(255, 230, 150, 255) / 255.f;
+
+	Out.vDiffuse.rgb = OrangeColor.rgb * (1 - Out.vDiffuse.r) + LightOrangeColor.rgb * Out.vDiffuse.r;
+
+
+	Out.vDiffuse.a *= g_fAlpha;
+
+	return Out;
+}
+
+
+PS_OUT PS_MAIN_HitSpark(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.a = Out.vDiffuse.r;
+
+	vector BrownColor = vector(137, 74, 25, 255) / 255.f;
+	vector DarkBrownColor = vector(50, 24, 0, 255) / 255.f;
+	
+
+	Out.vDiffuse.rgb = DarkBrownColor.rgb * (1 - Out.vDiffuse.r) + BrownColor.rgb * Out.vDiffuse.r;
+	Out.vDiffuse.a *= g_fAlpha;
+	return Out;
+}
+
 
 
 technique11 DefaultTechnique
@@ -147,7 +181,7 @@ technique11 DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_RollCut();
 	}
-
+	
 	pass HitFlash
 	{
 		SetRasterizerState(RS_Default);
@@ -157,6 +191,28 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_HitFlash();
+	}
+	
+	pass HitRing
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_HitRing();
+	}
+	
+	pass HitSpark
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Priority, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_HitSpark();
 	}
 
 }
