@@ -98,7 +98,7 @@ int CPlayer::Tick(_float fTimeDelta)
 		}
 	}
 
-	if (m_dwHitTime + 2500 < GetTickCount() && !m_bRed)
+	if (m_dwHitTime + 1500 < GetTickCount() && !m_bRed)
 	{
 		m_bHit = false;
 	}
