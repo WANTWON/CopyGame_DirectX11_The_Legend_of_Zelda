@@ -147,11 +147,13 @@ PS_OUT PS_MAIN_HitSpark(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDiffuse.a = Out.vDiffuse.r;
 
+	vector OrangeColor = vector(255, 121, 0, 255) / 255.f;
+	vector LightOrangeColor = vector(255, 191, 95, 255) / 255.f;
 	vector BrownColor = vector(137, 74, 25, 255) / 255.f;
 	vector DarkBrownColor = vector(50, 24, 0, 255) / 255.f;
 	
 
-	Out.vDiffuse.rgb = DarkBrownColor.rgb * (1 - Out.vDiffuse.r) + BrownColor.rgb * Out.vDiffuse.r;
+	Out.vDiffuse.rgb = OrangeColor.rgb * (1 - Out.vDiffuse.r) + LightOrangeColor.rgb * Out.vDiffuse.r;
 	Out.vDiffuse.a *= g_fAlpha;
 	return Out;
 }
@@ -175,7 +177,7 @@ technique11 DefaultTechnique
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
-		SetDepthStencilState(DSS_Priority, 0);
+		SetDepthStencilState(DSS_Default, 0);
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
@@ -208,7 +210,7 @@ technique11 DefaultTechnique
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
-		SetDepthStencilState(DSS_Priority, 0);
+		SetDepthStencilState(DSS_Default, 0);
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;

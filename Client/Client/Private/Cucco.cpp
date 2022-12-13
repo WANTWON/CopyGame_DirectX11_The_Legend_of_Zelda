@@ -201,26 +201,6 @@ HRESULT CCucco::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CCucco::SetUp_ShaderResources()
-{
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
-		return E_FAIL;
-
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
-		return E_FAIL;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return S_OK;
-}
 
 _bool CCucco::IsDead()
 {
@@ -366,7 +346,6 @@ void CCucco::Patrol(_float fTimeDelta)
 _uint CCucco::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
 
-
 	if (m_eState == LANDING || m_bAngry)
 		return 0;
 
@@ -439,6 +418,7 @@ void CCucco::Set_Angry(_bool type)
 		 CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
 		 CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_TRAP, this);
 		 m_eState = FLY_ATTACK;
+		 m_fHitRedColor = 0.5f;
 	 }
 	 else
 	 {
@@ -463,6 +443,7 @@ void CCucco::Set_Angry(_bool type)
 			 }
 		 }
 
+		 m_fHitRedColor = 0.f;
 		 RELEASE_INSTANCE(CGameInstance);
 	 }
 	

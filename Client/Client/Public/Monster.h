@@ -35,8 +35,8 @@ public:
 
 protected:
 	virtual HRESULT Ready_Components(void* pArg = nullptr) = 0;
-	virtual HRESULT SetUp_ShaderResources() { return S_OK; };
-	virtual HRESULT SetUp_ShaderID() { return S_OK; };
+	virtual HRESULT SetUp_ShaderResources();
+	virtual HRESULT SetUp_ShaderID();
 	virtual void Change_Animation(_float fTimeDelta) {};
 
 
@@ -53,6 +53,7 @@ protected:
 	virtual void Follow_Target(_float fTimeDelta) { };
 	virtual HRESULT Drop_Items();
 	virtual _bool IsDead() = 0;
+	void Make_GetAttacked_Effect(CBaseObj* DamageCauser = nullptr);
 
 protected:
 	CNavigation*			m_pNavigationCom = nullptr;
@@ -61,10 +62,14 @@ protected:
 	_float					m_fDistanceToTarget = 0.f;
 	_float					m_fPatrolRadius = 3.f;
 	_float3					m_fPatrolPosition = _float3(0.f, 0.f, 0.f);
+	_float					m_fHitRedColor = 0.5f;
+	_float					m_fMaxRed = 1.f;
+	_float					m_fMinRed = 0.4f;
 
 	_bool					m_bAggro = false;
 	_bool					m_bIsAttacking = false;
 	_bool					m_bHit = false;
+	_bool					m_bRed = false;
 	_bool					m_bMove = true;
 
 
@@ -73,6 +78,7 @@ protected:
 	DWORD m_dwAttackTime = GetTickCount();
 	DWORD m_dwIdleTime = GetTickCount();
 	DWORD m_dwWalkTime = GetTickCount();
+	DWORD m_dwHitTime = GetTickCount();
 
 
 	MONSTER_ID	m_eMonsterID = MONSTER_END;

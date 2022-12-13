@@ -234,8 +234,8 @@ void CFieldDecoObject::Bird_Tick(_float fTimeDelta)
 				m_eState = STATE::WALK;
 				m_dwWalkTime = GetTickCount();
 
-				m_eDir[DIR_X] = (rand() % 300)*0.01f - 0.9f;
-				m_eDir[DIR_Z] = (rand() % 300)*0.01f - 0.9f;
+				m_eDir[DIR_X] = (rand() % 200)*0.01f - 1.f;
+				m_eDir[DIR_Z] = (rand() % 200)*0.01f - 1.f;
 
 			}
 		}

@@ -50,6 +50,37 @@ int CMonster::Tick(_float fTimeDelta)
 	}
 		
 
+	if (m_bHit)
+	{
+		
+		if (!m_bRed)
+		{
+			m_fHitRedColor += 0.05f;
+			if (m_fHitRedColor >= m_fMaxRed)
+			{
+				m_fHitRedColor = m_fMaxRed;
+				m_bRed = true;
+			}
+				
+
+		}
+		else
+		{
+			m_fHitRedColor -= 0.05f;
+			if (m_fHitRedColor <= m_fMinRed)
+			{
+				m_bRed = false;
+				m_fHitRedColor = m_fMinRed;
+			}
+		}
+	}
+
+	if (m_dwHitTime + 1500 < GetTickCount() && !m_bRed)
+	{
+		m_bHit = false;
+	}
+		
+
 	return OBJ_NOEVENT;
 }
 
@@ -101,7 +132,6 @@ HRESULT CMonster::Render()
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))
 			return E_FAIL;
 	}
-
 
 
 	return S_OK;
@@ -208,6 +238,61 @@ HRESULT CMonster::Drop_Items()
 	return S_OK;
 }
 
+void CMonster::Make_GetAttacked_Effect(CBaseObj* DamageCauser)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CEffect::EFFECTDESC EffectDesc;
+
+	EffectDesc.eEffectType = CEffect::MESH;
+	EffectDesc.eEffectID = CMonsterEffect::HITFLASH;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.2f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = XMVector3Normalize((DamageCauser)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION));
+	EffectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CMonsterEffect::HITRING;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
+	EffectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
+	EffectDesc.fDeadTime = 0.8f;
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+	for (int i = 0; i < 10; ++i)
+	{
+		EffectDesc.eEffectID = CMonsterEffect::HITSPARK;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+		_float iRandNum = (rand() % 10 + 10) * 0.1f;
+		EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
+		EffectDesc.fDeadTime = 0.8f;
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	}
+	
+
+
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.eEffectID = CMonsterEffect::HITFLASH_TEX;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.15f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.iTextureNum = 0;
+	EffectDesc.vInitScale = _float3(1.5f, 1.5f, 1.5f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CMonsterEffect::HITFLASH_TEX;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.7f;
+	EffectDesc.iTextureNum = 1;
+	EffectDesc.vInitScale = _float3(3.5f, 3.5f, 3.5f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
 	if (fDamage <= 0 || m_bDead)
@@ -221,40 +306,10 @@ _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageC
 		return m_tInfo.iCurrentHp;
 	}
 
-	CEffect::EFFECTDESC EffectDesc;
-	EffectDesc.eEffectType = CEffect::MESH;
-	EffectDesc.eEffectID = CMonsterEffect::HITFLASH;
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) +XMVectorSet(0.f, Get_Scale().y - 0.2f, 0.f, 0.f);
-	EffectDesc.fDeadTime = 0.5f;
-	EffectDesc.vLook =  XMVector3Normalize((DamageCauser)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION));
-	EffectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
-	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	Make_GetAttacked_Effect(DamageCauser);
 
-
-	EffectDesc.eEffectID = CMonsterEffect::HITRING;
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
-	EffectDesc.vInitScale = _float3(3.5f, 3.5f, 3.5f);
-	EffectDesc.fDeadTime = 0.8f;
-	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
-
-	
-	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
-	EffectDesc.eEffectID = CMonsterEffect::HITFLASH_TEX;
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y- 0.15f, 0.f, 0.f);
-	EffectDesc.fDeadTime = 0.5f;
-	EffectDesc.iTextureNum = 0;
-
-	EffectDesc.vInitScale = _float3(1.5f, 1.5f, 1.5f);
-	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
-
-	EffectDesc.eEffectID = CMonsterEffect::HITFLASH_TEX;
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
-	EffectDesc.fDeadTime = 0.7f;
-	EffectDesc.iTextureNum = 1;
-
-	EffectDesc.vInitScale = _float3(3.5f, 3.5f, 3.5f);
-	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
-
+	m_bHit = true;
+	m_dwHitTime = GetTickCount();
 
 	return m_tInfo.iCurrentHp;
 }
@@ -263,6 +318,40 @@ void CMonster::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom == nullptr)
 		return;
+}
+
+HRESULT CMonster::SetUp_ShaderResources()
+{
+	if (nullptr == m_pShaderCom)
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
+		return E_FAIL;
+
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_HitRed", &m_fHitRedColor, sizeof(_float))))
+		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return S_OK;
+}
+
+HRESULT CMonster::SetUp_ShaderID()
+{
+	if (m_bHit)
+		m_eShaderID = SHADER_ANIMHIT;
+	else
+		m_eShaderID = SHADER_ANIMDEFAULT;
+
+	return S_OK;
 }
 
 

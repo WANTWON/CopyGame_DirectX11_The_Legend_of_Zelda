@@ -96,46 +96,62 @@ private:
 	vector<class CGameObject*>			m_Parts;
 	vector<CNavigation*>				m_vecNavigaitions;
 	CNavigation*						m_pNavigationCom =  nullptr ;
-	
+	CModel*								m_pModelCom = nullptr;
 
 private:
 	OBJINFO					m_tInfo;
-	CModel*					m_pModelCom = nullptr;
+	
+	/*For Anim State*/
 	ANIM					m_eState = IDLE;
 	ANIM					m_ePreState = IDLE;
 	_float					m_eAnimSpeed = 1.f;
 
-	_int					iRenderNum = 0;
-	CWeapon::WEAPONDESC		m_WeaponDesc;
-
 	_int					m_iDash[DIR_END] = { 0 };
-	//LeftHand : MESH_SHEILD, MESH_OCARINA 
-	//RightHand : MESH_SWORD MESH_SWORD2 MESH_HOOK, MESH_SHOVEL, MESH_WAND, MESH_FILPPER
-	MESH_NAME				m_eLeftHand = MESH_SHEILD;
-	MESH_NAME				m_eRightHand = MESH_SWORD;
 	_bool					m_bIsLoop = true;
-	_bool					m_bPressed = false;
+	_bool					m_bFirst = false;
 	_bool					m_bUpDown = false;
 	_bool					m_bCarry = false;
-	_bool					m_bHit = false;
 
-	_float					m_fTime = 0.f;
-	_float					m_fEffectTime = 0.f;
+
+	//For Jump
 	_float					m_fStartHeight = 2.2f;
 	_float					m_fDoubleHeight = 2.2f;
 	_float					m_fEndHeight = 2.2f;
-	_float					m_fPressedScale = 1.f;
 
+
+	//For Hit State
+	_bool					m_bHit = false;
+	_bool					m_bPressed = false;
+	_float					m_fPressedScale = 1.f;
+	_float					m_fHitRedColor = 0.5f;
+	_float					m_fMaxRed = 1.f;
+	_float					m_fMinRed = 0.4f;
+	_bool					m_bRed = false;
+
+
+	/* For Item&Weapon */
+	//LeftHand : MESH_SHEILD, MESH_OCARINA 
+	//RightHand : MESH_SWORD MESH_SWORD2 MESH_HOOK, MESH_SHOVEL, MESH_WAND, MESH_FILPPER
+	CWeapon::WEAPONDESC		m_WeaponDesc;
+	MESH_NAME				m_eLeftHand = MESH_SHEILD;
+	MESH_NAME				m_eRightHand = MESH_SWORD;
+	_vector					m_BulletLook = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+	
+	/* For State Timer */
+	_float					m_fTime = 0.f;
+	_float					m_fEffectTime = 0.f;
+	_float					m_fEffectTimeEnd = 0.f;
 	DWORD					m_dwDashTime = GetTickCount();
 	DWORD					m_dwPressedTime = GetTickCount();
 	DWORD					m_dwHitTime = GetTickCount();
 
+	/* For Portal */
 	_float3					m_vPortalPos = _float3(0.f, 0.f, 0.f);
 	_bool					m_b2D = false;
+	
 
-	_vector					m_BulletLook = XMVectorSet(0.f, 0.f, 0.f, 0.f);
-	_float					m_YPos = 0.f;
-	_bool					m_bFirst = false;
+
+	
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

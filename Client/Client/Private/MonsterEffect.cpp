@@ -39,7 +39,8 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 		m_eShaderID = SHADER_HITRING;
 		break;
 	case HITSPARK:
-		m_eShaderID = SHADER_HITRING;
+		m_eShaderID = SHADER_HITSPARK;
+		m_vDirection = _float3((rand() % 20  - 10) * 0.1f, /*(rand() % 20 -10) * 0.1f*/ 0.f, (rand() % 20 - 10 )* 0.1f);
 		break;
 	case HITFLASH:
 		m_eShaderID = SHADER_HITFLASH;
@@ -221,8 +222,39 @@ void CMonsterEffect::Tick_HitFlash(_float fTimeDelta)
 	switch (m_EffectDesc.eEffectID)
 	{
 	case HITRING:
-	case HITSPARK:
 		SetUp_BillBoard();
+		if (m_fDeadtime > m_EffectDesc.fDeadTime*0.5f)
+			m_fAlpha -= 0.1f;
+		m_fScale += 0.05f;
+		Set_Scale(_float3(m_fScale, m_fScale, m_fScale));
+		break;
+	case HITSPARK:
+	{
+		m_pTransformCom->Go_PosDir(fTimeDelta, XMLoadFloat3(&m_vDirection));
+		m_pTransformCom->LookAt(m_EffectDesc.vInitPositon);
+
+		_float4x4 ViewMatrix;
+
+		ViewMatrix = CGameInstance::Get_Instance()->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW); // Get View Matrix
+		_matrix matViewInv = XMMatrixInverse(nullptr, XMLoadFloat4x4(&ViewMatrix));      // Get Inverse of View Matrix (World Matrix of Camera)
+
+		_vector vRight = Get_TransformState(CTransform::STATE_RIGHT);
+		_vector vLook = (_vector)matViewInv.r[2];
+		_vector vUp = XMVector3Cross(vLook, vRight);
+
+		m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) *Get_Scale().x);
+		m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * Get_Scale().y);
+		m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) *Get_Scale().z);
+
+		
+		if (m_fDeadtime > m_EffectDesc.fDeadTime*0.5f)
+		{
+			m_fAlpha -= 0.1f;
+			m_fScale -= 0.1f;
+		}
+		Set_Scale(_float3(m_fScale, m_fScale, m_fScale));
+		break;
+		}
 	case HITFLASH:
 		if (m_fDeadtime > m_EffectDesc.fDeadTime*0.5f)
 		{

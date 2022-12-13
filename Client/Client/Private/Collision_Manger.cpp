@@ -119,7 +119,7 @@ void CCollision_Manager::CollisionwithBullet()
 		{
 
 			CMonsterBullet::BULLETDESC BulletDesc = dynamic_cast<CMonsterBullet*>(pMonsterBullet)->Get_BulletDesc(); 
-			dynamic_cast<CPlayer*>(Player)->Take_Damage(1.f, &BulletDesc, nullptr);
+			dynamic_cast<CPlayer*>(Player)->Take_Damage(1.f, &BulletDesc, pMonsterBullet);
 
 		}
 		

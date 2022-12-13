@@ -73,6 +73,37 @@ int CPlayer::Tick(_float fTimeDelta)
 	if (m_iCurrentLevel == LEVEL_LOADING)
 		return OBJ_NOEVENT;
 
+	if (m_bHit)
+	{
+
+		if (!m_bRed)
+		{
+			m_fHitRedColor += 0.05f;
+			if (m_fHitRedColor >= m_fMaxRed)
+			{
+				m_fHitRedColor = m_fMaxRed;
+				m_bRed = true;
+			}
+
+
+		}
+		else
+		{
+			m_fHitRedColor -= 0.05f;
+			if (m_fHitRedColor <= m_fMinRed)
+			{
+				m_bRed = false;
+				m_fHitRedColor = m_fMinRed;
+			}
+		}
+	}
+
+	if (m_dwHitTime + 2500 < GetTickCount() && !m_bRed)
+	{
+		m_bHit = false;
+	}
+
+
 	if (CUI_Manager::Get_Instance()->Get_UI_Open() != true )
 	{
 		Key_Input(fTimeDelta);
@@ -95,10 +126,6 @@ int CPlayer::Tick(_float fTimeDelta)
 		if(pParts != nullptr)
 			pParts->Tick(fTimeDelta);
 	}
-		
-
-	if (m_dwHitTime + 100 < GetTickCount())
-		m_bHit = false;
 
 	return OBJ_NOEVENT;
 }
@@ -185,6 +212,9 @@ HRESULT CPlayer::Render()
 
 	if (nullptr == m_pShaderCom ||
 		nullptr == m_pModelCom)
+		return E_FAIL;
+
+	if (FAILED(SetUp_ShaderID()))
 		return E_FAIL;
 
 	if (FAILED(SetUp_ShaderResources()))
@@ -275,35 +305,48 @@ _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 	}
 	
 
-	if (DamageType == nullptr)
+	if (DamageCauser != nullptr)
 	{
-		m_eState = CPlayer::DMG_F;
-		return 0;
-	}
-		
-
-	CMonsterBullet::BULLETDESC BulletDesc;
-	memcpy(&BulletDesc, DamageType, sizeof(CMonsterBullet::BULLETDESC));
-
-	if (BulletDesc.eBulletType == CMonsterBullet::DEFAULT && BulletDesc.eOwner == CMonster::MONSTER_ROLA)
-	{
-		m_eState = DMG_PRESS;
-	}
-	else
-	{
-		_vector BulletLook = BulletDesc.vLook;
+		_vector vDir = DamageCauser->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION);;
 		_vector PlayerLook = Get_TransformState(CTransform::STATE_LOOK);
-		_vector fDot = XMVector3Dot(BulletLook, PlayerLook);
+		_vector fDot = XMVector3Dot(XMVector3Normalize(vDir), XMVector3Normalize(PlayerLook));
 		_float fAngleRadian = acos(XMVectorGetX(fDot));
 		_float fAngleDegree = XMConvertToDegrees(fAngleRadian);
-		_vector vCross = XMVector3Cross(BulletLook, PlayerLook);
+		_vector vCross = XMVector3Cross(vDir, PlayerLook);
 
 		if (fAngleDegree > 0.f && fAngleDegree <= 90.f)
-			m_eState = CPlayer::DMG_B;
-		else if (fAngleDegree > 90.f && fAngleDegree <= 180.f)
 			m_eState = CPlayer::DMG_F;
-
+		else if (fAngleDegree > 90.f && fAngleDegree <= 180.f)
+			m_eState = CPlayer::DMG_B;
 	}
+	else if (DamageType != nullptr)
+	{
+		CMonsterBullet::BULLETDESC BulletDesc;
+		memcpy(&BulletDesc, DamageType, sizeof(CMonsterBullet::BULLETDESC));
+
+
+		if (BulletDesc.eBulletType == CMonsterBullet::DEFAULT && BulletDesc.eOwner == CMonster::MONSTER_ROLA)
+			m_eState = DMG_PRESS;
+		else 
+		{
+			_vector BulletLook = BulletDesc.vLook;
+			_vector PlayerLook = Get_TransformState(CTransform::STATE_LOOK);
+			_vector fDot = XMVector3Dot( XMVector3Normalize(BulletLook), XMVector3Normalize( PlayerLook));
+			_float fAngleRadian = acos(XMVectorGetX(fDot));
+			_float fAngleDegree = XMConvertToDegrees(fAngleRadian);
+			_vector vCross = XMVector3Cross(BulletLook, PlayerLook);
+
+			if (fAngleDegree > 0.f && fAngleDegree <= 90.f)
+				m_eState = CPlayer::DMG_B;
+			else if (fAngleDegree > 90.f && fAngleDegree <= 180.f)
+				m_eState = CPlayer::DMG_F;
+
+		}
+	}	
+	else
+		m_eState = CPlayer::DMG_F;
+			
+
 
 
 	return 0;
@@ -438,7 +481,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == FALL_FROMTOP ||
 		m_eState == FALL_HOLE || m_eState == FALL_ANTLION || m_eState == KEY_OPEN ||
-		m_eState == STAIR_DOWN || m_eState == STAIR_UP || m_bStop)
+		m_eState == STAIR_DOWN || m_eState == STAIR_UP || m_bStop || m_eState == LAND || m_eState == D_LAND)
 		return;
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -761,6 +804,9 @@ HRESULT CPlayer::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
 		return E_FAIL;
 
+	if (FAILED(m_pShaderCom->Set_RawValue("g_HitRed", &m_fHitRedColor, sizeof(_float))))
+		return E_FAIL;
+
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
@@ -768,6 +814,11 @@ HRESULT CPlayer::SetUp_ShaderResources()
 
 HRESULT CPlayer::SetUp_ShaderID()
 {
+	if (m_bHit)
+		m_eShaderID = SHADER_ANIMHIT;
+	else
+		m_eShaderID = SHADER_ANIMDEFAULT;
+
 	return S_OK;
 }
 
@@ -790,7 +841,7 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP || m_eState == ITEM_GET_ED || m_eState == FALL_FROMTOP || m_eState == FALL_HOLE ||
 		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP || m_eState == LADDER_UP_ED ||
 		m_eState == ITEM_CARRY || m_bDead  || m_eState == S_ITEM_GET_ST || m_eState == S_ITEM_GET_LP || m_eState == S_ITEM_GET_ED ||
-		m_eState == EV_TELL_ST || m_eState == EV_TELL_LP || m_eState == EV_TELL_ED)
+		m_eState == EV_TELL_ST || m_eState == EV_TELL_LP || m_eState == EV_TELL_ED || m_eState == LAND || m_eState == D_LAND)
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
@@ -961,9 +1012,31 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::WALK_CARRY:
 	case Client::CPlayer::RUN:
 	{
-
+		m_fEffectTimeEnd = 0.2f;
 		m_fEffectTime += fTimeDelta;
-		if (m_fEffectTime > 0.2f)
+		if (m_fEffectTime > m_fEffectTimeEnd)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CPlayerEffect::FOOTSMOKE;
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+			EffectDesc.fDeadTime = 0.1f;
+			EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			m_fEffectTime = 0.f;
+		}
+
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
+		break;
+
+	}
+	case Client::CPlayer::DASH_LP:
+	{
+		m_fEffectTimeEnd = 0.1f;
+		m_fEffectTime += fTimeDelta;
+		if (m_fEffectTime > m_fEffectTimeEnd)
 		{
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
@@ -983,7 +1056,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	}
 	case Client::CPlayer::LADDER_UP:
 	case Client::CPlayer::LADDER_WAIT:
-	case Client::CPlayer::DASH_LP:
+	
 	case Client::CPlayer::SLASH_HOLD_F:
 	case Client::CPlayer::SLASH_HOLD_B:
 	case Client::CPlayer::SLASH_HOLD_L:
@@ -1023,6 +1096,8 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_pTransformCom->Jump(m_fTime, 3.f, 2.0f, m_fStartHeight, m_fEndHeight);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
+			
+
 			m_eState = LAND;
 			_vector vPosition = XMVectorSetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_fEndHeight);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
@@ -1084,27 +1159,28 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::D_LAND:
 		if (!m_bFirst)
 		{
-			CEffect::EFFECTDESC EffectDesc;
-			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
-			EffectDesc.eEffectID = CPlayerEffect::FOOTSMOKE;
-			EffectDesc.fDeadTime = 0.1f;
-			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
+		
+		CEffect::EFFECTDESC EffectDesc;
+		EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+		EffectDesc.eEffectID = CPlayerEffect::FOOTSMOKE;
+		EffectDesc.fDeadTime = 0.1f;
+		EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
 
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.2f, 0.5f, 0.f);
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.2f, 0.5f, 0.f);
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.2f, -0.5f, 0.f);
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.2f, -0.5f, 0.f);
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.2f, 0.5f, 0.f);
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.2f, 0.5f, 0.f);
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.2f, -0.5f, 0.f);
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
-			m_bFirst = true;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.2f, -0.5f, 0.f);
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		m_bFirst = true;
 		}
 
-		m_eAnimSpeed = 3.f;
+		m_eAnimSpeed = 4.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
@@ -1166,33 +1242,11 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_eAnimSpeed = 2.5f;
 		m_bIsLoop = false;
 
-	/*	m_fEffectTime += fTimeDelta;
-		if (m_fEffectTime > 0.03f)
-		{
-			CPlayerBullet::BULLETDESC BulletDesc;
-			m_YPos += 0.01f;
-			BulletDesc.eBulletType = CPlayerBullet::SWORD;
-			BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(m_BulletLook) + XMVectorSet(0.f, 0.5f, 0.f, 0.f);
-
-			_float RotAngle = 0.2f * (1.f - fTimeDelta);
-			_matrix		RotationMatrix = XMMatrixRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), -RotAngle);
-			m_BulletLook = XMVector3TransformNormal(m_BulletLook, RotationMatrix);
-			BulletDesc.vLook = m_BulletLook;
-
-			BulletDesc.fDeadTime = 0.1f;
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
-			m_fEffectTime = 0.f;
-
-
-		}
-		*/
-
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
 			if (m_Parts[PARTS_EFFECT] != nullptr)
 				Safe_Release(m_Parts[PARTS_EFFECT]);
 			m_eState = IDLE;
-			m_YPos = 0.f;
 		}
 
 		break;

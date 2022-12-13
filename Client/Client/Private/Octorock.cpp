@@ -103,7 +103,7 @@ void COctorock::Change_Animation(_float fTimeDelta)
 			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 			CMonsterBullet::BULLETDESC BulletDesc;
 			BulletDesc.eBulletType = CMonsterBullet::OCTOROCK;
-			BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+			BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f,0.5f,0.f,0.f);
 			BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterBullet"), LEVEL_GAMEPLAY, TEXT("Layer_Bullet"), &BulletDesc)))
@@ -190,26 +190,6 @@ HRESULT COctorock::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT COctorock::SetUp_ShaderResources()
-{
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
-		return E_FAIL;
-
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
-		return E_FAIL;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return S_OK;
-}
 
 _bool COctorock::IsDead()
 {
