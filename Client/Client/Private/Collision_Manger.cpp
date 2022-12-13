@@ -131,7 +131,7 @@ void CCollision_Manager::CollisionwithBullet()
 	if (CollisionwithGroup(COLLISION_MONSTER, COLLISION_PBULLET, &pMonster, &pPlayerBullet))
 	{
 		CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")))->Get_AnimState();
-		if(ePlayerState == CPlayer::SLASH || ePlayerState == CPlayer::SLASH_HOLD_ED || ePlayerState == CPlayer::S_SLASH)
+		if (ePlayerState == CPlayer::SLASH || ePlayerState == CPlayer::SLASH_HOLD_ED || ePlayerState == CPlayer::S_SLASH)
 			dynamic_cast<CMonster*>(pMonster)->Take_Damage(1, nullptr, pPlayerBullet);
 	}
 }

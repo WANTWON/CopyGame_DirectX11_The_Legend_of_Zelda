@@ -31,19 +31,25 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 	Set_Scale(m_EffectDesc.vInitScale);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.vInitPositon);
 	m_pTransformCom->LookDir(m_EffectDesc.vLook);
+	m_fScale = m_EffectDesc.vInitScale.x;
 
 	switch (m_EffectDesc.eEffectID)
 	{
 	case HITRING:
+		m_eShaderID = SHADER_HITRING;
+		break;
+	case HITSPARK:
+		m_eShaderID = SHADER_HITRING;
+		break;
 	case HITFLASH:
 		m_eShaderID = SHADER_HITFLASH;
 		break;
 	case HITFLASH_TEX:
-		m_eShaderID = SHADER_HITFLASH_TEX;
+		m_eShaderID = SHADER_HITFLASH_TEX2;
 		m_fScale = m_EffectDesc.vInitScale.x;
 
 		if(m_EffectDesc.iTextureNum == 1)
-			m_eShaderID = SHADER_HITFLASH_TEX2;
+			m_eShaderID = SHADER_HITFLASH_TEX;
 		break;
 	default:
 		break;
@@ -66,6 +72,7 @@ int CMonsterEffect::Tick(_float fTimeDelta)
 	{
 	case HITFLASH:
 	case HITRING:
+	case HITSPARK:
 	case HITFLASH_TEX:
 		Tick_HitFlash(fTimeDelta);
 		break;
@@ -136,6 +143,10 @@ HRESULT CMonsterEffect::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_HitRing"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
+	case HITSPARK:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_HitSpark"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
 	case HITFLASH_TEX:
 		/* For.Com_VIBuffer */
 		if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
@@ -173,11 +184,10 @@ HRESULT CMonsterEffect::SetUp_ShaderResources()
 		if (FAILED(m_pShaderCom->Set_RawValue("g_TexUV", &m_fTexUV, sizeof(_float))))
 			return E_FAIL;
 	}
-	else
-	{
-		if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
-			return E_FAIL;
-	}
+	
+	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+		return E_FAIL;
+	
 		
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -208,21 +218,34 @@ void CMonsterEffect::Tick_HitFlash(_float fTimeDelta)
 		m_bDead = true;
 
 
-	if(m_EffectDesc.eEffectID == HITRING)
-		SetUp_BillBoard();
-
-
-	if (m_EffectDesc.eEffectType == VIBUFFER_RECT)
+	switch (m_EffectDesc.eEffectID)
 	{
+	case HITRING:
+	case HITSPARK:
+		SetUp_BillBoard();
+	case HITFLASH:
+		if (m_fDeadtime > m_EffectDesc.fDeadTime*0.5f)
+		{
+			m_fAlpha -= 0.1f;
+			m_fScale -= 0.1f;
+		}
+		Set_Scale(_float3(m_fScale, m_fScale, m_fScale));
+		break;
+	case HITFLASH_TEX:
 		SetUp_BillBoard();
 
-		if(m_fDeadtime < m_EffectDesc.fDeadTime*0.5f)
+		if (m_fDeadtime < m_EffectDesc.fDeadTime*0.5f)
 			m_fScale += 0.1f;
 		else
 			m_fScale -= 0.1f;
-
 		Set_Scale(_float3(m_fScale, m_fScale, m_fScale));
+		break;
+
+	default:
+		break;
 	}
+
+
 }
 
 CMonsterEffect * CMonsterEffect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

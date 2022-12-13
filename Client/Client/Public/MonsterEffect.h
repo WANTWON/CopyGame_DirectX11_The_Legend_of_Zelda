@@ -9,7 +9,7 @@ BEGIN(Client)
 class CMonsterEffect final : public CEffect
 {
 public:
-	enum TYPE { HITFLASH, HITFLASH_TEX, HITRING};
+	enum TYPE { HITFLASH, HITFLASH_TEX, HITRING, HITSPARK};
 
 
 
