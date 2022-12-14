@@ -27,6 +27,7 @@ public:
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
+	virtual HRESULT SetUp_ShaderID() override;
 	virtual _bool IsDead() override;
 	virtual void Find_Target() override;
 	virtual void Follow_Target(_float fTimeDelta) override;

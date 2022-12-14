@@ -133,8 +133,10 @@ void COctorock::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::COctorock::DEAD:
 	case Client::COctorock::DEAD_FIRE:
+		Make_DeadEffect();
+		m_fAlpha += 0.025f;
 		m_bIsLoop = false;
-		m_fAnimSpeed = 2.f;
+		m_fAnimSpeed = 1.5f;
 		m_pTransformCom->Go_Backward(fTimeDelta*4);
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
@@ -164,6 +166,10 @@ HRESULT COctorock::Ready_Components(void * pArg)
 
 	/* For.Com_Shader */
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"), (CComponent**)&m_pShaderCom)))
+		return E_FAIL;
+
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Components(TEXT("Com_DissolveTexture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Dissolve"), (CComponent**)&m_pDissolveTexture)))
 		return E_FAIL;
 
 	/* For.Com_Model*/
@@ -240,6 +246,19 @@ void COctorock::Find_Target()
 		m_pTarget = nullptr;
 }
 
+HRESULT COctorock::SetUp_ShaderID()
+{
+	if (m_eState == DEAD || m_eState == DEAD_FIRE)
+		m_eShaderID = SHADER_ANIMDEAD;
+	else if(m_bHit)
+		m_eShaderID = SHADER_ANIMHIT;
+	else
+		m_eShaderID = SHADER_ANIMDEFAULT;
+
+	return S_OK;
+}
+
+
 void COctorock::Follow_Target(_float fTimeDelta)
 {
 	if (m_pTarget == nullptr)
@@ -257,22 +276,7 @@ void COctorock::Follow_Target(_float fTimeDelta)
 
 void COctorock::Check_Navigation(_float fTimeDelta)
 {
-	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
-	{
-		if (m_eState == DAMAGE)
-		{
-			m_eState = DEAD;
-			return;
-		}
-
-		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pNavigationCom->Get_CurrentCellCenter();
-		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
-			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
-		else
-			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
-		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection, m_pNavigationCom);
-	}
-	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
+	 if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float fHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
@@ -287,7 +291,7 @@ void COctorock::Check_Navigation(_float fTimeDelta)
 
 void COctorock::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove && m_eState == DEAD)
+	if (!m_bMove || m_eState == DEAD)
 		return;
 
 	// Check for Target, AggroRadius
@@ -375,6 +379,7 @@ _uint COctorock::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 	else
 	{
 		m_eState = STATE::DEAD;
+		m_fAlpha = 0.f;
 	}
 		
 

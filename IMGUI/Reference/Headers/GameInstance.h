@@ -97,6 +97,10 @@ public: /* For Picking */
 public: /* For.Frustum */
 	_bool isIn_WorldFrustum(_fvector vPosition, _float fRange = 0.f);
 
+public: /* For.Target_Manager */
+	HRESULT Bind_RenderTarget_SRV(const _tchar* pTargetTag, class CShader* pShader, const char* pConstantName);
+
+
 public:
 	static void Release_Engine();
 

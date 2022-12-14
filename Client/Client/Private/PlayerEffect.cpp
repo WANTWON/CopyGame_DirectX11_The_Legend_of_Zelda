@@ -31,11 +31,12 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 	Set_Scale(m_EffectDesc.vInitScale);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.vInitPositon);
 	m_pTransformCom->LookDir(m_EffectDesc.vLook);
+	m_vScale = m_EffectDesc.vInitScale;
 
 	switch (m_EffectDesc.eEffectID)
 	{
 	case FOOTSMOKE:
-		m_fScale = m_EffectDesc.vInitScale.x;
+		m_eShaderID = SHADER_SMOKE;
 		m_EffectDesc.iTextureNum = rand() % 3;
 		break;
 	case ROLLCUT:
@@ -118,6 +119,11 @@ HRESULT CPlayerEffect::Ready_Components(void * pArg)
 		/* For.Com_Shader */
 		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect"), (CComponent**)&m_pShaderCom)))
 			return E_FAIL;
+
+		/* For.Com_VIBuffer */
+		if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
+			return E_FAIL;
+
 		break;
 	default:
 		break;
@@ -127,10 +133,6 @@ HRESULT CPlayerEffect::Ready_Components(void * pArg)
 	switch (m_EffectDesc.eEffectID)
 	{
 	case FOOTSMOKE:
-		/* For.Com_VIBuffer */
-		if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
-			return E_FAIL;
-
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
@@ -169,11 +171,19 @@ HRESULT CPlayerEffect::SetUp_ShaderResources()
 			return E_FAIL;
 	}
 	else
-	{
-		if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
-			return E_FAIL;
-	}
+	{	
 		
+		if (FAILED(pGameInstance->Bind_RenderTarget_SRV(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture")))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_EffectDesc.iTextureNum))))
+			return E_FAIL;
+
+	}
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+		return E_FAIL;
+
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -212,10 +222,13 @@ void CPlayerEffect::Tick_Smoke(_float fTimeDelta)
 	SetUp_BillBoard();
 
 	m_fAlpha -= 0.01f;
-	m_fScale -= 0.02f;
-	Set_Scale(_float3(m_fScale, m_fScale, m_fScale));
+	m_vScale.x -= 0.02f;
+	m_vScale.y -= 0.02f;
+	m_vScale.z -= 0.02f;
 
-	if (m_fScale <= 0 || m_fAlpha <= 0)
+	Set_Scale(m_vScale);
+
+	if (m_vScale.x <= 0 || m_fAlpha <= 0)
 		m_bDead = true;
 	
 }

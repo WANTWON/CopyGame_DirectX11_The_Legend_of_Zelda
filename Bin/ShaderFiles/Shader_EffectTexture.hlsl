@@ -4,7 +4,10 @@
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float			g_fAlpha = 1.f;
 texture2D		g_DiffuseTexture;
-
+texture2D		g_DepthTexture;
+texture2D		g_DissolveTexture;
+texture2D		g_SmokeDstTexture;
+vector			g_Color = vector(1.f, 1.f, 1.f, 1.f);
 
 
 struct VS_IN
@@ -17,6 +20,13 @@ struct VS_OUT
 {
 	float4		vPosition : SV_POSITION;
 	float2		vTexUV : TEXCOORD0;
+};
+
+struct VS_OUT_SOFTEFFECT
+{
+	float4		vPosition : SV_POSITION;
+	float2		vTexUV : TEXCOORD0;
+	float4		vProjPos : TEXCOORD1;
 };
 
 /* DrawIndexed함수를 호출하면. */
@@ -39,11 +49,35 @@ VS_OUT VS_MAIN(VS_IN In)
 	return Out;
 }
 
+VS_OUT_SOFTEFFECT VS_MAIN_SOFTEFFECT(VS_IN In)
+{
+	VS_OUT_SOFTEFFECT		Out = (VS_OUT_SOFTEFFECT)0;
+
+	matrix		matWV, matWVP;
+
+	matWV = mul(g_WorldMatrix, g_ViewMatrix);
+	matWVP = mul(matWV, g_ProjMatrix);
+
+	/* 정점의 위치에 월드 뷰 투영행렬을 곱한다. 현재 정점은 ViewSpace에 존재하낟. */
+	/* 투영행렬까지 곱하면 정점위치의 w에 뷰스페이스 상의 z를 보관한다. == Out.vPosition이 반드시 float4이어야하는 이유. */
+	Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
+	Out.vTexUV = In.vTexUV;
+	Out.vProjPos = Out.vPosition;
+
+	return Out;
+}
 
 struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
 	float2		vTexUV : TEXCOORD0;
+};
+
+struct PS_IN_SOFTEFFECT
+{
+	float4		vPosition : SV_POSITION;
+	float2		vTexUV : TEXCOORD0;
+	float4		vProjPos : TEXCOORD1;
 };
 
 struct PS_OUT
@@ -71,6 +105,36 @@ PS_OUT PS_MAIN(PS_IN In)
 	return Out;
 }
 
+
+PS_OUT PS_MAIN_SOFTEFFECT(PS_IN_SOFTEFFECT In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.r = 214;
+	Out.vDiffuse.g = 201;
+	Out.vDiffuse.b = 187;
+
+	float2	vUV;
+
+	vUV.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+	vUV.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+
+	vector	vDepthDesc = g_DepthTexture.Sample(LinearSampler, vUV);
+
+	float	fViewZ = In.vProjPos.w;
+	float	fOldViewZ = vDepthDesc.y*500.f;
+
+	//Out.vDiffuse.a = Out.vDiffuse.a * (fOldViewZ - fViewZ);
+
+	Out.vDiffuse.a *= g_fAlpha;
+
+	if (Out.vDiffuse.a < 0.1f)
+		discard;
+
+
+	return Out;
+}
 
 PS_OUT PS_HITFLASH(PS_IN In)
 {
@@ -157,21 +221,106 @@ PS_OUT PS_DEADGLOW(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDiffuse.a = Out.vDiffuse.r;
 
-	if (Out.vDiffuse.a < 0.1f)
+	if (Out.vDiffuse.a <= 0.0f)
+		discard;
+
+	vector WhiteColor = vector(228, 226, 228, 255) / 255.f;
+	vector GetColor = g_Color /255.f ; 
+
+	Out.vDiffuse.rgb = GetColor.rgb * (1 - Out.vDiffuse.r) + WhiteColor.rgb * Out.vDiffuse.r;
+	
+	Out.vDiffuse.a *= g_fAlpha;
+
+
+	return Out;
+}
+
+PS_OUT PS_DEADGLOWPINK(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.a = Out.vDiffuse.r;
+
+	if (Out.vDiffuse.a <= 0.0f)
 		discard;
 
 	vector WhiteColor = vector(228, 226, 228, 255) / 255.f;
 	vector PurpleColor = vector(144, 2, 225, 255) / 255.f;
 	vector DarkPurpleColor = vector(144, 23, 231, 255) / 255.f;
+	vector PinkColor = vector(226, 0, 255, 255) / 255.f;
 
+	Out.vDiffuse.rgb = PurpleColor.rgb * (1 - Out.vDiffuse.r) + PinkColor.rgb * Out.vDiffuse.r;
 	
-
-	Out.vDiffuse.rgb = PurpleColor.rgb * (1 - Out.vDiffuse.r) + WhiteColor.rgb * Out.vDiffuse.r;
-	//Out.vDiffuse.a *= g_fAlpha;
+	Out.vDiffuse.a *= g_fAlpha;
 
 
 	return Out;
 }
+
+
+PS_OUT PS_SMOKEBACKBLACK(PS_IN_SOFTEFFECT In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.a = Out.vDiffuse.r;
+
+	vector BlackColor = vector(20, 3, 17, 255) / 255.f;
+	vector PinkColor = vector(176, 21, 184, 255) / 255.f;
+
+	Out.vDiffuse.rgb = PinkColor.rgb * (1 - Out.vDiffuse.r) + BlackColor.rgb * Out.vDiffuse.r;
+
+	float2	vUV;
+
+	vUV.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+	vUV.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+
+	vector	vDepthDesc = g_DepthTexture.Sample(LinearSampler, vUV);
+
+	float	fViewZ = In.vProjPos.w;
+	float	fOldViewZ = vDepthDesc.y*500.f;
+
+	//Out.vDiffuse.a = Out.vDiffuse.a * (fOldViewZ - fViewZ);
+
+	Out.vDiffuse.a *= g_fAlpha;
+
+	if (Out.vDiffuse.a <= 0.0f)
+		discard;
+
+
+	return Out;
+}
+
+PS_OUT PS_SMOKEFRONT_PURPLE(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	vector vSmokeDst =  g_SmokeDstTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.a = Out.vDiffuse.r * vSmokeDst.r;
+
+
+	if (Out.vDiffuse.a <= 0.0f)
+		discard;
+
+	vector PurpleColor = vector(114, 0, 153, 255) / 255.f;
+	vector RedPurpleColor = vector(63, 0, 38, 255) / 255.f;
+
+	Out.vDiffuse.rgb = PurpleColor.rgb;
+	vSmokeDst.rgb = RedPurpleColor.rgb;
+
+	Out.vDiffuse.rgb *= vSmokeDst.rgb;
+
+	Out.vDiffuse.a *= g_fAlpha;
+
+	
+	
+
+
+	return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -181,9 +330,9 @@ technique11 DefaultTechnique
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
 		SetDepthStencilState(DSS_Default, 0);
 
-		VertexShader = compile vs_5_0 VS_MAIN();
+		VertexShader = compile vs_5_0 VS_MAIN_SOFTEFFECT();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_MAIN();
+		PixelShader = compile ps_5_0 PS_MAIN_SOFTEFFECT();
 	}
 	
 	pass HitFlashEffect
@@ -234,10 +383,44 @@ technique11 DefaultTechnique
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
-		SetDepthStencilState(DSS_Default, 0);
+		SetDepthStencilState(DSS_Priority, 0);
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_DEADGLOW();
 	}
+
+	pass DeadGlowPink
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Priority, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_DEADGLOWPINK();
+	}
+
+	pass SmokeBackBlack
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN_SOFTEFFECT();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_SMOKEBACKBLACK();
+	}
+
+	pass SmokeFrontPurple
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Priority, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_SMOKEFRONT_PURPLE();
+	}
+
 }

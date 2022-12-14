@@ -455,6 +455,14 @@ _bool CGameInstance::isIn_WorldFrustum(_fvector vPosition, _float fRange)
 	return m_pFrustum->isIn_WorldFrustum(vPosition, fRange);
 }
 
+HRESULT CGameInstance::Bind_RenderTarget_SRV(const _tchar * pTargetTag, CShader * pShader, const char * pConstantName)
+{
+	if (nullptr == m_pTarget_Manager)
+		return E_FAIL;
+
+	return m_pTarget_Manager->Bind_ShaderResource(pTargetTag, pShader, pConstantName);
+}
+
 void CGameInstance::Release_Engine()
 {
 	CGameInstance::Get_Instance()->Destroy_Instance();

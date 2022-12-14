@@ -6,6 +6,7 @@
 
 BEGIN(Engine)
 class CModel;
+class CTexture;
 END
 
 BEGIN(Client)
@@ -59,6 +60,7 @@ protected:
 protected:
 	CNavigation*			m_pNavigationCom = nullptr;
 	CBaseObj*				m_pTarget = nullptr;
+	CTexture*				m_pDissolveTexture = nullptr;
 	_float					m_fAttackRadius = .5f;
 	_float					m_fDistanceToTarget = 0.f;
 	_float					m_fPatrolRadius = 3.f;

@@ -1386,10 +1386,25 @@ HRESULT CLoader::Loading_For_Effect()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Smoke/SmokeSphere_1.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_Thunder*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Thunder_0"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Thunder/Thunder_0.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_Thunder*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Thunder_1"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Thunder/Thunder_1.fbx", PivotMatrix))))
+		return E_FAIL;
+
 
 	/*For.Prototype_Component_Texture_Smoke */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Smoke/Smoke_%d.dds"), 32))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Texture_SmokeBack */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SmokeDeath"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/DeathSmoke/Smoke_%02d.dds"), 5))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Texture_Flash */
@@ -1407,6 +1422,20 @@ HRESULT CLoader::Loading_For_Effect()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Glow/glow_%02d.dds"), 12))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Texture_Cross */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Cross"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Cross/cross_00.dds"), 1))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Texture_Dissolve */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Dissolve"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Dissolve/dissolve_02.dds"), 1))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Texture_SmokeDst */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SmokeDst"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/DeathSmoke/smoke_%02d_dst.dds"), 3))))
+		return E_FAIL;
 
 #pragma endregion SwordEffect
 

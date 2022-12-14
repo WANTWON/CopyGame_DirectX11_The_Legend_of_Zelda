@@ -31,7 +31,7 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 	Set_Scale(m_EffectDesc.vInitScale);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.vInitPositon);
 	m_pTransformCom->LookDir(m_EffectDesc.vLook);
-	m_fScale = m_EffectDesc.vInitScale.x;
+	m_vScale = m_EffectDesc.vInitScale;
 
 	switch (m_EffectDesc.eEffectID)
 	{
@@ -181,7 +181,21 @@ HRESULT CObjectEffect::SetUp_ShaderResources()
 	
 	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 		return E_FAIL;
-	
+
+	if (m_EffectDesc.eEffectType == MESH)
+	{
+		if (FAILED(m_pShaderCom->Set_RawValue("g_TexUV", &m_fTexUV, sizeof(_float))))
+			return E_FAIL;
+	}
+	else
+	{
+
+		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_EffectDesc.iTextureNum))))
+			return E_FAIL;
+
+		if (FAILED(pGameInstance->Bind_RenderTarget_SRV(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture")))
+			return E_FAIL;
+	}
 		
 
 	RELEASE_INSTANCE(CGameInstance);

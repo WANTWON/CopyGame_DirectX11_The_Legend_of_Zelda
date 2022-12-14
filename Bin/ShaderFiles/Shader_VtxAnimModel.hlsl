@@ -4,7 +4,12 @@
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D		g_DiffuseTexture;
 texture2D		g_NormalTexture;
+texture2D		g_DissolveTexture;
+
 float			g_HitRed = 0.2f;
+float			g_fAlpha = 1.f;
+float			g_DissolveSize = 1.5f;
+vector			g_DissolveColor = vector(1.f, 0.7f, 0.f, 1);
 
 /* 정점들에게 곱해져야할 행렬. */
 /* 정점들은 메시에게 소속. 이때 곱해져야하는 뼈의 행렬 == 이 메시에 영향을 주는 뼈다. */
@@ -110,6 +115,42 @@ PS_OUT PS_MAIN_HIT(PS_IN In)
 }
 
 
+PS_OUT PS_DEAD(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+
+	vector vDissolve = g_DissolveTexture.Sample(LinearSampler, In.vTexUV);
+	if (vDissolve.r >= g_fAlpha)
+	{
+		Out.vDiffuse.a = 1.f;
+	}
+	else
+	{
+		Out.vDiffuse.a = 0.f;
+	}
+
+	
+	if (vDissolve.r < g_fAlpha * g_DissolveSize)
+	{
+		Out.vDiffuse.rgb =  g_DissolveColor.rgb;
+	}
+
+
+	
+
+
+
+	if (Out.vDiffuse.a <= 0.0f)
+		discard;
+
+	return Out;
+}
+
+
 
 
 technique11 DefaultTechnique
@@ -134,6 +175,17 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_HIT();
+	}
+
+	pass Dead
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_DEAD();
 	}
 
 }
