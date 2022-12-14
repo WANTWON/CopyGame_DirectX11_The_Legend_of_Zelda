@@ -55,10 +55,16 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 		if (m_EffectDesc.iTextureNum == 2)
 			m_eShaderID = SHADER_HITFLASH_TEX3;
 		break;
+	case DEADSMOKE:
+		m_eShaderID = SHADER_DEADSMOKE;
+		break;
+	case DEADGLOW:
+		m_fAngle = XMConvertToRadians(float(rand() % 180));
+		m_eShaderID = SHADER_DEADGLOW;
+		break;
 	default:
 		break;
 	}
-
 	
 	return S_OK;
 }
@@ -79,6 +85,10 @@ int CMonsterEffect::Tick(_float fTimeDelta)
 	case HITSPARK:
 	case HITFLASH_TEX:
 		Tick_HitFlash(fTimeDelta);
+		break;
+	case DEADSMOKE:
+	case DEADGLOW:
+		Tick_DeadEffect(fTimeDelta);
 		break;
 	default:
 		break;
@@ -157,6 +167,18 @@ HRESULT CMonsterEffect::Ready_Components(void * pArg)
 			return E_FAIL;
 
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Flash"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case DEADGLOW:
+		/* For.Com_VIBuffer */
+		if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
+			return E_FAIL;
+
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case DEADSMOKE:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_SmokeSphere"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
 	default:
@@ -288,6 +310,38 @@ void CMonsterEffect::Tick_HitFlash(_float fTimeDelta)
 		break;
 	}
 
+
+}
+
+void CMonsterEffect::Tick_DeadEffect(_float fTimeDelta)
+{
+	m_fDeadtime += fTimeDelta;
+
+	switch (m_EffectDesc.eEffectID)
+	{
+	case DEADGLOW:
+		SetUp_BillBoard();
+
+		if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, m_EffectDesc.pTarget->Get_Scale().y + 1.f, 0.f, 0.f));
+		m_pTransformCom->Rotation(Get_TransformState(CTransform::STATE_LOOK), m_fAngle);
+
+		if (m_fDeadtime < m_EffectDesc.fDeadTime*0.5f)
+			m_fScale += 0.05f;
+		else
+			m_fScale += 0.1f;
+
+		Set_Scale(_float3(m_fScale, m_fScale, m_fScale));
+		break;
+	default:
+		break;
+	}
+
+	if (m_EffectDesc.fDeadTime < m_fDeadtime)
+		m_fAlpha -= 0.05f;
+
+	if (m_fAlpha <= 0.f)
+		m_bDead = true;
 
 }
 

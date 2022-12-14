@@ -291,12 +291,31 @@ void CMonster::Make_GetAttacked_Effect(CBaseObj* DamageCauser)
 
 	EffectDesc.eEffectID = CMonsterEffect::HITFLASH_TEX;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.1f, 0.f, 0.f);
-	EffectDesc.fDeadTime = 0.7f;
+	EffectDesc.fDeadTime = 0.5f;
 	EffectDesc.iTextureNum = 2;
 	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CMonster::Make_DeadEffect(CBaseObj * Target)
+{
+	m_bDeadEffect = true;
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	
+	EffectDesc.eEffectID = CMonsterEffect::DEADGLOW;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y, 0.f, 0.f);
+	EffectDesc.iTextureNum = 1;
+	EffectDesc.fDeadTime = 0.8f;
+	EffectDesc.pTarget = this;
+	EffectDesc.vInitScale = _float3(3.5f, 3.5f, 3.5f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -310,6 +329,8 @@ _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageC
 
 	if (m_tInfo.iCurrentHp <= 0)
 	{
+		if(!m_bDeadEffect)
+			Make_DeadEffect();
 		m_tInfo.iCurrentHp = 0;
 		return m_tInfo.iCurrentHp;
 	}

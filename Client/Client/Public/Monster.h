@@ -54,6 +54,7 @@ protected:
 	virtual HRESULT Drop_Items();
 	virtual _bool IsDead() = 0;
 	void Make_GetAttacked_Effect(CBaseObj* DamageCauser = nullptr);
+	void Make_DeadEffect(CBaseObj* Target = nullptr);
 
 protected:
 	CNavigation*			m_pNavigationCom = nullptr;
@@ -71,6 +72,7 @@ protected:
 	_bool					m_bHit = false;
 	_bool					m_bRed = false;
 	_bool					m_bMove = true;
+	_bool					m_bDeadEffect = false;
 
 
 	//For Move Time

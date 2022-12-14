@@ -373,7 +373,10 @@ _uint COctorock::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 		return fHp;
 	}
 	else
+	{
 		m_eState = STATE::DEAD;
+	}
+		
 
 	return 0;
 }

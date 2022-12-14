@@ -1381,6 +1381,11 @@ HRESULT CLoader::Loading_For_Effect()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Grass/Lawn_1.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_SmokeSphere*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_SmokeSphere"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Smoke/SmokeSphere_1.fbx", PivotMatrix))))
+		return E_FAIL;
+
 
 	/*For.Prototype_Component_Texture_Smoke */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"),
@@ -1396,6 +1401,12 @@ HRESULT CLoader::Loading_For_Effect()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Grass"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Grass/Grass_%d.dds"), 4))))
 		return E_FAIL;
+
+	/*For.Prototype_Component_Texture_Glow */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Glow/glow_%02d.dds"), 12))))
+		return E_FAIL;
+
 
 #pragma endregion SwordEffect
 

@@ -9,7 +9,8 @@ BEGIN(Client)
 class CMonsterEffect final : public CEffect
 {
 public:
-	enum TYPE { HITFLASH, HITFLASH_TEX, HITRING, HITSPARK};
+	enum TYPE { HITFLASH, HITFLASH_TEX, HITRING, HITSPARK, 
+		DEADSMOKE ,DEADGLOW };
 
 
 
@@ -38,7 +39,10 @@ private:
 
 private:
 	void Tick_HitFlash(_float fTimeDelta);
+	void Tick_DeadEffect(_float fTimeDelta);
 
+private:
+	_float m_fAngle = 0.f;
 
 public:
 	static CMonsterEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

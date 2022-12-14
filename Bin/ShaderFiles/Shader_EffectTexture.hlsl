@@ -65,6 +65,8 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	Out.vDiffuse.a *= g_fAlpha;
 
+	if (Out.vDiffuse.a < 0.1f)
+		discard;
 
 	return Out;
 }
@@ -77,6 +79,8 @@ PS_OUT PS_HITFLASH(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDiffuse.a = Out.vDiffuse.r;
 
+	if (Out.vDiffuse.a < 0.1f)
+		discard;
 
 	vector OrangeColor = vector(255, 191, 95, 255) /255.f;
 	vector BrownColor = vector(127, 95, 28, 255) /255.f;
@@ -93,6 +97,9 @@ PS_OUT PS_HITFLASH2(PS_IN In)
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDiffuse.a = Out.vDiffuse.r;
+
+	if (Out.vDiffuse.a < 0.1f)
+		discard;
 
 	vector BrownColor = vector(127, 95, 28, 255) / 255.f;
 	vector OrangeColor = vector(255, 191, 95, 255) / 255.f;
@@ -112,6 +119,9 @@ PS_OUT PS_HITFLASH3(PS_IN In)
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDiffuse.a = Out.vDiffuse.r;
+
+	if (Out.vDiffuse.a < 0.1f)
+		discard;
 
 	vector WhiteColor = vector(255, 255, 200, 255) / 255.f;
 	vector OrangeColor = vector(255, 191, 95, 255) / 255.f;
@@ -140,6 +150,28 @@ PS_OUT PS_GRASS(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_DEADGLOW(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.a = Out.vDiffuse.r;
+
+	if (Out.vDiffuse.a < 0.1f)
+		discard;
+
+	vector WhiteColor = vector(228, 226, 228, 255) / 255.f;
+	vector PurpleColor = vector(144, 2, 225, 255) / 255.f;
+	vector DarkPurpleColor = vector(144, 23, 231, 255) / 255.f;
+
+	
+
+	Out.vDiffuse.rgb = PurpleColor.rgb * (1 - Out.vDiffuse.r) + WhiteColor.rgb * Out.vDiffuse.r;
+	//Out.vDiffuse.a *= g_fAlpha;
+
+
+	return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -196,5 +228,16 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_GRASS();
+	}
+
+	pass DeadGlow
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_DEADGLOW();
 	}
 }
