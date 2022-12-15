@@ -21,11 +21,17 @@ public:
 		EFFECTTYPE eEffectType = MESH;
 		_uint	   eEffectID = 0;
 		_uint	   iTextureNum = 0;
+
 		_vector	   vInitPositon = XMVectorSet(0.f,0.f,0.f,1.f);
-		_vector	   vLook = XMVectorSet(0.f, 0.f, 0.f, 0.f);
 		_float3	   vInitScale = _float3(0.f, 0.f, 0.f);
-		_float	   fDeadTime = 0.f;
 		_vector	   vColor = XMVectorSet(255.f, 255.f, 255.f, 255.f);
+
+		_vector	   vDistance = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+		_vector	   vLook = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+		
+		_float	   fDeadTime = 0.f;
+		_float	   fStartTime = 0.f;
+
 		CBaseObj*  pTarget = nullptr;
 	}EFFECTDESC;
 

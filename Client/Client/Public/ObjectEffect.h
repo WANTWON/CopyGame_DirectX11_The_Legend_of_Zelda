@@ -9,7 +9,8 @@ BEGIN(Client)
 class CObjectEffect final : public CEffect
 {
 public:
-	enum TYPE { GRASS, LAWN, GRASS_TEX};
+	enum TYPE { GRASS, LAWN, GRASS_TEX,
+		ITEM_GET_FLASH, ITEM_GET_GLOW , HORIZONTAL_GLOW };
 
 
 
@@ -38,9 +39,23 @@ private:
 
 private:
 	void Tick_Grass(_float fTimeDelta);
+	void Tick_GlowEffect(_float fTimeDelta);
+	void Tick_FlashEffect(_float fTimeDelta);
+	void Tick_HorizontalGlowEffect(_float fTimeDelta);
+
 
 private:
 	_float m_fAngle = 0.f;
+	_float m_fColorTime = 0.f;
+	_vector m_vColorBack;
+	_vector m_vColorFront;
+
+	vector<_vector> m_vecColor;
+	_int			m_iColorIndex = 0;
+	_bool			m_bColorChaged = false;
+
+	_bool			m_bMax = false;
+	_float3			m_vMaxScale = _float3(2.f, 0.5f, 0.f);
 
 public:
 	static CObjectEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

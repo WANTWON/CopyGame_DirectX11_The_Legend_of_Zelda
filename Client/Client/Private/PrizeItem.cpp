@@ -8,6 +8,7 @@
 #include "UIButton.h"
 #include "CameraManager.h"
 #include "Portal.h"
+#include "ObjectEffect.h"
 
 CPrizeItem::CPrizeItem(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -117,8 +118,7 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 
 	if (m_ItemDesc.eInteractType == PRIZE && m_pSPHERECom->Collision(pTarget->Get_Collider()))
 	{
-		if(pGameInstance->Get_CurrentLevelIndex() != LEVEL_TOWER)
-			m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(90.f));
+		SetUp_BillBoard();
 
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
 
@@ -136,6 +136,9 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 			pUI_Manager->Add_MessageDesc(MsgDesc);
 			pUI_Manager->Set_Talking(true);
 			pUI_Manager->Open_Message(true);
+			Make_GetItemEffect();
+
+
 		}
 
 		m_bGet = true;
@@ -419,7 +422,6 @@ void CPrizeItem::Setting_TelephoneMessage()
 		{
 			eMsgDesc.iTextureNum = i;
 			pUI_Manager->Add_MessageDesc(eMsgDesc);
-
 		}
 		pUI_Manager->Set_TellEnd(true);
 	}
@@ -431,7 +433,6 @@ void CPrizeItem::Setting_TelephoneMessage()
 		{
 			eMsgDesc.iTextureNum = i;
 			pUI_Manager->Add_MessageDesc(eMsgDesc);
-
 		}
 	}
 	else
@@ -440,16 +441,71 @@ void CPrizeItem::Setting_TelephoneMessage()
 		{
 			eMsgDesc.iTextureNum = i;
 			pUI_Manager->Add_MessageDesc(eMsgDesc);
-
 		}
 	}
-
-	
 
 	pUI_Manager->Open_Message(true);
 
 	RELEASE_INSTANCE(CUI_Manager);
 	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CPrizeItem::Make_GetItemEffect()
+{
+	if (m_bMakeEffect)
+		return;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+	EffectDesc.pTarget = this;
+
+
+	EffectDesc.eEffectID = CObjectEffect::HORIZONTAL_GLOW;
+	EffectDesc.iTextureNum = 5;
+	EffectDesc.fDeadTime = 2.f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.01f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CObjectEffect::ITEM_GET_GLOW;
+	EffectDesc.iTextureNum = 0;
+	EffectDesc.fStartTime = 1.f;
+	EffectDesc.fDeadTime = EffectDesc.fStartTime + 3.5f;
+	EffectDesc.vInitScale = _float3(1.f, 1.f, 1.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.01f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.fStartTime = 0.f;
+	EffectDesc.iTextureNum = 0;
+	EffectDesc.fDeadTime = 2.f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, 0.f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CObjectEffect::ITEM_GET_FLASH;
+	EffectDesc.iTextureNum = 6;
+	EffectDesc.fDeadTime = 1.25f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, 0.f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.iTextureNum = 3;
+	EffectDesc.fDeadTime = 1.f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, 0.f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	m_bMakeEffect = true;
 }
 
 HRESULT CPrizeItem::Ready_Components(void * pArg)

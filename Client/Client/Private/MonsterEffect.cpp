@@ -32,19 +32,26 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.vInitPositon);
 	m_pTransformCom->LookDir(m_EffectDesc.vLook);
 	m_vScale = m_EffectDesc.vInitScale;
-	m_vColor = m_EffectDesc.vColor;
+	m_vColorBack = m_EffectDesc.vColor;
 
 	switch (m_EffectDesc.eEffectID)
 	{
 	case HITRING:
-		m_eShaderID = SHADER_HITRING;
+		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
+		m_vColorBack = XMVectorSet(255, 121, 0, 255);
+		m_vColorFront = XMVectorSet(255, 230, 150, 255);
 		break;
 	case HITSPARK:
-		m_eShaderID = SHADER_HITSPARK;
-		m_vDirection = _float3((rand() % 20 - 10) * 0.1f, /*(rand() % 20 -10) * 0.1f*/ 0.f, (rand() % 20 - 10)* 0.1f);
+		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
+		m_vDirection = _float3((rand() % 20 - 10) * 0.1f,  0.f, (rand() % 20 - 10)* 0.1f);
+		m_vColorBack = XMVectorSet(255, 121, 0, 255);
+		m_vColorFront = XMVectorSet(255, 191, 95, 255);
 		break;
 	case HITFLASH:
-		m_eShaderID = SHADER_HITFLASH;
+		m_eShaderID = SHADERM_TWOCOLOR_PRIORITY;
+		m_vColorBack = XMVectorSet(127, 95, 28, 255);
+		m_vColorBack = XMVectorSet(200, 95, 0, 255);
+		m_vColorFront = XMVectorSet(255, 191, 95, 255);
 		break;
 	case HITFLASH_TEX:
 		m_eShaderID = SHADER_HITFLASH_TEX2;
@@ -68,33 +75,39 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 		break;
 	case GLOW_LARGE:
 		m_fAngle = XMConvertToRadians(float(rand() % 180));
-		m_eShaderID = SHADER_GLOWCOLOR;
-		m_vColor = XMVectorSet(144, 2, 225, 255);
+		m_eShaderID = SHADER_TWOCOLOR_PRIORITY;
+		m_vColorBack = XMVectorSet(144, 2, 225, 255);
+		m_vColorFront = XMVectorSet(228, 226, 228, 255);
 		break;
 	case GLOW_MIDDLE:
 		m_fGlowMaxSize = 2.5f;
 		m_fGlowAddScale = 0.1f;
 		m_fSpeed = 0.5f;
-		m_eShaderID = SHADER_GLOWCOLOR;
-		m_vColor = XMVectorSet(76, 102, 255, 255);
+		m_eShaderID = SHADER_TWOCOLOR_PRIORITY;
+		m_vColorBack = XMVectorSet(76, 102, 255, 255);
+		m_vColorFront = XMVectorSet(228, 226, 228, 255);
 		break;
 	case GLOW_SMALL:
 		m_fGlowMaxSize = 1.0f;
 		m_fGlowAddScale = 0.1f;
 		m_fSpeed = 0.7f;
-		m_eShaderID = SHADER_GLOWCOLOR;
-		m_vColor = XMVectorSet(196, 0, 196, 255);
+		m_eShaderID = SHADER_TWOCOLOR_PRIORITY;
+		m_vColorBack = XMVectorSet(196, 0, 196, 255);
+		m_vColorFront = XMVectorSet(228, 226, 228, 255);
 		break;
 	case GLOW_MINI:
 		m_fGlowMaxSize = 0.6f;
 		m_fGlowAddScale = 0.05f;
 		m_fSpeed = 0.2f;
-		m_eShaderID = SHADER_GLOWCOLOR;
-		m_vColor = XMVectorSet(226, 0, 225, 255);
+		m_eShaderID = SHADER_TWOCOLOR_PRIORITY;
+		m_vColorBack = XMVectorSet(226, 0, 225, 255);
+		m_vColorFront = XMVectorSet(228, 226, 228, 255);
 		break;
 	case GLOW_SPHERE:
 		m_fAngle = XMConvertToRadians(float(rand() % 180));
-		m_eShaderID = SHADER_SPHEREGLOW;
+		m_eShaderID = SHADER_TWOCOLOR_PRIORITY;
+		m_vColorFront = m_EffectDesc.vColor;
+		m_vColorBack = XMVectorSet(144, 2, 225, 255);
 		break;
 	default:
 		break;
@@ -277,9 +290,6 @@ HRESULT CMonsterEffect::SetUp_ShaderResources()
 		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_EffectDesc.iTextureNum))))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Set_RawValue("g_Color", &m_vColor, sizeof(_vector))))
-			return E_FAIL;
-
 		if (m_EffectDesc.eEffectID == SMOKEFRONT)
 		{
 			if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DissolveTexture", m_pDissolveTexture->Get_SRV(0))))
@@ -295,7 +305,13 @@ HRESULT CMonsterEffect::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 		return E_FAIL;
 
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_Color", &m_vColorBack, sizeof(_vector))))
+		return E_FAIL;
 	
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorFront", &m_vColorFront, sizeof(_vector))))
+		return E_FAIL;
+
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -421,7 +437,7 @@ void CMonsterEffect::Tick_DeadEffect(_float fTimeDelta)
 	case GLOW_SPHERE:
 		SetUp_BillBoard();
 		if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vInitPositon);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vDistance);
 		//m_pTransformCom->Rotation(Get_TransformState(CTransform::STATE_LOOK), m_fAngle);
 		if (m_fDeadtime > m_EffectDesc.fDeadTime * 0.5f)
 		{
@@ -446,7 +462,7 @@ void CMonsterEffect::Tick_DeadEffect(_float fTimeDelta)
 		SetUp_BillBoard();
 
 		if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vInitPositon);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vDistance);
 
 		if (m_fDeadtime < m_EffectDesc.fDeadTime*0.5f)
 		{
@@ -465,7 +481,7 @@ void CMonsterEffect::Tick_DeadEffect(_float fTimeDelta)
 		SetUp_BillBoard();
 
 		if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vInitPositon);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vDistance);
 
 		m_vScale.x += 0.05f;
 		m_vScale.y += 0.05f;
@@ -575,7 +591,7 @@ void CMonsterEffect::Make_GlowEffect()
 
 		CEffect::EFFECTDESC EffectDesc;
 		EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
-		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
 		EffectDesc.iTextureNum = 1;
 		EffectDesc.fDeadTime = 0.5f;
 

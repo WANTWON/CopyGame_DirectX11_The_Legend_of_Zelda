@@ -7,7 +7,9 @@ texture2D		g_DiffuseTexture;
 texture2D		g_DepthTexture;
 texture2D		g_DissolveTexture;
 texture2D		g_SmokeDstTexture;
-vector			g_Color = vector(1.f, 1.f, 1.f, 1.f);
+vector			g_Color = vector(1.f, 1.f, 1.f, 1.f); 
+vector			g_ColorFront = vector(1.f, 1.f, 1.f, 1.f);
+
 
 
 struct VS_IN
@@ -199,60 +201,41 @@ PS_OUT PS_HITFLASH3(PS_IN In)
 	return Out;
 }
 
-PS_OUT PS_GRASS(PS_IN In)
+PS_OUT PS_TWOCOLOR_NOTALPHA(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 
-	vector GreenColor = vector(80, 153, 36, 255) / 255.f;
-	vector DarkGreenColor = vector(17, 82, 34, 255) / 255.f;
+	vector GetColorBack = g_Color / 255.f;
+	vector GetColorFront = g_ColorFront / 255.f;
 	
-	Out.vDiffuse.rgb = DarkGreenColor.rgb * (1 - Out.vDiffuse.r) + GreenColor.rgb * Out.vDiffuse.r;
+	Out.vDiffuse.rgb = GetColorBack.rgb * (1 - Out.vDiffuse.r) + GetColorFront.rgb * Out.vDiffuse.r;
 	Out.vDiffuse.a *= g_fAlpha;
+
+	if (Out.vDiffuse.a <= 0.0f)
+		discard;
 
 	return Out;
 }
 
-PS_OUT PS_DEADGLOW(PS_IN In)
+
+PS_OUT PS_TWOCOLOR(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDiffuse.a = Out.vDiffuse.r;
 
-	if (Out.vDiffuse.a <= 0.0f)
-		discard;
+	vector GetColorBack = g_Color / 255.f;
+	vector GetColorFront = g_ColorFront / 255.f;
 
-	vector WhiteColor = vector(228, 226, 228, 255) / 255.f;
-	vector GetColor = g_Color /255.f ; 
+	Out.vDiffuse.rgb = GetColorBack.rgb * (1 - Out.vDiffuse.r) + GetColorFront.rgb * Out.vDiffuse.r;
 
-	Out.vDiffuse.rgb = GetColor.rgb * (1 - Out.vDiffuse.r) + WhiteColor.rgb * Out.vDiffuse.r;
-	
 	Out.vDiffuse.a *= g_fAlpha;
-
-
-	return Out;
-}
-
-PS_OUT PS_DEADGLOWCOLOR(PS_IN In)
-{
-	PS_OUT		Out = (PS_OUT)0;
-
-	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vDiffuse.a = Out.vDiffuse.r;
 
 	if (Out.vDiffuse.a <= 0.0f)
 		discard;
-
-	vector WhiteColor = vector(228, 226, 228, 255) / 255.f;
-	vector PurpleColor = vector(144, 2, 225, 255) / 255.f;
-	vector GetColor = g_Color / 255.f;
-
-	Out.vDiffuse.rgb = PurpleColor.rgb * (1 - Out.vDiffuse.r) + GetColor.rgb * Out.vDiffuse.r;
-	
-	Out.vDiffuse.a *= g_fAlpha;
-
 
 	return Out;
 }
@@ -364,7 +347,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_HITFLASH3();
 	}
 
-	pass Grass
+	pass TwoColor_not_AlphaSet
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -372,10 +355,10 @@ technique11 DefaultTechnique
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_GRASS();
+		PixelShader = compile ps_5_0 PS_TWOCOLOR_NOTALPHA();
 	}
 
-	pass DeadGlow
+	pass TwoColor_Priority
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -383,18 +366,18 @@ technique11 DefaultTechnique
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_DEADGLOW();
+		PixelShader = compile ps_5_0 PS_TWOCOLOR();
 	}
 
-	pass DeadGlowColor
+	pass TwoColor_DepthDefault
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
-		SetDepthStencilState(DSS_Priority, 0);
+		SetDepthStencilState(DSS_Default, 0);
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_DEADGLOWCOLOR();
+		PixelShader = compile ps_5_0 PS_TWOCOLOR();
 	}
 
 	pass SmokeBackBlack

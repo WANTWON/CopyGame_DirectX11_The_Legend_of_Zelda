@@ -147,9 +147,9 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	//ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 
 	//LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	//LightDesc.vPosition = _float4(10.f, 3.f, 10.f, 1.f);
-	//LightDesc.fRange = 7.f;	
-	//LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	//LightDesc.vPosition = _float4(16.3f, 2.f, 18.8f, 1.f);
+	//LightDesc.fRange = 5.f;	
+	//LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
 	//LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	//LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 
@@ -177,6 +177,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(16.3f, 0.f, 18.8f, 1.f));
 		pPlayer->Change_Navigation(LEVEL_GAMEPLAY);
 		pPlayer->Compute_CurrentIndex(LEVEL_GAMEPLAY);
+
+
+		CPrizeItem::ITEMDESC ItemDesc;
+		ItemDesc.eType = CPrizeItem::YOSHIDOLL;
+		ItemDesc.eInteractType = CPrizeItem::PRIZE;
+		ItemDesc.vPosition = _float3(16.3f, 0.f, 22.8f);
+
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_STATIC, TEXT("Layer_Item"), &ItemDesc)))
+			return E_FAIL;
 	}
 	else
 	{

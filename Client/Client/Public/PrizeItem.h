@@ -47,10 +47,12 @@ private:
 	void LateTick_TelephoneModeItem(_float fTimeDelta);
 	void Setting_Get_Item();
 	void Setting_TelephoneMessage();
+	void Make_GetItemEffect();
 
 private:
 	ITEMDESC				m_ItemDesc;
 	_bool					m_bGet = false;
+	_bool					m_bMakeEffect = false;
 	_float4x4				m_CombinedWorldMatrix;
 
 private:

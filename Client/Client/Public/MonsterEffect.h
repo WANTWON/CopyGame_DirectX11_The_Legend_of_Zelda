@@ -53,8 +53,8 @@ private:
 	_float m_fGlowMaxSize = 0.f;
 	_float m_fGlowAddScale = 0.f;
 
-	_vector m_vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f);
-	_vector m_vColor2 = XMVectorSet(1.f, 1.f, 1.f, 1.f);
+	_vector m_vColorBack = XMVectorSet(1.f, 1.f, 1.f, 1.f);
+	_vector m_vColorFront = XMVectorSet(1.f, 1.f, 1.f, 1.f);
 
 
 	CTexture* m_pDissolveTexture = nullptr;

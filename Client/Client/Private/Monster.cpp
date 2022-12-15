@@ -318,7 +318,7 @@ void CMonster::Make_DeadEffect(CBaseObj * Target)
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.fDeadTime = 1.5f;
 	EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.0f);
-	EffectDesc.vInitPositon = XMVectorSet(0.0f, m_vScale.y - 0.2, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, m_vScale.y - 0.2f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 
@@ -326,24 +326,24 @@ void CMonster::Make_DeadEffect(CBaseObj * Target)
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.fDeadTime = 1.5f;
 	EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
-	EffectDesc.vInitPositon = XMVectorSet(0.5f, 0.5f, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.5f, 0.5f, 0.f, 0.f);
 	EffectDesc.vColor = XMVectorSet(114, 0, 153, 255);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 	
-	EffectDesc.vInitPositon = XMVectorSet(-0.5f, m_vScale.y - 0.2, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(-0.5f, m_vScale.y - 0.2f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 0.0f);
 	EffectDesc.vColor = XMVectorSet(176, 21, 184, 255);
 	EffectDesc.fDeadTime = 1.0f;
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
-	EffectDesc.vInitPositon = XMVectorSet(1.0f, m_vScale.y - 0.5, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(1.0f, m_vScale.y - 0.5f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
 	EffectDesc.vColor = XMVectorSet(38, 0, 63, 255);
 	EffectDesc.vColor = XMVectorSet(240, 0, 250, 255);
 	EffectDesc.fDeadTime = 0.7f;
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
-	EffectDesc.vInitPositon = XMVectorSet(-1.0f, m_vScale.y - 0.5, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(-1.0f, m_vScale.y - 0.5f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
 	EffectDesc.vColor = XMVectorSet(63, 0, 38, 255);
 	EffectDesc.vColor = XMVectorSet(176, 0, 184, 255);
@@ -352,7 +352,7 @@ void CMonster::Make_DeadEffect(CBaseObj * Target)
 
 
 	EffectDesc.eEffectID = CMonsterEffect::GLOW_SPHERE;
-	EffectDesc.vInitPositon = XMVectorSet(0.f, m_vScale.y, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.f, m_vScale.y, 0.f, 0.f);
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.fDeadTime = 1.0f;
 	EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);

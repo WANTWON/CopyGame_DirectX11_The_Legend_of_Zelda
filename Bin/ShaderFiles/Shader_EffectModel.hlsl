@@ -6,6 +6,8 @@ float			g_fAlpha = 1.f;
 texture2D		g_DiffuseTexture;
 float			g_TexUV = 1.f;
 
+vector			g_Color = vector(1.f, 1.f, 1.f, 1.f);
+vector			g_ColorFront = vector(1.f, 1.f, 1.f, 1.f);
 
 struct VS_IN
 {
@@ -101,7 +103,7 @@ PS_OUT PS_MAIN_RollCut(PS_IN In)
 	return Out;
 }
 
-PS_OUT PS_MAIN_HitFlash(PS_IN In)
+PS_OUT PS_TWOCOLOR_NOTALPHA(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
@@ -111,60 +113,36 @@ PS_OUT PS_MAIN_HitFlash(PS_IN In)
 	if (Out.vDiffuse.a < 0.1f)
 		discard;
 
-	vector OrangeColor = vector(255, 191, 95, 255) / 255.f;
-	vector BrownColor = vector(127, 95, 28, 255) / 255.f;
-	vector YellowColor = vector(255, 255, 100, 255) / 255.f;
-	vector LightOrangeColor = vector(255, 230, 150, 255) / 255.f;
+	vector GetColorBack = g_Color / 255.f;
+	vector GetColorFront = g_ColorFront / 255.f;
 
-	Out.vDiffuse.rgb = BrownColor.rgb * (1 - Out.vDiffuse.r) + OrangeColor.rgb * Out.vDiffuse.r;
-
-
-
-	return Out;
-}
-
-PS_OUT PS_MAIN_HitRing(PS_IN In)
-{
-	PS_OUT		Out = (PS_OUT)0;
-
-	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vDiffuse.a = Out.vDiffuse.r;
-
-	if (Out.vDiffuse.a < 0.1f)
-		discard;
-
-	vector OrangeColor = vector(255, 121, 0, 255) / 255.f;
-	vector BrownColor = vector(127, 95, 28, 255) / 255.f;
-	vector YellowColor = vector(255, 255, 100, 255) / 255.f;
-	vector LightOrangeColor = vector(255, 230, 150, 255) / 255.f;
-
-	Out.vDiffuse.rgb = OrangeColor.rgb * (1 - Out.vDiffuse.r) + LightOrangeColor.rgb * Out.vDiffuse.r;
-
-
-	Out.vDiffuse.a *= g_fAlpha;
-
-	return Out;
-}
-
-
-PS_OUT PS_MAIN_HitSpark(PS_IN In)
-{
-	PS_OUT		Out = (PS_OUT)0;
-
-	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vDiffuse.a = Out.vDiffuse.r;
-
-	if (Out.vDiffuse.a < 0.1f)
-		discard;
-
-	vector OrangeColor = vector(255, 121, 0, 255) / 255.f;
-	vector LightOrangeColor = vector(255, 191, 95, 255) / 255.f;
-	vector BrownColor = vector(137, 74, 25, 255) / 255.f;
-	vector DarkBrownColor = vector(50, 24, 0, 255) / 255.f;
+	Out.vDiffuse.rgb = GetColorBack.rgb * (1 - Out.vDiffuse.r) + GetColorFront.rgb * Out.vDiffuse.r;
 	
-
-	Out.vDiffuse.rgb = OrangeColor.rgb * (1 - Out.vDiffuse.r) + LightOrangeColor.rgb * Out.vDiffuse.r;
 	Out.vDiffuse.a *= g_fAlpha;
+	if (Out.vDiffuse.a <= 0.0f)
+		discard;
+
+
+	return Out;
+}
+
+PS_OUT PS_TWOCOLOR(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.a = Out.vDiffuse.r;
+
+	vector GetColorBack = g_Color / 255.f;
+	vector GetColorFront = g_ColorFront / 255.f;
+
+	Out.vDiffuse.rgb = GetColorBack.rgb * (1 - Out.vDiffuse.r) + GetColorFront.rgb * Out.vDiffuse.r;
+
+
+	Out.vDiffuse.a *= g_fAlpha;
+	if (Out.vDiffuse.a <= 0.0f)
+		discard;
+
 	return Out;
 }
 
@@ -222,7 +200,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_RollCut();
 	}
 	
-	pass HitFlash
+	pass TwoColor_AlphaSet_Priority
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -230,10 +208,10 @@ technique11 DefaultTechnique
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_MAIN_HitFlash();
+		PixelShader = compile ps_5_0 PS_TWOCOLOR();
 	}
 	
-	pass HitRing
+	pass TwoColor_AlphaSet
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -241,19 +219,9 @@ technique11 DefaultTechnique
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_MAIN_HitRing();
+		PixelShader = compile ps_5_0 PS_TWOCOLOR();
 	}
 	
-	pass HitSpark
-	{
-		SetRasterizerState(RS_Default);
-		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
-		SetDepthStencilState(DSS_Default, 0);
-
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_MAIN_HitSpark();
-	}
 
 	pass Grass
 	{
