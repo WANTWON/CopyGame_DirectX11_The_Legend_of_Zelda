@@ -32,6 +32,7 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.vInitPositon);
 	m_pTransformCom->LookDir(m_EffectDesc.vLook);
 	m_vScale = m_EffectDesc.vInitScale;
+	m_vColor = m_EffectDesc.vColor;
 
 	switch (m_EffectDesc.eEffectID)
 	{
@@ -67,26 +68,33 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 		break;
 	case GLOW_LARGE:
 		m_fAngle = XMConvertToRadians(float(rand() % 180));
-		m_eShaderID = SHADER_DEADGLOW;
+		m_eShaderID = SHADER_GLOWCOLOR;
 		m_vColor = XMVectorSet(144, 2, 225, 255);
 		break;
 	case GLOW_MIDDLE:
 		m_fGlowMaxSize = 2.5f;
 		m_fGlowAddScale = 0.1f;
 		m_fSpeed = 0.5f;
-		m_eShaderID = SHADER_DEADGLOW;
+		m_eShaderID = SHADER_GLOWCOLOR;
 		m_vColor = XMVectorSet(76, 102, 255, 255);
 		break;
 	case GLOW_SMALL:
 		m_fGlowMaxSize = 1.0f;
 		m_fGlowAddScale = 0.1f;
-		m_fSpeed = 1.f;
-		m_eShaderID = SHADER_DEADGLOW;
-		m_vColor =  rand()%2 == 0 ? XMVectorSet(196, 0, 196, 255) : XMVectorSet(226, 0, 225, 255);
+		m_fSpeed = 0.7f;
+		m_eShaderID = SHADER_GLOWCOLOR;
+		m_vColor = XMVectorSet(196, 0, 196, 255);
 		break;
-	case DEADCROSS:
+	case GLOW_MINI:
+		m_fGlowMaxSize = 0.6f;
+		m_fGlowAddScale = 0.05f;
+		m_fSpeed = 0.2f;
+		m_eShaderID = SHADER_GLOWCOLOR;
+		m_vColor = XMVectorSet(226, 0, 225, 255);
+		break;
+	case GLOW_SPHERE:
 		m_fAngle = XMConvertToRadians(float(rand() % 180));
-		m_eShaderID = SHADER_DEADGLOW_PINK;
+		m_eShaderID = SHADER_SPHEREGLOW;
 		break;
 	default:
 		break;
@@ -113,7 +121,7 @@ int CMonsterEffect::Tick(_float fTimeDelta)
 		Tick_HitFlash(fTimeDelta);
 		break;
 	case DEADSMOKE:
-	case DEADCROSS:
+	case GLOW_SPHERE:
 	case SMOKEBACK:
 	case SMOKEFRONT:
 		Tick_DeadEffect(fTimeDelta);
@@ -121,6 +129,7 @@ int CMonsterEffect::Tick(_float fTimeDelta)
 	case GLOW_LARGE:
 	case GLOW_MIDDLE:
 	case GLOW_SMALL:
+	case GLOW_MINI:
 		Tick_GlowEffect(fTimeDelta);
 	default:
 		break;
@@ -204,10 +213,11 @@ HRESULT CMonsterEffect::Ready_Components(void * pArg)
 	case GLOW_LARGE:
 	case GLOW_MIDDLE:
 	case GLOW_SMALL:
+	case GLOW_MINI:
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
-	case DEADCROSS:
+	case GLOW_SPHERE:
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
@@ -285,7 +295,7 @@ HRESULT CMonsterEffect::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 		return E_FAIL;
 
-
+	
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -408,7 +418,7 @@ void CMonsterEffect::Tick_DeadEffect(_float fTimeDelta)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case DEADCROSS:
+	case GLOW_SPHERE:
 		SetUp_BillBoard();
 		if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vInitPositon);
@@ -436,7 +446,7 @@ void CMonsterEffect::Tick_DeadEffect(_float fTimeDelta)
 		SetUp_BillBoard();
 
 		if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y*0.5f, 0.5f, 0.f));
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vInitPositon);
 
 		if (m_fDeadtime < m_EffectDesc.fDeadTime*0.5f)
 		{
@@ -455,7 +465,7 @@ void CMonsterEffect::Tick_DeadEffect(_float fTimeDelta)
 		SetUp_BillBoard();
 
 		if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(XMVectorGetX(m_EffectDesc.vInitPositon), Get_Scale().y*0.5f, 0.2f, 0.f));
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vInitPositon);
 
 		m_vScale.x += 0.05f;
 		m_vScale.y += 0.05f;
@@ -494,7 +504,7 @@ void CMonsterEffect::Tick_GlowEffect(_float fTimeDelta)
 
 	SetUp_BillBoard();
 
-	if (m_EffectDesc.eEffectID == GLOW_MIDDLE || m_EffectDesc.eEffectID == GLOW_SMALL)
+	if (m_EffectDesc.eEffectID != GLOW_LARGE)
 	{
 		m_pTransformCom->Go_PosDir(fTimeDelta*m_fSpeed, m_EffectDesc.vLook);
 
@@ -511,6 +521,9 @@ void CMonsterEffect::Tick_GlowEffect(_float fTimeDelta)
 			m_vScale.x -= m_fGlowAddScale;
 			m_vScale.y -= m_fGlowAddScale;
 
+			if (m_EffectDesc.eEffectID == GLOW_SMALL)
+				Make_GlowEffect();
+
 			if (m_vScale.x <= 0)
 				m_bDead = true;
 
@@ -522,12 +535,12 @@ void CMonsterEffect::Tick_GlowEffect(_float fTimeDelta)
 		if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, m_EffectDesc.pTarget->Get_Scale().y, 0.f, 0.f));
 
-		if (m_fDeadtime < 0.3f)
+		if (m_fDeadtime < m_EffectDesc.fDeadTime*0.3f)
 		{
 			m_vScale.x += 0.05f;
 			m_vScale.y += 0.05f;
 		}
-		else if (m_fDeadtime < 0.6f)
+		else if (m_fDeadtime < m_EffectDesc.fDeadTime*0.6f)
 		{
 			m_vScale.x += 0.3f;
 			//m_fScale.y += 0.2f;
@@ -556,7 +569,7 @@ void CMonsterEffect::Tick_GlowEffect(_float fTimeDelta)
 
 void CMonsterEffect::Make_GlowEffect()
 {
-	if (!m_bMakeGlow && m_EffectDesc.eEffectID != GLOW_SMALL)
+	if (!m_bMakeGlow)
 	{
 		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
@@ -566,50 +579,47 @@ void CMonsterEffect::Make_GlowEffect()
 		EffectDesc.iTextureNum = 1;
 		EffectDesc.fDeadTime = 0.5f;
 
-		if (m_EffectDesc.eEffectID == GLOW_LARGE)
-			EffectDesc.eEffectID = CMonsterEffect::GLOW_MIDDLE;
-		else if (m_EffectDesc.eEffectID == GLOW_MIDDLE)
-			EffectDesc.eEffectID = CMonsterEffect::GLOW_SMALL;
-		EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.0f);
 
-
-
-		for (int i = 0; i < 5; ++i)
+		if (m_EffectDesc.eEffectID == GLOW_SMALL)
 		{
-			EffectDesc.vInitScale = _float3(1.f, 1.f, 0.0f);
-			EffectDesc.fDeadTime = 0.5f;
-			EffectDesc.eEffectID = CMonsterEffect::GLOW_MIDDLE;
-			m_vDirection = _float3((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10), (rand() % 20 - 10)* 0.1f);
-			EffectDesc.vLook = XMLoadFloat3(& m_vDirection);
-			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+			
+			for (int i = 0; i < 4; ++i)
+			{
+				EffectDesc.vInitScale = _float3(0.3f, 0.3f, 0.0f);
+				EffectDesc.fDeadTime = 0.5f;
+				EffectDesc.eEffectID = CMonsterEffect::GLOW_MINI;
+				m_vDirection = _float3((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10), 0.f /*(rand() % 20 - 10)* 0.1f*/);
+				EffectDesc.vLook = XMLoadFloat3(&m_vDirection);
+				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
+			}
 		}
-
-
-		for (int i = 0; i < 5; ++i)
+		else
 		{
-			EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.0f);
-			EffectDesc.fDeadTime = 1.0f;
-			EffectDesc.eEffectID = CMonsterEffect::GLOW_SMALL;
-			m_vDirection = _float3((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10), (rand() % 20 - 10)* 0.1f);
-			EffectDesc.vLook = XMLoadFloat3(&m_vDirection);
-			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
+			for (int i = 0; i < 5; ++i)
+			{
+				EffectDesc.vInitScale = _float3(1.f, 1.f, 0.0f);
+				EffectDesc.fDeadTime = 0.5f;
+				EffectDesc.eEffectID = CMonsterEffect::GLOW_MIDDLE;
+				m_vDirection = _float3((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10), 0.f /*(rand() % 20 - 10)* 0.1f*/);
+				EffectDesc.vLook = XMLoadFloat3(&m_vDirection);
+				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			}
+
+
+			for (int i = 0; i < 5; ++i)
+			{
+				EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.0f);
+				EffectDesc.fDeadTime = 1.0f;
+				EffectDesc.eEffectID = CMonsterEffect::GLOW_SMALL;
+				m_vDirection = _float3((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10), 0.f /*(rand() % 20 - 10)* 0.1f*/);
+				EffectDesc.vLook = XMLoadFloat3(&m_vDirection);
+				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			}
 		}
-
-	/*	EffectDesc.vLook = XMVectorSet(-1.f, 1.f, 1.f, 0.f);
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
-
-		EffectDesc.vLook = XMVectorSet(1.f, 1.f, 1.f, 0.f);
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
-
-		EffectDesc.vLook = XMVectorSet(1.f, -1.f, -1.f, 0.f);
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
-
-		EffectDesc.vLook = XMVectorSet(-1.f, -1.f, -1.f, 0.f);
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
-*/
-
 		RELEASE_INSTANCE(CGameInstance);
 		m_bMakeGlow = true;
 	}

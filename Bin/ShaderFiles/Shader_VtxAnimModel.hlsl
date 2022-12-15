@@ -107,6 +107,7 @@ PS_OUT PS_MAIN_HIT(PS_IN In)
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 
 	Out.vDiffuse.gb *= g_HitRed;
+	Out.vDiffuse.r *= (g_HitRed + 0.2f);
 
 	if (Out.vDiffuse.a <= 0.3f)
 		discard;

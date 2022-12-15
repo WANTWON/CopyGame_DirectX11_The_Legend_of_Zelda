@@ -25,6 +25,7 @@ public:
 		_vector	   vLook = XMVectorSet(0.f, 0.f, 0.f, 0.f);
 		_float3	   vInitScale = _float3(0.f, 0.f, 0.f);
 		_float	   fDeadTime = 0.f;
+		_vector	   vColor = XMVectorSet(255.f, 255.f, 255.f, 255.f);
 		CBaseObj*  pTarget = nullptr;
 	}EFFECTDESC;
 

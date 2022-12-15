@@ -10,8 +10,8 @@ class CMonsterEffect final : public CEffect
 {
 public:
 	enum TYPE { HITFLASH, HITFLASH_TEX, HITRING, HITSPARK, 
-		DEADSMOKE, DEADCROSS, SMOKEBACK, SMOKEFRONT,
-		GLOW_LARGE, GLOW_MIDDLE, GLOW_SMALL
+		DEADSMOKE, GLOW_SPHERE, SMOKEBACK, SMOKEFRONT,
+		GLOW_LARGE, GLOW_MIDDLE, GLOW_SMALL, GLOW_MINI
 	};
 
 
@@ -54,6 +54,8 @@ private:
 	_float m_fGlowAddScale = 0.f;
 
 	_vector m_vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f);
+	_vector m_vColor2 = XMVectorSet(1.f, 1.f, 1.f, 1.f);
+
 
 	CTexture* m_pDissolveTexture = nullptr;
 	CTexture* m_pSmokeDstTexture = nullptr;

@@ -235,7 +235,7 @@ PS_OUT PS_DEADGLOW(PS_IN In)
 	return Out;
 }
 
-PS_OUT PS_DEADGLOWPINK(PS_IN In)
+PS_OUT PS_DEADGLOWCOLOR(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
@@ -247,10 +247,9 @@ PS_OUT PS_DEADGLOWPINK(PS_IN In)
 
 	vector WhiteColor = vector(228, 226, 228, 255) / 255.f;
 	vector PurpleColor = vector(144, 2, 225, 255) / 255.f;
-	vector DarkPurpleColor = vector(144, 23, 231, 255) / 255.f;
-	vector PinkColor = vector(226, 0, 255, 255) / 255.f;
+	vector GetColor = g_Color / 255.f;
 
-	Out.vDiffuse.rgb = PurpleColor.rgb * (1 - Out.vDiffuse.r) + PinkColor.rgb * Out.vDiffuse.r;
+	Out.vDiffuse.rgb = PurpleColor.rgb * (1 - Out.vDiffuse.r) + GetColor.rgb * Out.vDiffuse.r;
 	
 	Out.vDiffuse.a *= g_fAlpha;
 
@@ -296,27 +295,24 @@ PS_OUT PS_SMOKEFRONT_PURPLE(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
-	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	vector vSmokeDst =  g_SmokeDstTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vDiffuse.a = Out.vDiffuse.r * vSmokeDst.r;
-
+	Out.vDiffuse = vDiffuse*vSmokeDst;
+	Out.vDiffuse.a = vDiffuse.r*vSmokeDst.r;
 
 	if (Out.vDiffuse.a <= 0.0f)
 		discard;
 
 	vector PurpleColor = vector(114, 0, 153, 255) / 255.f;
 	vector RedPurpleColor = vector(63, 0, 38, 255) / 255.f;
+	vector GetColor = g_Color / 255.f;
 
 	Out.vDiffuse.rgb = PurpleColor.rgb;
-	vSmokeDst.rgb = RedPurpleColor.rgb;
+	vSmokeDst.rgb = GetColor.rgb;
 
 	Out.vDiffuse.rgb *= vSmokeDst.rgb;
 
 	Out.vDiffuse.a *= g_fAlpha;
-
-	
-	
-
 
 	return Out;
 }
@@ -390,7 +386,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_DEADGLOW();
 	}
 
-	pass DeadGlowPink
+	pass DeadGlowColor
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -398,14 +394,14 @@ technique11 DefaultTechnique
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_DEADGLOWPINK();
+		PixelShader = compile ps_5_0 PS_DEADGLOWCOLOR();
 	}
 
 	pass SmokeBackBlack
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
-		SetDepthStencilState(DSS_Default, 0);
+		SetDepthStencilState(DSS_Priority, 0);
 
 		VertexShader = compile vs_5_0 VS_MAIN_SOFTEFFECT();
 		GeometryShader = NULL;
