@@ -127,7 +127,7 @@ void CGrass::Late_Tick(_float fTimeDelta)
 			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 			CEffect::EFFECTDESC EffectDesc;
-			EffectDesc.eEffectType = CEffect::MESH;
+			EffectDesc.eEffectType = CEffect::MODEL;
 
 			if(m_GrassDesc.eType == GRASS || m_GrassDesc.eType == GRASS2x2)
 				EffectDesc.eEffectID = CObjectEffect::GRASS;

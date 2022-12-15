@@ -244,7 +244,7 @@ void CMonster::Make_GetAttacked_Effect(CBaseObj* DamageCauser)
 
 	CEffect::EFFECTDESC EffectDesc;
 
-	EffectDesc.eEffectType = CEffect::MESH;
+	EffectDesc.eEffectType = CEffect::MODEL;
 	EffectDesc.eEffectID = CMonsterEffect::HITFLASH;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.2f, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.5f;

@@ -13,12 +13,12 @@ BEGIN(Client)
 class CEffect abstract : public CBaseObj
 {
 public:
-	enum EFFECTTYPE { MESH, VIBUFFER_RECT};
+	enum EFFECTTYPE { MODEL, VIBUFFER_RECT};
 
 
 	typedef struct EffectTag
 	{
-		EFFECTTYPE eEffectType = MESH;
+		EFFECTTYPE eEffectType = MODEL;
 		_uint	   eEffectID = 0;
 		_uint	   iTextureNum = 0;
 

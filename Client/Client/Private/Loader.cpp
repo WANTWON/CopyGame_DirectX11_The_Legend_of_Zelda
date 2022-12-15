@@ -1397,6 +1397,14 @@ HRESULT CLoader::Loading_For_Effect()
 		return E_FAIL;
 
 
+	/*For.Prototype_Component_Model_RainBowHalo*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_RainbowHalo"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Halo/Halo_0.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+
+
 	/*For.Prototype_Component_Texture_Smoke */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Smoke/Smoke_%d.dds"), 32))))

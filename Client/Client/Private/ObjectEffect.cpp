@@ -39,7 +39,7 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 	case GRASS:
 	case LAWN:
 		m_pTransformCom->Rotation(XMVectorSet((rand() % 10 + 1)*0.1f, (rand() % 10)*0.1f, (rand() % 10)*0.1f, 0.f), XMConvertToRadians(float(rand() % 180)));
-		m_eShaderID = SHADER_GRASS;
+		m_eShaderID = SHADERM_ONLY_TEXTURE;
 		break;
 	case GRASS_TEX:
 		m_eShaderID = SHADER_TWOCOLOR_NOT_ALPHASET;
@@ -92,6 +92,42 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
 		m_vColorBack = m_vecColor.front();
 		break;
+	case RAINBOW_RING:
+		m_eShaderID = SHADERM_ONLY_TEXTURE;
+		break;
+	case RAINBOW_HALO:
+		m_fAlpha = 0.f;
+		m_eShaderID = SHADERM_ONLY_TEXTURE;
+		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
+		m_vColorBack = XMVectorSet(63, 191.f, 228.f, 255.f);
+		break;
+	case GRAD_RING:
+		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
+		m_vecColor.push_back(XMVectorSet(255.f, 63.f, 63.f, 255.f));
+		m_vecColor.push_back(XMVectorSet(255.f, 127.f, 0.f, 255.f));
+		m_vecColor.push_back(XMVectorSet(0.f, 255.f, 0.f, 255.f));
+		m_vecColor.push_back(XMVectorSet(63.f, 127.f, 255.f, 255.f));
+		m_vecColor.push_back(XMVectorSet(255.f, 127.f, 255.f, 255.f));
+		m_vecColor.push_back(XMVectorSet(255.f, 63.f, 63.f, 255.f));
+		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
+		m_vColorBack = m_vecColor.front();
+
+		break;
+
+	case GLITTER:
+	{
+		m_eShaderID = SHADER_TWOCOLOR_PRIORITY;
+		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
+		_int iRandNum = rand() % 6 + 1;
+		if (iRandNum == 1) m_vColorBack = XMVectorSet(255.f, 63.f, 63.f, 255.f);
+		else if (iRandNum == 2) m_vColorBack = XMVectorSet(255.f, 127.f, 0.f, 255.f);
+		else if (iRandNum == 3)	m_vColorBack = XMVectorSet(0.f, 255.f, 0.f, 255.f);
+		else if (iRandNum == 4)	m_vColorBack = XMVectorSet(63.f, 127.f, 255.f, 255.f);
+		else if (iRandNum == 5) m_vColorBack = XMVectorSet(255.f, 63.f, 63.f, 255.f);
+		else  m_vColorBack = XMVectorSet(228.f, 226.f, 228.f, 255.f);
+		m_fSpeed = (rand() % 20 + 5)* 0.1f;
+		m_vMaxScale = m_EffectDesc.vInitScale;
+	}
 	default:
 		break;
 	}
@@ -124,6 +160,13 @@ int CObjectEffect::Tick(_float fTimeDelta)
 		break;
 	case HORIZONTAL_GLOW:
 		Tick_HorizontalGlowEffect(fTimeDelta);
+		break;
+	case RAINBOW_RING:
+	case GRAD_RING:
+		Tick_RingEffect(fTimeDelta);
+		break;
+	case RAINBOW_HALO:
+		Tick_HaloEffect(fTimeDelta);
 		break;
 	default:
 		break;
@@ -167,7 +210,7 @@ HRESULT CObjectEffect::Ready_Components(void * pArg)
 	/* For.Com_Model*/
 	switch (m_EffectDesc.eEffectType)
 	{
-	case MESH:
+	case MODEL:
 		/* For.Com_Shader */
 		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect_Model"), (CComponent**)&m_pShaderCom)))
 			return E_FAIL;
@@ -220,6 +263,22 @@ HRESULT CObjectEffect::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
+	case RAINBOW_RING:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RainbowRing"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case RAINBOW_HALO:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RainbowHalo"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case GRAD_RING:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_GradRing"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case GLITTER:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
@@ -245,21 +304,13 @@ HRESULT CObjectEffect::SetUp_ShaderResources()
 		return E_FAIL;
 
 
-	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
-		return E_FAIL;
-
-	if (m_EffectDesc.eEffectType == MESH)
+	if (m_EffectDesc.eEffectType == MODEL)
 	{
 		if (FAILED(m_pShaderCom->Set_RawValue("g_TexUV", &m_fTexUV, sizeof(_float))))
 			return E_FAIL;
 	}
 	else
 	{
-		if (FAILED(m_pShaderCom->Set_RawValue("g_Color", &m_vColorBack, sizeof(_vector))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Set_RawValue("g_ColorFront", &m_vColorFront, sizeof(_vector))))
-			return E_FAIL;
-
 		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_EffectDesc.iTextureNum))))
 			return E_FAIL;
 
@@ -267,6 +318,12 @@ HRESULT CObjectEffect::SetUp_ShaderResources()
 			return E_FAIL;
 	}
 
+	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Set_RawValue("g_Color", &m_vColorBack, sizeof(_vector))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorFront", &m_vColorFront, sizeof(_vector))))
+		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -460,6 +517,144 @@ void CObjectEffect::Tick_HorizontalGlowEffect(_float fTimeDelta)
 	}
 
 	Set_Scale(m_vScale);
+}
+
+void CObjectEffect::Tick_RingEffect(_float fTimeDelta)
+{
+	SetUp_BillBoard();
+
+	m_fDeadtime += fTimeDelta;
+	m_fColorTime += fTimeDelta;
+
+	if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vDistance);
+
+
+	if (m_vecColor.size() != 0)
+	{
+		if (m_fColorTime > m_EffectDesc.fDeadTime*0.3f)
+		{
+			if (m_iColorIndex + 1 >= m_vecColor.size() - 1)
+				m_iColorIndex = 0;
+			else
+				m_iColorIndex++;
+
+			m_fColorTime = 0.f;
+		}
+
+		m_vColorBack = XMVectorLerp(m_vecColor[m_iColorIndex], m_vecColor[m_iColorIndex + 1], m_fColorTime / 0.3f);
+
+	}
+
+
+	if (m_fDeadtime < m_EffectDesc.fDeadTime*0.5  && m_fDeadtime > m_EffectDesc.fStartTime)
+	{
+		m_fAlpha += 0.1f;
+		if (m_fAlpha >= 1.f)
+			m_fAlpha = 1.f;
+		m_vScale.x += 0.05f;
+		m_vScale.y += 0.05f;
+		m_vScale.z += 0.05f;
+	}
+	else if (m_fDeadtime < m_EffectDesc.fDeadTime)
+	{
+		m_vScale.x += 0.025f;
+		m_vScale.y += 0.025f;
+		m_vScale.z += 0.025f;
+
+	}
+	else
+	{
+		m_vScale.x += 0.01f;
+		m_vScale.y += 0.01f;
+		m_vScale.z += 0.01f;
+		m_fAlpha -= 0.025f;
+	}
+
+	Set_Scale(m_vScale);
+
+	if (m_fAlpha <= 0)
+		m_bDead = true;
+}
+
+void CObjectEffect::Tick_HaloEffect(_float fTimeDelta)
+{
+	SetUp_BillBoard();
+
+	m_fDeadtime += fTimeDelta;
+	m_fColorTime += fTimeDelta;
+
+	if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vDistance);
+
+
+	if (!m_bMax)
+	{
+		m_fAlpha += 0.002f;
+		if (m_fAlpha >= 0.6f)
+		{
+			m_fAlpha = 0.6f;
+			m_bMax = true;
+		}
+			
+
+	}
+	else if(m_fDeadtime > m_EffectDesc.fDeadTime)
+	{
+		m_fAlpha -= 0.002f;
+
+		if (m_fAlpha <= 0)
+			m_bDead = true;
+	}
+
+
+	
+}
+
+void CObjectEffect::Tick_GlitterEffect(_float fTimeDelta)
+{
+	m_fDeadtime += fTimeDelta;
+
+	SetUp_BillBoard();
+
+	m_pTransformCom->Go_PosDir(fTimeDelta*m_fSpeed, m_EffectDesc.vLook);
+
+	if (m_fDeadtime < m_EffectDesc.fDeadTime*0.3f)
+	{
+		m_vScale.x += 0.05f;
+		m_vScale.y += 0.05f;
+
+		if (m_vScale.x >= m_vMaxScale.x)
+		{
+			m_vScale = m_vMaxScale;
+		}
+	}
+	else if (m_fDeadtime < m_EffectDesc.fDeadTime*0.6f)
+	{
+		m_vScale.x -= 0.05f;
+		m_vScale.y -= 0.05f;
+	}
+	else if (m_fDeadtime < m_EffectDesc.fDeadTime)
+	{
+		m_vScale.x += 0.05f;
+		m_vScale.y += 0.05f;
+
+		if (m_vScale.x >= m_vMaxScale.x)
+		{
+			m_vScale = m_vMaxScale;
+		}
+	}
+	else
+	{
+		m_vScale.x -= 0.05f;
+		m_vScale.y -= 0.05f;
+		m_fAlpha -= 0.25f;
+	}
+
+	Set_Scale(m_vScale);
+
+	if (m_fAlpha <= 0.f)
+		m_bDead = true;
 }
 
 

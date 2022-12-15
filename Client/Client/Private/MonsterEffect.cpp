@@ -49,7 +49,6 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 		break;
 	case HITFLASH:
 		m_eShaderID = SHADERM_TWOCOLOR_PRIORITY;
-		m_vColorBack = XMVectorSet(127, 95, 28, 255);
 		m_vColorBack = XMVectorSet(200, 95, 0, 255);
 		m_vColorFront = XMVectorSet(255, 191, 95, 255);
 		break;
@@ -69,9 +68,6 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 	case SMOKEFRONT:
 		m_fAlpha = 0.f;
 		m_eShaderID = SHADER_SMOKEFRONT;
-		break;
-	case DEADSMOKE:
-		m_eShaderID = SHADER_DEADSMOKE;
 		break;
 	case GLOW_LARGE:
 		m_fAngle = XMConvertToRadians(float(rand() % 180));
@@ -133,7 +129,6 @@ int CMonsterEffect::Tick(_float fTimeDelta)
 	case HITFLASH_TEX:
 		Tick_HitFlash(fTimeDelta);
 		break;
-	case DEADSMOKE:
 	case GLOW_SPHERE:
 	case SMOKEBACK:
 	case SMOKEFRONT:
@@ -186,7 +181,7 @@ HRESULT CMonsterEffect::Ready_Components(void * pArg)
 	/* For.Com_Model*/
 	switch (m_EffectDesc.eEffectType)
 	{
-	case MESH:
+	case MODEL:
 		/* For.Com_Shader */
 		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect_Model"), (CComponent**)&m_pShaderCom)))
 			return E_FAIL;
@@ -234,10 +229,6 @@ HRESULT CMonsterEffect::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
-	case DEADSMOKE:
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_SmokeSphere"), (CComponent**)&m_pModelCom)))
-			return E_FAIL;
-		break;
 	case SMOKEBACK:
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_SmokeDeath"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
@@ -276,7 +267,7 @@ HRESULT CMonsterEffect::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
 		return E_FAIL;
 
-	if (m_EffectDesc.eEffectType == MESH)
+	if (m_EffectDesc.eEffectType == MODEL)
 	{
 		if (FAILED(m_pShaderCom->Set_RawValue("g_TexUV", &m_fTexUV, sizeof(_float))))
 			return E_FAIL;

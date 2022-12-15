@@ -147,26 +147,8 @@ PS_OUT PS_TWOCOLOR(PS_IN In)
 }
 
 
-PS_OUT PS_DEADSMOKE(PS_IN In)
-{
-	PS_OUT		Out = (PS_OUT)0;
 
-	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vDiffuse.a = Out.vDiffuse.r;
-
-	if (Out.vDiffuse.a < 0.1f)
-		discard;
-
-	vector PurpleColor = vector(114, 0, 153, 255) / 255.f;
-	vector DarkPurpleColor = vector(38, 0, 63, 255) / 255.f;
-	
-
-	Out.vDiffuse.rgb = DarkPurpleColor.rgb * (1 - Out.vDiffuse.r) + PurpleColor.rgb * Out.vDiffuse.r;
-	Out.vDiffuse.a *= g_fAlpha;
-	return Out;
-}
-
-PS_OUT PS_GRASS(PS_IN In)
+PS_OUT PS_ONLY_TEXTURE(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
@@ -223,7 +205,7 @@ technique11 DefaultTechnique
 	}
 	
 
-	pass Grass
+	pass Only_Texture
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -231,18 +213,8 @@ technique11 DefaultTechnique
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_GRASS();
+		PixelShader = compile ps_5_0 PS_ONLY_TEXTURE();
 	}
 
-	pass DeadSmoke
-	{
-		SetRasterizerState(RS_Default);
-		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
-		SetDepthStencilState(DSS_Priority, 0);
-
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_DEADSMOKE();
-	}
 
 }

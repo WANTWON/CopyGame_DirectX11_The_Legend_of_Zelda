@@ -10,7 +10,8 @@ class CObjectEffect final : public CEffect
 {
 public:
 	enum TYPE { GRASS, LAWN, GRASS_TEX,
-		ITEM_GET_FLASH, ITEM_GET_GLOW , HORIZONTAL_GLOW };
+		ITEM_GET_FLASH, ITEM_GET_GLOW , HORIZONTAL_GLOW,
+		RAINBOW_RING ,  GRAD_RING, RAINBOW_HALO, GLITTER };
 
 
 
@@ -39,14 +40,20 @@ private:
 
 private:
 	void Tick_Grass(_float fTimeDelta);
+
+	/* For Get Item*/
 	void Tick_GlowEffect(_float fTimeDelta);
 	void Tick_FlashEffect(_float fTimeDelta);
 	void Tick_HorizontalGlowEffect(_float fTimeDelta);
+	void Tick_RingEffect(_float fTimeDelta);
+	void Tick_HaloEffect(_float fTimeDelta);
+	void Tick_GlitterEffect(_float fTimeDelta);
 
 
 private:
-	_float m_fAngle = 0.f;
-	_float m_fColorTime = 0.f;
+	_float	m_fAngle = 0.f;
+	_float	m_fColorTime = 0.f;
+	_float	m_fSpeed = 0.f;
 	_vector m_vColorBack;
 	_vector m_vColorFront;
 

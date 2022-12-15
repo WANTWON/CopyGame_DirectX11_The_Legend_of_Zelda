@@ -458,17 +458,54 @@ void CPrizeItem::Make_GetItemEffect()
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	CEffect::EFFECTDESC EffectDesc;
-	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
 	EffectDesc.pTarget = this;
 
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CObjectEffect::RAINBOW_RING;
+	EffectDesc.fDeadTime = 2.f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.01f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
+	EffectDesc.eEffectID = CObjectEffect::GRAD_RING;
+	EffectDesc.fStartTime = 1.f;
+	EffectDesc.fDeadTime = EffectDesc.fStartTime + 3.f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.02f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CObjectEffect::RAINBOW_HALO;
+	EffectDesc.fStartTime = 0.f;
+	EffectDesc.fDeadTime = 4.f;
+	EffectDesc.vInitScale = _float3(10.f, 10.f, 10.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.02f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 	EffectDesc.eEffectID = CObjectEffect::HORIZONTAL_GLOW;
 	EffectDesc.iTextureNum = 5;
 	EffectDesc.fDeadTime = 2.f;
 	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
 	EffectDesc.vDistance = XMVectorSet(0.0f, -0.01f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	for (int i = 0; i < 10; ++i)
+	{
+		EffectDesc.eEffectID = CObjectEffect::GLITTER;
+		_float fRandNum = (rand() % 10 + 1) * 0.1f;
+		EffectDesc.vInitScale = _float3(fRandNum, fRandNum, 0.0f);
+		EffectDesc.fDeadTime = 0.5f;
+		EffectDesc.iTextureNum = 0;
+		EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10), 0.f, 0.f);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+	}
+
 
 
 	EffectDesc.eEffectID = CObjectEffect::ITEM_GET_GLOW;

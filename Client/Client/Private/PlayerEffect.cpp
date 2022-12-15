@@ -110,7 +110,7 @@ HRESULT CPlayerEffect::Ready_Components(void * pArg)
 	/* For.Com_Model*/
 	switch (m_EffectDesc.eEffectType)
 	{
-	case MESH:
+	case MODEL:
 		/* For.Com_Shader */
 		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect_Model"), (CComponent**)&m_pShaderCom)))
 			return E_FAIL;
@@ -165,7 +165,7 @@ HRESULT CPlayerEffect::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
 		return E_FAIL;
 
-	if (m_EffectDesc.eEffectType == MESH)
+	if (m_EffectDesc.eEffectType == MODEL)
 	{
 		if (FAILED(m_pShaderCom->Set_RawValue("g_TexUV", &m_fTexUV, sizeof(_float))))
 			return E_FAIL;

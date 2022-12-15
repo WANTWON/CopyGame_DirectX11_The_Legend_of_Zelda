@@ -609,7 +609,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
 
 		CEffect::EFFECTDESC EffectDesc;
-		EffectDesc.eEffectType = CEffect::MESH;
+		EffectDesc.eEffectType = CEffect::MODEL;
 		EffectDesc.eEffectID = CPlayerEffect::ROLLCUT;
 		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, 0.5f, 0.f, 0.f);
 		EffectDesc.fDeadTime = 0.5f;
