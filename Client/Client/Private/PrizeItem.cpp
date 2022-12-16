@@ -159,6 +159,17 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 			Setting_Get_Item();
 			m_bDead = true;
 
+			list<CGameObject*>* pEffectList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_ObjectEffect"));
+			if (pEffectList != nullptr)
+			{
+				for (auto& iter : *pEffectList)
+				{
+					if(iter != nullptr)
+						dynamic_cast<CObjectEffect*>(iter)->Set_EndMode(true);
+				}
+					
+			}
+
 			if (m_ItemDesc.eType == TAIL_KEY)
 			{
 				CPortal::PORTALDESC PortalDesc;
@@ -494,18 +505,7 @@ void CPrizeItem::Make_GetItemEffect()
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 
-	for (int i = 0; i < 10; ++i)
-	{
-		EffectDesc.eEffectID = CObjectEffect::GLITTER;
-		_float fRandNum = (rand() % 10 + 1) * 0.1f;
-		EffectDesc.vInitScale = _float3(fRandNum, fRandNum, 0.0f);
-		EffectDesc.fDeadTime = 0.5f;
-		EffectDesc.iTextureNum = 0;
-		EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10), 0.f, 0.f);
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
-
-	}
-
+	
 
 
 	EffectDesc.eEffectID = CObjectEffect::ITEM_GET_GLOW;

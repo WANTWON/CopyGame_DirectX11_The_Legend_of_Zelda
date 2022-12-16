@@ -1,20 +1,20 @@
 #include "stdafx.h"
-#include "..\Public\MonsterEffect.h"
+#include "..\Public\FightEffect.h"
 #include "Weapon.h"
 #include "Player.h"
 #include "GameInstance.h"
 
-CMonsterEffect::CMonsterEffect(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CFightEffect::CFightEffect(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CEffect(pDevice, pContext)
 {
 }
 
-CMonsterEffect::CMonsterEffect(const CMonsterEffect & rhs)
+CFightEffect::CFightEffect(const CFightEffect & rhs)
 	: CEffect(rhs)
 {
 }
 
-HRESULT CMonsterEffect::Initialize_Prototype()
+HRESULT CFightEffect::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
@@ -22,7 +22,7 @@ HRESULT CMonsterEffect::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CMonsterEffect::Initialize(void * pArg)
+HRESULT CFightEffect::Initialize(void * pArg)
 {
 
 	if (FAILED(__super::Initialize(pArg)))
@@ -105,6 +105,12 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 		m_vColorFront = m_EffectDesc.vColor;
 		m_vColorBack = XMVectorSet(144, 2, 225, 255);
 		break;
+	case GUARD_FLASH:
+		m_eShaderID = SHADERM_TWOCOLOR_NOTALPHASET;
+		m_fAngle = 0.f;
+		m_vColorFront = XMVectorSet(51, 178, 255, 255);
+		m_vColorBack = XMVectorSet(51, 102, 225, 255);
+		break;
 	default:
 		break;
 	}
@@ -112,7 +118,7 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 	return S_OK;
 }
 
-int CMonsterEffect::Tick(_float fTimeDelta)
+int CFightEffect::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
@@ -139,6 +145,12 @@ int CMonsterEffect::Tick(_float fTimeDelta)
 	case GLOW_SMALL:
 	case GLOW_MINI:
 		Tick_GlowEffect(fTimeDelta);
+		break;
+	case GUARD_FLASH:
+	case GUARD_RING:
+	case GUARD_DUST:
+		Tick_GuardEffect(fTimeDelta);
+		break;
 	default:
 		break;
 	}
@@ -146,12 +158,12 @@ int CMonsterEffect::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CMonsterEffect::Late_Tick(_float fTimeDelta)
+void CFightEffect::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 }
 
-HRESULT CMonsterEffect::Render()
+HRESULT CFightEffect::Render()
 {
 
 	__super::Render();
@@ -160,7 +172,7 @@ HRESULT CMonsterEffect::Render()
 	return S_OK;
 }
 
-HRESULT CMonsterEffect::Ready_Components(void * pArg)
+HRESULT CFightEffect::Ready_Components(void * pArg)
 {
 	LEVEL iLevel = (LEVEL)CGameInstance::Get_Instance()->Get_DestinationLevelIndex();
 
@@ -243,6 +255,10 @@ HRESULT CMonsterEffect::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_SmokeDstTexture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_SmokeDst"), (CComponent**)&m_pSmokeDstTexture)))
 			return E_FAIL;
 		break;
+	case GUARD_FLASH:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardFlash"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
@@ -251,7 +267,7 @@ HRESULT CMonsterEffect::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CMonsterEffect::SetUp_ShaderResources()
+HRESULT CFightEffect::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -309,22 +325,22 @@ HRESULT CMonsterEffect::SetUp_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CMonsterEffect::SetUp_ShaderID()
+HRESULT CFightEffect::SetUp_ShaderID()
 {
 	return S_OK;
 }
 
-void CMonsterEffect::Change_Animation(_float fTimeDelta)
+void CFightEffect::Change_Animation(_float fTimeDelta)
 {
 }
 
-void CMonsterEffect::Change_Texture(_float fTimeDelta)
+void CFightEffect::Change_Texture(_float fTimeDelta)
 {
 	
 }
 
 
-void CMonsterEffect::Tick_HitFlash(_float fTimeDelta)
+void CFightEffect::Tick_HitFlash(_float fTimeDelta)
 {
 	m_fDeadtime += fTimeDelta;
 
@@ -419,7 +435,7 @@ void CMonsterEffect::Tick_HitFlash(_float fTimeDelta)
 
 }
 
-void CMonsterEffect::Tick_DeadEffect(_float fTimeDelta)
+void CFightEffect::Tick_DeadEffect(_float fTimeDelta)
 {
 	m_fDeadtime += fTimeDelta;
 
@@ -504,7 +520,7 @@ void CMonsterEffect::Tick_DeadEffect(_float fTimeDelta)
 
 }
 
-void CMonsterEffect::Tick_GlowEffect(_float fTimeDelta)
+void CFightEffect::Tick_GlowEffect(_float fTimeDelta)
 {
 
 	m_fDeadtime += fTimeDelta;
@@ -574,7 +590,40 @@ void CMonsterEffect::Tick_GlowEffect(_float fTimeDelta)
 
 }
 
-void CMonsterEffect::Make_GlowEffect()
+void CFightEffect::Tick_GuardEffect(_float fTimeDelta)
+{
+
+	m_fDeadtime += fTimeDelta;
+
+
+	m_pTransformCom->LookDir(m_EffectDesc.vLook);
+
+	if ( m_fDeadtime < m_EffectDesc.fDeadTime)
+	{
+		m_vScale.x += 0.05f;
+		m_vScale.y += 0.05f;
+		m_vScale.z += 0.05f;
+		m_fAlpha += 0.05f;
+
+		if (m_fAlpha >= 1.f)
+			m_fAlpha = 1.f;
+	}
+	else
+	{
+		m_vScale.x += 0.01f;
+		m_vScale.y += 0.01f;
+		m_vScale.z += 0.01f;
+		m_fAlpha -= 0.05f;
+		
+	}
+
+	Set_Scale(m_vScale);
+
+	if (m_fAlpha <= 0.f || m_vScale.x <= 0.f)
+		m_bDead = true;
+}
+
+void CFightEffect::Make_GlowEffect()
 {
 	if (!m_bMakeGlow)
 	{
@@ -594,10 +643,10 @@ void CMonsterEffect::Make_GlowEffect()
 			{
 				EffectDesc.vInitScale = _float3(0.3f, 0.3f, 0.0f);
 				EffectDesc.fDeadTime = 0.5f;
-				EffectDesc.eEffectID = CMonsterEffect::GLOW_MINI;
+				EffectDesc.eEffectID = CFightEffect::GLOW_MINI;
 				m_vDirection = _float3((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10), 0.f /*(rand() % 20 - 10)* 0.1f*/);
 				EffectDesc.vLook = XMLoadFloat3(&m_vDirection);
-				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 			}
 		}
@@ -608,10 +657,10 @@ void CMonsterEffect::Make_GlowEffect()
 			{
 				EffectDesc.vInitScale = _float3(1.f, 1.f, 0.0f);
 				EffectDesc.fDeadTime = 0.5f;
-				EffectDesc.eEffectID = CMonsterEffect::GLOW_MIDDLE;
+				EffectDesc.eEffectID = CFightEffect::GLOW_MIDDLE;
 				m_vDirection = _float3((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10), 0.f /*(rand() % 20 - 10)* 0.1f*/);
 				EffectDesc.vLook = XMLoadFloat3(&m_vDirection);
-				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 			}
 
@@ -620,10 +669,10 @@ void CMonsterEffect::Make_GlowEffect()
 			{
 				EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.0f);
 				EffectDesc.fDeadTime = 1.0f;
-				EffectDesc.eEffectID = CMonsterEffect::GLOW_SMALL;
+				EffectDesc.eEffectID = CFightEffect::GLOW_SMALL;
 				m_vDirection = _float3((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10), 0.f /*(rand() % 20 - 10)* 0.1f*/);
 				EffectDesc.vLook = XMLoadFloat3(&m_vDirection);
-				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 			}
 		}
@@ -632,9 +681,9 @@ void CMonsterEffect::Make_GlowEffect()
 	}
 }
 
-CMonsterEffect * CMonsterEffect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CFightEffect * CFightEffect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CMonsterEffect*	pInstance = new CMonsterEffect(pDevice, pContext);
+	CFightEffect*	pInstance = new CFightEffect(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
@@ -645,9 +694,9 @@ CMonsterEffect * CMonsterEffect::Create(ID3D11Device * pDevice, ID3D11DeviceCont
 	return pInstance;
 }
 
-CGameObject * CMonsterEffect::Clone(void * pArg)
+CGameObject * CFightEffect::Clone(void * pArg)
 {
-	CMonsterEffect*	pInstance = new CMonsterEffect(*this);
+	CFightEffect*	pInstance = new CFightEffect(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
@@ -658,7 +707,7 @@ CGameObject * CMonsterEffect::Clone(void * pArg)
 	return pInstance;
 }
 
-void CMonsterEffect::Free()
+void CFightEffect::Free()
 {
 	__super::Free();
 

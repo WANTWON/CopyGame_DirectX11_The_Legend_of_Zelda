@@ -108,10 +108,6 @@ PS_OUT PS_TWOCOLOR_NOTALPHA(PS_IN In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vDiffuse.a = Out.vDiffuse.r;
-
-	if (Out.vDiffuse.a < 0.1f)
-		discard;
 
 	vector GetColorBack = g_Color / 255.f;
 	vector GetColorFront = g_ColorFront / 255.f;
@@ -216,5 +212,14 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_ONLY_TEXTURE();
 	}
 
+	pass TwoColor_NotAlphaSet
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
 
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_TWOCOLOR_NOTALPHA();
+	}
 }

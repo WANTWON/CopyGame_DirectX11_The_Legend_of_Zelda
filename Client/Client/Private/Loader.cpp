@@ -14,7 +14,7 @@
 #include "Weapon.h"
 
 //for Monster
-#include "MonsterEffect.h"
+#include "FightEffect.h"
 #include "Octorock.h"
 #include "MoblinSword.h"
 #include "Rola.h"
@@ -972,8 +972,8 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 		return E_FAIL;
 
 	/*For.Prototype_GameObject_PlayerEffect*/
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterEffect"),
-		CMonsterEffect::Create(m_pDevice, m_pContext))))
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_AttackEffect"),
+		CFightEffect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	/*For.Prototype_GameObject_PlayerEffect*/
@@ -1396,13 +1396,20 @@ HRESULT CLoader::Loading_For_Effect()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Ring/GradRing.fbx", PivotMatrix))))
 		return E_FAIL;
 
-
 	/*For.Prototype_Component_Model_RainBowHalo*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_RainbowHalo"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Halo/Halo_0.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_GuardFlash*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardFlash"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Guard/GuardFlash.fbx", PivotMatrix))))
+		return E_FAIL;
 
+	///*For.Prototype_Component_Model_GuardRing*/
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardFlash"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Guard/GuardFlash.fbx", PivotMatrix))))
+	//	return E_FAIL;
 
 
 	/*For.Prototype_Component_Texture_Smoke */
@@ -1443,6 +1450,11 @@ HRESULT CLoader::Loading_For_Effect()
 	/*For.Prototype_Component_Texture_SmokeDst */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SmokeDst"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/DeathSmoke/smoke_%02d_dst.dds"), 3))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Texture_Ray */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Ray"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Ray/ray_00.dds"), 1))))
 		return E_FAIL;
 
 #pragma endregion SwordEffect

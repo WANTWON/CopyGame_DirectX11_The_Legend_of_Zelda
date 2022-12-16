@@ -208,11 +208,11 @@
     <Filter Include="02.GameObjects\07.Effect\PlayerEffect">
       <UniqueIdentifier>{d00c9424-8da9-4b50-8ac2-060275fc3b44}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\07.Effect\MonsterEffect">
-      <UniqueIdentifier>{bdee52db-8683-4483-9131-df1eeace1cfc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\07.Effect\ObjectEffect">
       <UniqueIdentifier>{fdadcf74-4a1a-4072-a8c2-a3eebbc023a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\07.Effect\FightEffect">
+      <UniqueIdentifier>{bdee52db-8683-4483-9131-df1eeace1cfc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -426,11 +426,11 @@
     <ClInclude Include="..\Public\PlayerEffect.h">
       <Filter>02.GameObjects\07.Effect\PlayerEffect</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MonsterEffect.h">
-      <Filter>02.GameObjects\07.Effect\MonsterEffect</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\ObjectEffect.h">
       <Filter>02.GameObjects\07.Effect\ObjectEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FightEffect.h">
+      <Filter>02.GameObjects\07.Effect\FightEffect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -629,11 +629,11 @@
     <ClCompile Include="..\Private\PlayerEffect.cpp">
       <Filter>02.GameObjects\07.Effect\PlayerEffect</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MonsterEffect.cpp">
-      <Filter>02.GameObjects\07.Effect\MonsterEffect</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\ObjectEffect.cpp">
       <Filter>02.GameObjects\07.Effect\ObjectEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FightEffect.cpp">
+      <Filter>02.GameObjects\07.Effect\FightEffect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -46,12 +46,12 @@ public:
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 
-public:
+
+public: /* Getter & Setter */
 	ANIM	Get_AnimState() { return m_eState; }
 	OBJINFO Get_Info() { return m_tInfo; }
 	_uint	Get_PartsItemType();
 	CWeapon::WEAPONDESC Get_WeaponDesc() { return m_WeaponDesc; }
-
 	void	Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void	Set_AnimState(ANIM eAnim);
 	void	Set_Carry(_bool type) { m_bCarry = type; }
@@ -72,15 +72,18 @@ public:
 	void	Set_PlayerState_Defaut();
 
 	
+public:
+	void Make_GuardEffect(CBaseObj* pTarget = nullptr);
+	void Make_SlashEffect();
+
+
 private:
 	void Key_Input(_float fTimeDelta);
-
 	void Change_Direction(_float fTimeDelta);
 	void Change_Animation(_float fTimeDelta);
 	void Check_Navigation(_float fTimeDelta);
 	void Render_Model(MESH_NAME eMeshName);
 	
-
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;
 	virtual HRESULT SetUp_ShaderResources() override; /* 셰이더 전역변수에 값을 전달한다. */
@@ -90,7 +93,8 @@ private:
 	void SetDirection_byPosition_Slash(_float fTimeDelta);
 	void SetDirection_byPosition_Shield(_float fTimeDelta);
 	void SetDirection_Pushing(_float fTimeDelta);
-	
+
+
 
 private:
 	vector<class CGameObject*>			m_Parts;
@@ -127,7 +131,7 @@ private:
 	_float					m_fMaxRed = 1.f;
 	_float					m_fMinRed = 0.4f;
 	_bool					m_bRed = false;
-
+	_bool					m_bMakeEffect = false;
 
 	/* For Item&Weapon */
 	//LeftHand : MESH_SHEILD, MESH_OCARINA 

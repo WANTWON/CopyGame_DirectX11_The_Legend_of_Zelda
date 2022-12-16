@@ -9,9 +9,14 @@ BEGIN(Client)
 class CObjectEffect final : public CEffect
 {
 public:
-	enum TYPE { GRASS, LAWN, GRASS_TEX,
-		ITEM_GET_FLASH, ITEM_GET_GLOW , HORIZONTAL_GLOW,
-		RAINBOW_RING ,  GRAD_RING, RAINBOW_HALO, GLITTER };
+	enum TYPE { 
+		/*For Grass */
+		GRASS, LAWN, GRASS_TEX,
+
+		/*For Item Get */
+		ITEM_GET_FLASH, ITEM_GET_GLOW , HORIZONTAL_GLOW, RAINBOW_RING , GRAD_RING, RAINBOW_HALO, GLITTER , RAY
+	
+	};
 
 
 
@@ -29,7 +34,7 @@ public:
 
 public:
 	void Set_Target(CBaseObj* pObject) { m_pTarget = pObject; }
-
+	void Set_EndMode(_bool type) { m_bEndMode = type; }
 
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
@@ -48,7 +53,7 @@ private:
 	void Tick_RingEffect(_float fTimeDelta);
 	void Tick_HaloEffect(_float fTimeDelta);
 	void Tick_GlitterEffect(_float fTimeDelta);
-
+	void Tick_Ray(_float fTimeDelta);
 
 private:
 	_float	m_fAngle = 0.f;
@@ -60,7 +65,7 @@ private:
 	vector<_vector> m_vecColor;
 	_int			m_iColorIndex = 0;
 	_bool			m_bColorChaged = false;
-
+	_bool			m_bEndMode = false;
 	_bool			m_bMax = false;
 	_float3			m_vMaxScale = _float3(2.f, 0.5f, 0.f);
 

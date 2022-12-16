@@ -198,7 +198,7 @@
     <ClInclude Include="..\Public\Camera_Dynamic.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Collision_Manger.h" />
-    <ClInclude Include="..\Public\MonsterEffect.h" />
+    <ClInclude Include="..\Public\FightEffect.h" />
     <ClInclude Include="..\Public\Npc.h" />
     <ClInclude Include="..\Public\ObjectEffect.h" />
     <ClInclude Include="..\Public\PlayerEffect.h" />
@@ -269,7 +269,7 @@
     <ClCompile Include="..\Private\CameraManager.cpp" />
     <ClCompile Include="..\Private\Camera_Dynamic.cpp" />
     <ClCompile Include="..\Private\Collision_Manger.cpp" />
-    <ClCompile Include="..\Private\MonsterEffect.cpp" />
+    <ClCompile Include="..\Private\FightEffect.cpp" />
     <ClCompile Include="..\Private\Npc.cpp" />
     <ClCompile Include="..\Private\ObjectEffect.cpp" />
     <ClCompile Include="..\Private\PlayerEffect.cpp" />

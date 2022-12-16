@@ -6,20 +6,26 @@
 
 
 BEGIN(Client)
-class CMonsterEffect final : public CEffect
+class CFightEffect final : public CEffect
 {
 public:
-	enum TYPE { HITFLASH, HITFLASH_TEX, HITRING, HITSPARK, 
-		GLOW_SPHERE, SMOKEBACK, SMOKEFRONT,
-		GLOW_LARGE, GLOW_MIDDLE, GLOW_SMALL, GLOW_MINI
+	enum TYPE {
+		/* Hit */
+		HITFLASH, HITFLASH_TEX, HITRING, HITSPARK, 
+
+		/* Dead */
+		GLOW_SPHERE, SMOKEBACK, SMOKEFRONT,GLOW_LARGE, GLOW_MIDDLE, GLOW_SMALL, GLOW_MINI,
+	
+		/* Guard */
+		GUARD_FLASH, GUARD_RING, GUARD_DUST
 	};
 
 
 
 protected:
-	CMonsterEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CMonsterEffect(const CMonsterEffect& rhs);
-	virtual ~CMonsterEffect() = default;
+	CFightEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CFightEffect(const CFightEffect& rhs);
+	virtual ~CFightEffect() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -42,6 +48,9 @@ private:
 	void Tick_HitFlash(_float fTimeDelta);
 	void Tick_DeadEffect(_float fTimeDelta);
 	void Tick_GlowEffect(_float fTimeDelta);
+	void Tick_GuardEffect(_float fTimeDelta);
+
+private:
 	void Make_GlowEffect();
 
 private:
@@ -62,7 +71,7 @@ private:
 
 
 public:
-	static CMonsterEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CFightEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);
 	virtual void Free() override;
 };

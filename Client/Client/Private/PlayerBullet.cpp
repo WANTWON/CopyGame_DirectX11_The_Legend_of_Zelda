@@ -48,7 +48,7 @@ HRESULT CPlayerBullet::Initialize(void * pArg)
 		break;
 	}
 
-	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PBULLET, this);
+	//CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PBULLET, this);
 	
 	return S_OK;
 }
@@ -57,7 +57,7 @@ int CPlayerBullet::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
-		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_PBULLET, this);
+		//CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_PBULLET, this);
 		return OBJ_DEAD;
 	}
 		
@@ -161,13 +161,13 @@ HRESULT CPlayerBullet::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 
-		/* For.Com_OBB*/
-		CCollider::COLLIDERDESC		ColliderDesc;
-		ColliderDesc.vScale = _float3(1.f, 0.2f, 0.4f);
-		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
-		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.5f);
-		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
-			return E_FAIL;
+		///* For.Com_OBB*/
+		//CCollider::COLLIDERDESC		ColliderDesc;
+		//ColliderDesc.vScale = _float3(1.f, 0.2f, 0.4f);
+		//ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		//ColliderDesc.vPosition = _float3(0.f, 0.f, 0.5f);
+		//if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+		//	return E_FAIL;
 		break;
 	}
 	case BOW:

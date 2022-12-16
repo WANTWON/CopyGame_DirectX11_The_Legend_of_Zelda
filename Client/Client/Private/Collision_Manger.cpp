@@ -114,6 +114,7 @@ void CCollision_Manager::CollisionwithBullet()
 		if (Player->Get_AnimState() == CPlayer::SHIELD || Player->Get_AnimState() == CPlayer::SHIELD_HOLD_LP)
 		{
 			Player->Set_AnimState(CPlayer::SHIELD_HIT);
+			Player->Make_GuardEffect(pMonsterBullet);
 		}
 		else
 		{

@@ -4,7 +4,7 @@
 #include "Level_Manager.h"
 #include "CameraManager.h"
 #include "PrizeItem.h"
-#include "MonsterEffect.h"
+#include "FightEffect.h"
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CBaseObj(pDevice, pContext)
@@ -245,56 +245,56 @@ void CMonster::Make_GetAttacked_Effect(CBaseObj* DamageCauser)
 	CEffect::EFFECTDESC EffectDesc;
 
 	EffectDesc.eEffectType = CEffect::MODEL;
-	EffectDesc.eEffectID = CMonsterEffect::HITFLASH;
+	EffectDesc.eEffectID = CFightEffect::HITFLASH;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.2f, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.5f;
 	EffectDesc.vLook = XMVector3Normalize((DamageCauser)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION));
 	EffectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 
-	EffectDesc.eEffectID = CMonsterEffect::HITRING;
+	EffectDesc.eEffectID = CFightEffect::HITRING;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
 	EffectDesc.fDeadTime = 0.8f;
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 
 	for (int i = 0; i < 10; ++i)
 	{
-		EffectDesc.eEffectID = CMonsterEffect::HITSPARK;
+		EffectDesc.eEffectID = CFightEffect::HITSPARK;
 		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
 		_float iRandNum = (rand() % 10 + 10) * 0.1f;
 		EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
 		EffectDesc.fDeadTime = 0.8f;
-		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 	}
 	
 
 
 	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
-	EffectDesc.eEffectID = CMonsterEffect::HITFLASH_TEX;
+	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.15f, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.5f;
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.vInitScale = _float3(2.f, 2.f, 2.2f);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 
-	EffectDesc.eEffectID = CMonsterEffect::HITFLASH_TEX;
+	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.7f;
 	EffectDesc.iTextureNum = 1;
 	EffectDesc.vInitScale = _float3(3.5f, 3.5f, 3.5f);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
-	EffectDesc.eEffectID = CMonsterEffect::HITFLASH_TEX;
+	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.1f, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.5f;
 	EffectDesc.iTextureNum = 2;
 	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 
 
@@ -314,67 +314,67 @@ void CMonster::Make_DeadEffect(CBaseObj * Target)
 	EffectDesc.pTarget = this;
 
 
-	EffectDesc.eEffectID = CMonsterEffect::SMOKEBACK;
+	EffectDesc.eEffectID = CFightEffect::SMOKEBACK;
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.fDeadTime = 1.5f;
 	EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.0f);
 	EffectDesc.vDistance = XMVectorSet(0.0f, m_vScale.y - 0.2f, 0.f, 0.f);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 
-	EffectDesc.eEffectID = CMonsterEffect::SMOKEFRONT;
+	EffectDesc.eEffectID = CFightEffect::SMOKEFRONT;
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.fDeadTime = 1.5f;
 	EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
 	EffectDesc.vDistance = XMVectorSet(0.5f, 0.5f, 0.f, 0.f);
 	EffectDesc.vColor = XMVectorSet(114, 0, 153, 255);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 	
 	EffectDesc.vDistance = XMVectorSet(-0.5f, m_vScale.y - 0.2f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 0.0f);
 	EffectDesc.vColor = XMVectorSet(176, 21, 184, 255);
 	EffectDesc.fDeadTime = 1.0f;
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 	EffectDesc.vDistance = XMVectorSet(1.0f, m_vScale.y - 0.5f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
 	EffectDesc.vColor = XMVectorSet(38, 0, 63, 255);
 	EffectDesc.vColor = XMVectorSet(240, 0, 250, 255);
 	EffectDesc.fDeadTime = 0.7f;
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 	EffectDesc.vDistance = XMVectorSet(-1.0f, m_vScale.y - 0.5f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
 	EffectDesc.vColor = XMVectorSet(63, 0, 38, 255);
 	EffectDesc.vColor = XMVectorSet(176, 0, 184, 255);
 	EffectDesc.fDeadTime = 0.7f;
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 
-	EffectDesc.eEffectID = CMonsterEffect::GLOW_SPHERE;
+	EffectDesc.eEffectID = CFightEffect::GLOW_SPHERE;
 	EffectDesc.vDistance = XMVectorSet(0.f, m_vScale.y, 0.f, 0.f);
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.fDeadTime = 1.0f;
 	EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
 	EffectDesc.vColor = XMVectorSet(226, 0, 255, 255);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 	EffectDesc.fDeadTime = 1.3f;
 	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
 	EffectDesc.vColor = XMVectorSet(0, 0, 0, 255);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 	EffectDesc.fDeadTime = 0.5f;
 	EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
 	EffectDesc.vColor = XMVectorSet(0, 255, 0, 255);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 
-	EffectDesc.eEffectID = CMonsterEffect::GLOW_LARGE;
+	EffectDesc.eEffectID = CFightEffect::GLOW_LARGE;
 	EffectDesc.iTextureNum = 1;
 	EffectDesc.fDeadTime = 0.7f;
 	EffectDesc.vInitScale = _float3(1.5f, 1.5f, 0.0f);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 	
 	

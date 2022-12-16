@@ -10,6 +10,7 @@
 #include "Level_Room.h"
 #include "PlayerEffect.h"
 #include "ObjectEffect.h"
+#include "FightEffect.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -599,29 +600,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			m_pModelCom->Set_AnimationReset();
 		}
 
-		m_BulletLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
-		CPlayerBullet::BULLETDESC BulletDesc;
-		BulletDesc.eBulletType = CPlayerBullet::SLASH;
-		BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.5f, 0.f, 0.f);
-
-		BulletDesc.vLook = m_BulletLook;
-		BulletDesc.fDeadTime = 0.5f;
-		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
-
-		CEffect::EFFECTDESC EffectDesc;
-		EffectDesc.eEffectType = CEffect::MODEL;
-		EffectDesc.eEffectID = CPlayerEffect::ROLLCUT;
-		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, 0.5f, 0.f, 0.f);
-		EffectDesc.fDeadTime = 0.5f;
-		EffectDesc.vLook = m_BulletLook;
-		EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
-		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
-		
-		/*if (FAILED(Ready_Parts_Bullet(CWeapon::SLASH, PARTS_EFFECT)))
-		{
-			RELEASE_INSTANCE(CGameInstance);
-			return;
-		}*/
+		Make_SlashEffect();
 			
 		
 	}
@@ -1001,6 +980,51 @@ void CPlayer::SetDirection_Pushing(_float fTimeDelta)
 	}
 }
 
+void CPlayer::Make_GuardEffect(CBaseObj* pTarget)
+{
+	if (m_bMakeEffect)
+		return;
+
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CFightEffect::GUARD_FLASH;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK))*0.8f + XMVectorSet(0.f,Get_Scale().y*0.5f,0.f,0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - pTarget->Get_TransformState(CTransform::STATE_POSITION);
+	EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.5f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+
+	m_bMakeEffect = true;
+}
+
+void CPlayer::Make_SlashEffect()
+{
+	m_BulletLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
+	CPlayerBullet::BULLETDESC BulletDesc;
+	BulletDesc.eBulletType = CPlayerBullet::SLASH;
+	BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.5f, 0.f, 0.f);
+
+	BulletDesc.vLook = m_BulletLook;
+	BulletDesc.fDeadTime = 0.5f;
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
+
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CPlayerEffect::ROLLCUT;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, 0.5f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = m_BulletLook;
+	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+	/*if (FAILED(Ready_Parts_Bullet(CWeapon::SLASH, PARTS_EFFECT)))
+	{
+	RELEASE_INSTANCE(CGameInstance);
+	return;
+	}*/
+}
+
 void CPlayer::Change_Animation(_float fTimeDelta)
 {
 	switch (m_eState)
@@ -1166,7 +1190,10 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			m_bMakeEffect = false;
 			m_eState = SHIELD_HOLD_LP;
+		}			
 		break;
 	case Client::CPlayer::LAND:
 	case Client::CPlayer::D_LAND:

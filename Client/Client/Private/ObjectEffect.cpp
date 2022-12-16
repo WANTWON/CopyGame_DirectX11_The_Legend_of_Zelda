@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "GameInstance.h"
 
+
 CObjectEffect::CObjectEffect(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CEffect(pDevice, pContext)
 {
@@ -116,7 +117,7 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 
 	case GLITTER:
 	{
-		m_eShaderID = SHADER_TWOCOLOR_PRIORITY;
+		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
 		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
 		_int iRandNum = rand() % 6 + 1;
 		if (iRandNum == 1) m_vColorBack = XMVectorSet(255.f, 63.f, 63.f, 255.f);
@@ -125,9 +126,14 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 		else if (iRandNum == 4)	m_vColorBack = XMVectorSet(63.f, 127.f, 255.f, 255.f);
 		else if (iRandNum == 5) m_vColorBack = XMVectorSet(255.f, 63.f, 63.f, 255.f);
 		else  m_vColorBack = XMVectorSet(228.f, 226.f, 228.f, 255.f);
-		m_fSpeed = (rand() % 20 + 5)* 0.1f;
+		m_fSpeed = (rand() % 3 + 1)* 0.1f;
 		m_vMaxScale = m_EffectDesc.vInitScale;
+		break;
 	}
+	case RAY:
+		m_eShaderID = SHADER_ONLY_TEXTURE;
+		m_fAlpha = 0.f;
+		break;
 	default:
 		break;
 	}
@@ -144,6 +150,21 @@ int CObjectEffect::Tick(_float fTimeDelta)
 	}
 
 	__super::Tick(fTimeDelta);
+
+
+	if (m_bEndMode)
+	{
+		m_vScale.x -= 0.05f;
+		m_vScale.y -= 0.05f;
+		m_vScale.z -= 0.05f;
+		m_fAlpha -= 0.05f;
+
+		if (m_fAlpha < 0.f || m_vScale.x <= 0.f)
+			m_bDead = true;
+
+		return OBJ_NOEVENT;
+	}
+
 
 	switch (m_EffectDesc.eEffectID)
 	{
@@ -168,6 +189,12 @@ int CObjectEffect::Tick(_float fTimeDelta)
 	case RAINBOW_HALO:
 		Tick_HaloEffect(fTimeDelta);
 		break;
+	case GLITTER:
+		Tick_GlitterEffect(fTimeDelta);
+		break;
+	case RAY:
+		Tick_Ray(fTimeDelta);
+		break;
 	default:
 		break;
 	}
@@ -178,6 +205,9 @@ int CObjectEffect::Tick(_float fTimeDelta)
 void CObjectEffect::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
+
+
+
 }
 
 HRESULT CObjectEffect::Render()
@@ -277,6 +307,10 @@ HRESULT CObjectEffect::Ready_Components(void * pArg)
 		break;
 	case GLITTER:
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case RAY:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Ray"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
 	default:
@@ -458,8 +492,48 @@ void CObjectEffect::Tick_FlashEffect(_float fTimeDelta)
 		m_fAlpha -= 0.05f;
 
 		if (m_fAlpha <= 0.f || m_vScale.x <= 0.f)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+			EffectDesc.pTarget = m_EffectDesc.pTarget;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			for (int i = 0; i < 10; ++i)
+			{
+				
+				EffectDesc.eEffectID = CObjectEffect::GLITTER;
+				_float fRandNum = (rand() % 5 + 1) * 0.1f;
+				EffectDesc.vInitScale = _float3(fRandNum, fRandNum, 0.0f);
+				EffectDesc.fDeadTime = 1.5f;
+				EffectDesc.iTextureNum = 1;
+				EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10)*0.1f, 0.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+			}
+
+			/*for (int i = 0; i < 4; ++i)
+			{
+				EffectDesc.vDistance = (rand()%2 == 0) ? XMVectorSetX(EffectDesc.vDistance, XMVectorGetX(EffectDesc.vDistance) + 1.f)
+					: XMVectorSetX(EffectDesc.vDistance, XMVectorGetX(EffectDesc.vDistance) -1.f);
+				
+				EffectDesc.vDistance = (rand() % 2 == 0) ? XMVectorSetY(EffectDesc.vDistance, XMVectorGetY(EffectDesc.vDistance) + 1.f)
+					: XMVectorSetY(EffectDesc.vDistance, XMVectorGetY(EffectDesc.vDistance) -1.f);
+
+				EffectDesc.eEffectID = CObjectEffect::RAY;
+				_float fRandNum = (rand() % 5 + 1) * 0.1f;
+				EffectDesc.vInitScale = _float3(fRandNum, fRandNum, 0.0f);
+				EffectDesc.fDeadTime = (rand() % 3 + 1) * 0.1f;
+				EffectDesc.iTextureNum = 0;
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+			}*/
+
 			m_bDead = true;
+		}
+			
 	}
+
+
+
+	
 
 	Set_Scale(m_vScale);
 }
@@ -591,9 +665,9 @@ void CObjectEffect::Tick_HaloEffect(_float fTimeDelta)
 	if (!m_bMax)
 	{
 		m_fAlpha += 0.002f;
-		if (m_fAlpha >= 0.6f)
+		if (m_fAlpha >= 0.5f)
 		{
-			m_fAlpha = 0.6f;
+			m_fAlpha = 0.5f;
 			m_bMax = true;
 		}
 			
@@ -619,7 +693,7 @@ void CObjectEffect::Tick_GlitterEffect(_float fTimeDelta)
 
 	m_pTransformCom->Go_PosDir(fTimeDelta*m_fSpeed, m_EffectDesc.vLook);
 
-	if (m_fDeadtime < m_EffectDesc.fDeadTime*0.3f)
+	if (m_fDeadtime < m_EffectDesc.fDeadTime*0.2f)
 	{
 		m_vScale.x += 0.05f;
 		m_vScale.y += 0.05f;
@@ -629,7 +703,22 @@ void CObjectEffect::Tick_GlitterEffect(_float fTimeDelta)
 			m_vScale = m_vMaxScale;
 		}
 	}
+	else if (m_fDeadtime < m_EffectDesc.fDeadTime*0.4f)
+	{
+		m_vScale.x -= 0.05f;
+		m_vScale.y -= 0.05f;
+	}
 	else if (m_fDeadtime < m_EffectDesc.fDeadTime*0.6f)
+	{
+		m_vScale.x += 0.05f;
+		m_vScale.y += 0.05f;
+
+		if (m_vScale.x >= m_vMaxScale.x)
+		{
+			m_vScale = m_vMaxScale;
+		}
+	}
+	else if (m_fDeadtime < m_EffectDesc.fDeadTime*0.8f)
 	{
 		m_vScale.x -= 0.05f;
 		m_vScale.y -= 0.05f;
@@ -655,6 +744,34 @@ void CObjectEffect::Tick_GlitterEffect(_float fTimeDelta)
 
 	if (m_fAlpha <= 0.f)
 		m_bDead = true;
+}
+
+void CObjectEffect::Tick_Ray(_float fTimeDelta)
+{
+	if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
+	{
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vDistance);
+	}
+
+	if (m_fDeadtime < m_EffectDesc.fDeadTime)
+	{
+		m_vScale.y += 0.01f;
+		m_fAlpha += 0.01f;
+
+		if (m_fAlpha >= 1.f)
+			m_fAlpha = 1.f;
+	}
+	else
+	{
+		m_vScale.y += 0.01f;
+		m_fAlpha -= 0.01f;
+	}
+
+	Set_Scale(m_vScale);
+
+	if (m_fAlpha <= 0.f)
+		m_bDead = true;
+	
 }
 
 
