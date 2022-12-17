@@ -10,11 +10,9 @@
 //for Player
 #include "Player.h"
 #include "PlayerBullet.h"
-#include "PlayerEffect.h"
 #include "Weapon.h"
 
 //for Monster
-#include "FightEffect.h"
 #include "Octorock.h"
 #include "MoblinSword.h"
 #include "Rola.h"
@@ -61,7 +59,12 @@
 #include "Crane.h"
 #include "FieldDecoObject.h"
 #include "Sky.h"
+
+//for Effect
 #include "ObjectEffect.h"
+#include "PlayerEffect.h"
+#include "FightEffect.h"
+#include "MonsterEffect.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -965,6 +968,11 @@ HRESULT CLoader::Loading_ForTowerLevel()
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	/*For.Prototype_GameObject_MonsterEffect*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterEffect"),
+		CMonsterEffect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	/*For.Prototype_GameObject_ObjectEffect*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_ObjectEffect"),

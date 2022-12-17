@@ -102,6 +102,47 @@ HRESULT CEffect::Render()
 }
 
 
+HRESULT CEffect::Ready_Components(void * pArg)
+{
+	/* For.Com_Renderer */
+	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))
+		return E_FAIL;
+
+	/* For.Com_Transform */
+	CTransform::TRANSFORMDESC		TransformDesc;
+	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
+
+	TransformDesc.fSpeedPerSec = 5.0f;
+	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
+	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
+		return E_FAIL;
+
+
+	/* For.Com_Model*/
+	switch (m_EffectDesc.eEffectType)
+	{
+	case MODEL:
+		/* For.Com_Shader */
+		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect_Model"), (CComponent**)&m_pShaderCom)))
+			return E_FAIL;
+		break;
+	case VIBUFFER_RECT:
+		/* For.Com_Shader */
+		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect"), (CComponent**)&m_pShaderCom)))
+			return E_FAIL;
+
+		/* For.Com_VIBuffer */
+		if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
+			return E_FAIL;
+
+		break;
+	default:
+		break;
+	}
+
+	return S_OK;
+}
+
 HRESULT CEffect::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
@@ -117,6 +158,32 @@ HRESULT CEffect::SetUp_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
 		return E_FAIL;
+
+	if (m_EffectDesc.eEffectType == MODEL)
+	{
+		if (FAILED(m_pShaderCom->Set_RawValue("g_TexUV", &m_fTexUV, sizeof(_float))))
+			return E_FAIL;
+	}
+	else
+	{
+
+		if (FAILED(pGameInstance->Bind_RenderTarget_SRV(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture")))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_EffectDesc.iTextureNum))))
+			return E_FAIL;
+
+	}
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorBack", &m_vColorBack, sizeof(_vector))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorFront", &m_vColorFront, sizeof(_vector))))
+		return E_FAIL;
+
 
 	RELEASE_INSTANCE(CGameInstance);
 

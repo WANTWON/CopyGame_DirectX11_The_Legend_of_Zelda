@@ -51,9 +51,9 @@ public:
 	void Set_Target(CBaseObj* pObject) { m_pTarget = pObject; }
 
 
-private:
-	virtual HRESULT Ready_Components(void* pArg = nullptr) = 0;
-	virtual HRESULT SetUp_ShaderResources() ;
+protected:
+	virtual HRESULT Ready_Components(void* pArg = nullptr);
+	virtual HRESULT SetUp_ShaderResources();
 	virtual HRESULT SetUp_ShaderID() { return S_OK; };
 	virtual void Change_Animation(_float fTimeDelta) {};
 	virtual void Change_Texture(_float fTimeDelta) {};
@@ -69,9 +69,12 @@ protected: /* For.Components */
 	_float					m_fTexUV = 0.f;
 	_float3					m_vDirection = _float3(0.f, 0.f, 0.f);
 
+	_vector					m_vColorBack = XMVectorSet(1.f, 1.f, 1.f, 1.f);
+	_vector					m_vColorFront = XMVectorSet(1.f, 1.f, 1.f, 1.f);
 
 	EFFECTDESC				m_EffectDesc;
 	_float4x4				m_CombinedWorldMatrix;
+
 public:
 	virtual void Free() override;
 };

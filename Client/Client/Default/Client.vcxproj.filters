@@ -444,6 +444,9 @@
     <ClInclude Include="..\Public\CameraManager.h">
       <Filter>04.Camera\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MonsterEffect.h">
+      <Filter>02.GameObjects\05.Effect\MonsterEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -646,6 +649,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\CameraManager.cpp">
       <Filter>04.Camera\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MonsterEffect.cpp">
+      <Filter>02.GameObjects\05.Effect\MonsterEffect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

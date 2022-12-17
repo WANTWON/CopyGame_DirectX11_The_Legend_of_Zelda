@@ -332,7 +332,7 @@ void CMonsterBullet::LateTick_Octorock(_float fTimeDelta)
 		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
 		EffectDesc.fDeadTime = 0.1f;
 		EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
-		EffectDesc.vInitScale = _float3(0.7, 0.7f, 0.7f);
+		EffectDesc.vInitScale = _float3(0.7f, 0.7f, 0.7f);
 		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 		m_fEffectTime = 0.f;
 	}

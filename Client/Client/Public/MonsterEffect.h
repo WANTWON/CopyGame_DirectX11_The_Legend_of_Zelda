@@ -6,27 +6,20 @@
 
 
 BEGIN(Client)
-class CObjectEffect final : public CEffect
+class CMonsterEffect final : public CEffect
 {
 public:
 	enum TYPE { 
-		/*For Grass */
-		GRASS, LAWN, GRASS_TEX,
-
-		/*For Item Get */
-		ITEM_GET_FLASH, ITEM_GET_GLOW , HORIZONTAL_GLOW, RAINBOW_RING ,
-		GRAD_RING, RAINBOW_HALO, GLITTER , RAY,
-	
-		/*For Smoke*/
-		SMOKE 
+		/* For Octorock */
+		BULLET_SMOKE, BURST_RING,
 	};
 
 
 
 protected:
-	CObjectEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CObjectEffect(const CObjectEffect& rhs);
-	virtual ~CObjectEffect() = default;
+	CMonsterEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CMonsterEffect(const CMonsterEffect& rhs);
+	virtual ~CMonsterEffect() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -49,19 +42,12 @@ private:
 	void Tick_Grass(_float fTimeDelta);
 	void Tick_Smoke(_float fTimeDelta);
 
-	/* For Get Item*/
-	void Tick_GlowEffect(_float fTimeDelta);
-	void Tick_FlashEffect(_float fTimeDelta);
-	void Tick_HorizontalGlowEffect(_float fTimeDelta);
-	void Tick_RingEffect(_float fTimeDelta);
-	void Tick_HaloEffect(_float fTimeDelta);
-	void Tick_GlitterEffect(_float fTimeDelta);
-	void Tick_Ray(_float fTimeDelta);
 
 private:
 	_float	m_fAngle = 0.f;
 	_float	m_fColorTime = 0.f;
 	_float	m_fSpeed = 0.f;
+	
 
 	vector<_vector> m_vecColor;
 	_int			m_iColorIndex = 0;
@@ -71,7 +57,7 @@ private:
 	_float3			m_vMaxScale = _float3(2.f, 0.5f, 0.f);
 
 public:
-	static CObjectEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CMonsterEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);
 	virtual void Free() override;
 };
