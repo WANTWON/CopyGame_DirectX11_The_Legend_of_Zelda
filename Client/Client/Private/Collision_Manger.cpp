@@ -111,7 +111,9 @@ void CCollision_Manager::CollisionwithBullet()
 		pMonsterBullet->Set_Dead(true);
 
 		CPlayer* Player = dynamic_cast<CPlayer*>(pPlayer);
-		if (Player->Get_AnimState() == CPlayer::SHIELD || Player->Get_AnimState() == CPlayer::SHIELD_HOLD_LP)
+		if (Player->Get_AnimState() == CPlayer::SHIELD || Player->Get_AnimState() == CPlayer::SHIELD_HOLD_LP
+			|| Player->Get_AnimState() == CPlayer::SHIELD_HOLD_B || Player->Get_AnimState() == CPlayer::SHIELD_HOLD_F
+			|| Player->Get_AnimState() == CPlayer::SHIELD_HOLD_L || Player->Get_AnimState() == CPlayer::SHIELD_HOLD_R )
 		{
 			Player->Set_AnimState(CPlayer::SHIELD_HIT);
 			Player->Make_GuardEffect(pMonsterBullet);

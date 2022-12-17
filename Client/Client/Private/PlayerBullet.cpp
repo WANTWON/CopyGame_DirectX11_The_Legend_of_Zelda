@@ -40,7 +40,7 @@ HRESULT CPlayerBullet::Initialize(void * pArg)
 		Set_Scale(_float3(3.f, 3.f, 3.f));
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		m_pTransformCom->LookDir(m_BulletDesc.vLook);
-		m_eShaderID = SHADER_SLASH;
+		m_eShaderID = SHADERM_SLASH;
 		m_fTexUV = 1.f;
 		//m_bSocket = true;
 		break;

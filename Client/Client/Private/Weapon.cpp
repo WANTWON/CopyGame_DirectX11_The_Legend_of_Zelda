@@ -115,7 +115,7 @@ HRESULT CWeapon::Render()
 			return E_FAIL;
 
 		if (m_WeaponDesc.eType == SLASH)
-			m_eShaderID = SHADER_SLASH;
+			m_eShaderID = SHADERM_SLASH;
 		else
 			m_eShaderID = SHADER_DEFAULT;
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))

@@ -28,59 +28,11 @@
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{ffd39a2b-4897-4694-bc2f-d9c96bf2d061}</UniqueIdentifier>
     </Filter>
-    <Filter Include="96.Camera">
-      <UniqueIdentifier>{55d7a379-9b3f-44de-b2a6-a82b799e9ebb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="96.Camera\Dynamic">
-      <UniqueIdentifier>{ee3116ca-37dc-4973-8974-89f3c24106c8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="95.UI">
-      <UniqueIdentifier>{db326884-8e5c-47c6-bd6b-1b276e8834a9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="95.UI\01. BackGround">
-      <UniqueIdentifier>{57566d9b-4982-490a-9436-a60395b8dd99}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="95.UI\04. UIButton">
-      <UniqueIdentifier>{1301e89d-dc8c-4c2b-bb34-ee43c21d52d0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="95.UI\00. ObjUI%28Base%29">
-      <UniqueIdentifier>{c5474d07-5e19-48f3-a029-fbff9831b93d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\00.BaseObj">
       <UniqueIdentifier>{3c7378a6-3e37-486a-b9ee-fc1f1825002c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\02.Player">
-      <UniqueIdentifier>{2a2f6828-11ef-4b28-a218-49dc0b8693d6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster">
-      <UniqueIdentifier>{176bbdcc-cb7d-42f6-8ed7-b6ae261f9ea1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster\00.Octorock">
-      <UniqueIdentifier>{f0d3fb72-495a-48e4-9f30-554b6b7b10d7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\01.NonAnim">
-      <UniqueIdentifier>{702373a4-8bfc-4fcf-b1a3-b6e9013b66eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster\01.MoblinSword">
-      <UniqueIdentifier>{1ea90761-5912-46ea-a861-ce80f25ae670}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="95.UI\02. Inventory">
-      <UniqueIdentifier>{a03ca03d-fc3c-4419-847f-970cb5a55716}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="95.UI\02. Inventory\00. InvenTile">
-      <UniqueIdentifier>{37acfc00-5104-4b3a-9122-478460e1c85b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="95.UI\02. Inventory\01. InvenItem">
-      <UniqueIdentifier>{98a8fba2-465d-43fd-9bba-0ccc270e4b67}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="95.UI\03. PlayerState">
-      <UniqueIdentifier>{c158d6cc-1b69-4972-9042-26d179eca7c9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\03.TailCave">
       <UniqueIdentifier>{ad8ba1ec-e482-40ae-b02f-775c9db6d21b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster\02.Rola">
-      <UniqueIdentifier>{277fde18-006f-4e25-bf82-100d2c0979fc}</UniqueIdentifier>
     </Filter>
     <Filter Include="94.CollisionMgr">
       <UniqueIdentifier>{30a8f8a5-3e7e-4b8b-9e02-4c3a30fa0e3b}</UniqueIdentifier>
@@ -94,125 +46,185 @@
     <Filter Include="02.GameObjects\04.Bullet\01.PlayerBullet">
       <UniqueIdentifier>{a01df109-d708-4035-937d-125f61229e8d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\02.Player\Weapon">
-      <UniqueIdentifier>{48ef9c7f-970a-44b0-96ec-7ff3f84bb05d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster\03.Pawn">
-      <UniqueIdentifier>{36fe2785-0cd5-41fe-bdf4-789eb567803b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\05.Object">
-      <UniqueIdentifier>{0dd72c5c-1e22-492a-8380-0dd9ba87836a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\01.NonAnim\02.DgnKey">
-      <UniqueIdentifier>{a763ca3b-af19-4589-8029-c83bf2105c38}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\05.Object\01.FootSwitch">
-      <UniqueIdentifier>{acdfb9fa-9e30-4e97-800a-c3cdb52d4b0e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\05.Object\00.Treasurebox">
-      <UniqueIdentifier>{99921f31-1be4-4c3b-b755-589da03728ec}</UniqueIdentifier>
-    </Filter>
     <Filter Include="93.DataManager">
       <UniqueIdentifier>{51f6e595-97c0-4eaa-88ff-4ef974a2adec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="95.UI\05. MessageBox">
-      <UniqueIdentifier>{be2b1e41-6c34-430d-9f63-a569e70b4a20}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster\05.TailBoss">
-      <UniqueIdentifier>{c02f26b0-f6e7-4339-ba1b-7894cfbe7b3a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\01.NonAnim\03.CollapseTile">
-      <UniqueIdentifier>{2f24d655-b332-4ef9-9eeb-ad3bf5355fa5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\05.Object\02.Door">
-      <UniqueIdentifier>{1fdb551f-2a8b-4a21-9bef-48e04789f46e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster\04.BuzzBlob">
-      <UniqueIdentifier>{a8622992-5935-4f83-809f-1d164b6b78bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster\06.RedZol">
-      <UniqueIdentifier>{a26cceaa-cd44-49cf-9e87-748752733c87}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster\07.Keese">
-      <UniqueIdentifier>{97c7ffc2-0d5c-4c3f-968e-a991e8dc1945}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\01.NonAnim\04.SquareBlock">
-      <UniqueIdentifier>{75a6af79-4d70-472d-8782-ce6af3fa590c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster\08.Tail">
-      <UniqueIdentifier>{4469c2a0-c4ac-42cb-9245-bec1fb6535f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster\09.Togezo">
-      <UniqueIdentifier>{fbfa1714-8b60-47e5-9304-34f66add9510}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\05.Object\03.BladeTrap">
-      <UniqueIdentifier>{8721f067-9032-484c-bec4-20c3e5fdab24}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\01.NonAnim\05.Portal">
-      <UniqueIdentifier>{30af3763-4fa6-485f-a9a9-c6f8e074088d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="96.Camera\2DCam">
-      <UniqueIdentifier>{d5aa3d88-0a33-4dfd-bc33-691978807bf0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\01.NonAnim\06.PrizeItem">
-      <UniqueIdentifier>{59264d96-cec9-4d0c-a0e1-2ba39fb57a9b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\01.NonAnim\07.Grass">
-      <UniqueIdentifier>{7846b7eb-1e36-4ca2-962a-d07170beec4e}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Levels\04.Room">
       <UniqueIdentifier>{cf1ac70c-25d7-4a2d-9bd6-7bcbcc16c912}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\06.Npc">
-      <UniqueIdentifier>{53e39c73-5ecb-4f35-816d-7aba84d4a436}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\06.Npc\ShopNpc">
-      <UniqueIdentifier>{02854cb7-cf41-4393-b59d-3869a1b2756b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\06.Npc\MarinNpc">
-      <UniqueIdentifier>{ec869e40-566e-4cb6-ade4-be3539948f03}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\06.Npc\CraneGameNpc">
-      <UniqueIdentifier>{2aaa7c1d-1d00-4c8d-8dfa-c9c511ee790b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\05.Object\04.CraneButton">
-      <UniqueIdentifier>{afdfe9d9-9ae0-453f-8f2e-722bbeace43b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\01.NonAnim\08.Crane">
-      <UniqueIdentifier>{a54f2e90-1238-43cc-bac3-c11f8e240973}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\03.Monster\10.Cucco">
-      <UniqueIdentifier>{7834f938-0a3d-4887-acab-2bc5b356a5dd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\01.NonAnim\01.Background">
-      <UniqueIdentifier>{6cd33bd8-14ca-4499-8f92-7d7ff986c039}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\05.Tower">
       <UniqueIdentifier>{e2affbcc-6e32-48ec-ba3c-2fe90b8f676f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\06.Npc\FieldNpc">
-      <UniqueIdentifier>{39707b96-105f-4b83-8003-56dd958cec09}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\01.Actor">
+      <UniqueIdentifier>{37818c69-d823-4610-b55b-7f269da22e55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\03.Monster\11.Albatoss">
-      <UniqueIdentifier>{a4498069-8626-4373-aa89-38db76ac8b33}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\02.NonAnimObject">
+      <UniqueIdentifier>{702373a4-8bfc-4fcf-b1a3-b6e9013b66eb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\05.Object\05.AnimDecoObject">
+    <Filter Include="02.GameObjects\02.NonAnimObject\02.DgnKey">
+      <UniqueIdentifier>{a763ca3b-af19-4589-8029-c83bf2105c38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\02.NonAnimObject\03.CollapseTile">
+      <UniqueIdentifier>{2f24d655-b332-4ef9-9eeb-ad3bf5355fa5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\02.NonAnimObject\04.SquareBlock">
+      <UniqueIdentifier>{75a6af79-4d70-472d-8782-ce6af3fa590c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\02.NonAnimObject\05.Portal">
+      <UniqueIdentifier>{30af3763-4fa6-485f-a9a9-c6f8e074088d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\02.NonAnimObject\06.PrizeItem">
+      <UniqueIdentifier>{59264d96-cec9-4d0c-a0e1-2ba39fb57a9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\02.NonAnimObject\07.Grass">
+      <UniqueIdentifier>{7846b7eb-1e36-4ca2-962a-d07170beec4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\02.NonAnimObject\08.Crane">
+      <UniqueIdentifier>{a54f2e90-1238-43cc-bac3-c11f8e240973}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\02.NonAnimObject\01.Background">
+      <UniqueIdentifier>{6cd33bd8-14ca-4499-8f92-7d7ff986c039}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.AnimObject">
+      <UniqueIdentifier>{0dd72c5c-1e22-492a-8380-0dd9ba87836a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.AnimObject\01.FootSwitch">
+      <UniqueIdentifier>{acdfb9fa-9e30-4e97-800a-c3cdb52d4b0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.AnimObject\00.Treasurebox">
+      <UniqueIdentifier>{99921f31-1be4-4c3b-b755-589da03728ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.AnimObject\02.Door">
+      <UniqueIdentifier>{1fdb551f-2a8b-4a21-9bef-48e04789f46e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.AnimObject\03.BladeTrap">
+      <UniqueIdentifier>{8721f067-9032-484c-bec4-20c3e5fdab24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.AnimObject\04.CraneButton">
+      <UniqueIdentifier>{afdfe9d9-9ae0-453f-8f2e-722bbeace43b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\03.AnimObject\05.AnimDecoObject">
       <UniqueIdentifier>{ee7a90cc-9992-4dc5-8c7f-f79df7c009da}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\06.Npc\TarinNpc">
-      <UniqueIdentifier>{6aed2e3f-63e4-4bad-a215-8345ffe1dded}</UniqueIdentifier>
+    <Filter Include="03.UI">
+      <UniqueIdentifier>{db326884-8e5c-47c6-bd6b-1b276e8834a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\07.Effect">
+    <Filter Include="03.UI\01. BackGround">
+      <UniqueIdentifier>{57566d9b-4982-490a-9436-a60395b8dd99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\04. UIButton">
+      <UniqueIdentifier>{1301e89d-dc8c-4c2b-bb34-ee43c21d52d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\00. ObjUI%28Base%29">
+      <UniqueIdentifier>{c5474d07-5e19-48f3-a029-fbff9831b93d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\02. Inventory">
+      <UniqueIdentifier>{a03ca03d-fc3c-4419-847f-970cb5a55716}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\02. Inventory\00. InvenTile">
+      <UniqueIdentifier>{37acfc00-5104-4b3a-9122-478460e1c85b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\02. Inventory\01. InvenItem">
+      <UniqueIdentifier>{98a8fba2-465d-43fd-9bba-0ccc270e4b67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\03. PlayerState">
+      <UniqueIdentifier>{c158d6cc-1b69-4972-9042-26d179eca7c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\05. MessageBox">
+      <UniqueIdentifier>{be2b1e41-6c34-430d-9f63-a569e70b4a20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\Manager">
+      <UniqueIdentifier>{4d942a95-98cf-4133-bfb4-abb1a532e3b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Camera">
+      <UniqueIdentifier>{55d7a379-9b3f-44de-b2a6-a82b799e9ebb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Camera\00.Dynamic">
+      <UniqueIdentifier>{ee3116ca-37dc-4973-8974-89f3c24106c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Camera\01.2DCam">
+      <UniqueIdentifier>{d5aa3d88-0a33-4dfd-bc33-691978807bf0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Camera\Manager">
+      <UniqueIdentifier>{1eb0408d-401f-4ecf-9026-c603f46dbc8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\05.Effect">
       <UniqueIdentifier>{0abf4918-cf98-48f3-9c99-83243c37b609}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\07.Effect\PlayerEffect">
+    <Filter Include="02.GameObjects\05.Effect\PlayerEffect">
       <UniqueIdentifier>{d00c9424-8da9-4b50-8ac2-060275fc3b44}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\07.Effect\ObjectEffect">
+    <Filter Include="02.GameObjects\05.Effect\ObjectEffect">
       <UniqueIdentifier>{fdadcf74-4a1a-4072-a8c2-a3eebbc023a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\07.Effect\FightEffect">
+    <Filter Include="02.GameObjects\05.Effect\FightEffect">
       <UniqueIdentifier>{bdee52db-8683-4483-9131-df1eeace1cfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\05.Effect\MonsterEffect">
+      <UniqueIdentifier>{41846995-5261-473e-b224-516eac694efc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\00.Player">
+      <UniqueIdentifier>{2a2f6828-11ef-4b28-a218-49dc0b8693d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\00.Player\Weapon">
+      <UniqueIdentifier>{48ef9c7f-970a-44b0-96ec-7ff3f84bb05d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster">
+      <UniqueIdentifier>{176bbdcc-cb7d-42f6-8ed7-b6ae261f9ea1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\00.Octorock">
+      <UniqueIdentifier>{f0d3fb72-495a-48e4-9f30-554b6b7b10d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\01.MoblinSword">
+      <UniqueIdentifier>{1ea90761-5912-46ea-a861-ce80f25ae670}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\02.Rola">
+      <UniqueIdentifier>{277fde18-006f-4e25-bf82-100d2c0979fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\03.Pawn">
+      <UniqueIdentifier>{36fe2785-0cd5-41fe-bdf4-789eb567803b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\05.TailBoss">
+      <UniqueIdentifier>{c02f26b0-f6e7-4339-ba1b-7894cfbe7b3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\04.BuzzBlob">
+      <UniqueIdentifier>{a8622992-5935-4f83-809f-1d164b6b78bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\06.RedZol">
+      <UniqueIdentifier>{a26cceaa-cd44-49cf-9e87-748752733c87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\07.Keese">
+      <UniqueIdentifier>{97c7ffc2-0d5c-4c3f-968e-a991e8dc1945}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\08.Tail">
+      <UniqueIdentifier>{4469c2a0-c4ac-42cb-9245-bec1fb6535f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\09.Togezo">
+      <UniqueIdentifier>{fbfa1714-8b60-47e5-9304-34f66add9510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\10.Cucco">
+      <UniqueIdentifier>{7834f938-0a3d-4887-acab-2bc5b356a5dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\01.Monster\11.Albatoss">
+      <UniqueIdentifier>{a4498069-8626-4373-aa89-38db76ac8b33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\02.Npc">
+      <UniqueIdentifier>{53e39c73-5ecb-4f35-816d-7aba84d4a436}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\02.Npc\ShopNpc">
+      <UniqueIdentifier>{02854cb7-cf41-4393-b59d-3869a1b2756b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\02.Npc\MarinNpc">
+      <UniqueIdentifier>{ec869e40-566e-4cb6-ade4-be3539948f03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\02.Npc\CraneGameNpc">
+      <UniqueIdentifier>{2aaa7c1d-1d00-4c8d-8dfa-c9c511ee790b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\02.Npc\FieldNpc">
+      <UniqueIdentifier>{39707b96-105f-4b83-8003-56dd958cec09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\01.Actor\02.Npc\TarinNpc">
+      <UniqueIdentifier>{6aed2e3f-63e4-4bad-a215-8345ffe1dded}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -250,58 +262,52 @@
       <Filter>01.Levels\01.Logo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
-      <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\01.Background</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Camera_Dynamic.h">
-      <Filter>96.Camera\Dynamic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\CameraManager.h">
-      <Filter>96.Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\UI_Manager.h">
-      <Filter>95.UI</Filter>
+      <Filter>04.Camera\00.Dynamic</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
-      <Filter>95.UI\01. BackGround</Filter>
+      <Filter>03.UI\01. BackGround</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\InvenTile.h">
-      <Filter>95.UI\02. Inventory\00. InvenTile</Filter>
+      <Filter>03.UI\02. Inventory\00. InvenTile</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Obj_UI.h">
-      <Filter>95.UI\00. ObjUI%28Base%29</Filter>
+      <Filter>03.UI\00. ObjUI%28Base%29</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UIButton.h">
-      <Filter>95.UI\04. UIButton</Filter>
+      <Filter>03.UI\04. UIButton</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\InvenItem.h">
-      <Filter>95.UI\02. Inventory\01. InvenItem</Filter>
+      <Filter>03.UI\02. Inventory\01. InvenItem</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BaseObj.h">
       <Filter>02.GameObjects\00.BaseObj</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Player.h">
-      <Filter>02.GameObjects\02.Player</Filter>
+      <Filter>02.GameObjects\01.Actor\00.Player</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Bin\ShaderFiles\Client_Shader_Defines.hpp">
       <Filter>97.ShaderFiles</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster.h">
-      <Filter>02.GameObjects\03.Monster</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Octorock.h">
-      <Filter>02.GameObjects\03.Monster\00.Octorock</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\00.Octorock</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MoblinSword.h">
-      <Filter>02.GameObjects\03.Monster\01.MoblinSword</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\01.MoblinSword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\NonAnim.h">
-      <Filter>02.GameObjects\01.NonAnim</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_TailCave.h">
       <Filter>01.Levels\03.TailCave</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Rola.h">
-      <Filter>02.GameObjects\03.Monster\02.Rola</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\02.Rola</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Collision_Manger.h">
       <Filter>94.CollisionMgr</Filter>
@@ -313,124 +319,130 @@
       <Filter>02.GameObjects\04.Bullet\01.PlayerBullet</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Weapon.h">
-      <Filter>02.GameObjects\02.Player\Weapon</Filter>
+      <Filter>02.GameObjects\01.Actor\00.Player\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Pawn.h">
-      <Filter>02.GameObjects\03.Monster\03.Pawn</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\03.Pawn</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DgnKey.h">
-      <Filter>02.GameObjects\01.NonAnim\02.DgnKey</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\02.DgnKey</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PlayerState.h">
-      <Filter>95.UI\03. PlayerState</Filter>
+      <Filter>03.UI\03. PlayerState</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TreasureBox.h">
-      <Filter>02.GameObjects\05.Object\00.Treasurebox</Filter>
+      <Filter>02.GameObjects\03.AnimObject\00.Treasurebox</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FootSwitch.h">
-      <Filter>02.GameObjects\05.Object\01.FootSwitch</Filter>
+      <Filter>02.GameObjects\03.AnimObject\01.FootSwitch</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Data_Manager.h">
       <Filter>93.DataManager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MessageBox.h">
-      <Filter>95.UI\05. MessageBox</Filter>
+      <Filter>03.UI\05. MessageBox</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BuzzBlob.h">
-      <Filter>02.GameObjects\03.Monster\04.BuzzBlob</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\04.BuzzBlob</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TailBoss.h">
-      <Filter>02.GameObjects\03.Monster\05.TailBoss</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\05.TailBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CollapseTile.h">
-      <Filter>02.GameObjects\01.NonAnim\03.CollapseTile</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\03.CollapseTile</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Door.h">
-      <Filter>02.GameObjects\05.Object\02.Door</Filter>
+      <Filter>02.GameObjects\03.AnimObject\02.Door</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RedZol.h">
-      <Filter>02.GameObjects\03.Monster\06.RedZol</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\06.RedZol</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Keese.h">
-      <Filter>02.GameObjects\03.Monster\07.Keese</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\07.Keese</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SquareBlock.h">
-      <Filter>02.GameObjects\01.NonAnim\04.SquareBlock</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\04.SquareBlock</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Tail.h">
-      <Filter>02.GameObjects\03.Monster\08.Tail</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\08.Tail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Togezo.h">
-      <Filter>02.GameObjects\03.Monster\09.Togezo</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\09.Togezo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeTrap.h">
-      <Filter>02.GameObjects\05.Object\03.BladeTrap</Filter>
+      <Filter>02.GameObjects\03.AnimObject\03.BladeTrap</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Portal.h">
-      <Filter>02.GameObjects\01.NonAnim\05.Portal</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\05.Portal</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Camera_2D.h">
-      <Filter>96.Camera\2DCam</Filter>
+      <Filter>04.Camera\01.2DCam</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PrizeItem.h">
-      <Filter>02.GameObjects\01.NonAnim\06.PrizeItem</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\06.PrizeItem</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Grass.h">
-      <Filter>02.GameObjects\01.NonAnim\07.Grass</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\07.Grass</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Room.h">
       <Filter>01.Levels\04.Room</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Npc.h">
-      <Filter>02.GameObjects\06.Npc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ShopNpc.h">
-      <Filter>02.GameObjects\06.Npc\ShopNpc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc\ShopNpc</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MarinNpc.h">
-      <Filter>02.GameObjects\06.Npc\MarinNpc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc\MarinNpc</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CraneGameNpc.h">
-      <Filter>02.GameObjects\06.Npc\CraneGameNpc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc\CraneGameNpc</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CraneButton.h">
-      <Filter>02.GameObjects\05.Object\04.CraneButton</Filter>
+      <Filter>02.GameObjects\03.AnimObject\04.CraneButton</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Crane.h">
-      <Filter>02.GameObjects\01.NonAnim\08.Crane</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\08.Crane</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Cucco.h">
-      <Filter>02.GameObjects\03.Monster\10.Cucco</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\10.Cucco</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FieldDecoObject.h">
-      <Filter>02.GameObjects\05.Object\05.AnimDecoObject</Filter>
+      <Filter>02.GameObjects\03.AnimObject\05.AnimDecoObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Sky.h">
-      <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\01.Background</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Tower.h">
       <Filter>01.Levels\05.Tower</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FieldNpc.h">
-      <Filter>02.GameObjects\06.Npc\FieldNpc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc\FieldNpc</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Albatoss.h">
-      <Filter>02.GameObjects\03.Monster\11.Albatoss</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\11.Albatoss</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TarinNpc.h">
-      <Filter>02.GameObjects\06.Npc\TarinNpc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc\TarinNpc</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect.h">
-      <Filter>02.GameObjects\07.Effect</Filter>
+      <Filter>02.GameObjects\05.Effect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PlayerEffect.h">
-      <Filter>02.GameObjects\07.Effect\PlayerEffect</Filter>
+      <Filter>02.GameObjects\05.Effect\PlayerEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ObjectEffect.h">
-      <Filter>02.GameObjects\07.Effect\ObjectEffect</Filter>
+      <Filter>02.GameObjects\05.Effect\ObjectEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FightEffect.h">
-      <Filter>02.GameObjects\07.Effect\FightEffect</Filter>
+      <Filter>02.GameObjects\05.Effect\FightEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Manager.h">
+      <Filter>03.UI\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CameraManager.h">
+      <Filter>04.Camera\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -456,55 +468,49 @@
       <Filter>01.Levels\01.Logo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
-      <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\01.Background</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Dynamic.cpp">
-      <Filter>96.Camera\Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\CameraManager.cpp">
-      <Filter>96.Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\UI_Manager.cpp">
-      <Filter>95.UI</Filter>
+      <Filter>04.Camera\00.Dynamic</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
-      <Filter>95.UI\01. BackGround</Filter>
+      <Filter>03.UI\01. BackGround</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\InvenTile.cpp">
-      <Filter>95.UI\02. Inventory\00. InvenTile</Filter>
+      <Filter>03.UI\02. Inventory\00. InvenTile</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Obj_UI.cpp">
-      <Filter>95.UI\00. ObjUI%28Base%29</Filter>
+      <Filter>03.UI\00. ObjUI%28Base%29</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UIButton.cpp">
-      <Filter>95.UI\04. UIButton</Filter>
+      <Filter>03.UI\04. UIButton</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\InvenItem.cpp">
-      <Filter>95.UI\02. Inventory\01. InvenItem</Filter>
+      <Filter>03.UI\02. Inventory\01. InvenItem</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BaseObj.cpp">
       <Filter>02.GameObjects\00.BaseObj</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Player.cpp">
-      <Filter>02.GameObjects\02.Player</Filter>
+      <Filter>02.GameObjects\01.Actor\00.Player</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster.cpp">
-      <Filter>02.GameObjects\03.Monster</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Octorock.cpp">
-      <Filter>02.GameObjects\03.Monster\00.Octorock</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\00.Octorock</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MoblinSword.cpp">
-      <Filter>02.GameObjects\03.Monster\01.MoblinSword</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\01.MoblinSword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\NonAnim.cpp">
-      <Filter>02.GameObjects\01.NonAnim</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_TailCave.cpp">
       <Filter>01.Levels\03.TailCave</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Rola.cpp">
-      <Filter>02.GameObjects\03.Monster\02.Rola</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\02.Rola</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Collision_Manger.cpp">
       <Filter>94.CollisionMgr</Filter>
@@ -516,124 +522,130 @@
       <Filter>02.GameObjects\04.Bullet\01.PlayerBullet</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Weapon.cpp">
-      <Filter>02.GameObjects\02.Player\Weapon</Filter>
+      <Filter>02.GameObjects\01.Actor\00.Player\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Pawn.cpp">
-      <Filter>02.GameObjects\03.Monster\03.Pawn</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\03.Pawn</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DgnKey.cpp">
-      <Filter>02.GameObjects\01.NonAnim\02.DgnKey</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\02.DgnKey</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PlayerState.cpp">
-      <Filter>95.UI\03. PlayerState</Filter>
+      <Filter>03.UI\03. PlayerState</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TreasureBox.cpp">
-      <Filter>02.GameObjects\05.Object\00.Treasurebox</Filter>
+      <Filter>02.GameObjects\03.AnimObject\00.Treasurebox</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FootSwitch.cpp">
-      <Filter>02.GameObjects\05.Object\01.FootSwitch</Filter>
+      <Filter>02.GameObjects\03.AnimObject\01.FootSwitch</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Data_Manager.cpp">
       <Filter>93.DataManager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MessageBox.cpp">
-      <Filter>95.UI\05. MessageBox</Filter>
+      <Filter>03.UI\05. MessageBox</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BuzzBlob.cpp">
-      <Filter>02.GameObjects\03.Monster\04.BuzzBlob</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\04.BuzzBlob</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TailBoss.cpp">
-      <Filter>02.GameObjects\03.Monster\05.TailBoss</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\05.TailBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CollapseTile.cpp">
-      <Filter>02.GameObjects\01.NonAnim\03.CollapseTile</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\03.CollapseTile</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Door.cpp">
-      <Filter>02.GameObjects\05.Object\02.Door</Filter>
+      <Filter>02.GameObjects\03.AnimObject\02.Door</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RedZol.cpp">
-      <Filter>02.GameObjects\03.Monster\06.RedZol</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\06.RedZol</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Keese.cpp">
-      <Filter>02.GameObjects\03.Monster\07.Keese</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\07.Keese</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SquareBlock.cpp">
-      <Filter>02.GameObjects\01.NonAnim\04.SquareBlock</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\04.SquareBlock</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Tail.cpp">
-      <Filter>02.GameObjects\03.Monster\08.Tail</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\08.Tail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Togezo.cpp">
-      <Filter>02.GameObjects\03.Monster\09.Togezo</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\09.Togezo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeTrap.cpp">
-      <Filter>02.GameObjects\05.Object\03.BladeTrap</Filter>
+      <Filter>02.GameObjects\03.AnimObject\03.BladeTrap</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Portal.cpp">
-      <Filter>02.GameObjects\01.NonAnim\05.Portal</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\05.Portal</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Camera_2D.cpp">
-      <Filter>96.Camera\2DCam</Filter>
+      <Filter>04.Camera\01.2DCam</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PrizeItem.cpp">
-      <Filter>02.GameObjects\01.NonAnim\06.PrizeItem</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\06.PrizeItem</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Grass.cpp">
-      <Filter>02.GameObjects\01.NonAnim\07.Grass</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\07.Grass</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Room.cpp">
       <Filter>01.Levels\04.Room</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Npc.cpp">
-      <Filter>02.GameObjects\06.Npc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ShopNpc.cpp">
-      <Filter>02.GameObjects\06.Npc\ShopNpc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc\ShopNpc</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MarinNpc.cpp">
-      <Filter>02.GameObjects\06.Npc\MarinNpc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc\MarinNpc</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CraneGameNpc.cpp">
-      <Filter>02.GameObjects\06.Npc\CraneGameNpc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc\CraneGameNpc</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CraneButton.cpp">
-      <Filter>02.GameObjects\05.Object\04.CraneButton</Filter>
+      <Filter>02.GameObjects\03.AnimObject\04.CraneButton</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Crane.cpp">
-      <Filter>02.GameObjects\01.NonAnim\08.Crane</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\08.Crane</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Cucco.cpp">
-      <Filter>02.GameObjects\03.Monster\10.Cucco</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\10.Cucco</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FieldDecoObject.cpp">
-      <Filter>02.GameObjects\05.Object\05.AnimDecoObject</Filter>
+      <Filter>02.GameObjects\03.AnimObject\05.AnimDecoObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Sky.cpp">
-      <Filter>02.GameObjects\01.NonAnim\01.Background</Filter>
+      <Filter>02.GameObjects\02.NonAnimObject\01.Background</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Tower.cpp">
       <Filter>01.Levels\05.Tower</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FieldNpc.cpp">
-      <Filter>02.GameObjects\06.Npc\FieldNpc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc\FieldNpc</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Albatoss.cpp">
-      <Filter>02.GameObjects\03.Monster\11.Albatoss</Filter>
+      <Filter>02.GameObjects\01.Actor\01.Monster\11.Albatoss</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TarinNpc.cpp">
-      <Filter>02.GameObjects\06.Npc\TarinNpc</Filter>
+      <Filter>02.GameObjects\01.Actor\02.Npc\TarinNpc</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect.cpp">
-      <Filter>02.GameObjects\07.Effect</Filter>
+      <Filter>02.GameObjects\05.Effect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PlayerEffect.cpp">
-      <Filter>02.GameObjects\07.Effect\PlayerEffect</Filter>
+      <Filter>02.GameObjects\05.Effect\PlayerEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ObjectEffect.cpp">
-      <Filter>02.GameObjects\07.Effect\ObjectEffect</Filter>
+      <Filter>02.GameObjects\05.Effect\ObjectEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FightEffect.cpp">
-      <Filter>02.GameObjects\07.Effect\FightEffect</Filter>
+      <Filter>02.GameObjects\05.Effect\FightEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Manager.cpp">
+      <Filter>03.UI\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CameraManager.cpp">
+      <Filter>04.Camera\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

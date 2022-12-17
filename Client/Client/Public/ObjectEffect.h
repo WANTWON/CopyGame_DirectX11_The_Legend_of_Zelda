@@ -14,8 +14,11 @@ public:
 		GRASS, LAWN, GRASS_TEX,
 
 		/*For Item Get */
-		ITEM_GET_FLASH, ITEM_GET_GLOW , HORIZONTAL_GLOW, RAINBOW_RING , GRAD_RING, RAINBOW_HALO, GLITTER , RAY
+		ITEM_GET_FLASH, ITEM_GET_GLOW , HORIZONTAL_GLOW, RAINBOW_RING ,
+		GRAD_RING, RAINBOW_HALO, GLITTER , RAY,
 	
+		/*For Smoke*/
+		SMOKE 
 	};
 
 
@@ -45,6 +48,7 @@ private:
 
 private:
 	void Tick_Grass(_float fTimeDelta);
+	void Tick_Smoke(_float fTimeDelta);
 
 	/* For Get Item*/
 	void Tick_GlowEffect(_float fTimeDelta);

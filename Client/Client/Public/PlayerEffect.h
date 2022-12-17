@@ -9,7 +9,7 @@ BEGIN(Client)
 class CPlayerEffect final : public CEffect
 {
 public:
-	enum TYPE { FOOTSMOKE, ROLLCUT,};
+	enum TYPE { ROLLCUT,};
 
 
 
@@ -37,10 +37,10 @@ private:
 	virtual void Change_Texture(_float fTimeDelta) override;
 
 private:
-	void Tick_Smoke(_float fTimeDelta);
 	void Tick_RollCut(_float fTimeDelta);
 
-
+	_vector m_vColorBack = XMVectorSet(1.f, 1.f, 1.f, 1.f);
+	_vector m_vColorFront = XMVectorSet(1.f, 1.f, 1.f, 1.f);
 
 public:
 	static CPlayerEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

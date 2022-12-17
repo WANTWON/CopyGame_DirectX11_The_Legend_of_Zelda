@@ -52,6 +52,9 @@ private:
 	void Moving_RolaBullet(_float fTimeDelta);
 	void Moving_AlbatossBullet(_float fTimeDelta);
 
+private:
+	void LateTick_Octorock(_float fTimeDelta);
+
 protected: /* For.Components */
 	CModel*					m_pModelCom = nullptr;
 	CBaseObj*				m_pTarget = nullptr;
@@ -59,6 +62,8 @@ protected: /* For.Components */
 	_float					m_fDeadtime = 0.f;
 	_float					m_fAnimSpeed = 1.f;
 	_float					m_fSpeed = 0.f;
+	_float					m_fEffectTimeEnd = 0.f;
+	_float					m_fEffectTime = 0.f;
 	BULLETDESC				m_BulletDesc;
 
 public:

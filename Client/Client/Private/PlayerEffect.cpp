@@ -35,10 +35,6 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case FOOTSMOKE:
-		m_eShaderID = SHADER_SMOKE;
-		m_EffectDesc.iTextureNum = rand() % 3;
-		break;
 	case ROLLCUT:
 		m_eShaderID = ROLLCUT;
 		m_fTexUV = 1.f;
@@ -62,9 +58,6 @@ int CPlayerEffect::Tick(_float fTimeDelta)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case FOOTSMOKE:
-		Tick_Smoke(fTimeDelta);
-		break;
 	case ROLLCUT:
 		Tick_RollCut(fTimeDelta);
 		break;
@@ -132,10 +125,6 @@ HRESULT CPlayerEffect::Ready_Components(void * pArg)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case FOOTSMOKE:
-		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"), (CComponent**)&m_pTextureCom)))
-			return E_FAIL;
-		break;
 	case ROLLCUT:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut_Blast"), (CComponent**)&m_pModelCom)))
@@ -184,6 +173,12 @@ HRESULT CPlayerEffect::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 		return E_FAIL;
 
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorBack", &m_vColorBack, sizeof(_vector))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorFront", &m_vColorFront, sizeof(_vector))))
+		return E_FAIL;
+
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -201,37 +196,10 @@ void CPlayerEffect::Change_Animation(_float fTimeDelta)
 
 void CPlayerEffect::Change_Texture(_float fTimeDelta)
 {
-	switch (m_EffectDesc.eEffectID)
-	{
-	case FOOTSMOKE:
-		m_EffectDesc.iTextureNum++;
-
-		if (m_EffectDesc.iTextureNum >= m_pTextureCom->Get_TextureSize())
-		{
-			m_bDead = true;
-			m_EffectDesc.iTextureNum--;
-		}
-		break;
-	}
-}
-
-
-void CPlayerEffect::Tick_Smoke(_float fTimeDelta)
-{
-
-	SetUp_BillBoard();
-
-	m_fAlpha -= 0.01f;
-	m_vScale.x -= 0.02f;
-	m_vScale.y -= 0.02f;
-	m_vScale.z -= 0.02f;
-
-	Set_Scale(m_vScale);
-
-	if (m_vScale.x <= 0 || m_fAlpha <= 0)
-		m_bDead = true;
 	
 }
+
+
 
 void CPlayerEffect::Tick_RollCut(_float fTimeDelta)
 {

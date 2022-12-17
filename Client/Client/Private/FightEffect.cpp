@@ -106,10 +106,28 @@ HRESULT CFightEffect::Initialize(void * pArg)
 		m_vColorBack = XMVectorSet(144, 2, 225, 255);
 		break;
 	case GUARD_FLASH:
-		m_eShaderID = SHADERM_TWOCOLOR_NOTALPHASET;
-		m_fAngle = 0.f;
+		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
+		m_fAlpha = 0.f;
 		m_vColorFront = XMVectorSet(51, 178, 255, 255);
 		m_vColorBack = XMVectorSet(51, 102, 225, 255);
+		break;
+	case GUARD_RING:
+		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
+		m_fAlpha = 0.f;
+		m_vColorFront = XMVectorSet(228, 226, 228, 255);
+		m_vColorBack = XMVectorSet(51, 102, 225, 255);
+		break;
+	case GUARD_RING2:
+		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
+		m_fAlpha = 0.f;
+		m_vColorFront = XMVectorSet(228, 226, 228, 255);
+		m_vColorBack = XMVectorSet(51, 102, 225, 255);
+		break;
+	case GUARD_DUST:
+		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
+		m_vDirection = _float3( XMVectorGetX(m_EffectDesc.vLook)*-1.f + (rand() % 20 - 10) * 0.1f, 0.f, (rand() % 20 - 10)* 0.1f);
+		m_vColorFront = XMVectorSet(51, 102, 225, 255);
+		m_vColorBack = XMVectorSet(228, 226, 228, 255);
 		break;
 	default:
 		break;
@@ -148,8 +166,11 @@ int CFightEffect::Tick(_float fTimeDelta)
 		break;
 	case GUARD_FLASH:
 	case GUARD_RING:
-	case GUARD_DUST:
+	case GUARD_RING2:
 		Tick_GuardEffect(fTimeDelta);
+		break;
+	case GUARD_DUST:
+		Tick_SparkEffect(fTimeDelta);
 		break;
 	default:
 		break;
@@ -259,11 +280,22 @@ HRESULT CFightEffect::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardFlash"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
+	case GUARD_RING:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardRing"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case GUARD_RING2:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardRing_2"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case GUARD_DUST:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardDust"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
-
-
+	
 	return S_OK;
 }
 
@@ -313,7 +345,7 @@ HRESULT CFightEffect::SetUp_ShaderResources()
 		return E_FAIL;
 
 
-	if (FAILED(m_pShaderCom->Set_RawValue("g_Color", &m_vColorBack, sizeof(_vector))))
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorBack", &m_vColorBack, sizeof(_vector))))
 		return E_FAIL;
 	
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorFront", &m_vColorFront, sizeof(_vector))))
@@ -595,8 +627,10 @@ void CFightEffect::Tick_GuardEffect(_float fTimeDelta)
 
 	m_fDeadtime += fTimeDelta;
 
-
 	m_pTransformCom->LookDir(m_EffectDesc.vLook);
+
+	if (m_EffectDesc.eEffectID == GUARD_RING || m_EffectDesc.eEffectID == GUARD_RING2)
+		SetUp_BillBoard();
 
 	if ( m_fDeadtime < m_EffectDesc.fDeadTime)
 	{
@@ -621,6 +655,42 @@ void CFightEffect::Tick_GuardEffect(_float fTimeDelta)
 
 	if (m_fAlpha <= 0.f || m_vScale.x <= 0.f)
 		m_bDead = true;
+}
+
+void CFightEffect::Tick_SparkEffect(_float fTimeDelta)
+{
+	m_fDeadtime += fTimeDelta;
+
+	m_pTransformCom->Go_PosDir(fTimeDelta, XMLoadFloat3(&m_vDirection));
+	m_pTransformCom->LookAt(m_EffectDesc.vInitPositon);
+
+	_float4x4 ViewMatrix;
+
+	ViewMatrix = CGameInstance::Get_Instance()->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW); // Get View Matrix
+	_matrix matViewInv = XMMatrixInverse(nullptr, XMLoadFloat4x4(&ViewMatrix));      // Get Inverse of View Matrix (World Matrix of Camera)
+
+	_vector vRight = Get_TransformState(CTransform::STATE_RIGHT);
+	_vector vLook = (_vector)matViewInv.r[2];
+	_vector vUp = XMVector3Cross(vLook, vRight);
+
+	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) *Get_Scale().x);
+	m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * Get_Scale().y);
+	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) *Get_Scale().z);
+
+
+	if (m_fDeadtime > m_EffectDesc.fDeadTime*0.5f)
+	{
+		m_fAlpha -= 0.1f;
+		m_vScale.x -= 0.1f;
+		m_vScale.y -= 0.1f;
+		m_vScale.z -= 0.1f;
+	}
+	Set_Scale(m_vScale);
+
+
+	if (m_fAlpha <= 0.f || m_vScale.x <= 0.f)
+		m_bDead = true;
+	
 }
 
 void CFightEffect::Make_GlowEffect()

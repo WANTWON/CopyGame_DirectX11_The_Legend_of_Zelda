@@ -89,7 +89,7 @@ HRESULT CMainApp::Render()
 		m_iNumRender = 0;
 	}
 
-	m_pGameInstance->Render_Font(TEXT("Font_Nexon"), m_szFPS, XMVectorSet(0.f, 0.f, 0.f, 1.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.6f);
+	//m_pGameInstance->Render_Font(TEXT("Font_Nexon"), m_szFPS, XMVectorSet(0.f, 0.f, 0.f, 1.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.6f);
 #endif // _DEBUG
 
 	m_pGameInstance->Present();

@@ -17,7 +17,7 @@ public:
 		GLOW_SPHERE, SMOKEBACK, SMOKEFRONT,GLOW_LARGE, GLOW_MIDDLE, GLOW_SMALL, GLOW_MINI,
 	
 		/* Guard */
-		GUARD_FLASH, GUARD_RING, GUARD_DUST
+		GUARD_FLASH, GUARD_RING, GUARD_RING2, GUARD_DUST
 	};
 
 
@@ -49,6 +49,7 @@ private:
 	void Tick_DeadEffect(_float fTimeDelta);
 	void Tick_GlowEffect(_float fTimeDelta);
 	void Tick_GuardEffect(_float fTimeDelta);
+	void Tick_SparkEffect(_float fTimeDelta);
 
 private:
 	void Make_GlowEffect();

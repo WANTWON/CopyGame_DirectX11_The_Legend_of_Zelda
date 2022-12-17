@@ -134,6 +134,11 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 		m_eShaderID = SHADER_ONLY_TEXTURE;
 		m_fAlpha = 0.f;
 		break;
+	case SMOKE:
+		m_eShaderID = SHADER_ONECOLOR;
+		m_EffectDesc.iTextureNum = rand() % 3;
+		m_vColorFront = m_EffectDesc.vColor;
+		break;
 	default:
 		break;
 	}
@@ -195,6 +200,9 @@ int CObjectEffect::Tick(_float fTimeDelta)
 	case RAY:
 		Tick_Ray(fTimeDelta);
 		break;
+	case SMOKE:
+		Tick_Smoke(fTimeDelta);
+		break;
 	default:
 		break;
 	}
@@ -205,8 +213,6 @@ int CObjectEffect::Tick(_float fTimeDelta)
 void CObjectEffect::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
-
-
 
 }
 
@@ -313,6 +319,10 @@ HRESULT CObjectEffect::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Ray"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
+	case SMOKE:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
@@ -354,7 +364,7 @@ HRESULT CObjectEffect::SetUp_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Set_RawValue("g_Color", &m_vColorBack, sizeof(_vector))))
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorBack", &m_vColorBack, sizeof(_vector))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorFront", &m_vColorFront, sizeof(_vector))))
 		return E_FAIL;
@@ -375,7 +385,18 @@ void CObjectEffect::Change_Animation(_float fTimeDelta)
 
 void CObjectEffect::Change_Texture(_float fTimeDelta)
 {
+	switch (m_EffectDesc.eEffectID)
+	{
+	case SMOKE:
+		m_EffectDesc.iTextureNum++;
 
+		if (m_EffectDesc.iTextureNum >= m_pTextureCom->Get_TextureSize())
+		{
+			m_bDead = true;
+			m_EffectDesc.iTextureNum--;
+		}
+		break;
+	}
 }
 
 
@@ -411,6 +432,22 @@ void CObjectEffect::Tick_Grass(_float fTimeDelta)
 	if (m_fAlpha <= 0)
 		m_bDead = true;
 
+}
+
+void CObjectEffect::Tick_Smoke(_float fTimeDelta)
+{
+
+	SetUp_BillBoard();
+
+	m_fAlpha -= 0.01f;
+	m_vScale.x -= 0.02f;
+	m_vScale.y -= 0.02f;
+	m_vScale.z -= 0.02f;
+
+	Set_Scale(m_vScale);
+
+	if (m_vScale.x <= 0 || m_fAlpha <= 0)
+		m_bDead = true;
 }
 
 void CObjectEffect::Tick_GlowEffect(_float fTimeDelta)

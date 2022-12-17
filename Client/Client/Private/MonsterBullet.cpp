@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\MonsterBullet.h"
-
+#include "ObjectEffect.h"
 
 CMonsterBullet::CMonsterBullet(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -39,7 +39,7 @@ HRESULT CMonsterBullet::Initialize(void * pArg)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		break;
 	case OCTOROCK:
-		Set_Scale(_float3(1, 1, 1));
+		Set_Scale(_float3(2, 2, 2));
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		m_pTransformCom->LookDir(m_BulletDesc.vLook);
 		break;
@@ -113,6 +113,15 @@ void CMonsterBullet::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	SetUp_ShaderID();
+
+	switch (m_BulletDesc.eBulletType)
+	{
+	case OCTOROCK:
+		LateTick_Octorock(fTimeDelta);
+		break;
+	default:
+		break;
+	}
 }
 
 HRESULT CMonsterBullet::Render()
@@ -309,6 +318,24 @@ void CMonsterBullet::Moving_AlbatossBullet(_float fTimeDelta)
 	}
 		
 
+}
+
+void CMonsterBullet::LateTick_Octorock(_float fTimeDelta)
+{
+	m_fEffectTimeEnd = 0.1f;
+	m_fEffectTime += fTimeDelta;
+	if (m_fEffectTime > m_fEffectTimeEnd)
+	{
+		CEffect::EFFECTDESC EffectDesc;
+		EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+		EffectDesc.eEffectID = CObjectEffect::SMOKE;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+		EffectDesc.fDeadTime = 0.1f;
+		EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+		EffectDesc.vInitScale = _float3(0.7, 0.7f, 0.7f);
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		m_fEffectTime = 0.f;
+	}
 }
 
 CMonsterBullet * CMonsterBullet::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

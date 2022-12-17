@@ -7,7 +7,7 @@ texture2D		g_DiffuseTexture;
 texture2D		g_DepthTexture;
 texture2D		g_DissolveTexture;
 texture2D		g_SmokeDstTexture;
-vector			g_Color = vector(1.f, 1.f, 1.f, 1.f); 
+vector			g_ColorBack = vector(1.f, 1.f, 1.f, 1.f); 
 vector			g_ColorFront = vector(1.f, 1.f, 1.f, 1.f);
 
 
@@ -95,9 +95,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vDiffuse.r = 214;
-	Out.vDiffuse.g = 201;
-	Out.vDiffuse.b = 187;
+	Out.vDiffuse.rgb = g_ColorFront.rgb;
 
 	Out.vDiffuse.a *= g_fAlpha;
 
@@ -113,9 +111,7 @@ PS_OUT PS_MAIN_SOFTEFFECT(PS_IN_SOFTEFFECT In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vDiffuse.r = 214;
-	Out.vDiffuse.g = 201;
-	Out.vDiffuse.b = 187;
+	Out.vDiffuse.rgb = g_ColorFront.rgb;
 
 	float2	vUV;
 
@@ -207,7 +203,7 @@ PS_OUT PS_TWOCOLOR_NOTALPHA(PS_IN In)
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 
-	vector GetColorBack = g_Color / 255.f;
+	vector GetColorBack = g_ColorBack / 255.f;
 	vector GetColorFront = g_ColorFront / 255.f;
 	
 	Out.vDiffuse.rgb = GetColorBack.rgb * (1 - Out.vDiffuse.r) + GetColorFront.rgb * Out.vDiffuse.r;
@@ -227,7 +223,7 @@ PS_OUT PS_TWOCOLOR(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDiffuse.a = Out.vDiffuse.r;
 
-	vector GetColorBack = g_Color / 255.f;
+	vector GetColorBack = g_ColorBack / 255.f;
 	vector GetColorFront = g_ColorFront / 255.f;
 
 	Out.vDiffuse.rgb = GetColorBack.rgb * (1 - Out.vDiffuse.r) + GetColorFront.rgb * Out.vDiffuse.r;
@@ -288,7 +284,7 @@ PS_OUT PS_SMOKEFRONT_PURPLE(PS_IN In)
 
 	vector PurpleColor = vector(114, 0, 153, 255) / 255.f;
 	vector RedPurpleColor = vector(63, 0, 38, 255) / 255.f;
-	vector GetColor = g_Color / 255.f;
+	vector GetColor = g_ColorBack / 255.f;
 
 	Out.vDiffuse.rgb = PurpleColor.rgb;
 	vSmokeDst.rgb = GetColor.rgb;
@@ -317,7 +313,7 @@ PS_OUT PS_ONLY_TEXTURE(PS_IN In)
 
 technique11 DefaultTechnique
 {
-	pass FootSmokeEffect
+	pass OneColor
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);

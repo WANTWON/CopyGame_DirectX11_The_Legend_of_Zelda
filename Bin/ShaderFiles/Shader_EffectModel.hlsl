@@ -6,7 +6,7 @@ float			g_fAlpha = 1.f;
 texture2D		g_DiffuseTexture;
 float			g_TexUV = 1.f;
 
-vector			g_Color = vector(1.f, 1.f, 1.f, 1.f);
+vector			g_ColorBack = vector(1.f, 1.f, 1.f, 1.f);
 vector			g_ColorFront = vector(1.f, 1.f, 1.f, 1.f);
 
 struct VS_IN
@@ -109,7 +109,7 @@ PS_OUT PS_TWOCOLOR_NOTALPHA(PS_IN In)
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 
-	vector GetColorBack = g_Color / 255.f;
+	vector GetColorBack = g_ColorBack / 255.f;
 	vector GetColorFront = g_ColorFront / 255.f;
 
 	Out.vDiffuse.rgb = GetColorBack.rgb * (1 - Out.vDiffuse.r) + GetColorFront.rgb * Out.vDiffuse.r;
@@ -129,7 +129,7 @@ PS_OUT PS_TWOCOLOR(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDiffuse.a = Out.vDiffuse.r;
 
-	vector GetColorBack = g_Color / 255.f;
+	vector GetColorBack = g_ColorBack / 255.f;
 	vector GetColorFront = g_ColorFront / 255.f;
 
 	Out.vDiffuse.rgb = GetColorBack.rgb * (1 - Out.vDiffuse.r) + GetColorFront.rgb * Out.vDiffuse.r;
