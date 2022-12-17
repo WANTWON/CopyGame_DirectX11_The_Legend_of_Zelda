@@ -39,7 +39,6 @@ public:
 
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
-	virtual HRESULT SetUp_ShaderResources();
 	virtual HRESULT SetUp_ShaderID();
 	virtual void Change_Animation(_float fTimeDelta);
 	virtual void Change_Texture(_float fTimeDelta) override;
@@ -62,10 +61,6 @@ private:
 	_bool  m_bMax = false;
 	_float m_fGlowMaxSize = 0.f;
 	_float m_fGlowAddScale = 0.f;
-
-	_vector m_vColorBack = XMVectorSet(1.f, 1.f, 1.f, 1.f);
-	_vector m_vColorFront = XMVectorSet(1.f, 1.f, 1.f, 1.f);
-
 
 	CTexture* m_pDissolveTexture = nullptr;
 	CTexture* m_pSmokeDstTexture = nullptr;

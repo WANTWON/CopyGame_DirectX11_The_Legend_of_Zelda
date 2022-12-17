@@ -27,9 +27,9 @@ HRESULT CWeapon::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, 2.f);
-	m_pTransformCom->Set_Scale(CTransform::STATE_UP, 2.f);
-	m_pTransformCom->Set_Scale(CTransform::STATE_LOOK, 2.f);
+	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, 3.f);
+	m_pTransformCom->Set_Scale(CTransform::STATE_UP, 3.f);
+	m_pTransformCom->Set_Scale(CTransform::STATE_LOOK, 3.f);
 
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
 	//m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(90.0f));
@@ -62,39 +62,7 @@ void CWeapon::Late_Tick(_float fTimeDelta)
 	if (m_pOBBCom != nullptr)
 		m_pRendererCom->Add_Debug(m_pOBBCom);
 #endif
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	
-	//if (pPlayer->Get_AnimState() == CPlayer::SLASH)
-	//{
-	////	if (!m_bFirst)
-	//	//{
-	//	//	m_BulletLook = *(_vector*)m_CombinedWorldMatrix.m[2];
-	//	//	_matrix		RotationMatrix = XMMatrixRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 90.f);
-	//	//	m_BulletLook = XMVector3TransformNormal(m_BulletLook, RotationMatrix);
-	//	//	m_bFirst = true;
-	//	//}
-	//	CPlayerBullet::BULLETDESC BulletDesc;
-
-	//	BulletDesc.eBulletType = CPlayerBullet::SWORD;
-	//	BulletDesc.vInitPositon = *(_vector*)m_CombinedWorldMatrix.m[3] + XMVector3Normalize(m_BulletLook) + XMVectorSet(0.f, m_Ypos, 0.f,0.f);
-	////	m_Ypos += 0.001f;
-	////	_matrix		RotationMatrix = XMMatrixRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), -0.25f);
-	////	m_BulletLook = XMVector3TransformNormal(m_BulletLook, RotationMatrix);
-	//	BulletDesc.vLook = *(_vector*)m_CombinedWorldMatrix.m[2];
-	////	BulletDesc.vLook = XMVectorSetY(BulletDesc.vLook, 0.f);
-
-	//	BulletDesc.fDeadTime = 0.15f;
-	//	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
-	//	//m_fEffectTime = 0.f;
-	//}
-	//else
-	//{
-	//	m_bFirst = false;
-	//	m_Ypos = 0.f;
-	//}
-	//	
-
-
 	Compute_CamDistance(Get_TransformState(CTransform::STATE_POSITION));
 }
 
@@ -114,9 +82,6 @@ HRESULT CWeapon::Render()
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
 			return E_FAIL;
 
-		if (m_WeaponDesc.eType == SLASH)
-			m_eShaderID = SHADERM_SLASH;
-		else
 			m_eShaderID = SHADER_DEFAULT;
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))
 			return E_FAIL;
@@ -143,19 +108,11 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
 
-	switch (m_WeaponDesc.eType)
-	{
-	case SLASH:
-		/* For.Com_Shader */
-		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect_Model"), (CComponent**)&m_pShaderCom)))
-			return E_FAIL;
-		break;
-	default:
+
 		/* For.Com_Shader */
 		if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"), (CComponent**)&m_pShaderCom)))
 			return E_FAIL;
-		break;
-	}
+		
 	
 
 	CCollider::COLLIDERDESC		ColliderDesc;
@@ -229,14 +186,10 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 			return E_FAIL;
 		break;
-	case SLASH:
-		/* For.Com_Model*/
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_SwordSlash"), (CComponent**)&m_pModelCom)))
-			return E_FAIL;
-
+	case WEAPON_END:
 		/* For.Com_OBB*/
-		ColliderDesc.vScale = _float3(0.9f, 0.2f, 0.2f);
-		ColliderDesc.vPosition = _float3(0.0f, 0.2f, 0.2f);
+		ColliderDesc.vScale = _float3(0.5f, 0.1f, 0.1f);
+		ColliderDesc.vPosition = _float3(0.3f, 0.2f, 0.2f);
 		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 			return E_FAIL;
 		break;

@@ -48,7 +48,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
 	m_Parts.resize(PARTS_END);
-	if (FAILED(Ready_Parts(CPrizeItem::BOW, PARTS_BOW)))
+	if (FAILED(Ready_Parts(CPrizeItem::ITEM_END, PARTS_WEAPON)))
 		return E_FAIL;
 
 	m_pModelCom->Set_CurrentAnimIndex(m_eState);
@@ -149,7 +149,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_BOW]);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_WEAPON]);
 
 		if (m_Parts[PARTS_ITEM] != nullptr)
 		{
@@ -238,8 +238,14 @@ HRESULT CPlayer::Render()
 	Render_Model(MESH_MOUSE);
 	Render_Model(MESH_BELT);
 
-	Render_Model(m_eLeftHand);
-	Render_Model(m_eRightHand);
+
+	if (m_eState != EV_TELL_ST && m_eState != EV_TELL_LP && m_eState != EV_TELL_ED &&
+		m_eState != IDLE_CARRY && m_eState != ITEM_CARRY)
+	{
+		Render_Model(m_eLeftHand);
+		Render_Model(m_eRightHand);
+	}
+
 	
 
 	return S_OK;
@@ -388,6 +394,9 @@ HRESULT CPlayer::Ready_Parts(CPrizeItem::TYPE eType, PARTS PartsIndex)
 		break;
 	case Client::CPrizeItem::TELEPHONE:
 		m_WeaponDesc.eType = CWeapon::TELEPHONE;
+		break;
+	case Client::CPrizeItem::ITEM_END:
+		m_WeaponDesc.eType = CWeapon::WEAPON_END;
 		break;
 	default:
 		break;
@@ -1000,13 +1009,6 @@ void CPlayer::Make_GuardEffect(CBaseObj* pTarget)
 	EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - pTarget->Get_TransformState(CTransform::STATE_POSITION);
 	EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
 	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
-
-	//EffectDesc.eEffectID = CFightEffect::GUARD_RING2;
-	//EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK))*0.8f + XMVectorSet(0.f, Get_Scale().y*0.5f, 0.f, 0.f);
-	//EffectDesc.fDeadTime = 0.5f;
-	//EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - pTarget->Get_TransformState(CTransform::STATE_POSITION);
-	//EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
-	//CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
 
 	for (int i = 0; i < 10; ++i)

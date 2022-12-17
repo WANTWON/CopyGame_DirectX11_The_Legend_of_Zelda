@@ -173,19 +173,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 			return E_FAIL;
 		CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 		LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
-		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 0.f, 44.8f, 1.f));
+		//pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 0.f, 44.8f, 1.f));
 		//pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(16.3f, 0.f, 18.8f, 1.f));
+		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(2.33f, 3.f, 66.8f, 1.f));
 		pPlayer->Change_Navigation(LEVEL_GAMEPLAY);
 		pPlayer->Compute_CurrentIndex(LEVEL_GAMEPLAY);
-
-
-		CPrizeItem::ITEMDESC ItemDesc;
-		ItemDesc.eType = CPrizeItem::YOSHIDOLL;
-		ItemDesc.eInteractType = CPrizeItem::PRIZE;
-		ItemDesc.vPosition = _float3(16.3f, 0.f, 22.8f);
-
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_STATIC, TEXT("Layer_Item"), &ItemDesc)))
-			return E_FAIL;
 
 	}
 	else

@@ -2,6 +2,8 @@
 #include "..\Public\MoblinSword.h"
 #include "Player.h"
 #include "MonsterBullet.h"
+#include "FightEffect.h"
+#include "ObjectEffect.h"
 
 CMoblinSword::CMoblinSword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -21,7 +23,7 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_tInfo.iMaxHp = 3;
+	m_tInfo.iMaxHp = 5;
 	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
@@ -89,6 +91,7 @@ void CMoblinSword::Late_Tick(_float fTimeDelta)
 		{
 			m_eState = STAGGER;
 			dynamic_cast<CPlayer*>(m_pTarget)->Set_AnimState(CPlayer::SHIELD_HIT);
+			dynamic_cast<CPlayer*>(m_pTarget)->Make_GuardEffect(this);
 			m_bIsAttacking = false;
 		}
 		else
@@ -103,6 +106,7 @@ void CMoblinSword::Late_Tick(_float fTimeDelta)
 			BulletDesc.eBulletType = CMonsterBullet::DEFAULT;
 			BulletDesc.vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 			
+			Make_GetAttacked_Effect(m_pTarget);
 			dynamic_cast<CPlayer*>(m_pTarget)->Take_Damage(1.f, &BulletDesc, nullptr);
 			
 		}
@@ -141,7 +145,6 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CMoblinSword::DAMAGE_F:
 	case Client::CMoblinSword::DAMAGE_B:
-	case Client::CMoblinSword::GUARD:
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
@@ -149,8 +152,45 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 			m_bHit = false;
 		}
 		break;
+	case Client::CMoblinSword::GUARD:
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*2, m_bIsLoop))
+		{
+			m_eState = IDLE;
+			m_bHit = false;
+		}
+		break;
 	case Client::CMoblinSword::FIND:
 	case Client::CMoblinSword::STANCE_WALK:
+
+		m_fEffectTimeEnd = 0.1f;
+		m_fEffectTime += fTimeDelta;
+		if (m_fEffectTime > m_fEffectTimeEnd)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CObjectEffect::SMOKE;
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+			EffectDesc.fDeadTime = 0.1f;
+			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			m_fEffectTime = 0.f;
+
+
+			for (int i = 0; i < 3; ++i)
+			{
+				EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+				EffectDesc.eEffectID = CObjectEffect::GRASS_TEX;
+				EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
+				EffectDesc.fDeadTime = 0.5f;
+				EffectDesc.iTextureNum = rand() % 3;
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+			}
+		}
+
+
 		m_bIsLoop = true;
 		m_bHit = false;
 		m_pTransformCom->Go_Straight(fTimeDelta * 3, m_pNavigationCom);
@@ -165,22 +205,28 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 			m_eState = IDLE;
 			m_bHit = false;
 		}
-		break;
+		break; 
 	case Client::CMoblinSword::DEAD_F:
-		m_pTransformCom->Go_Backward(fTimeDelta * 4);
+		Make_DeadEffect();
+		m_fAlpha += 0.015f;
+		m_pTransformCom->Go_Backward(fTimeDelta * 1, m_pNavigationCom);
 		m_bIsLoop = false;
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 			m_bDead = true;
 		break;
 	case Client::CMoblinSword::DEAD_B:
-		m_pTransformCom->Go_Straight(fTimeDelta * 4);
+		Make_DeadEffect();
+		m_fAlpha += 0.015f;
+		m_pTransformCom->Go_Straight(fTimeDelta * 1, m_pNavigationCom);
 		m_bIsLoop = false;
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 			m_bDead = true;
 		break;
 	case Client::CMoblinSword::DEAD_FIRE:
+		Make_DeadEffect();
+		m_fAlpha += 0.015f;
 		m_bIsLoop = false;
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
@@ -216,6 +262,11 @@ HRESULT CMoblinSword::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("MoblinSword"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Components(TEXT("Com_DissolveTexture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Dissolve"), (CComponent**)&m_pDissolveTexture)))
+		return E_FAIL;
+
+
 	CCollider::COLLIDERDESC		ColliderDesc;
 
 	///* For.Com_AABB */
@@ -248,6 +299,18 @@ HRESULT CMoblinSword::Ready_Components(void * pArg)
 		return E_FAIL;
 
 
+
+	return S_OK;
+}
+
+HRESULT CMoblinSword::SetUp_ShaderID()
+{
+	if (m_eState == DEAD_B || m_eState == DEAD_F || m_eState == DEAD_FIRE)
+		m_eShaderID = SHADER_ANIMDEAD;
+	else if (m_bHit)
+		m_eShaderID = SHADER_ANIMHIT;
+	else
+		m_eShaderID = SHADER_ANIMDEFAULT;
 
 	return S_OK;
 }
@@ -315,22 +378,7 @@ void CMoblinSword::Follow_Target(_float fTimeDelta)
 
 void CMoblinSword::Check_Navigation(_float fTimeDelta)
 {
-	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
-	{
-		if (m_eState == DAMAGE_F)
-		{
-			m_eState = DEAD_F;
-			return;
-		}
-
-		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pNavigationCom->Get_CurrentCellCenter();
-		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
-			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
-		else
-			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
-		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection, m_pNavigationCom);
-	}
-	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
+	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float fHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
@@ -437,13 +485,43 @@ void CMoblinSword::Patrol(_float fTimeDelta)
 
 _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
-	if (m_eState == DAMAGE_B || m_eState == DAMAGE_F || m_eState == GUARD)
+	if (m_eState == DAMAGE_B || m_eState == DAMAGE_F || m_eState == GUARD || 
+		m_eState == DEAD_B || m_eState == DEAD_F || m_eState == DEAD_FIRE)
 		return 0;
 
 	_int iNumRand = rand() % 3;
 	if (iNumRand == 0) //random È®·ü·Î Shield Mode
 	{
 		m_eState = GUARD;
+
+		CEffect::EFFECTDESC EffectDesc;
+		EffectDesc.eEffectType = CEffect::MODEL;
+		EffectDesc.eEffectID = CFightEffect::GUARD_FLASH;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK))*1.5f + XMVectorSet(0.f, Get_Scale().y, 0.f, 0.f);
+		EffectDesc.fDeadTime = 0.5f;
+		EffectDesc.vLook =  Get_TransformState(CTransform::STATE_POSITION)- m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		EffectDesc.vInitScale = _float3(1.5f, 1.5f, 1.5f);
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+		EffectDesc.eEffectID = CFightEffect::GUARD_RING;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK))*0.8f + XMVectorSet(0.f, Get_Scale().y*0.5f, 0.f, 0.f);
+		EffectDesc.fDeadTime = 0.5f;
+		EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - DamageCauser->Get_TransformState(CTransform::STATE_POSITION);
+		EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+
+		for (int i = 0; i < 10; ++i)
+		{
+			EffectDesc.eEffectID = CFightEffect::GUARD_DUST;
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+			_float iRandNum = (rand() % 10 + 10) * 0.1f;
+			EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
+			EffectDesc.fDeadTime = 0.8f;
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+		}
+
 		m_pTransformCom->LookAt(dynamic_cast<CPlayer*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
 		m_bAggro = true;
 		return 0;
@@ -474,6 +552,7 @@ _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CBaseObj * Dam
 	}
 	else
 	{
+		m_fAlpha = 0.f;
 		if (Calculate_Direction() == FRONT)
 			m_eState = STATE::DEAD_F;
 		else

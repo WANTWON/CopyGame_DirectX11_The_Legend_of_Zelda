@@ -3,6 +3,8 @@
 #include "Player.h"
 #include "MonsterBullet.h"
 #include "Navigation.h"
+#include "ObjectEffect.h"
+#include "MonsterEffect.h"
 
 COctorock::COctorock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -100,16 +102,7 @@ void COctorock::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_eState = ATTACK_ED;
-			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-			CMonsterBullet::BULLETDESC BulletDesc;
-			BulletDesc.eBulletType = CMonsterBullet::OCTOROCK;
-			BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f,0.5f,0.f,0.f);
-			BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
-
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterBullet"), LEVEL_GAMEPLAY, TEXT("Layer_Bullet"), &BulletDesc)))
-				return;
-			RELEASE_INSTANCE(CGameInstance);
-			//make bullet
+			Make_Bullet();
 		}
 		break;
 	case Client::COctorock::ATTACK_ED:
@@ -120,6 +113,7 @@ void COctorock::Change_Animation(_float fTimeDelta)
 			m_bIsAttacking = false;
 			m_eState = IDLE;
 			m_bHit = false;
+			m_bMakeBullet = false;
 		}
 		break;
 	case Client::COctorock::DAMAGE:
@@ -134,7 +128,7 @@ void COctorock::Change_Animation(_float fTimeDelta)
 	case Client::COctorock::DEAD:
 	case Client::COctorock::DEAD_FIRE:
 		Make_DeadEffect();
-		m_fAlpha += 0.025f;
+		m_fAlpha += 0.01f;
 		m_bIsLoop = false;
 		m_fAnimSpeed = 1.5f;
 		m_pTransformCom->Go_Backward(fTimeDelta*4);
@@ -352,6 +346,47 @@ void COctorock::Patrol(_float fTimeDelta)
 		Change_Direction();
 		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
 	}
+}
+
+void COctorock::Make_Bullet()
+{
+	if (m_bMakeBullet)
+		return;
+
+	m_bMakeBullet = true;
+
+	//make bullet
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CMonsterBullet::BULLETDESC BulletDesc;
+	BulletDesc.eBulletType = CMonsterBullet::OCTOROCK;
+	BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.5f, 0.f, 0.f) + Get_TransformState(CTransform::STATE_LOOK)*0.5f;
+	BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+	BulletDesc.fDeadTime = 2.f;
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterBullet"), LEVEL_GAMEPLAY, TEXT("Layer_Bullet"), &BulletDesc)))
+		return;
+
+	//make bullet Effect
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.eEffectID = CObjectEffect::SMOKE;
+	EffectDesc.fDeadTime = 0.3f;
+	EffectDesc.vColor = XMVectorSet(178, 159, 134, 255);
+	EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + BulletDesc.vLook*0.5f;
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+	
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CMonsterEffect::BLAST_RING;
+	EffectDesc.fDeadTime = 0.3f;
+	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + BulletDesc.vLook*0.7f + XMVectorSet(0.f, 0.5f, 0.f, 0.f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 _uint COctorock::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)

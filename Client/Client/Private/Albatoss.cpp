@@ -4,7 +4,8 @@
 #include "CameraManager.h"
 #include "MessageBox.h"
 #include "MonsterBullet.h"
-
+#include "ObjectEffect.h"
+#include "MonsterEffect.h"
 
 CAlbatoss::CAlbatoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -48,8 +49,6 @@ int CAlbatoss::Tick(_float fTimeDelta)
 	if (__super::Tick(fTimeDelta))
 	{
 		Drop_Items();
-		//CCamera_Dynamic* pCamera = dynamic_cast<CCamera_Dynamic*>(CCameraManager::Get_Instance()->Get_CurrentCamera());
-	//	pCamera->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
 		return OBJ_DEAD;
 	}
 
@@ -126,6 +125,7 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_eState = RUSH;
+			m_iRushCount++;
 		}
 		break;
 	case Client::CAlbatoss::RUSH_RETURN:
@@ -134,12 +134,8 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_vLastDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-			//if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) < 16.f && XMVectorGetY(m_vLastDir) < -0.5f)
-			//{
-			//	m_vLastDir = XMVectorSetY(m_vLastDir, XMVectorGetY(m_vLastDir) + 0.3f);
-			//}
-			 if (XMVectorGetY(m_vLastDir) < 0 )
-				m_vLastDir = XMVectorSetY(m_vLastDir, XMVectorGetY(m_vLastDir) + 0.5f);
+			if (XMVectorGetY(m_vLastDir) < 0 )
+			m_vLastDir = XMVectorSetY(m_vLastDir, XMVectorGetY(m_vLastDir) + 0.1f);
 			
 			m_pTransformCom->LookDir(m_vLastDir);
 			m_eState = RUSH;
@@ -168,10 +164,26 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 	case Client::CAlbatoss::ATTACK_CLAW:
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
-		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+
+		m_fEffectTimeEnd = 0.3f;
+		m_fEffectTime += fTimeDelta;
+		if (m_fEffectTime > m_fEffectTimeEnd)
 		{
-			m_iClawCount++;
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CMonsterEffect::CLAW_SMOKE;
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+			EffectDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+			EffectDesc.vLook = XMVectorSetY(EffectDesc.vLook, (rand()%100*0.01f) - 0.5f);
+			EffectDesc.vLook = XMVectorSetZ(EffectDesc.vLook, 0.f);
+			EffectDesc.vLook *= -1.f;
+			EffectDesc.fDeadTime = 2.f;
+			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+			m_fEffectTime = 0.f;
 		}
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CAlbatoss::ATTACK_CLAW_LP:
 		m_fAnimSpeed = 2.f;
@@ -260,26 +272,6 @@ HRESULT CAlbatoss::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CAlbatoss::SetUp_ShaderResources()
-{
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
-		return E_FAIL;
-
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
-		return E_FAIL;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return S_OK;
-}
 
 _bool CAlbatoss::IsDead()
 {
@@ -525,7 +517,7 @@ void CAlbatoss::Rush_Attack(_float fTimeDelta)
 			if (XMVectorGetX(vPosition) < m_RushLeftPos.x)
 			{
 				vPosition = XMVectorSetX(vPosition, m_RushLeftPos.x);
-				//vPosition = XMVectorSetY(vPosition, m_RushLeftPos.y);
+				vPosition = XMVectorSetY(vPosition, m_RushLeftPos.y);
 
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 				m_bIsAttacking = true;
@@ -537,7 +529,8 @@ void CAlbatoss::Rush_Attack(_float fTimeDelta)
 			if (XMVectorGetX(vPosition) > m_RushRightPos.x)
 			{
 				vPosition = XMVectorSetX(vPosition, m_RushRightPos.x);
-				//vPosition = XMVectorSetY(vPosition, m_RushRightPos.y);
+				vPosition = XMVectorSetY(vPosition, m_RushLeftPos.y);
+
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 				m_bIsAttacking = true;
 			}
@@ -558,7 +551,7 @@ void CAlbatoss::Rush_Attack(_float fTimeDelta)
 
 			if (m_eState == RUSH || m_eState == RUSH_RETURN)
 			{
-				if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) <= XMVectorGetY(vTargetPos) + 1 &&
+				if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) <= XMVectorGetY(vTargetPos) &&
 					XMVectorGetY(Get_TransformState(CTransform::STATE_LOOK)) < 0.f)
 				{
 					m_eState = RUSH_RETURN;
@@ -570,15 +563,19 @@ void CAlbatoss::Rush_Attack(_float fTimeDelta)
 				{
 					m_eState = RUSH_ST;
 					vPosition = XMVectorSetX(vPosition, m_RushLeftPos.x);
+					vPosition = XMVectorSetY(vPosition, m_RushLeftPos.y);
+
 					m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-					m_iRushCount++;
+					
 				}
 				else if (XMVectorGetX(vPosition) > m_RushRightPos.x)
 				{
 					m_eState = RUSH_ST;
 					vPosition = XMVectorSetX(vPosition, m_RushRightPos.x);
+					vPosition = XMVectorSetY(vPosition, m_RushLeftPos.y);
+
 					m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-					m_iRushCount++;
+	
 				}
 				else
 				{
@@ -594,11 +591,12 @@ void CAlbatoss::Rush_Attack(_float fTimeDelta)
 				}
 
 
-				if (m_iRushCount + 10000 < GetTickCount() && m_eState == RUSH_ST)
+				if (m_iRushCount > 3 && m_eState == RUSH_ST)
 				{
 					m_bIsAttacking = false;
 					m_eAttackMode = CLAW_STATE;
 					m_iClawCount = GetTickCount();
+					m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSetY(Get_TransformState(CTransform::STATE_POSITION), m_ClawingPos.y));
 				}
 			}
 		}
@@ -619,7 +617,7 @@ void CAlbatoss::Claw_Attack(_float fTimeDelta)
 
 			if (m_eState == m_eHoverState)
 			{
-				m_pTransformCom->Go_PosDir(fTimeDelta*0.5f, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+				m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 1.f, 0.f, 0.f));
 				if (XMVectorGetY(vPosition) > m_ClawingPos.y)
 				{
 					_vector vDir = vTargetPos - vPosition;
@@ -685,7 +683,7 @@ void CAlbatoss::Claw_Attack(_float fTimeDelta)
 		}
 
 
-		if (m_iClawCount + 15000 < GetTickCount() && m_bIsAttacking == false)
+ 		if (m_iClawCount + 15000 < GetTickCount() && m_bIsAttacking == false)
 		{
 			m_bIsAttacking = false;
 			m_eAttackMode = FLAPPING;
@@ -769,6 +767,18 @@ void CAlbatoss::Flapping_Attack(_float fTimeDelta)
 					return;
 				RELEASE_INSTANCE(CGameInstance);
 				m_bMakeBullet = false;
+
+
+					CEffect::EFFECTDESC EffectDesc;
+					EffectDesc.eEffectType = CEffect::MODEL;
+					EffectDesc.eEffectID = CMonsterEffect::FLAPPING_SMOKE;
+					EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y, 0.f, 0.f) + Get_TransformState(CTransform::STATE_LOOK);
+					EffectDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+					EffectDesc.fDeadTime = 2.f;
+					EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+					EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
+					CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
 			}
 
 		}
@@ -781,7 +791,7 @@ void CAlbatoss::Flapping_Attack(_float fTimeDelta)
 		{
 			m_eState = ATTACK_FLAPPING_ED;
 			m_bMakeBullet = false;
-			m_iRushCount = GetTickCount();
+			m_iRushCount = 0;
 		}
 
 	}

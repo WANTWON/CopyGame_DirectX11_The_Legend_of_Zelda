@@ -37,7 +37,6 @@ public:
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
-	virtual HRESULT SetUp_ShaderResources() override;
 	virtual _bool IsDead() override;
 	virtual void Find_Target() override;
 	virtual void Follow_Target(_float fTimeDelta) override;
@@ -69,14 +68,17 @@ private:
 
 	_float3			m_vTargetDistance = _float3(0.f, 0.f, 0.f);
 	_float4			m_ClawingPos = _float4(0.f, 30.f, 0.f, 1.f);
-	_float4			m_RushRightPos = _float4(10.f, 20.f, 0.f, 1.f);
-	_float4			m_RushLeftPos = _float4(-10.f, 20.f, 0.f, 1.f);
+	_float4			m_RushRightPos = _float4(17.f, 16.5f, 0.f, 1.f);
+	_float4			m_RushLeftPos = _float4(-17.f, 16.5f, 0.f, 1.f);
 
 	_uint	m_eAttackMode = RUSH_STATE;
-	DWORD	m_iRushCount = GetTickCount();
+
+	_uint  m_iRushCount = 0;
+	DWORD	m_dwRushCount = GetTickCount();
 	DWORD	m_iClawCount = GetTickCount();
 
-	
+	_float					m_fEffectTime = 0.f;
+	_float					m_fEffectTimeEnd = 0.f;
 
 public:
 	static CAlbatoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

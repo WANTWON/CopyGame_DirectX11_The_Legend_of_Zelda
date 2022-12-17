@@ -95,7 +95,6 @@ void CMonster::Late_Tick(_float fTimeDelta)
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
-	SetUp_ShaderID();
 
 #ifdef _DEBUG
 	if (m_pAABBCom != nullptr)
@@ -121,6 +120,8 @@ HRESULT CMonster::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
+	if (FAILED(SetUp_ShaderID()))
+		return E_FAIL;
 
 	_uint		iNumMeshes = m_pModelCom->Get_NumMeshContainers();
 
@@ -241,20 +242,21 @@ HRESULT CMonster::Drop_Items()
 void CMonster::Make_GetAttacked_Effect(CBaseObj* DamageCauser)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
+	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	CEffect::EFFECTDESC EffectDesc;
 
 	EffectDesc.eEffectType = CEffect::MODEL;
 	EffectDesc.eEffectID = CFightEffect::HITFLASH;
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.2f, 0.f, 0.f);
+	
 	EffectDesc.fDeadTime = 0.5f;
-	EffectDesc.vLook = XMVector3Normalize((DamageCauser)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION));
+	EffectDesc.vLook = XMVector3Normalize((pTarget)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION));
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION)+ EffectDesc.vLook + XMVectorSet(0.f, Get_Scale().y - 0.2f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 
 	EffectDesc.eEffectID = CFightEffect::HITRING;
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
 	EffectDesc.fDeadTime = 0.8f;
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
@@ -263,7 +265,7 @@ void CMonster::Make_GetAttacked_Effect(CBaseObj* DamageCauser)
 	for (int i = 0; i < 10; ++i)
 	{
 		EffectDesc.eEffectID = CFightEffect::HITSPARK;
-		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
 		_float iRandNum = (rand() % 10 + 10) * 0.1f;
 		EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
 		EffectDesc.fDeadTime = 0.8f;
@@ -275,7 +277,7 @@ void CMonster::Make_GetAttacked_Effect(CBaseObj* DamageCauser)
 
 	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.15f, 0.f, 0.f);
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook + XMVectorSet(0.f, Get_Scale().y - 0.15f, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.5f;
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.vInitScale = _float3(2.f, 2.f, 2.2f);
@@ -283,14 +285,14 @@ void CMonster::Make_GetAttacked_Effect(CBaseObj* DamageCauser)
 
 
 	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.7f;
 	EffectDesc.iTextureNum = 1;
 	EffectDesc.vInitScale = _float3(3.5f, 3.5f, 3.5f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.1f, 0.f, 0.f);
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook + XMVectorSet(0.f, Get_Scale().y - 0.1f, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.5f;
 	EffectDesc.iTextureNum = 2;
 	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
@@ -392,8 +394,6 @@ _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageC
 
 	if (m_tInfo.iCurrentHp <= 0)
 	{
-		
-			
 		m_tInfo.iCurrentHp = 0;
 		return m_tInfo.iCurrentHp;
 	}

@@ -10,6 +10,7 @@
 #include "UIButton.h"
 #include "InvenTile.h"
 #include "InvenItem.h"
+#include "ObjectEffect.h"
 
 CMarinNpc::CMarinNpc(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CNpc(pDevice, pContext)
@@ -419,6 +420,76 @@ void CMarinNpc::GiveItemMode()
 	CUI_Manager::Get_Instance()->Add_MessageDesc(MsgDesc);
 	CUI_Manager::Get_Instance()->Open_Message(true);
 	
+
+	CEffect::EFFECTDESC EffectDesc;
+
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+	EffectDesc.pTarget = this;
+
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CObjectEffect::RAINBOW_RING;
+	EffectDesc.fDeadTime = 2.f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.01f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+	EffectDesc.eEffectID = CObjectEffect::GRAD_RING;
+	EffectDesc.fStartTime = 1.f;
+	EffectDesc.fDeadTime = EffectDesc.fStartTime + 3.f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.02f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CObjectEffect::RAINBOW_HALO;
+	EffectDesc.fStartTime = 0.f;
+	EffectDesc.fDeadTime = 4.f;
+	EffectDesc.vInitScale = _float3(10.f, 10.f, 10.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.02f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.eEffectID = CObjectEffect::HORIZONTAL_GLOW;
+	EffectDesc.iTextureNum = 5;
+	EffectDesc.fDeadTime = 2.f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.01f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CObjectEffect::ITEM_GET_GLOW;
+	EffectDesc.iTextureNum = 0;
+	EffectDesc.fStartTime = 1.f;
+	EffectDesc.fDeadTime = EffectDesc.fStartTime + 3.5f;
+	EffectDesc.vInitScale = _float3(1.f, 1.f, 1.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.01f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.fStartTime = 0.f;
+	EffectDesc.iTextureNum = 0;
+	EffectDesc.fDeadTime = 2.f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, 0.f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CObjectEffect::ITEM_GET_FLASH;
+	EffectDesc.iTextureNum = 6;
+	EffectDesc.fDeadTime = 1.25f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, 0.f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+	EffectDesc.iTextureNum = 3;
+	EffectDesc.fDeadTime = 1.f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, 0.f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
 	m_bGiveItem = false;
 	m_bGet = false;
 

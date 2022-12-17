@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\MonsterBullet.h"
 #include "ObjectEffect.h"
+#include "MonsterEffect.h"
 
 CMonsterBullet::CMonsterBullet(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -39,10 +40,12 @@ HRESULT CMonsterBullet::Initialize(void * pArg)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		break;
 	case OCTOROCK:
+	{
 		Set_Scale(_float3(2, 2, 2));
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		m_pTransformCom->LookDir(m_BulletDesc.vLook);
 		break;
+	}
 	case ROLA:
 	{
 		Set_Scale(_float3(3, 3, 3));
@@ -77,6 +80,7 @@ int CMonsterBullet::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
+		Make_DeathEffect();
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MBULLET, this);
 		return OBJ_DEAD;
 	}
@@ -276,6 +280,14 @@ void CMonsterBullet::Moving_OctorockBullet(_float fTimeDelta)
 {
 
 	m_pTransformCom->Go_Straight(fTimeDelta);
+
+	m_fDeadtime += fTimeDelta;
+
+	if (m_BulletDesc.fDeadTime < m_fDeadtime)
+	{
+		m_bDead = true;
+	}
+		
 }
 
 void CMonsterBullet::Moving_RolaBullet(_float fTimeDelta)
@@ -328,14 +340,50 @@ void CMonsterBullet::LateTick_Octorock(_float fTimeDelta)
 	{
 		CEffect::EFFECTDESC EffectDesc;
 		EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
-		EffectDesc.eEffectID = CObjectEffect::SMOKE;
-		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+		EffectDesc.eEffectID = CMonsterEffect::BULLET_SMOKE;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
 		EffectDesc.fDeadTime = 0.1f;
 		EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
 		EffectDesc.vInitScale = _float3(0.7f, 0.7f, 0.7f);
-		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 		m_fEffectTime = 0.f;
 	}
+}
+
+void CMonsterBullet::Make_DeathEffect()
+{
+	CEffect::EFFECTDESC EffectDesc;
+
+	switch (m_BulletDesc.eBulletType)
+	{
+	case OCTOROCK:
+		EffectDesc.eEffectType = CEffect::MODEL;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+		EffectDesc.fDeadTime = 0.5f;
+
+		for (int i = 0; i < 5; ++i)
+		{
+			EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.5f);
+			EffectDesc.eEffectID = CMonsterEffect::OCTOROCK_STONE;
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+		}
+		break;
+	default:
+		break;
+	}
+
+	
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.eEffectID = CObjectEffect::SMOKE;
+	EffectDesc.fDeadTime = 0.3f;
+	EffectDesc.vColor = XMVectorSet(178, 159, 134, 255);
+	EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+
 }
 
 CMonsterBullet * CMonsterBullet::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

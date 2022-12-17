@@ -95,11 +95,12 @@ PS_OUT PS_MAIN(PS_IN In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.a = Out.vDiffuse.r;
 	Out.vDiffuse.rgb = g_ColorFront.rgb;
 
 	Out.vDiffuse.a *= g_fAlpha;
 
-	if (Out.vDiffuse.a < 0.1f)
+	if (Out.vDiffuse.a <= 0.0f)
 		discard;
 
 	return Out;
@@ -127,7 +128,7 @@ PS_OUT PS_MAIN_SOFTEFFECT(PS_IN_SOFTEFFECT In)
 
 	Out.vDiffuse.a *= g_fAlpha;
 
-	if (Out.vDiffuse.a < 0.1f)
+	if (Out.vDiffuse.a <= 0.0f)
 		discard;
 
 
@@ -313,7 +314,7 @@ PS_OUT PS_ONLY_TEXTURE(PS_IN In)
 
 technique11 DefaultTechnique
 {
-	pass OneColor
+	pass OneColor_NotAlphaSet
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -322,6 +323,17 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_SOFTEFFECT();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_SOFTEFFECT();
+	}
+
+	pass OneColor_AlphaSet
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 	
 	pass HitFlashEffect

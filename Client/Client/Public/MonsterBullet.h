@@ -54,6 +54,8 @@ private:
 
 private:
 	void LateTick_Octorock(_float fTimeDelta);
+	void Make_DeathEffect();
+
 
 protected: /* For.Components */
 	CModel*					m_pModelCom = nullptr;
@@ -64,6 +66,9 @@ protected: /* For.Components */
 	_float					m_fSpeed = 0.f;
 	_float					m_fEffectTimeEnd = 0.f;
 	_float					m_fEffectTime = 0.f;
+
+	
+
 	BULLETDESC				m_BulletDesc;
 
 public:

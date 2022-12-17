@@ -11,7 +11,10 @@ class CMonsterEffect final : public CEffect
 public:
 	enum TYPE { 
 		/* For Octorock */
-		BULLET_SMOKE, BURST_RING,
+		BULLET_SMOKE, BLAST_RING, OCTOROCK_STONE,
+
+		/* For Albatoss */
+		CLAW_SMOKE, FLAPPING_SMOKE,
 	};
 
 
@@ -40,8 +43,8 @@ private:
 
 private:
 	void Tick_Grass(_float fTimeDelta);
-	void Tick_Smoke(_float fTimeDelta);
-
+	void Tick_OctoRockEffect(_float fTimeDelta);
+	void Tick_AlbatossEffect(_float fTimeDelta);
 
 private:
 	_float	m_fAngle = 0.f;

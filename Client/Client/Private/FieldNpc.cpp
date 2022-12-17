@@ -10,6 +10,7 @@
 #include "UIButton.h"
 #include "InvenTile.h"
 #include "InvenItem.h"
+#include "ObjectEffect.h"
 
 CFieldNpc::CFieldNpc(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CNpc(pDevice, pContext)
@@ -552,39 +553,12 @@ int CFieldNpc::Child_Tick(_float fTimeDelta)
 		{
 			Change_Direction();
 			m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+			Make_ChildEffect(fTimeDelta);
 		}
 
 	}
 	else
 	{
-		//// Switch between Idle and Walk (based on time)
-		//if (m_eState == APPEAL)
-		//{
-		//	if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 3 + 1) + 3000)
-		//	{
-		//		m_eState = RUN;
-		//		m_dwWalkTime = GetTickCount();
-
-		//		m_eDir[DIR_X] = (rand() % 300)*0.01f - 1.f;
-		//		m_eDir[DIR_Z] = (rand() % 300)*0.01f - 1.f;
-
-		//	}
-		//}
-		//else if (m_eState == RUN)
-		//{
-		//	if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 3 + 1) + 1500)
-		//	{
-		//		m_eState = APPEAL;
-		//		m_dwIdleTime = GetTickCount();
-		//	}
-		//}
-
-		//// Movement
-		//if (m_eState == RUN)
-		//{
-		//	Change_Direction();
-		//	m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
-		//}
 
 		m_pTarget = dynamic_cast<CBaseObj*>(pChildrenList);
 		_vector vTargetPos = m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
@@ -594,6 +568,7 @@ int CFieldNpc::Child_Tick(_float fTimeDelta)
 		if (m_fDistanceToTarget > 3)
 		{
 			m_eState = RUN;
+			Make_ChildEffect(fTimeDelta);
 			m_pTransformCom->LookAt(vTargetPos);
 			m_pTransformCom->Go_StraightSliding(fTimeDelta*0.5f, m_pNavigationCom);
 			
@@ -616,6 +591,24 @@ int CFieldNpc::Child_Tick(_float fTimeDelta)
 	RELEASE_INSTANCE(CGameInstance);
 
 	return OBJ_NOEVENT;
+}
+
+void CFieldNpc::Make_ChildEffect(_float fTimeDelta)
+{
+	m_fEffectTimeEnd = 0.3f;
+	m_fEffectTime += fTimeDelta;
+	if (m_fEffectTime > m_fEffectTimeEnd)
+	{
+		CEffect::EFFECTDESC EffectDesc;
+		EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+		EffectDesc.eEffectID = CObjectEffect::SMOKE;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+		EffectDesc.fDeadTime = 0.1f;
+		EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+		EffectDesc.vInitScale = _float3(1.5f, 1.5f, 1.5f);
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		m_fEffectTime = 0.f;
+	}
 }
 
 

@@ -28,6 +28,7 @@ public:
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
+	virtual HRESULT SetUp_ShaderID() override;
 	virtual _bool IsDead() override;
 	virtual void Find_Target() override;
 	virtual void Follow_Target(_float fTimeDelta) override;
@@ -40,6 +41,9 @@ private:
 private:
 	STATE m_eState = IDLE;
 	STATE m_ePreState = FIND;
+
+	_float					m_fEffectTime = 0.f;
+	_float					m_fEffectTimeEnd = 0.f;
 
 public:
 	static CMoblinSword* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

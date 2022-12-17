@@ -135,7 +135,7 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 		m_fAlpha = 0.f;
 		break;
 	case SMOKE:
-		m_eShaderID = SHADER_ONECOLOR;
+		m_eShaderID = SHADER_ONECOLOR_ALPHASET;
 		m_EffectDesc.iTextureNum = rand() % 3;
 		m_vColorFront = m_EffectDesc.vColor;
 		break;

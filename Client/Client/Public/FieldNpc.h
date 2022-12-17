@@ -46,12 +46,16 @@ private:
 	int		Madam_Tick(_float fTimeDelta);
 	int		Grandma_Tick(_float fTimeDelta);
 	int		Child_Tick(_float fTimeDelta);
+
+	void	Make_ChildEffect(_float fTimeDelta);
 	
 private:
 	_uint	m_eState = IDLE_CUCCO;
 	_uint	m_eIdleState = IDLE_CUCCO;
 	_uint	m_eTalkState = IDLE_CUCCO;
 
+	_float					m_fEffectTime = 0.f;
+	_float					m_fEffectTimeEnd = 0.f;
 	
 
 	_float4 m_vTargetPos = _float4(0.f, 0.f, 0.f, 1.f);

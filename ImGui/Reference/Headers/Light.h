@@ -14,6 +14,7 @@ public:
 	const LIGHTDESC* Get_LightDesc() const {
 		return &m_LightDesc;
 	}
+	void Set_LightDesc(LIGHTDESC* pLightDesc) { memcpy(&m_LightDesc, pLightDesc, sizeof(LIGHTDESC)); }
 
 public:
 	HRESULT Initialize(const LIGHTDESC& LightDesc);

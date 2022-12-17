@@ -31,7 +31,7 @@ public:
 	};
 
 
-	enum PARTS { PARTS_BOW, PARTS_ITEM, PARTS_EFFECT, PARTS_END };
+	enum PARTS { PARTS_WEAPON, PARTS_ITEM, PARTS_EFFECT, PARTS_END };
 
 
 private:

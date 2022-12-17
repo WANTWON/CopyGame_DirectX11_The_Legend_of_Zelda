@@ -36,9 +36,11 @@ private:
 private:
 	virtual void AI_Behaviour(_float fTimeDelta) override;
 	void Patrol(_float fTimeDelta);
+	void Make_Bullet();
 
 private:
 	STATE m_eState = IDLE;
+	_bool m_bMakeBullet = false;
 
 public:
 	static COctorock* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
