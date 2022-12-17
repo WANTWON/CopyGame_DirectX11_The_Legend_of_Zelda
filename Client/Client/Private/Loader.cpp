@@ -1445,6 +1445,11 @@ HRESULT CLoader::Loading_For_Effect()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Smoke/Smoke_%d.dds"), 32))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Texture_Smoke2 */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke2"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Smoke2/Smoke_%d.dds"), 32))))
+		return E_FAIL;
+
 	/*For.Prototype_Component_Texture_SmokeBack */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SmokeDeath"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/DeathSmoke/Smoke_%02d.dds"), 5))))

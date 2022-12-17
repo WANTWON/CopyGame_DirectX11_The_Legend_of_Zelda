@@ -165,7 +165,7 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
 
-		m_fEffectTimeEnd = 0.3f;
+		m_fEffectTimeEnd = 0.1f;
 		m_fEffectTime += fTimeDelta;
 		if (m_fEffectTime > m_fEffectTimeEnd)
 		{
@@ -179,7 +179,7 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 			EffectDesc.vLook *= -1.f;
 			EffectDesc.fDeadTime = 2.f;
 			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
-			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
+			EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 			m_fEffectTime = 0.f;
 		}
@@ -777,6 +777,18 @@ void CAlbatoss::Flapping_Attack(_float fTimeDelta)
 					EffectDesc.fDeadTime = 2.f;
 					EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
 					EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
+					CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			
+					EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+					EffectDesc.eEffectID = CMonsterEffect::CLAW_SMOKE;
+					EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+					EffectDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+					EffectDesc.vLook = XMVectorSetY(EffectDesc.vLook, (rand() % 100 * 0.01f) - 0.5f);
+					EffectDesc.vLook = XMVectorSetZ(EffectDesc.vLook, 0.f);
+					EffectDesc.fDeadTime = 2.f;
+					EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+					EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
 					CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 			}

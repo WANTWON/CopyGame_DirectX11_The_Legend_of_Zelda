@@ -56,7 +56,7 @@ HRESULT CMonsterEffect::Initialize(void * pArg)
 		m_fAlpha = 0.f;
 		break;
 	case FLAPPING_SMOKE:
-		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
+		m_eShaderID = SHADER_ONECOLOR_ALPHASET;
 		m_vColorFront = XMVectorSet(255, 255, 255, 255);
 		m_vColorBack = XMVectorSet(138, 136, 135, 255);
 	default:
@@ -255,10 +255,24 @@ void CMonsterEffect::Tick_AlbatossEffect(_float fTimeDelta)
 		break;
 	case FLAPPING_SMOKE:
 		m_pTransformCom->LookDir(m_EffectDesc.vLook);
+
+		if (!m_bMax)
+		{
+			m_fAlpha += 0.05f;
+
+			if (m_fAlpha >= 1.f)
+			{
+				m_fAlpha = 1.f;
+				m_bMax = true;
+			}
+		}
+		else
+			m_fAlpha -= 0.01f;
+
 		m_fAlpha -= 0.01f;
-		m_vScale.x += 0.2f;
-		m_vScale.y += 0.2f;
-		m_vScale.z += 0.2f;
+		m_vScale.x += 0.15f;
+		m_vScale.y += 0.15f;
+		m_vScale.z += 0.15f;
 		break;
 	default:
 		break;

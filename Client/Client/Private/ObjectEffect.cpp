@@ -135,7 +135,7 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 		m_fAlpha = 0.f;
 		break;
 	case SMOKE:
-		m_eShaderID = SHADER_ONECOLOR_ALPHASET;
+		m_eShaderID = SHADER_ONECOLOR;
 		m_EffectDesc.iTextureNum = rand() % 3;
 		m_vColorFront = m_EffectDesc.vColor;
 		break;
@@ -285,7 +285,7 @@ HRESULT CObjectEffect::Ready_Components(void * pArg)
 			return E_FAIL;
 		break;
 	case SMOKE:
-		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"), (CComponent**)&m_pTextureCom)))
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke2"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
 	default:
