@@ -14,7 +14,10 @@ public:
 		BULLET_SMOKE, BLAST_RING, OCTOROCK_STONE,
 
 		/* For Albatoss */
-		CLAW_SMOKE, FLAPPING_SMOKE,
+		CLAW_SMOKE, CLAW_RING, FLAPPING_SMOKE, 
+		FEATHER, ALBATROSSDEAD_SMOKE, GLOW_SPHERE,
+
+
 	};
 
 
@@ -38,6 +41,8 @@ public:
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
 	virtual HRESULT SetUp_ShaderID();
+	virtual HRESULT SetUp_ShaderResources() override;
+
 	virtual void Change_Animation(_float fTimeDelta);
 	virtual void Change_Texture(_float fTimeDelta) override;
 
@@ -51,6 +56,8 @@ private:
 	_float	m_fColorTime = 0.f;
 	_float	m_fSpeed = 0.f;
 	
+	CTexture*		m_pSmokeDstTexture = nullptr;
+	CTexture*		m_pDissolveTexture = nullptr;
 
 	vector<_vector> m_vecColor;
 	_int			m_iColorIndex = 0;

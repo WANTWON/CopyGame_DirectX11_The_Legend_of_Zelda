@@ -95,6 +95,7 @@ void COctorock::Change_Animation(_float fTimeDelta)
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		m_bMakeEffect = false;
 		break;
 	case Client::COctorock::ATTACK_ST:
 		m_fAnimSpeed = 2.f;
@@ -123,6 +124,7 @@ void COctorock::Change_Animation(_float fTimeDelta)
 		{
 			m_eState = IDLE;
 			m_bHit = false;
+			m_bMakeEffect = false;
 		}
 		break;
 	case Client::COctorock::DEAD:

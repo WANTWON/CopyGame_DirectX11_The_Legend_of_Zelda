@@ -241,6 +241,10 @@ HRESULT CMonster::Drop_Items()
 
 void CMonster::Make_GetAttacked_Effect(CBaseObj* DamageCauser)
 {
+
+	if (m_bMakeEffect)
+		return;
+
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	CEffect::EFFECTDESC EffectDesc;
@@ -298,14 +302,14 @@ void CMonster::Make_GetAttacked_Effect(CBaseObj* DamageCauser)
 	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
-
+	m_bMakeEffect = true;
 
 	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CMonster::Make_DeadEffect(CBaseObj * Target)
 {
-	if (m_bDeadEffect)
+	if (m_bMakeEffect)
 		return;
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -382,7 +386,7 @@ void CMonster::Make_DeadEffect(CBaseObj * Target)
 	
 	RELEASE_INSTANCE(CGameInstance);
 
-	m_bDeadEffect = true;
+	m_bMakeEffect = true;
 }
 
 _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)

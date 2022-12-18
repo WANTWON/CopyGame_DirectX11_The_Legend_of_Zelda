@@ -14,7 +14,9 @@ public:
 		HITFLASH, HITFLASH_TEX, HITRING, HITSPARK, 
 
 		/* Dead */
-		GLOW_SPHERE, SMOKEBACK, SMOKEFRONT,GLOW_LARGE, GLOW_MIDDLE, GLOW_SMALL, GLOW_MINI,
+		GLOW_SPHERE, SMOKEBACK, SMOKEFRONT, 
+		GLOW_LARGE, GLOW_MIDDLE, GLOW_SMALL, GLOW_MINI,
+		DEAD_FLASH,
 	
 		/* Guard */
 		GUARD_FLASH, GUARD_RING, GUARD_RING2, GUARD_DUST
@@ -42,6 +44,7 @@ private:
 	virtual HRESULT SetUp_ShaderID();
 	virtual void Change_Animation(_float fTimeDelta);
 	virtual void Change_Texture(_float fTimeDelta) override;
+	virtual HRESULT SetUp_ShaderResources() override;
 
 private:
 	void Tick_HitFlash(_float fTimeDelta);

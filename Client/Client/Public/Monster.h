@@ -14,7 +14,7 @@ class CMonster abstract : public CBaseObj
 {
 public:
 	enum MONSTER_ID { MONSTER_OCTOROCK, MONSTER_MOBLINSWORD, MONSTER_ROLA, MONSTER_PAWN, MONSTER_TAIL, 
-		MONSTER_CUCCO ,MONSTER_END };
+		MONSTER_CUCCO , MONSTER_ALBATROSS, MONSTER_END };
 	enum DMG_DIRECTION {FRONT, BACK};
 
 protected:
@@ -55,7 +55,7 @@ protected:
 	virtual HRESULT Drop_Items();
 	virtual _bool IsDead() = 0;
 	void Make_GetAttacked_Effect(CBaseObj* DamageCauser = nullptr);
-	void Make_DeadEffect(CBaseObj* Target = nullptr);
+	virtual void Make_DeadEffect(CBaseObj* Target = nullptr);
 
 protected:
 	CNavigation*			m_pNavigationCom = nullptr;
@@ -74,7 +74,7 @@ protected:
 	_bool					m_bHit = false;
 	_bool					m_bRed = false;
 	_bool					m_bMove = true;
-	_bool					m_bDeadEffect = false;
+	_bool					m_bMakeEffect = false;
 
 
 	//For Move Time

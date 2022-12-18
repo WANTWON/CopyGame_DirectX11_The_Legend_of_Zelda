@@ -32,7 +32,7 @@ public:
 
 public:
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
-
+	virtual HRESULT SetUp_ShaderID() override;
 
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;
@@ -48,6 +48,9 @@ private:
 	void Rush_Attack(_float fTimeDelta);
 	void Claw_Attack(_float fTimeDelta);
 	void Flapping_Attack(_float fTimeDelta);
+
+	void Make_ClawEffect(_float fTimeDelta);
+	virtual void Make_DeadEffect(CBaseObj* Target = nullptr) override;
 
 private:
 	STATE m_eState = PICCOLO_WAIT;
@@ -73,12 +76,14 @@ private:
 
 	_uint	m_eAttackMode = RUSH_STATE;
 
-	_uint  m_iRushCount = 0;
+	_uint	m_iRushCount = 0;
 	DWORD	m_dwRushCount = GetTickCount();
 	DWORD	m_iClawCount = GetTickCount();
 
 	_float					m_fEffectTime = 0.f;
 	_float					m_fEffectTimeEnd = 0.f;
+	_float					m_fClawTime = 0.f;
+	_float					m_fClawTimeEnd = 0.f;
 
 public:
 	static CAlbatoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

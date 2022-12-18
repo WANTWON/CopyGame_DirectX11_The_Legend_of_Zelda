@@ -283,12 +283,10 @@ PS_OUT PS_SMOKEFRONT_PURPLE(PS_IN In)
 	if (Out.vDiffuse.a <= 0.0f)
 		discard;
 
-	vector PurpleColor = vector(114, 0, 153, 255) / 255.f;
-	vector RedPurpleColor = vector(63, 0, 38, 255) / 255.f;
-	vector GetColor = g_ColorBack / 255.f;
-
-	Out.vDiffuse.rgb = PurpleColor.rgb;
-	vSmokeDst.rgb = GetColor.rgb;
+	vector FrontColor = g_ColorFront / 255.f;
+	vector BackColor = g_ColorBack / 255.f;
+	Out.vDiffuse.rgb = FrontColor.rgb;
+	vSmokeDst.rgb = BackColor.rgb;
 
 	Out.vDiffuse.rgb *= vSmokeDst.rgb;
 

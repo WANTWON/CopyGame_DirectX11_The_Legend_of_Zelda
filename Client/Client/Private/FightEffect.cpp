@@ -68,6 +68,8 @@ HRESULT CFightEffect::Initialize(void * pArg)
 	case SMOKEFRONT:
 		m_fAlpha = 0.f;
 		m_eShaderID = SHADER_SMOKEFRONT;
+		m_vColorBack = XMVectorSet(63, 0, 38, 255);
+		m_vColorFront = XMVectorSet(114, 0, 153, 255);
 		break;
 	case GLOW_LARGE:
 		m_fAngle = XMConvertToRadians(float(rand() % 180));
@@ -129,6 +131,13 @@ HRESULT CFightEffect::Initialize(void * pArg)
 		m_vColorFront = XMVectorSet(51, 102, 225, 255);
 		m_vColorBack = XMVectorSet(228, 226, 228, 255);
 		break;
+	case DEAD_FLASH:
+		m_fSpeed = (rand() % 100)*0.01f + 0.3f;
+		m_eShaderID = SHADERM_TWOCOLOR_PRIORITY;
+		m_vColorBack = XMVectorSet(228, 0, 228, 255);
+		m_vColorFront = XMVectorSet(228, 226, 228, 255);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.vInitPositon + m_EffectDesc.vDistance);
+		break;
 	default:
 		break;
 	}
@@ -156,6 +165,7 @@ int CFightEffect::Tick(_float fTimeDelta)
 	case GLOW_SPHERE:
 	case SMOKEBACK:
 	case SMOKEFRONT:
+	case DEAD_FLASH:
 		Tick_DeadEffect(fTimeDelta);
 		break;
 	case GLOW_LARGE:
@@ -214,6 +224,7 @@ HRESULT CFightEffect::Ready_Components(void * pArg)
 			return E_FAIL;
 		break;
 	case HITFLASH_TEX:
+	case DEAD_FLASH:
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Flash"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
@@ -280,6 +291,24 @@ void CFightEffect::Change_Texture(_float fTimeDelta)
 	
 }
 
+HRESULT CFightEffect::SetUp_ShaderResources()
+{
+	__super::SetUp_ShaderResources();
+
+
+	switch (m_EffectDesc.eEffectID)
+	{
+	case SMOKEFRONT:
+		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_SmokeDstTexture", m_pSmokeDstTexture->Get_SRV())))
+			return E_FAIL;
+		break;
+	default:
+		break;
+	}
+
+	return S_OK;
+}
+
 
 void CFightEffect::Tick_HitFlash(_float fTimeDelta)
 {
@@ -287,7 +316,6 @@ void CFightEffect::Tick_HitFlash(_float fTimeDelta)
 
 	if (m_EffectDesc.fDeadTime < m_fDeadtime)
 		m_bDead = true;
-
 
 	switch (m_EffectDesc.eEffectID)
 	{
@@ -448,6 +476,18 @@ void CFightEffect::Tick_DeadEffect(_float fTimeDelta)
 		{
 			m_fAlpha -= 0.02f;
 		}
+		break;
+	case DEAD_FLASH:
+		if (m_fDeadtime > m_EffectDesc.fDeadTime*0.5f)
+		{
+			m_fAlpha -= 0.1f;
+			m_vScale.x -= 0.1f;
+			m_vScale.y -= 0.1f;
+			m_vScale.z -= 0.1f;
+		}
+		SetUp_BillBoard();
+
+		m_pTransformCom->Go_PosDir(fTimeDelta*m_fSpeed, XMVectorSet(0.f, 1.f, 0.f, 0.f));
 		break;
 	default:
 		break;

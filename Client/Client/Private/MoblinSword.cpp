@@ -135,6 +135,7 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 	case Client::CMoblinSword::STANCE_WAIT:
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta * 2, m_bIsLoop);
+		m_bMakeEffect = false;
 		break;
 	case Client::CMoblinSword::WALK:
 		m_bIsLoop = true;
@@ -150,6 +151,7 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 		{
 			m_eState = IDLE;
 			m_bHit = false;
+			m_bMakeEffect = false;
 		}
 		break;
 	case Client::CMoblinSword::GUARD:
