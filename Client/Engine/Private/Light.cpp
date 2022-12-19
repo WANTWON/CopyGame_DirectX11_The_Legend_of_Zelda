@@ -1,6 +1,8 @@
 #include "..\Public\Light.h"
 #include "Shader.h"
 #include "VIBuffer_Rect.h"
+#include "Frustum.h"
+
 
 CLight::CLight(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: m_pDevice(pDevice)
@@ -35,6 +37,9 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 	}
 	else
 	{
+		if (CFrustum::Get_Instance()->isIn_WorldFrustum(XMLoadFloat4(&m_LightDesc.vPosition), m_LightDesc.fRange*0.5f) == false)
+			return E_FAIL;
+
 		iPassIndex = 2;
 
 		if (FAILED(pShader->Set_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof(_float4))))

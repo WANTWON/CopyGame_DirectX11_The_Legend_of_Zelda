@@ -65,7 +65,8 @@ int CPrizeItem::Tick(_float fTimeDelta)
 	}
 	
 
-	if (m_ItemDesc.eType == TAIL_KEY && !m_bGet)
+	if ((m_ItemDesc.eType == TAIL_KEY  || m_ItemDesc.eType == RUBY_GREEN ||
+		m_ItemDesc.eType == HEART_RECOVERY )&& !m_bGet)
 	{
 		
 		_float fMinPos = m_ItemDesc.vPosition.y + 0.5f;
@@ -421,6 +422,12 @@ void CPrizeItem::Setting_Get_Item()
 				continue;
 		}
 	}
+	else if (m_ItemDesc.eType == RUBYPURPLE)
+	{
+		CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+		pPlayer->Set_RubyAdd(100);
+	}
 
 
 	RELEASE_INSTANCE(CUI_Manager);
@@ -710,7 +717,7 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 	CCollider::COLLIDERDESC		ColliderDesc;
 
 	/* For.Com_SPHERE */
-		ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+		ColliderDesc.vScale = _float3(0.7f, 0.7f, 0.7f);
 	if(m_ItemDesc.eInteractType == DEFAULT)
 		ColliderDesc.vScale = _float3(0.3f, 0.3f, 0.3f);
 	if (m_ItemDesc.eInteractType == TELL)

@@ -240,8 +240,32 @@ void CDoor::Tick_ClosedDoor(_float fTimeDelta)
 		return;
 	}
 
-	//m_bOpen = dynamic_cast<CLevel_TailCave*>(pLevel)->Get_OpenDoor();
+
 	m_bOpen = Check_Open();
+	if (m_bOpen == true)
+	{
+		list<CGameObject*>* pDoorList = pGameInstance->Get_ObjectList(LEVEL_TAILCAVE, TEXT("Layer_ColsedDoor"));
+		if (pDoorList != nullptr)
+		{
+			for (auto& iter : *pDoorList)
+			{
+				dynamic_cast<CDoor*>(iter)->Set_OpenDoor(true);
+			}
+		}
+	}
+	else
+	{
+		list<CGameObject*>* pDoorList = pGameInstance->Get_ObjectList(LEVEL_TAILCAVE, TEXT("Layer_ColsedDoor"));
+		if (pDoorList != nullptr)
+		{
+			for (auto& iter : *pDoorList)
+			{
+				dynamic_cast<CDoor*>(iter)->Set_OpenDoor(false);
+			}
+		}
+	}
+
+
 	if (m_bOpen)
 	{
 		if (m_eState != OPEN_WAIT_CD)
@@ -532,6 +556,13 @@ _bool CDoor::Check_Open()
 	_vector vPlayerPos = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
 	_vector vDir = vPlayerPos - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
+	if (XMVectorGetX(XMVector3Length(vDir)) < 3.f && m_bOpen)
+	{
+		RELEASE_INSTANCE(CGameInstance);
+		return true;
+	}
+
+
 	if (0 < XMVectorGetX(XMVector3Dot(vDir, vLook)))
 	{
 		// 조건 1 스위치가 없거나 스위치가 눌려 있을 경우
@@ -557,6 +588,9 @@ _bool CDoor::Check_Open()
 			if (dynamic_cast<CBaseObj*>(iter)->Check_IsinFrustum() == false)
 				continue;
 
+			if (XMVectorGetX(XMVector3Length(dynamic_cast<CBaseObj*>(iter)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION))) >= 8.f)
+				continue;
+
 			if (iter->Get_Dead() == false)
 				goto RETURN_CLOSEDOOR;
 		}
@@ -565,15 +599,6 @@ _bool CDoor::Check_Open()
 		return true;
 	}
 
-	if (XMVectorGetX(XMVector3Length(vDir)) < 3.f)
-	{
-		RELEASE_INSTANCE(CGameInstance);
-		return true;
-
-	}
-	else
-		goto RETURN_CLOSEDOOR;
-	
 
 RETURN_CLOSEDOOR:
 	RELEASE_INSTANCE(CGameInstance);

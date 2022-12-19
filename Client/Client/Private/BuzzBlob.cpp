@@ -48,8 +48,12 @@ int CBuzzBlob::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 	}
 
-	AI_Behaviour(fTimeDelta);
-	Check_Navigation(fTimeDelta);
+	if (Check_IsinFrustum() == true)
+	{
+		AI_Behaviour(fTimeDelta);
+		Check_Navigation(fTimeDelta);
+	}
+	
 
 	m_pModelCom->Set_NextAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
@@ -62,7 +66,17 @@ void CBuzzBlob::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
+	CBaseObj* pCollisionBlock = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_MONSTER, m_pSPHERECom, &pCollisionBlock))
+	{
 
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionBlock->Get_TransformState(CTransform::STATE_POSITION);
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta, vDirection, m_pNavigationCom);
+	}
 }
 
 HRESULT CBuzzBlob::Render()
@@ -108,6 +122,7 @@ void CBuzzBlob::Change_Animation(_float fTimeDelta)
 	}
 	case Client::CBuzzBlob::DEAD:
 	{
+		Make_DeadEffect();
 		m_fAnimSpeed = 1.f;
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
 		m_pTransformCom->Go_Backward(fTimeDelta * 2, m_pNavigationCom);
@@ -124,6 +139,7 @@ void CBuzzBlob::Change_Animation(_float fTimeDelta)
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		m_bMakeEffect = false;
 		break;
 	default:
 		break;
@@ -143,6 +159,10 @@ HRESULT CBuzzBlob::Ready_Components(void * pArg)
 	TransformDesc.fSpeedPerSec = 2.f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
+		return E_FAIL;
+
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Components(TEXT("Com_DissolveTexture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Dissolve"), (CComponent**)&m_pDissolveTexture)))
 		return E_FAIL;
 
 	/* For.Com_Shader */
@@ -250,7 +270,7 @@ void CBuzzBlob::AI_Behaviour(_float fTimeDelta)
 	// Check for Target, AggroRadius
 	Find_Target();
 
-	if (m_pTarget && m_pSPHERECom->Collision(m_pTarget->Get_Collider()) == true)
+	if (m_pTarget /*&& m_pSPHERECom->Collision(m_pTarget->Get_Collider()) == true*/)
 	{
 		m_bAggro = true;
 
@@ -304,6 +324,18 @@ _uint CBuzzBlob::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 		m_eState = STATE::DEAD;
 
 	return 0;
+}
+
+HRESULT CBuzzBlob::SetUp_ShaderID()
+{
+	if (m_eState == DEAD)
+		m_eShaderID = SHADER_ANIMDEAD;
+	else if (m_bHit)
+		m_eShaderID = SHADER_ANIMHIT;
+	else
+		m_eShaderID = SHADER_ANIMDEFAULT;
+
+	return S_OK;
 }
 
 CBuzzBlob * CBuzzBlob::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

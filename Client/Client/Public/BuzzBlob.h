@@ -22,7 +22,7 @@ public:
 
 public:
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
-
+	virtual HRESULT SetUp_ShaderID() override;
 
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;

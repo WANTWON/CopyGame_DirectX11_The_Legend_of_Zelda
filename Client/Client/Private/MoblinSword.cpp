@@ -496,33 +496,7 @@ _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CBaseObj * Dam
 	{
 		m_eState = GUARD;
 
-		CEffect::EFFECTDESC EffectDesc;
-		EffectDesc.eEffectType = CEffect::MODEL;
-		EffectDesc.eEffectID = CFightEffect::GUARD_FLASH;
-		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK))*1.5f + XMVectorSet(0.f, Get_Scale().y, 0.f, 0.f);
-		EffectDesc.fDeadTime = 0.5f;
-		EffectDesc.vLook =  Get_TransformState(CTransform::STATE_POSITION)- m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
-		EffectDesc.vInitScale = _float3(1.5f, 1.5f, 1.5f);
-		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
-
-		EffectDesc.eEffectID = CFightEffect::GUARD_RING;
-		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK))*0.8f + XMVectorSet(0.f, Get_Scale().y*0.5f, 0.f, 0.f);
-		EffectDesc.fDeadTime = 0.5f;
-		EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - DamageCauser->Get_TransformState(CTransform::STATE_POSITION);
-		EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
-		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
-
-
-		for (int i = 0; i < 10; ++i)
-		{
-			EffectDesc.eEffectID = CFightEffect::GUARD_DUST;
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
-			_float iRandNum = (rand() % 10 + 10) * 0.1f;
-			EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
-			EffectDesc.fDeadTime = 0.8f;
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
-
-		}
+		Make_GuardEffect(m_pTarget);
 
 		m_pTransformCom->LookAt(dynamic_cast<CPlayer*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
 		m_bAggro = true;

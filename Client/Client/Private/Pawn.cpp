@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Pawn.h"
 #include "Player.h"
+#include "FightEffect.h"
 
 CPawn::CPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -44,7 +45,6 @@ int CPawn::Tick(_float fTimeDelta)
 {
 	if (__super::Tick(fTimeDelta))
 	{
-		Drop_Items();
 		return OBJ_DEAD;
 	}
 
@@ -328,6 +328,7 @@ _uint CPawn::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 		if (!m_bDead)
 		{
 			m_bHit = true;
+			Make_GuardEffect(m_pTarget);
 			m_eState = STATE::DAMAGE;
 			m_bMove = true;
 		}
@@ -342,6 +343,37 @@ _uint CPawn::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 		m_eState = STATE::DEADFALL;
 
 	return 0;
+}
+
+void CPawn::Make_GuardEffect(CBaseObj * Target)
+{
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CFightEffect::GUARD_FLASH;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+	EffectDesc.vInitScale = _float3(1.5f, 1.5f, 1.5f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+	EffectDesc.eEffectID = CFightEffect::GUARD_RING;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK))*0.5f + XMVectorSet(0.f, Get_Scale().y*0.5f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - Target->Get_TransformState(CTransform::STATE_POSITION);
+	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+
+	for (int i = 0; i < 10; ++i)
+	{
+		EffectDesc.eEffectID = CFightEffect::GUARD_DUST;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+		_float iRandNum = (rand() % 10 + 10) * 0.1f;
+		EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
+		EffectDesc.fDeadTime = 0.8f;
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	}
 }
 
 CPawn * CPawn::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

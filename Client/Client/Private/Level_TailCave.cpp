@@ -125,42 +125,27 @@ HRESULT CLevel_TailCave::Ready_Lights()
 	pGameInstance->Clear_AllLight();
 	LIGHTDESC			LightDesc;
 
-	/* For.Directional*/
-	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
+	HANDLE hFile = 0;
+	_ulong dwByte = 0;
+	_uint iNum = 0;
 
-	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(0.f, -1.f, 1.f, 0.f);
-	LightDesc.vDiffuse = _float4(0.7f, 0.7f, 0.7f, 1.f);
-	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);	
-
-	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
+	hFile = CreateFile(TEXT("../../../Bin/Data/TailCave_Light2.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
 		return E_FAIL;
 
-	/* For.Point */
-	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
 
-	LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	LightDesc.vPosition = _float4(54.f, 2.5f, 2.8f, 1.f);
-	LightDesc.fRange = 7.f;	
-	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
-	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	LightDesc.vSpecular = LightDesc.vDiffuse;
+	for (_uint i = 0; i< iNum; ++i)
+	{
+		ReadFile(hFile, &LightDesc, sizeof(LIGHTDESC), &dwByte, nullptr);
+		if (0 == dwByte)
+			break;
 
-	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
-		return E_FAIL;
+		pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc);
+	}
+	CloseHandle(hFile);
 
-	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
-
-	LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	LightDesc.vPosition = _float4(58.f, 2.5f, 2.8f, 1.f);
-	LightDesc.fRange = 7.f;
-	LightDesc.vDiffuse = _float4(0.0f, 1.f, 0.0f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
-	LightDesc.vSpecular = LightDesc.vDiffuse;
-
-	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
-		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -249,9 +234,9 @@ HRESULT CLevel_TailCave::Ready_Layer_Camera(const _tchar * pLayerTag)
 
 	CameraDesc_Dynamic.iTest = 10;
 
-	CameraDesc_Dynamic.CameraDesc.vEye = _float4(0.f, 11.8f, -3.5f, 1.f);
-	CameraDesc_Dynamic.CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc_Dynamic.InitPostion = _float4(54.f, 10.1f, 2.8f, 1.f);
+	CameraDesc_Dynamic.CameraDesc.vEye = _float4(0.f, 12.f, -3.5f, 1.f);
+	CameraDesc_Dynamic.CameraDesc.vAt = _float4(0.f, 0.f, 0.2f, 1.f);
+	CameraDesc_Dynamic.InitPostion = _float4(54.f, 10.1f, -2.8f, 1.f);
 
 	CameraDesc_Dynamic.CameraDesc.fFovy = XMConvertToRadians(60.0f);
 	CameraDesc_Dynamic.CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
@@ -469,7 +454,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Object(const _tchar * pLayerTag)
 			DoorDesc.eType = CDoor::DOOR_CLOSED;
 			DoorDesc.InitPosition = ModelDesc.vPosition;
 			DoorDesc.fAngle = ModelDesc.m_fAngle;
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Door"), LEVEL_TAILCAVE, pLayerTag, &DoorDesc)))
+			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Door"), LEVEL_TAILCAVE, TEXT("Layer_ColsedDoor"), &DoorDesc)))
 				return E_FAIL;
 		}
 		else if (!wcscmp(pModeltag, TEXT("LockDoor.fbx")))

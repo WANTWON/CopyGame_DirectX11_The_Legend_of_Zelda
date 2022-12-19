@@ -30,10 +30,11 @@ public:
 	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
-
+	void Make_GetItemEffect();
 private:
 	DGNKEYDESC				m_eKeyDesc;
 	_bool					m_bGet = false;
+	_bool					m_bMakeEffect = false;
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;
 

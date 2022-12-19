@@ -302,7 +302,7 @@ void CTreasureBox::OpenBox()
 	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
 
 	CPrizeItem::ITEMDESC ItemDesc;
-	XMStoreFloat3(&ItemDesc.vPosition, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	XMStoreFloat3(&ItemDesc.vPosition, pPlayer->Get_TransformState(CTransform::STATE_POSITION));
 
 	ItemDesc.eInteractType = CPrizeItem::PRIZE;
 

@@ -24,7 +24,7 @@ public:
 
 public:
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
-
+	virtual void Make_GuardEffect(CBaseObj* Target = nullptr) override;
 
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;
