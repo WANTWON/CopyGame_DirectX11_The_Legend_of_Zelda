@@ -55,6 +55,10 @@ private:
 	_bool					m_bMakeEffect = false;
 	_float4x4				m_CombinedWorldMatrix;
 
+	_float					m_fHeight= 0.f;
+	_float					m_fMoveTime = 0.f;
+	_bool					m_bTimeMax = false;
+
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;
 

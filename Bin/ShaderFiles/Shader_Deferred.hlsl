@@ -133,7 +133,7 @@ PS_OUT_LIGHT PS_MAIN_LIGHT_POINT(PS_IN In)
 	vector			vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
 	vector			vDepthDesc = g_DepthTexture.Sample(LinearSampler, In.vTexUV);
 
-	float			fViewZ = vDepthDesc.z;
+	float			fViewZ = vDepthDesc.y * 500.f;
 
 	vector			vWorldPos = (vector)0.f;
 

@@ -300,9 +300,15 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CAlbatoss::ATTACK_CLAW:
 		m_fAnimSpeed = 2.f;
-		m_bIsLoop = true;
+		m_bIsLoop = false;
 		Make_ClawEffect(fTimeDelta);
-		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		if(m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+		{
+			m_iClawCount++;
+
+			if (m_iClawCount % 4 == 3)
+				m_bIsAttacking = false;
+		}
 		break;
 	case Client::CAlbatoss::ATTACK_CLAW_LP:
 		m_fAnimSpeed = 2.f;
@@ -372,8 +378,6 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		m_fEffectTime += fTimeDelta;
 		if (m_fEffectTime > m_fEffectTimeEnd)
 		{
-
-			
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.pTarget = this;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
@@ -384,7 +388,6 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 			EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 			
-
 			EffectDesc.eEffectID = CMonsterEffect::GLOW_SPHERE;
 			EffectDesc.vDistance = XMVectorSet((rand() % 200 * 0.01f) - 1.f, (rand() % 200 * 0.01f) - 1.f, 0.f, 0.f);
 			EffectDesc.iTextureNum = rand()% 2 == 0 ? 0 : 2;
@@ -580,9 +583,30 @@ HRESULT CAlbatoss::Drop_Items()
 	ItemDesc.vPosition = _float3(0.f, 16.5, 3.f);
 	ItemDesc.eInteractType = CPrizeItem::PRIZE;
 	ItemDesc.eType = CPrizeItem::TAIL_KEY;
-	
-
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), iLevel, TEXT("PrizeItem"), &ItemDesc);
+
+
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.eEffectID = CFightEffect::GLOW_SPHERE;
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.vInitPositon = XMVectorSet(0.f, 17.5, 3.5f, 1.f);
+	EffectDesc.iTextureNum = 0;
+	EffectDesc.fDeadTime = 0.8f;
+	EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
+	EffectDesc.vColor = XMVectorSet(226, 255, 255, 255);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	EffectDesc.fDeadTime = 1.0f;
+	EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.5f);
+	EffectDesc.vColor = XMVectorSet(255, 226, 226, 255);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	EffectDesc.eEffectID = CFightEffect::GLOW_LARGE;
+	EffectDesc.iTextureNum = 1;
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vInitScale = _float3(1.f, 1.f, 0.0f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
@@ -790,7 +814,7 @@ void CAlbatoss::Rush_Attack(_float fTimeDelta)
 				{
 					m_bIsAttacking = false;
 					m_eAttackMode = CLAW_STATE;
-					m_iClawCount = GetTickCount();
+					m_dwClawCount = GetTickCount();
 					m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSetY(Get_TransformState(CTransform::STATE_POSITION), m_ClawingPos.y));
 				}
 			}
@@ -879,7 +903,7 @@ void CAlbatoss::Claw_Attack(_float fTimeDelta)
 		}
 
 
- 		if (m_iClawCount + 15000 < GetTickCount() && m_bIsAttacking == false)
+ 		if (m_dwClawCount + 15000 < GetTickCount() && m_bIsAttacking == false)
 		{
 			m_bIsAttacking = false;
 			m_eAttackMode = FLAPPING;

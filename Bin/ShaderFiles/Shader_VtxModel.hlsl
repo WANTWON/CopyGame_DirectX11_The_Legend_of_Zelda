@@ -8,7 +8,6 @@ texture2D		g_NormalTexture;
 texture2D		g_SpecularTexture;
 
 
-
 struct VS_IN
 {
 	float3		vPosition : POSITION;
@@ -88,26 +87,19 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	//packednormal.wy * 2 - 1
 	vNormal = float3((vTexturenormal.x) , vTexturenormal.y , sqrt(1 - vTexturenormal.x*vTexturenormal.x - vTexturenormal.y * vTexturenormal.y));
-	
-	//if(vNormal.x == 1.f)
-	vNormal.x += (vTexturenormal.w);
+	//vNormal.x *= (vTexturenormal.w);
+	//vNormal.y *= (vTexturenormal.w);
 	//vNormal.xy = vNormal.xy * 2.f - 1.f;
 	
-
-	//vNormal = float3(vTexturenormal.w*2 -1, vTexturenormal.y * 2 - 1, sqrt(1 - vTexturenormal.x*vTexturenormal.x - vTexturenormal.y * vTexturenormal.y));
-	//vNormal = vNormal * 2.f - 1.f;
-
 	float3x3	WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
 	vNormal = mul(vNormal, WorldMatrix);
 	Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
 
 
-	//Out.vDepth = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+	//Out.vDepth = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
 	//Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f) ;
 	
-
-
 	Out.vDiffuse.a = g_fAlpha;
 
 	if (Out.vDiffuse.a <= 0.2f)

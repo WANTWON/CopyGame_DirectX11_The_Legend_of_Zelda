@@ -101,6 +101,17 @@ int CMarinNpc::Tick(_float fTimeDelta)
 					continue;
 			}
 
+			list<CGameObject*>* pEffectList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_ObjectEffect"));
+			if (pEffectList != nullptr)
+			{
+				for (auto& iter : *pEffectList)
+				{
+					if (iter != nullptr)
+						dynamic_cast<CObjectEffect*>(iter)->Set_EndMode(true);
+				}
+
+			}
+
 			CUI_Manager::Get_Instance()->Open_Message(false);
 			m_eState = MARIN_GETED;
 		}
@@ -358,7 +369,7 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 			if (m_iHeart > 10)
 				eMsgDesc.iTextureNum = MARIN_TALKEND_COMPLETE;
 			else
-				eMsgDesc.iTextureNum = MARIN_TALKEND_FAIL;
+				eMsgDesc.iTextureNum = MARIN_LOVEUFAIL;
 			pUI_Manager->Add_MessageDesc(eMsgDesc);
 		}
 		else if (m_eTalkingMode == FINAL)
@@ -387,8 +398,14 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 	{
 		CUI_Manager::MSGDESC eMsgDesc;
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
-		eMsgDesc.iTextureNum = MARIN_A5_COMPLETE;
-		m_eState = EXCITING;
+		if (m_iHeart > 10)
+		{
+			m_eState = EXCITING;
+			eMsgDesc.iTextureNum = MARIN_A5_COMPLETE;
+		}		
+		else 
+			eMsgDesc.iTextureNum = MARIN_LOVEUFAIL;
+			
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 	}
 	else if (iTextureNum == CUIButton::SORRY)

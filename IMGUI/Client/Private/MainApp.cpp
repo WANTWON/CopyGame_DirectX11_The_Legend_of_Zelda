@@ -174,5 +174,7 @@ void CMainApp::Free()
 	CPickingMgr::Get_Instance()->Destroy_Instance();
 	CImgui_Manager::Get_Instance()->Destroy_Instance();
 	
+	CCamera_Manager::Get_Instance()->Destroy_Instance();
+	CTerrain_Manager::Get_Instance()->Destroy_Instance();
 }
 

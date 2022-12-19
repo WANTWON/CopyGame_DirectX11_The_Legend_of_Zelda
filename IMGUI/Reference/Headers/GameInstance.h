@@ -85,7 +85,9 @@ public: /* For.Light_Manager */
 	const LIGHTDESC* Get_LightDesc(_uint iIndex);
 	void Set_LightDesc(_uint iIndex, LIGHTDESC* pLightDesc);
 	HRESULT Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const LIGHTDESC& LightDesc);
-	void Clear_Light();
+	void Clear_AllLight();
+	void Clear_Light(_uint iIndex);
+	_uint Get_LightSize();
 
 public: /* For.Font_Manager */
 	HRESULT Add_Fonts(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontTag, const _tchar* pFontFilePath);

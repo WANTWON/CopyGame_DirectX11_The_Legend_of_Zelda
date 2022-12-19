@@ -53,32 +53,33 @@ private:
 	virtual void Make_DeadEffect(CBaseObj* Target = nullptr) override;
 
 private:
-	STATE m_eState = PICCOLO_WAIT;
-	_bool m_bOpening = false;
-	_bool m_bFirst = false;
-	_bool m_bMessageAutoPass = false;
-	_bool m_bDownHovering = false;
-	_bool m_bMakeBullet = false;
+	STATE					m_eState = PICCOLO_WAIT;
+	_bool					m_bOpening = false;
+	_bool					m_bFirst = false;
+	_bool					m_bMessageAutoPass = false;
+	_bool					m_bDownHovering = false;
+	_bool					m_bMakeBullet = false;
 
-	DWORD m_dwOpeningTime = GetTickCount();
-	DWORD m_dwFlappingTime = GetTickCount();
-	DWORD m_dwBulletTime = GetTickCount();
-	_vector m_vLastDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+	DWORD					m_dwOpeningTime = GetTickCount();
+	DWORD					m_dwFlappingTime = GetTickCount();
+	DWORD					m_dwBulletTime = GetTickCount();
+	_vector					m_vLastDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);
 
-	STATE m_eHoverState = HOVERING_LP_FAST;
-	STATE m_eHoverStState = HOVERING_ST;
-	RUSHDIR m_eRushDir = RUSH_RIGHT;
+	STATE					m_eHoverState = HOVERING_LP_FAST;
+	STATE					m_eHoverStState = HOVERING_ST;
+	RUSHDIR					m_eRushDir = RUSH_RIGHT;
 
-	_float3			m_vTargetDistance = _float3(0.f, 0.f, 0.f);
-	_float4			m_ClawingPos = _float4(0.f, 30.f, 0.f, 1.f);
-	_float4			m_RushRightPos = _float4(17.f, 16.5f, 0.f, 1.f);
-	_float4			m_RushLeftPos = _float4(-17.f, 16.5f, 0.f, 1.f);
+	_float3					m_vTargetDistance = _float3(0.f, 0.f, 0.f);
+	_float4					m_ClawingPos = _float4(0.f, 30.f, 0.f, 1.f);
+	_float4					m_RushRightPos = _float4(17.f, 16.5f, 0.f, 1.f);
+	_float4					m_RushLeftPos = _float4(-17.f, 16.5f, 0.f, 1.f);
 
-	_uint	m_eAttackMode = RUSH_STATE;
+	_uint					m_eAttackMode = RUSH_STATE;
 
-	_uint	m_iRushCount = 0;
-	DWORD	m_dwRushCount = GetTickCount();
-	DWORD	m_iClawCount = GetTickCount();
+	_uint					m_iRushCount = 0;
+	_uint					m_iClawCount = 0;
+	DWORD					m_dwRushCount = GetTickCount();
+	DWORD					m_dwClawCount = GetTickCount();
 
 	_float					m_fEffectTime = 0.f;
 	_float					m_fEffectTimeEnd = 0.f;

@@ -31,6 +31,7 @@ struct VS_OUT
 	float4		vPosition : SV_POSITION;
 	float4		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
+	float4		vProjPos : TEXCOORD1;
 };
 
 /* DrawIndexed함수를 호출하면. */
@@ -61,7 +62,7 @@ VS_OUT VS_MAIN(VS_IN In)
 	Out.vPosition = mul(vPosition, matWVP);
 	Out.vNormal = vNormal;
 	Out.vTexUV = In.vTexUV;
-
+	Out.vProjPos = Out.vPosition;
 	return Out;
 }
 
@@ -71,12 +72,14 @@ struct PS_IN
 	float4		vPosition : SV_POSITION;
 	float4		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
+	float4		vProjPos : TEXCOORD1;
 };
 
 struct PS_OUT
 {
 	float4		vDiffuse : SV_TARGET0;
 	float4		vNormal : SV_TARGET1;
+	float4		vDepth : SV_TARGET2;
 };
 
 /* 이렇게 만들어진 픽셀을 PS_MAIN함수의 인자로 던진다. */
@@ -89,7 +92,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
 
 	if (Out.vDiffuse.a <= 0.3f)
 		discard;
@@ -108,7 +111,7 @@ PS_OUT PS_MAIN_HIT(PS_IN In)
 
 	Out.vDiffuse.gb *= g_HitRed;
 	Out.vDiffuse.r *= (g_HitRed + 0.2f);
-
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
 	if (Out.vDiffuse.a <= 0.3f)
 		discard;
 
@@ -141,7 +144,7 @@ PS_OUT PS_DEAD(PS_IN In)
 	}
 
 
-	
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
 
 
 

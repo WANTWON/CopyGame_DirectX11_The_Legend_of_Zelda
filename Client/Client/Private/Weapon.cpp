@@ -188,7 +188,7 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 		break;
 	case WEAPON_END:
 		/* For.Com_OBB*/
-		ColliderDesc.vScale = _float3(0.5f, 0.1f, 0.1f);
+		ColliderDesc.vScale = _float3(0.4f, 0.2f, 0.2f);
 		ColliderDesc.vPosition = _float3(0.3f, 0.2f, 0.2f);
 		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 			return E_FAIL;
@@ -199,9 +199,6 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 		return E_FAIL;
-
-	
-
 
 	
 	///* For.Com_SHPERE */

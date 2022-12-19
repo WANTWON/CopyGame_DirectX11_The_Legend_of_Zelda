@@ -126,7 +126,7 @@ HRESULT CNavigation_Manager::Add_Cell(_float3 * vPoss, CCell::CELLTYPE eType, _b
 		return E_FAIL;
 
 	// 추가한다.
-	CCell*			pCell = CCell::Create(m_pDevice, m_pContext, vPoss, m_Cells.size());
+	CCell*			pCell = CCell::Create(m_pDevice, m_pContext, vPoss, (_int)m_Cells.size());
 	if (nullptr == pCell)
 		return E_FAIL;
 	m_Cells.push_back(pCell);
@@ -232,8 +232,6 @@ _float3 CNavigation_Manager::Find_MinDistance(_vector vPosition)
 
 		//내가 피킹한 마우스 Postion과 셀과의 거리를 구한다.
 		//그 중에서 가장 작은 값을 체크
-		_float		fDist;
-
 		_float fDis_A = XMVectorGetX(XMVector3Length(vPoint[CCell::POINT_A] - vPosition));
 		_float fDis_B = XMVectorGetX(XMVector3Length(vPoint[CCell::POINT_B] - vPosition));
 		_float fDis_C = XMVectorGetX(XMVector3Length(vPoint[CCell::POINT_C] - vPosition));

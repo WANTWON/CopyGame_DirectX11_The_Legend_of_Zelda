@@ -35,7 +35,7 @@ public:
 public:
 	HRESULT Add_TreasureBox(const _tchar* pLayerTag, CTreasureBox::BOXTAG* BoxDesc);
 	void	Add_TreasureBoxGroup(CTreasureBox* pObj) { m_TreasureBox.push_back(pObj); };
-	_int	Get_TreasureBoxSize() { return m_TreasureBox.size(); }
+	_int	Get_TreasureBoxSize() { return (_int)m_TreasureBox.size(); }
 	void	Out_TreasureBoxGroup(CTreasureBox* pGameObject);
 	CTreasureBox*	Get_TreasureBox(_int index);
 	CTreasureBox*	Get_LastTreasureBox() { return m_TreasureBox.back();};

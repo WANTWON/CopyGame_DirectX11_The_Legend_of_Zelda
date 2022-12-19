@@ -16,25 +16,15 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Lights()))
-		return E_FAIL;
+	//if (FAILED(Ready_Lights()))
+		//return E_FAIL;
 
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
-	//if(FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
-	//	return E_FAIL;
-
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	//if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
-	//	return E_FAIL;	
-
-	//if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
-	//	return E_FAIL;
-
-	
 
 	return S_OK;
 }
@@ -51,8 +41,6 @@ void CLevel_GamePlay::Late_Tick(_float fTimeDelta)
 	__super::Late_Tick(fTimeDelta);
 
 	
-	
-
 	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
 }
 
@@ -75,18 +63,30 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
 
-	///* For.Point */
-	//ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
+	/* For.Point */
+	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 
-	//LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	//LightDesc.vPosition = _float4(10.f, 3.f, 10.f, 1.f);
-	//LightDesc.fRange = 7.f;	
-	//LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	//LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	//LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.eType = LIGHTDESC::TYPE_POINT;
+	LightDesc.vPosition = _float4(54.f, 2.5f, 2.8f, 1.f);
+	LightDesc.fRange = 7.f;
+	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
+	LightDesc.vSpecular = LightDesc.vDiffuse;
 
-	//if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
-	//	return E_FAIL;
+	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
+		return E_FAIL;
+
+	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
+
+	LightDesc.eType = LIGHTDESC::TYPE_POINT;
+	LightDesc.vPosition = _float4(58.f, 2.5f, 2.8f, 1.f);
+	LightDesc.fRange = 7.f;
+	LightDesc.vDiffuse = _float4(0.0f, 1.f, 0.0f, 1.f);
+	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
+	LightDesc.vSpecular = LightDesc.vDiffuse;
+
+	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
+		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -122,39 +122,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, &TerrainDesc)))
 		return E_FAIL;
 
-	/*TerrainDesc = CTerrain_Manager::Get_Instance()->Get_TerrainDesc();
-	TerrainDesc.m_eDebugTerrain = CTerrain_Manager::DEBUG_SOILD;
-	CTerrain_Manager::Get_Instance()->Set_TerrainDesc(&TerrainDesc);
-
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, &TerrainDesc)))
-		return E_FAIL;*/
-
-	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
-		//return E_FAIL;
-
-	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Sky"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
-	//	return E_FAIL;
-	
 	Safe_Release(pGameInstance);
 
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_Effect(const _tchar * pLayerTag)
-{
-	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
-	Safe_AddRef(pGameInstance);
-
-	for (_uint i = 0; i < 20; ++i)
-	{
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Effect"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
-			return E_FAIL;
-	}	
-
-	Safe_Release(pGameInstance);
-	
-	return S_OK;
-}
 
 HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _tchar * pLayerTag)
 {
@@ -185,18 +157,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _tchar * pLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
-{
-	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
-	Safe_AddRef(pGameInstance);
-
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_UI"), LEVEL_GAMEPLAY, pLayerTag)))
-		return E_FAIL;
-
-	Safe_Release(pGameInstance);
-
-	return S_OK;
-}
 
 CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

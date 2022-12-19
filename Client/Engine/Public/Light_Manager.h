@@ -13,12 +13,17 @@ private:
 
 public:
 	const LIGHTDESC* Get_LightDesc(_uint iIndex);
+	list<class CLight*>* GetLights() { return &m_Lights; }
+	_uint Get_LightSize() { return (_uint)m_Lights.size(); }
 	void Set_LightDesc(_uint iIndex, LIGHTDESC* pLightDesc);
 
 public:
 	HRESULT Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const LIGHTDESC& LightDesc);
-	void Clear_Light();
 	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+	void Clear_AllLight();
+	void Clear_Light(_uint iIndex);
+	
+
 private:
 	list<class CLight*>				m_Lights;
 

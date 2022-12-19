@@ -28,7 +28,7 @@ public:
 	HRESULT Render();
 
 public:
-	_uint Get_CellsSize() { return m_Cells.size(); }
+	_uint Get_CellsSize() { return (_uint)m_Cells.size(); }
 	CCell* Get_Cell();
 	CCell* Get_Cell(_uint iIndex);
 	_float3 Get_ClickedPos() { return m_vClickedPos; }

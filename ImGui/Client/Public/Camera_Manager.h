@@ -24,7 +24,7 @@ public:
 	_int						  Get_CurrentCamIndex() { return m_iCamIndex; }
 	void						  Set_CilckedCamIndex(_uint iIndex) { m_iCamIndex = iIndex; }
 	const vector<class CNonAnim*> Get_Cameras() const { return m_vecCameras; }
-	_int						  Get_CameraSize() { return m_vecCameras.size();}
+	_int						  Get_CameraSize() { return (_int)m_vecCameras.size();}
 	CNonAnim*					  Get_CurrentCam() { if(m_vecCameras.size() != 0 ) return m_vecCameras[m_iCamIndex]; }
 	CNonAnim*					  Get_LastCam() { return m_vecCameras.back(); }
 

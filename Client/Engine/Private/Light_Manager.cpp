@@ -44,12 +44,27 @@ HRESULT CLight_Manager::Add_Light(ID3D11Device * pDevice, ID3D11DeviceContext * 
 	return S_OK;
 }
 
-void CLight_Manager::Clear_Light()
+void CLight_Manager::Clear_AllLight()
 {
 	for (auto& pLight : m_Lights)
 		Safe_Release(pLight);
 
 	m_Lights.clear();
+}
+
+void CLight_Manager::Clear_Light(_uint iIndex)
+{
+	if (iIndex >= m_Lights.size())
+		return;
+
+	auto	iter = m_Lights.begin();
+
+	for (_uint i = 0; i < iIndex; ++i)
+		++iter;
+
+	Safe_Release(*iter);
+
+	iter = m_Lights.erase(iter);
 }
 
 HRESULT CLight_Manager::Render_Lights(CShader * pShader, CVIBuffer_Rect * pVIBuffer)

@@ -481,4 +481,7 @@ CGameObject * CMonsterEffect::Clone(void * pArg)
 void CMonsterEffect::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pSmokeDstTexture);
+	Safe_Release(m_pDissolveTexture);
 }

@@ -245,6 +245,13 @@ void CImgui_Manager::Tick_Imgui()
 			Set_Camera();
 			ImGui::EndTabItem();
 		}
+		if (ImGui::BeginTabItem("Light Tool"))
+		{
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Add Light Mode on"); ImGui::SameLine();
+			ImGui::Checkbox("##Add Light Mode on", &m_bMakeLight);
+			Set_Light();
+			ImGui::EndTabItem();
+		}
 		ImGui::EndTabBar();
 	}
 
@@ -2009,6 +2016,253 @@ void CImgui_Manager::Load_Camera()
 				break;
 
 			m_pCamera_Manager->Add_Camera(vPosition);
+		}
+		CloseHandle(hFile);
+
+	}
+}
+
+void CImgui_Manager::Set_Light()
+{
+	static int selected = 0;
+	{
+		ImGui::BeginChild("left pane", ImVec2(150, 0), true);
+
+		if ((int)CGameInstance::Get_Instance()->Get_LightSize() != 0)
+		{
+			for (int i = 0; i < CGameInstance::Get_Instance()->Get_LightSize();)
+			{
+				//char label[MAX_PATH] = "";
+				char szLayertag[MAX_PATH] = "Light";
+
+				char label[MAX_PATH] = "Light";
+				char buffer[MAX_PATH];
+				sprintf(buffer, "%d", i);
+				strcat(label, buffer);
+				if (ImGui::Selectable(label, m_iLightIndex == i))
+				{
+					m_iLightIndex = i;
+
+				}
+				i++;
+			}
+		}
+		ImGui::EndChild();
+	}
+	ImGui::SameLine();
+	// ------------------------ Right -----------------------------------
+	{
+
+		ImGui::BeginGroup();
+		ImGui::BeginChild("Cell view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+
+
+		ImGui::CollapsingHeader("Show Current Light");
+
+		ImGui::Text("Selected Index : "); ImGui::SameLine();  ImGui::Text("%d", m_iLightIndex);
+		
+		
+		static float fPositionX = m_LightDesc.vPosition.x;
+		static float fPositionY = m_LightDesc.vPosition.y;
+		static float fPositionZ = m_LightDesc.vPosition.z;
+
+
+		LIGHTDESC LightDesc;
+		ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
+		if (CGameInstance::Get_Instance()->Get_LightDesc(m_iLightIndex) != nullptr)
+		{
+			LightDesc = *CGameInstance::Get_Instance()->Get_LightDesc(m_iLightIndex);
+			memcpy(&m_LightDesc, &m_LightDesc, sizeof(LIGHTDESC));
+			m_iLightType = LightDesc.eType;
+		}
+
+		const char* TypeList[] = { "TYPE_DIRECTIONAL", "TYPE_POINT" };
+		ImGui::Combo("LightType", &m_iLightType, TypeList, IM_ARRAYSIZE(TypeList));
+		m_LightDesc.eType = (LIGHTDESC::TYPE)m_iLightType;
+
+
+		ImGui::Text("LightPosXYZ");
+		ImGui::DragFloat("LightPosX", &LightDesc.vPosition.x, 0.01f);
+		ImGui::DragFloat("LightPosY", &LightDesc.vPosition.y, 0.01f);
+		ImGui::DragFloat("LightPosZ", &LightDesc.vPosition.z, 0.01f);
+		m_LightDesc.vPosition = LightDesc.vPosition;
+		
+		
+		static float vDiffuse[4]{ LightDesc.vDiffuse.x,  LightDesc.vDiffuse.y, LightDesc.vDiffuse.z , LightDesc.vDiffuse.w };
+		vDiffuse[0] = LightDesc.vDiffuse.x;
+		vDiffuse[1] = LightDesc.vDiffuse.y;
+		vDiffuse[2] = LightDesc.vDiffuse.z;
+		vDiffuse[3] = LightDesc.vDiffuse.w;
+		ImGui::DragFloat4("Diffuse", vDiffuse, 0.01f, 0.f, 1.f);
+		LightDesc.vDiffuse = _float4(vDiffuse[0], vDiffuse[1], vDiffuse[2], vDiffuse[3]);
+		m_LightDesc.vDiffuse = _float4(vDiffuse[0], vDiffuse[1], vDiffuse[2], vDiffuse[3]);
+		
+
+		
+		static float vAmbient[4]{ LightDesc.vAmbient.x,  LightDesc.vAmbient.y, LightDesc.vAmbient.z , LightDesc.vAmbient.w };
+		vAmbient[0] = LightDesc.vAmbient.x;
+		vAmbient[1] = LightDesc.vAmbient.y;
+		vAmbient[2] = LightDesc.vAmbient.z;
+		vAmbient[3] = LightDesc.vAmbient.w;
+		ImGui::DragFloat4("Ambient", vAmbient, 0.01f, 0.f, 1.f);
+		LightDesc.vAmbient = _float4(vAmbient[0], vAmbient[1], vAmbient[2], vAmbient[3]);
+		m_LightDesc.vAmbient = _float4(vAmbient[0], vAmbient[1], vAmbient[2], vAmbient[3]);
+
+		
+		static float vSpecular[4]{ LightDesc.vSpecular.x,  LightDesc.vSpecular.y, LightDesc.vSpecular.z , LightDesc.vSpecular.w };
+		vSpecular[0] =LightDesc.vSpecular.x;
+		vSpecular[1] =LightDesc.vSpecular.y;
+		vSpecular[2] =LightDesc.vSpecular.z;
+		vSpecular[3] =LightDesc.vSpecular.w;
+		ImGui::DragFloat4("Specular", vSpecular, 0.01f, 0.f, 1.f);
+		LightDesc.vSpecular = _float4(vSpecular[0], vSpecular[1], vSpecular[2], vSpecular[3]);
+		m_LightDesc.vSpecular = _float4(vSpecular[0], vSpecular[1], vSpecular[2], vSpecular[3]);
+
+		if (m_LightDesc.eType == LIGHTDESC::TYPE_DIRECTIONAL)
+		{
+			static float vDirection[4]{ LightDesc.vDirection.x,  LightDesc.vDirection.y, LightDesc.vDirection.z , LightDesc.vDirection.w};
+			vDirection[0] = LightDesc.vDirection.x;
+			vDirection[1] = LightDesc.vDirection.y;
+			vDirection[2] = LightDesc.vDirection.z;
+			vDirection[3] = LightDesc.vDirection.w;
+			ImGui::DragFloat4("Direction", vDirection, 0.01f, 0.f, 1.f);
+			m_LightDesc.vDirection = _float4(vDirection[0], vDirection[1], vDirection[2], vDirection[3]);
+			LightDesc.vDirection = _float4(vDirection[0], vDirection[1], vDirection[2], vDirection[3]);
+
+		}
+		else
+		{
+			ImGui::DragFloat("Range", &LightDesc.fRange, 0.01f, 0.f);
+			m_LightDesc.fRange = LightDesc.fRange;
+		}
+
+
+		if (CGameInstance::Get_Instance()->Get_LightDesc(m_iLightIndex) != nullptr)
+		{
+			CGameInstance::Get_Instance()->Set_LightDesc(m_iLightIndex, &m_LightDesc);
+		}
+
+		
+		if (ImGui::Button("Add Light"))
+		{
+			if (FAILED(CGameInstance::Get_Instance()->Add_Light(m_pDevice, m_pContext, m_LightDesc)))
+				return;
+			m_iLightIndex = CGameInstance::Get_Instance()->Get_LightSize() - 1;
+		}
+
+		if (ImGui::Button("Erase Picked Light"))
+		{
+			CGameInstance::Get_Instance()->Clear_Light(m_iLightIndex);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("All_Clear Light"))
+			CGameInstance::Get_Instance()->Clear_AllLight();
+
+
+		if (ImGui::Button("Save Light"))
+		{
+			Save_Light();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Load Light"))
+		{
+			Load_Light();
+		}
+
+		ImGui::EndChild();
+		ImGui::EndGroup();
+	}
+
+}
+
+void CImgui_Manager::Save_Light()
+{
+	OPENFILENAME OFN;
+	TCHAR filePathName[300] = L"";
+	TCHAR lpstrFile[300] = L"";
+	static TCHAR filter[] = L"데이터 파일\0*.dat\0텍스트 파일\0*.txt";
+
+	memset(&OFN, 0, sizeof(OPENFILENAME));
+	OFN.lStructSize = sizeof(OPENFILENAME);
+	OFN.hwndOwner = g_hWnd;
+	OFN.lpstrFilter = filter;
+	OFN.lpstrFile = lpstrFile;
+	OFN.nMaxFile = 300;
+	OFN.lpstrInitialDir = L".";
+	OFN.Flags = OFN_SHOWHELP | OFN_OVERWRITEPROMPT;
+
+	if (GetSaveFileName(&OFN))
+	{
+		//ERR_MSG(TEXT("save-as  '%s'\n"), ofn.lpstrFile); //경로// 파일이름.확장자
+		//ERR_MSG(TEXT("filename '%s'\n"), ofn.lpstrFile + ofn.nFileOffset); 
+
+		HANDLE hFile = 0;
+		_ulong dwByte = 0;
+		_uint iNum = 0;
+		LIGHTDESC LightDesc;
+		m_iCurrentLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
+
+
+		iNum = (_int)CGameInstance::Get_Instance()->Get_LightSize();
+
+		hFile = CreateFile(OFN.lpstrFile, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);;
+		if (0 == hFile)
+			return;
+
+		/* 첫줄은 object 리스트의 size 받아서 갯수만큼 for문 돌리게 하려고 저장해놓음*/
+		WriteFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+		for (int i = 0; i < iNum; ++i)
+		{
+			LightDesc = *CGameInstance::Get_Instance()->Get_LightDesc(i);
+			WriteFile(hFile, &LightDesc, sizeof(LIGHTDESC), &dwByte, nullptr);
+		}
+
+		CloseHandle(hFile);
+	}
+}
+
+void CImgui_Manager::Load_Light()
+{
+	OPENFILENAME OFN;
+	TCHAR filePathName[300] = L"";
+	TCHAR lpstrFile[300] = L"";
+	static TCHAR filter[] = L"데이터 파일\0*.dat\0텍스트 파일\0*.txt";
+
+	memset(&OFN, 0, sizeof(OPENFILENAME));
+	OFN.lStructSize = sizeof(OPENFILENAME);
+	OFN.hwndOwner = g_hWnd;
+	OFN.lpstrFilter = filter;
+	OFN.lpstrFile = lpstrFile;
+	OFN.nMaxFile = 300;
+	OFN.lpstrInitialDir = L".";
+
+	if (GetOpenFileName(&OFN) != 0) {
+		wsprintf(filePathName, L"%s 파일을 열겠습니까?", OFN.lpstrFile);
+		MessageBox(g_hWnd, filePathName, L"열기 선택", MB_OK);
+
+		//ERR_MSG(TEXT("save-as  '%s'\n"), ofn.lpstrFile); //경로// 파일이름.확장자
+		//ERR_MSG(TEXT("filename '%s'\n"), ofn.lpstrFile + ofn.nFileOffset); 
+
+		HANDLE hFile = 0;
+		_ulong dwByte = 0;
+		_uint iNum = 0;
+		LIGHTDESC LightDesc;
+
+		hFile = CreateFile(OFN.lpstrFile, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		if (0 == hFile)
+			return;
+
+		/* 타일의 개수 받아오기 */
+		ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+		for (int i = 0; i< iNum; ++i)
+		{
+			ReadFile(hFile, &LightDesc, sizeof(LIGHTDESC), &dwByte, nullptr);
+			if (0 == dwByte)
+				break;
+
+			CGameInstance::Get_Instance()->Add_Light(m_pDevice, m_pContext, LightDesc);
 		}
 		CloseHandle(hFile);
 

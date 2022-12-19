@@ -102,7 +102,7 @@ void CLevel_Tower::Late_Tick(_float fTimeDelta)
 HRESULT CLevel_Tower::Ready_Lights()
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-	pGameInstance->Clear_Light();
+	pGameInstance->Clear_AllLight();
 	LIGHTDESC			LightDesc;
 
 	/* For.Directional*/

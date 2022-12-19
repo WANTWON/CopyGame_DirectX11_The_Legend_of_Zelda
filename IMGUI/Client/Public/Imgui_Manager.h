@@ -11,6 +11,7 @@
 #include "Camera_Manager.h"
 #include "TreasureBox.h"
 
+
 BEGIN(Engine)
 class CGameObject;
 END
@@ -76,6 +77,11 @@ public:
 	void Save_Camera();
 	void Load_Camera();
 
+	/* For Light Tool */
+	void Set_Light();
+	void Save_Light();
+	void Load_Light();
+
 public:
 	void Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag, _bool bCreatePrototype = false);
 	void Read_Objects_Name( _tchar* cFolderPath);
@@ -137,7 +143,14 @@ private:
 	CCamera_Manager*						m_pCamera_Manager = nullptr;
 	_bool									m_bMakeCamera = false;
 	_int									m_iCameraIndex = 0;
-	_float3									m_fCamPosition = _float3(0.f, 0.f, 0.f);;
+	_float3									m_fCamPosition = _float3(0.f, 0.f, 0.f);
+
+	/*For Light */
+	_bool									m_bMakeLight = false;
+	_int									m_iLightIndex = 0;
+	_int									m_iLightType = 0;
+	LIGHTDESC								m_LightDesc;
+
 public:
 	virtual void Free() override;
 };

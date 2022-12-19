@@ -127,7 +127,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	pGameInstance->Clear_Light();
+	pGameInstance->Clear_AllLight();
 
 	LIGHTDESC			LightDesc;
 
@@ -135,7 +135,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 
 	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(0.1f, -1.f, 0.1f, 0.f);
+	LightDesc.vDirection = _float4(-1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 0.8f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);	
@@ -175,7 +175,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 		LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
 		//pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 0.f, 44.8f, 1.f));
 		//pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(16.3f, 0.f, 18.8f, 1.f));
-		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(2.33f, 3.f, 66.8f, 1.f));
+		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(55.8f, 4.2f, 10.3f, 1.f));
 		pPlayer->Change_Navigation(LEVEL_GAMEPLAY);
 		pPlayer->Compute_CurrentIndex(LEVEL_GAMEPLAY);
 

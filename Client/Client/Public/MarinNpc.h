@@ -48,8 +48,8 @@ private:
 private:
 	STATE	m_eState = IDLE;
 	_int	m_iCoin = 0;
-	_int	m_iHeart = 12;
-	_uint	m_eTalkingMode = FINAL;
+	_int	m_iHeart = 0;
+	_uint	m_eTalkingMode = PERFUME;
 	_bool	m_bEnd = false;
 	_bool	m_bGet = false;
 	_float4  m_vLastPosition;

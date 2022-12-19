@@ -61,10 +61,36 @@ int CPrizeItem::Tick(_float fTimeDelta)
 	if (m_bDead)
 	{
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_ITEM, this);
-
 		return OBJ_DEAD;
 	}
 	
+
+	if (m_ItemDesc.eType == TAIL_KEY && !m_bGet)
+	{
+		
+		_float fMinPos = m_ItemDesc.vPosition.y + 0.5f;
+		_float fMaxPos = m_ItemDesc.vPosition.y + 1.f;
+		
+		if (!m_bTimeMax )
+		{
+			m_fMoveTime += 0.01f;
+			if (m_fMoveTime >= 1.f)
+				m_bTimeMax = true;
+		}
+		else
+		{
+			m_fMoveTime -= 0.01f;
+			if (m_fMoveTime <= 0.f)
+				m_bTimeMax = false;
+		}
+
+		m_fHeight = (1 - m_fMoveTime)*fMinPos + fMaxPos*m_fMoveTime;
+		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vPosition = XMVectorSetY(vPosition, m_fHeight);
+
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+
+	}
 
 	return OBJ_NOEVENT;
 }
