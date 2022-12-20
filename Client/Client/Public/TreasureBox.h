@@ -32,6 +32,7 @@ public:
 	virtual int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	void Set_Visible(_bool type) { m_eTreasureBoxDesc.bVisible = type; }
 
 private:
 	void Change_Animation(_float fTimeDelta);
@@ -39,6 +40,8 @@ private:
 	virtual HRESULT SetUp_ShaderResources() override;
 	_bool Check_Visible();
 	void OpenBox();
+	void Make_OpenEffect();
+	void Make_EntranceEffect();
 
 private:
 	CModel*					m_pModelCom = nullptr;
@@ -46,6 +49,13 @@ private:
 	STATE					m_ePreState = APPEAR;
 	BOXTAG					m_eTreasureBoxDesc;
 	_bool					m_bGet = false;
+	_bool					m_bMakeEffect = false;
+	_bool					m_bOpen = false;
+	_bool					m_bEntranceEffect = false;
+	_bool					m_bCheck = false;
+
+	DWORD					m_dwOpenTime = GetTickCount();
+
 
 public:
 	static CTreasureBox* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

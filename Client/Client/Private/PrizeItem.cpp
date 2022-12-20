@@ -538,9 +538,6 @@ void CPrizeItem::Make_GetItemEffect()
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 
-	
-
-
 	EffectDesc.eEffectID = CObjectEffect::ITEM_GET_GLOW;
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.fStartTime = 1.f;

@@ -7,6 +7,7 @@
 #include "Monster.h"
 #include "FootSwitch.h"
 #include "InvenItem.h"
+#include "ObjectEffect.h"
 
 CTreasureBox::CTreasureBox(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -83,7 +84,18 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 				pInvenItem->Set_CompassOn(false);
 		}
 
-		m_eTreasureBoxDesc.bVisible = Check_Visible();
+		if (!m_bCheck)
+		{
+			if (!m_bEntranceEffect)
+				m_bEntranceEffect = Check_Visible();
+			else
+			{
+				Make_EntranceEffect();
+				m_bCheck = true;
+			}
+				
+		}
+		
 
 		if (m_eTreasureBoxDesc.bVisible == false)
 		{
@@ -123,6 +135,30 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 	}
 	else
 		pButton->Set_Visible(false);
+
+
+
+	if (m_bOpen && m_dwOpenTime + 1500 < GetTickCount())
+	{
+		OpenBox();
+		m_bOpen = false;
+	}
+
+
+	if (m_eState == OPEN_WAIT &&  dynamic_cast<CPlayer*>(pTarget)->Get_AnimState() == CPlayer::ITEM_GET_ST)
+	{
+		list<CGameObject*>* pEffectList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_TreasureBox"));
+		if (pEffectList != nullptr)
+		{
+			for (auto& iter : *pEffectList)
+			{
+				if (iter != nullptr)
+					dynamic_cast<CObjectEffect*>(iter)->Set_EndMode(true);
+			}
+
+		}
+	}
+
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -173,12 +209,14 @@ void CTreasureBox::Change_Animation(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta * 2, m_bIsLoop);
 		break;
 	case Client::CTreasureBox::OPEN:
+		Make_OpenEffect();
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
 			m_eState = OPEN_WAIT;
 			m_bGet = true;
-			OpenBox();
+			m_bOpen = true;
+			m_dwOpenTime = GetTickCount();
 		}
 
 		break;
@@ -344,6 +382,102 @@ void CTreasureBox::OpenBox()
 
 	RELEASE_INSTANCE(CGameInstance);
 
+}
+
+void CTreasureBox::Make_OpenEffect()
+{
+	if (m_bMakeEffect)
+		return;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CEffect::EFFECTDESC EffectDesc;
+
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+	EffectDesc.pTarget = this;
+
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CObjectEffect::TREASURE_BEAM;
+	EffectDesc.fDeadTime = 2.f;
+	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.0f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, 0.f, -1.f, 0.f);
+	EffectDesc.vColor = XMVectorSet(247, 255, 139, 255);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
+
+	EffectDesc.eEffectID = CObjectEffect::TREASURE_HALO;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+	EffectDesc.fStartTime = 0.f;
+	EffectDesc.fDeadTime = 1.f;
+	EffectDesc.vInitScale = _float3(5.f, 5.f, 5.f);
+	EffectDesc.vColor = XMVectorSet(255, 255, 255, 255);
+	EffectDesc.vDistance = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
+
+
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.eEffectID = CObjectEffect::TREASURE_GLOW;
+	EffectDesc.iTextureNum = 0;
+	EffectDesc.fStartTime = 0.3f;
+	EffectDesc.vColor = XMVectorSet(247, 255, 139, 255);;
+	EffectDesc.fDeadTime = EffectDesc.fStartTime + 2.5f;
+	EffectDesc.vDistance = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+	EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.5f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
+
+	EffectDesc.eEffectID = CObjectEffect::TREASURE_GLOW;
+	EffectDesc.iTextureNum = 0;
+	EffectDesc.fStartTime = 0.2f;
+	EffectDesc.vColor = XMVectorSet(255, 137, 105, 255);;
+	EffectDesc.fDeadTime = EffectDesc.fStartTime + 2.5f;
+	EffectDesc.vDistance = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+	EffectDesc.vInitScale = _float3(1.f, 1.f, 1.0f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CObjectEffect::ITEM_GET_FLASH;
+	EffectDesc.iTextureNum = 6;
+	EffectDesc.fStartTime = 0.3f;
+	EffectDesc.fDeadTime = 0.6f;
+	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
+
+
+	LIGHTDESC			LightDesc;
+
+	/* For.Directional*/
+	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
+	LightDesc.eType = LIGHTDESC::TYPE_POINT;
+	XMStoreFloat4(&LightDesc.vPosition, EffectDesc.vInitPositon + EffectDesc.vDistance);
+	LightDesc.fRange = 2.f;	
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 0.5f, 1.f);
+	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
+	LightDesc.vSpecular = _float4(0.f, 0.f, 0.f, 0.f);
+
+	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
+		return;
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	m_bMakeEffect = true; 
+}
+
+void CTreasureBox::Make_EntranceEffect()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 5.f, 0.f, 0.f);
+	EffectDesc.pTarget = this;
+
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.eEffectID = CObjectEffect::TREASURE_CROSS;
+	EffectDesc.iTextureNum = 6;
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = XMVectorSet(0.f, -1.f, 0.f, 0.f);
+	EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.5f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 CTreasureBox * CTreasureBox::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

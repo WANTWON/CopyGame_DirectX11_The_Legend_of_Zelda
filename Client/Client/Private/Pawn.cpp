@@ -124,7 +124,7 @@ void CPawn::Change_Animation(_float fTimeDelta)
 	{
 		m_fAnimSpeed = 1.f;
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
-		m_pTransformCom->Go_Backward(fTimeDelta*2, m_pNavigationCom);
+		m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
 		m_pTransformCom->Go_PosDir(fTimeDelta*2, XMVectorSet(0.f, -0.1f, 0.f, 0.f), m_pNavigationCom);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
@@ -284,13 +284,13 @@ void CPawn::Follow_Target(_float fTimeDelta)
 
 void CPawn::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_eState == DAMAGE  || m_eState == DEADFALL)
+	if (!m_bMove || m_eState == DAMAGE  || m_eState == DEADFALL || Check_IsinFrustum() == false)
 		return;
 
 	// Check for Target, AggroRadius
 	Find_Target();
 
-	if (m_pTarget && m_pSPHERECom->Collision(m_pTarget->Get_Collider()) == true)
+	if (m_pTarget /*&& m_pSPHERECom->Collision(m_pTarget->Get_Collider()) == true*/)
 	{
 		m_bAggro = true;
 		// If in AttackRadius > Attack

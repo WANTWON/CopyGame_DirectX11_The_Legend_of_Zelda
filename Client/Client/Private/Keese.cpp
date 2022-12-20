@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Keese.h"
 #include "Player.h"
+#include "FightEffect.h"
 
 CKeese::CKeese(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -116,11 +117,15 @@ void CKeese::Change_Animation(_float fTimeDelta)
 		m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+		{
 			m_eState = WALK;
+			m_bMakeEffect = false;
+		}
 		break;
 	}
 	case Client::CKeese::DEAD:
 	{
+		Make_DeadEffect();
 		m_fAnimSpeed = 1.f;
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
 		m_pTransformCom->Go_Backward(fTimeDelta * 2, m_pNavigationCom);
@@ -295,6 +300,7 @@ void CKeese::AI_Behaviour(_float fTimeDelta)
 		m_bAggro = true;
 
 		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		vDir = XMVectorSetY(vDir, 0.f);
 		m_pTransformCom->LookDir(vDir);
 		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
 		m_eState = STATE::WALK;
@@ -336,6 +342,74 @@ _uint CKeese::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCau
 		m_eState = STATE::DEAD;
 
 	return 0;
+}
+
+void CKeese::Make_GetAttacked_Effect(CBaseObj * DamageCauser)
+{
+
+	if (m_bMakeEffect)
+		return;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	CEffect::EFFECTDESC EffectDesc;
+
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CFightEffect::HITFLASH;
+
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = XMVector3Normalize((pTarget)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION));
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.2f, 0.f, 0.f);
+	EffectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CFightEffect::HITRING;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
+	EffectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
+	EffectDesc.fDeadTime = 0.8f;
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+	for (int i = 0; i < 10; ++i)
+	{
+		EffectDesc.eEffectID = CFightEffect::HITSPARK;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+		_float iRandNum = (rand() % 10 + 10) * 0.1f;
+		EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
+		EffectDesc.fDeadTime = 0.8f;
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	}
+
+
+
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.15f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.iTextureNum = 0;
+	EffectDesc.vInitScale = _float3(2.f, 2.f, 2.2f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.7f;
+	EffectDesc.iTextureNum = 1;
+	EffectDesc.vInitScale = _float3(3.5f, 3.5f, 3.5f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.1f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.iTextureNum = 2;
+	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	m_bMakeEffect = true;
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 CKeese * CKeese::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

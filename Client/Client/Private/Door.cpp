@@ -63,9 +63,6 @@ HRESULT CDoor::Initialize(void * pArg)
 
 int CDoor::Tick(_float fTimeDelta)
 {
-	if(CGameInstance::Get_Instance()->isIn_WorldFrustum(Get_TransformState(CTransform::STATE_POSITION)) == false)
-		return OBJ_NOEVENT;
-
 	if (m_bDead)
 	{
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
@@ -233,48 +230,43 @@ void CDoor::Tick_ClosedDoor(_float fTimeDelta)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	CLevel* pLevel = pGameInstance->Get_CurrentLevel();
-	if (pLevel == nullptr || pGameInstance->Get_CurrentLevelIndex() != LEVEL_TAILCAVE )
+	if ( Check_IsinFrustum() == true)
 	{
-		RELEASE_INSTANCE(CGameInstance);
-		return;
-	}
+		m_bOpen = Check_Open();
 
-
-	m_bOpen = Check_Open();
-	if (m_bOpen == true)
-	{
-		list<CGameObject*>* pDoorList = pGameInstance->Get_ObjectList(LEVEL_TAILCAVE, TEXT("Layer_ColsedDoor"));
-		if (pDoorList != nullptr)
+		if (m_bOpen == false)
 		{
-			for (auto& iter : *pDoorList)
+			list<CGameObject*>* pDoorList = pGameInstance->Get_ObjectList(LEVEL_TAILCAVE, TEXT("Layer_ColsedDoor"));
+			if (pDoorList != nullptr)
 			{
-				dynamic_cast<CDoor*>(iter)->Set_OpenDoor(true);
+				for (auto& iter : *pDoorList)
+				{
+					dynamic_cast<CDoor*>(iter)->Set_OpenDoor(false);
+				}
 			}
 		}
-	}
-	else
-	{
-		list<CGameObject*>* pDoorList = pGameInstance->Get_ObjectList(LEVEL_TAILCAVE, TEXT("Layer_ColsedDoor"));
-		if (pDoorList != nullptr)
+		else
 		{
-			for (auto& iter : *pDoorList)
+			list<CGameObject*>* pDoorList = pGameInstance->Get_ObjectList(LEVEL_TAILCAVE, TEXT("Layer_ColsedDoor"));
+			if (pDoorList != nullptr)
 			{
-				dynamic_cast<CDoor*>(iter)->Set_OpenDoor(false);
+				for (auto& iter : *pDoorList)
+				{
+					dynamic_cast<CDoor*>(iter)->Set_OpenDoor(true);
+				}
 			}
 		}
-	}
 
+			
+	}
 
 	if (m_bOpen)
 	{
 		if (m_eState != OPEN_WAIT_CD)
 		{
 			m_eState = OPEN_CD;
-
 			m_bPlay = true;
 		}
-
 	}
 	else
 		m_eState = CLOSE_CD;
@@ -563,8 +555,8 @@ _bool CDoor::Check_Open()
 	}
 
 
-	if (0 < XMVectorGetX(XMVector3Dot(vDir, vLook)))
-	{
+	//if (0 < XMVectorGetX(XMVector3Dot(vDir, vLook)))
+	//{
 		// 조건 1 스위치가 없거나 스위치가 눌려 있을 경우
 		list<CGameObject*>* pSwitches = pGameInstance->Get_ObjectList(LEVEL_TAILCAVE, TEXT("Layer_FootSwitch"));
 		for (auto& iter : *pSwitches)
@@ -597,7 +589,7 @@ _bool CDoor::Check_Open()
 
 		RELEASE_INSTANCE(CGameInstance);
 		return true;
-	}
+//	}
 
 
 RETURN_CLOSEDOOR:

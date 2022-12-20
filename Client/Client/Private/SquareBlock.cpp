@@ -31,7 +31,7 @@ HRESULT CSquareBlock::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
-
+	m_eShaderID = SHADER_ALPHABLEND;
 	m_eObjectID = OBJ_KEY;
 
 	if (pArg != nullptr)

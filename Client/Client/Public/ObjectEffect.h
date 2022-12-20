@@ -17,6 +17,11 @@ public:
 		ITEM_GET_FLASH, ITEM_GET_GLOW , HORIZONTAL_GLOW, RAINBOW_RING ,
 		GRAD_RING, RAINBOW_HALO, GLITTER , RAY,
 	
+
+		/* For TreasureBox*/
+		TREASURE_BEAM, TREASURE_HALO, TREASURE_GLOW, TREASURE_GLITTER,
+		TREASURE_CROSS, TREASURE_FLASH, TRASURE_ENTRANCEBOX,  
+
 		/*For Smoke*/
 		SMOKE 
 	};
@@ -57,6 +62,8 @@ private:
 	void Tick_HaloEffect(_float fTimeDelta);
 	void Tick_GlitterEffect(_float fTimeDelta);
 	void Tick_Ray(_float fTimeDelta);
+	void Tick_TreausureBox(_float fTimeDelta);
+	void Tick_TreasureCross(_float fTimeDelta);
 
 private:
 	_float	m_fAngle = 0.f;

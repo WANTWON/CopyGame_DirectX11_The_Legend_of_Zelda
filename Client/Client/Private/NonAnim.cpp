@@ -130,6 +130,9 @@ HRESULT CNonAnim::Render()
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS)))
 			return E_FAIL;
 
+		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_SpecularTexture", i, aiTextureType_SPECULAR)))
+			return E_FAIL;
+
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))
 			return E_FAIL;
 	}
@@ -195,7 +198,7 @@ HRESULT CNonAnim::SetUp_ShaderResources()
 HRESULT CNonAnim::SetUp_ShaderID()
 {
 	
-	m_eShaderID = SHADER_DEFAULT;
+	//m_eShaderID = SHADER_DEFAULT;
 
 	return S_OK;
 }

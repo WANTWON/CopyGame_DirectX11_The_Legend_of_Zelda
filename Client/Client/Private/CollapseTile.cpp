@@ -38,7 +38,7 @@ HRESULT CCollapseTile::Initialize(void * pArg)
 	}
 
 	Set_Scale(_float3(3.f, 3.f, 3.f));
-	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_TRAP, this);
+	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_INTERACT, this);
 
 	return S_OK;
 }
@@ -47,7 +47,7 @@ int CCollapseTile::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
-		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_TRAP, this);
+		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_INTERACT, this);
 		return OBJ_DEAD;
 	}
 	
@@ -230,7 +230,7 @@ void CCollapseTile::Free()
 {
 	__super::Free();
 
-	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_TRAP, this);
+	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_INTERACT, this);
 
 	Safe_Release(m_pNavigationCom);
 }
