@@ -251,7 +251,7 @@ void CCamera_Dynamic::Terrain_Camera(_float fTimeDelta)
 	}
 
 	
-	m_pTransform->Go_PosLerp(fTimeDelta, XMLoadFloat4(&m_fTargetPos), 1.f, XMVectorSet(m_vDistance.x, m_vDistance.y, m_vDistance.z, 0.f));
+	m_pTransform->Go_PosLerp(fTimeDelta, XMLoadFloat4(&m_fTargetPos), 1.f, XMVectorSet(m_vDistance.x, m_vDistance.y + m_fZoom, m_vDistance.z, 0.f));
 
 	
 	RELEASE_INSTANCE(CGameInstance);
@@ -399,6 +399,7 @@ void CCamera_Dynamic::Target_Camera(_float fTimeDelta)
 
 	RELEASE_INSTANCE(CGameInstance);
 }
+
 
 void CCamera_Dynamic::Set_Position(_vector vPosition)
 {

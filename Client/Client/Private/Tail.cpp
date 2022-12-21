@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Tail.h"
 #include "Player.h"
+#include "MonsterBullet.h"
 
 CTail::CTail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -34,7 +35,6 @@ HRESULT CTail::Initialize(void * pArg)
 	m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
 
-
 	Create_Tail(m_TailDesc.eTailType);
 
 
@@ -44,11 +44,18 @@ HRESULT CTail::Initialize(void * pArg)
 
 int CTail::Tick(_float fTimeDelta)
 {
+	if (m_TailDesc.eTailType == TAIL1 && Check_IsinFrustum() == false)
+		return OBJ_NOEVENT;
+
 	if (CUI_Manager::Get_Instance()->Get_NextLevel() == true)
 		return OBJ_DEAD;
 
 	if (__super::Tick(fTimeDelta))
+	{
+		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
 		return OBJ_DEAD;
+	}
+		
 
 	AI_Behaviour(fTimeDelta);
 	Check_Navigation(fTimeDelta);
@@ -58,7 +65,6 @@ int CTail::Tick(_float fTimeDelta)
 
 	m_pModelCom->Set_NextAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
-
 
 	return OBJ_NOEVENT;
 }
@@ -86,6 +92,50 @@ void CTail::Late_Tick(_float fTimeDelta)
 		m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
 	}
 
+	CBaseObj* pInteractBox = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pSPHERECom, &pInteractBox))
+	{
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pInteractBox->Get_TransformState(CTransform::STATE_POSITION);
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection);
+
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
+		m_fTurnAngle = (rand() % 2000) * 0.001f + 0.1f;
+		m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
+	}
+
+
+	if (m_pTarget != nullptr && true == m_pSPHERECom->Collision((m_pTarget)->Get_Collider()))
+	{
+		CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(m_pTarget)->Get_AnimState();
+		
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection);
+
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
+		m_fTurnAngle = (rand() % 2000) * 0.001f + 0.1f;
+		m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
+
+
+		if (ePlayerState == CPlayer::SHIELD_HOLD_LP || ePlayerState == CPlayer::SHIELD)
+		{
+			dynamic_cast<CPlayer*>(m_pTarget)->Set_AnimState(CPlayer::SHIELD_HIT);
+			dynamic_cast<CPlayer*>(m_pTarget)->Make_GuardEffect(this);
+		}
+		else
+		{
+			
+			Make_GetAttacked_Effect(m_pTarget);
+			dynamic_cast<CPlayer*>(m_pTarget)->Take_Damage(1.f, nullptr, this);
+		}
+	}
 }
 
 HRESULT CTail::Render()
@@ -145,7 +195,7 @@ void CTail::Change_Animation(_float fTimeDelta)
 		{
 			m_bIsAttacking = false;
 			m_eState = WAIT_MOVE;
-
+			m_bMakeEffect = false;
 			//m_fTurnAngle += 1.f;
 			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
 			m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
@@ -161,6 +211,10 @@ void CTail::Change_Animation(_float fTimeDelta)
 		}
 		break;
 	case Client::CTail::DEAD:
+		m_fAnimSpeed = 1.f;
+		m_fAlpha += 0.01f;
+		if(m_TailDesc.eTailType == TAIL1)
+			Make_DeadEffect();
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
@@ -168,6 +222,7 @@ void CTail::Change_Animation(_float fTimeDelta)
 		}
 		break;
 	case Client::CTail::WAIT_MOVE:
+		m_bMakeEffect = false;
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
@@ -191,6 +246,10 @@ HRESULT CTail::Ready_Components(void * pArg)
 	TransformDesc.fSpeedPerSec = 5.f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(1.0f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
+		return E_FAIL;
+
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Components(TEXT("Com_DissolveTexture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Dissolve"), (CComponent**)&m_pDissolveTexture)))
 		return E_FAIL;
 
 	/* For.Com_Shader */
@@ -228,7 +287,7 @@ HRESULT CTail::Ready_Components(void * pArg)
 	//	return E_FAIL;
 
 	/* For.Com_SHPERE */
-	ColliderDesc.vScale = _float3(0.5f, 0.5f, 0.5f);
+	ColliderDesc.vScale = _float3(0.7f, 0.7f, 0.7f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
@@ -245,23 +304,15 @@ HRESULT CTail::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CTail::SetUp_ShaderResources()
+
+HRESULT CTail::SetUp_ShaderID()
 {
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
-		return E_FAIL;
-
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
-		return E_FAIL;
-
-	RELEASE_INSTANCE(CGameInstance);
+	if (m_eState == DEAD)
+		m_eShaderID = SHADER_ANIMDEAD;
+	else if (m_bHit)
+		m_eShaderID = SHADER_ANIMHIT;
+	else
+		m_eShaderID = SHADER_ANIMDEFAULT;
 
 	return S_OK;
 }
@@ -269,7 +320,10 @@ HRESULT CTail::SetUp_ShaderResources()
 _bool CTail::IsDead()
 {
 	if (m_bDead && m_eState == STATE::DEAD)
+	{
 		return true;
+	}
+		
 	else if (m_bDead && m_eState != STATE::DEAD)
 	{
 		m_dwDeathTime = GetTickCount();
@@ -277,6 +331,19 @@ _bool CTail::IsDead()
 	}
 
 	return false;
+}
+
+void CTail::Follow_Target(_float fTimeDelta)
+{
+	if (m_pTarget == nullptr)
+		return;
+
+	_vector vTargetPos = (m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
+
+	m_pTransformCom->LookAt(vTargetPos);
+	m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+
+	m_bIsAttacking = false;
 }
 
 
@@ -287,12 +354,13 @@ void CTail::AI_Behaviour(_float fTimeDelta)
 	if (CUI_Manager::Get_Instance()->Get_NextLevel() == true)
 		return;
 
-	if (!m_bMove || m_eState == DEAD || m_eState == PIYO)
-		return;
-
 
 	if (m_TailDesc.eTailType == TAIL1)
+	{
+		if (!m_bMove || m_eState == DEAD || m_eState == PIYO)
+			return;
 		Behaviour_Head(fTimeDelta);
+	}
 	else
 		Behaviour_Tail(fTimeDelta);
 
@@ -318,20 +386,24 @@ void CTail::Behaviour_Head(_float fTimeDelta)
 	}
 	else
 	{
-		m_bChangeDirection = m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
-		if (m_bChangeDirection == false)
+		if (m_fDistanceToTarget > 20.f)
+			Follow_Target(fTimeDelta);
+		else
 		{
-			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
-			m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
-		}
+			m_bChangeDirection = m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+			if (m_bChangeDirection == false)
+			{
+				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
+				m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
+			}
 
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTurnAngle);
+			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTurnAngle);
+		}
 	}
 }
 
 void CTail::Behaviour_Tail(_float fTimeDelta)
 {
-	
 
 	if (m_eState == DEAD || m_bDead)
 		return;
@@ -339,8 +411,14 @@ void CTail::Behaviour_Tail(_float fTimeDelta)
 	if (m_TailDesc.pParent == nullptr)
 		return;
 
+	if (m_TailDesc.pParent->Get_Hited())
+		m_bHit = true;
+
+
 	if (m_TailDesc.eTailType != TAIL1)
 	{ 
+		m_eState = m_TailDesc.pParent->Get_AnimState();
+
 		_vector vPosition;
 		if(m_TailDesc.eTailType == TAIL2)
 			 vPosition = m_TailDesc.pParent->Get_TransformState(CTransform::STATE_POSITION) - m_TailDesc.pParent->Get_TransformState(CTransform::STATE_LOOK)*0.4f;
@@ -399,7 +477,11 @@ _uint CTail::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 		return fHp;
 	}
 	else
+	{
 		m_eState = STATE::DEAD;
+		m_fAlpha = 0.f;
+	}
+		
 
 	return 0;
 }
@@ -408,6 +490,9 @@ void CTail::Change_Parent_State(STATE TailState)
 {
 	if (m_TailDesc.pParent == nullptr)
 		return;
+
+	if (m_eState == DAMAGE)
+		m_bHit = true;
 
 	dynamic_cast<CTail*>(m_TailDesc.pParent)->Set_AnimState(m_eState);
 	dynamic_cast<CTail*>(m_TailDesc.pParent)->Change_Parent_State(m_eState);

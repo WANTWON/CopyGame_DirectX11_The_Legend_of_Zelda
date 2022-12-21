@@ -664,20 +664,28 @@ void CFightEffect::Make_GlowEffect()
 				EffectDesc.fDeadTime = 0.5f;
 				EffectDesc.eEffectID = CFightEffect::GLOW_MINI;
 				m_vDirection = _float3((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10)* 0.1f, 0.f /*(rand() % 20 - 10)* 0.1f*/);
-				EffectDesc.vLook = XMLoadFloat3(&m_vDirection);
+				if (pGameInstance->Get_CurrentLevelIndex() == LEVEL_TAILCAVE)
+					EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, 0.f, (rand() % 20 - 10)* 0.1f, 0.f);
+				else
+					EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10)* 0.1f, 0.f, 0.f);
+
 				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 			}
 		}
 		else
 		{
-
+			
 			for (int i = 0; i < 5; ++i)
 			{
 				EffectDesc.vInitScale = _float3(1.f, 1.f, 0.0f);
 				EffectDesc.fDeadTime = 0.5f;
 				EffectDesc.eEffectID = CFightEffect::GLOW_MIDDLE;
-				m_vDirection = _float3((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10)* 0.1f, 0.f /*(rand() % 20 - 10)* 0.1f*/);
+				if (pGameInstance->Get_CurrentLevelIndex() == LEVEL_TAILCAVE)
+					EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, 0.f, (rand() % 20 - 10)* 0.1f, 0.f);
+				else
+					EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10)* 0.1f, 0.f, 0.f);
+
 				EffectDesc.vLook = XMLoadFloat3(&m_vDirection);
 				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
@@ -689,8 +697,11 @@ void CFightEffect::Make_GlowEffect()
 				EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.0f);
 				EffectDesc.fDeadTime = 1.0f;
 				EffectDesc.eEffectID = CFightEffect::GLOW_SMALL;
-				m_vDirection = _float3((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10)* 0.1f, 0.f /*(rand() % 20 - 10)* 0.1f*/);
-				EffectDesc.vLook = XMLoadFloat3(&m_vDirection);
+				if (pGameInstance->Get_CurrentLevelIndex() == LEVEL_TAILCAVE)
+					EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, 0.f, (rand() % 20 - 10)* 0.1f, 0.f);
+				else
+					EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, (rand() % 20 - 10)* 0.1f, 0.f, 0.f);
+
 				pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 			}

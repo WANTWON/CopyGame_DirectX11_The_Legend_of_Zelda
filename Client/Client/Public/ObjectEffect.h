@@ -76,6 +76,7 @@ private:
 	_bool			m_bEndMode = false;
 	_bool			m_bMax = false;
 	_float3			m_vMaxScale = _float3(2.f, 0.5f, 0.f);
+	_float			m_fZoomValue = 0.f;
 
 public:
 	static CObjectEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

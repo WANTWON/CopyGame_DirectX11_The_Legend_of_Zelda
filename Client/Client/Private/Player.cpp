@@ -202,7 +202,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		eBulletDesc.vLook = pCollisionTrap->Get_TransformState(CTransform::STATE_LOOK);
 
 		if(m_eState != DMG_B && m_eState != DMG_F)
-			Take_Damage(1.f, &eBulletDesc, nullptr);
+			Take_Damage(1.f, &eBulletDesc, pCollisionTrap);
 	}
 		
 }
@@ -322,6 +322,7 @@ _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 		_float fAngleDegree = XMConvertToDegrees(fAngleRadian);
 		_vector vCross = XMVector3Cross(vDir, PlayerLook);
 
+
 		if (fAngleDegree > 0.f && fAngleDegree <= 90.f)
 			m_eState = CPlayer::DMG_F;
 		else if (fAngleDegree > 90.f && fAngleDegree <= 180.f)
@@ -344,7 +345,7 @@ _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 			_float fAngleDegree = XMConvertToDegrees(fAngleRadian);
 			_vector vCross = XMVector3Cross(BulletLook, PlayerLook);
 
-			if (fAngleDegree > 0.f && fAngleDegree <= 90.f)
+			if (fAngleDegree >= 0.f && fAngleDegree <= 90.f)
 				m_eState = CPlayer::DMG_B;
 			else if (fAngleDegree > 90.f && fAngleDegree <= 180.f)
 				m_eState = CPlayer::DMG_F;
@@ -820,6 +821,9 @@ void CPlayer::Render_Model(MESH_NAME eMeshName)
 	if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_NormalTexture", eMeshName, aiTextureType_NORMALS)))
 		return;
 
+	if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_SpecularTexture", eMeshName, aiTextureType_SPECULAR)))
+		return;
+
 	if (FAILED(m_pModelCom->Render(m_pShaderCom, eMeshName, m_eShaderID)))
 		return;
 }
@@ -830,7 +834,8 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 		m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP || m_eState == ITEM_GET_ED || m_eState == FALL_FROMTOP || m_eState == FALL_HOLE ||
 		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP || m_eState == LADDER_UP_ED ||
 		m_eState == ITEM_CARRY || m_bDead  || m_eState == S_ITEM_GET_ST || m_eState == S_ITEM_GET_LP || m_eState == S_ITEM_GET_ED ||
-		m_eState == EV_TELL_ST || m_eState == EV_TELL_LP || m_eState == EV_TELL_ED || m_eState == LAND || m_eState == D_LAND || m_eState == SHIELD_HIT)
+		m_eState == EV_TELL_ST || m_eState == EV_TELL_LP || m_eState == EV_TELL_ED || m_eState == LAND || m_eState == D_LAND || 
+		m_eState == SHIELD_HIT || m_eState == DEAD)
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
@@ -1373,10 +1378,19 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::ITEM_GET_ED:
 	case Client::CPlayer::S_ITEM_GET_ED:
 	case Client::CPlayer::KEY_OPEN:
-	case Client::CPlayer::FALL_FROMTOP:
 	case Client::CPlayer::STAIR_UP:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+			m_eState = IDLE;
+		break;
+	case Client::CPlayer::FALL_FROMTOP:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		
+		if (m_fEndHeight < XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)))
+			m_pTransformCom->Go_PosDir(fTimeDelta*3, XMVectorSet(0.f, -1.f, 0.f, 0.f));
+
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 			m_eState = IDLE;
 		break;
@@ -1388,7 +1402,10 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
 			m_eState = FALL_FROMTOP;
-			m_pTransformCom->Go_Backward(fTimeDelta * 20, m_pNavigationCom);
+			_vector vPosition = Get_TransformState(CTransform::STATE_POSITION);
+			vPosition = XMVectorSetY(vPosition, 15.f);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+			m_pTransformCom->Go_Backward(fTimeDelta * 25, m_pNavigationCom);
 		}
 		break;
 	case Client::CPlayer::STAIR_DOWN:
@@ -1472,15 +1489,18 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 
 void CPlayer::Check_Navigation(_float fTimeDelta)
 {
-	if (m_pNavigationCom->Get_CurrentCellIndex() == -1)
+	if (m_pNavigationCom->Get_CurrentCellIndex() == -1 || m_eState == DEAD || m_bDead)
 		return;
 
 
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
 	{
-		if (m_eState != FALL_ANTLION)
+		if (m_eState != FALL_ANTLION && m_eState != JUMP && m_eState != D_JUMP && m_eState != D_FALL && m_eState != LAND && m_eState != D_LAND)
+		{
 			m_pTransformCom->Go_Straight(fTimeDelta * 10, m_pNavigationCom);
-		m_eState = FALL_ANTLION;
+			m_eState = FALL_ANTLION;
+		}
+			
 	}
 	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
 	{
@@ -1491,7 +1511,7 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 				m_fStartHeight = m_fWalkingHeight;
 		m_fEndHeight = m_fWalkingHeight;
 
-		if (m_eState != JUMP && m_eState != D_JUMP && m_eState != D_FALL && m_eState != LAND && m_eState != D_LAND)
+		if (m_eState != JUMP && m_eState != D_JUMP && m_eState != D_FALL && m_eState != LAND && m_eState != D_LAND && m_eState != FALL_FROMTOP)
 		{
 			if (m_fWalkingHeight < XMVectorGetY(vPosition) && m_b2D)
 				m_eState = FALL;

@@ -33,10 +33,25 @@ HRESULT CRola::Initialize(void * pArg)
 
 	_vector vecPostion = XMLoadFloat3((_float3*)pArg);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
+	vecPostion = XMVectorSetZ(vecPostion, XMVectorGetZ(vecPostion) - 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
 	m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
+	m_pTransformCom->LookDir(XMVectorSet(-1.f, 0.f, 0.f, 0.f));
+
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CMonsterBullet::BULLETDESC BulletDesc;
+	BulletDesc.eOwner = MONSTER_ROLA;
+	BulletDesc.eBulletType = CMonsterBullet::ROLA;
+	BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + Get_TransformState(CTransform::STATE_LOOK);
+	BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+	BulletDesc.vLook = XMVectorSetY(BulletDesc.vLook, 0.f);
+
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterBullet"), LEVEL_TAILCAVE, TEXT("Layer_RulaRolling"), &BulletDesc)))
+		return E_FAIL;
+	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }
@@ -46,7 +61,6 @@ int CRola::Tick(_float fTimeDelta)
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
 
-	
 
 	AI_Behaviour(fTimeDelta);
 	Check_Navigation(fTimeDelta);
@@ -118,25 +132,15 @@ void CRola::Change_Animation(_float fTimeDelta)
 			m_eState = IDLE;
 			m_bIsAttacking = false;
 			m_bHit = false;
-
-
-			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-			CMonsterBullet::BULLETDESC BulletDesc;
-			BulletDesc.eOwner = MONSTER_ROLA;
-			BulletDesc.eBulletType = CMonsterBullet::ROLA;
-			BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
-			BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
-			BulletDesc.vLook = XMVectorSetY(BulletDesc.vLook, 0.f);
-
-			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterBullet"), LEVEL_TAILCAVE, TEXT("Layer_Bullet"), &BulletDesc)))
-				return;
-			RELEASE_INSTANCE(CGameInstance);
+			CMonsterBullet* pRollingBullet = dynamic_cast<CMonsterBullet*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_TAILCAVE, TEXT("Layer_RulaRolling")));
+			pRollingBullet->Set_Rolling();
 		}
-		break;		break;
+		break;
 	case Client::CRola::DAMAGE:
 		m_bIsLoop = false;
 		_vector vDir = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
-		m_pTransformCom->Go_PosDir(fTimeDelta, vDir);
+
+		m_pTransformCom->Go_PosDir(fTimeDelta*0.5f, vDir);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_eState = JUMP_ST;
@@ -158,15 +162,21 @@ void CRola::Change_Animation(_float fTimeDelta)
 		m_fAnimSpeed = 3.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+		{
+			if (!m_bSpecialAttack &&  m_iDmgCount%4 != 3)
+			{
+				m_vDirection = m_pTarget->Get_TransformState(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			}
+			m_vDirection = XMVectorSetY(m_vDirection, 0.f);
 			m_eState = JUMP;
+		}
+
 		break;
 	case Client::CRola::JUMP:
-		m_fAnimSpeed = 2.0f;
+		m_fAnimSpeed = 3.f;
 		m_bIsLoop = false;
-		// Movement
-		if (m_iDmgCount % 4 != 3 && m_fDistanceToTarget > m_fAttackRadius)
-			Follow_Target(fTimeDelta);
-
+		if (m_iDmgCount % 4 != 3)
+			Jumping_Attack(fTimeDelta);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_eState = JUMP_ED;
@@ -180,10 +190,7 @@ void CRola::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta* m_fAnimSpeed, m_bIsLoop))
 		{
-			//if (m_bJump)
-				m_eState = JUMP_ST;
-			//else
-			//	m_eState = IDLE;
+			m_eState = JUMP_ST;
 		}
 		break;
 	}
@@ -209,6 +216,11 @@ HRESULT CRola::Ready_Components(void * pArg)
 	TransformDesc.fSpeedPerSec = 2.0f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(3.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
+		return E_FAIL;
+
+
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Components(TEXT("Com_DissolveTexture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Dissolve"), (CComponent**)&m_pDissolveTexture)))
 		return E_FAIL;
 
 	/* For.Com_Shader */
@@ -240,26 +252,6 @@ HRESULT CRola::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CRola::SetUp_ShaderResources()
-{
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
-		return E_FAIL;
-
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
-		return E_FAIL;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return S_OK;
-}
 
 _bool CRola::IsDead()
 {
@@ -313,7 +305,7 @@ void CRola::Follow_Target(_float fTimeDelta)
 	if (m_pTarget == nullptr)
 		return;
 
-	_vector vTargetPos =m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+	_vector vTargetPos = m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
 	m_pTransformCom->LookAt(vTargetPos);
 	m_pTransformCom->Go_Straight(fTimeDelta*1.5f, m_pNavigationCom);
 }
@@ -330,7 +322,6 @@ void CRola::AI_Behaviour(_float fTimeDelta)
 		m_eState = IDLE;
 		return;
 	}
-		
 
 
 
@@ -340,7 +331,7 @@ void CRola::AI_Behaviour(_float fTimeDelta)
 			m_bBackStep = false;
 
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
-		m_pTransformCom->Go_Backward(fTimeDelta*3, m_pNavigationCom);
+		m_pTransformCom->Go_Backward(fTimeDelta * 2, m_pNavigationCom);
 	}
 
 	if (m_iDmgCount % 4 == 3 && m_fDistanceToTarget < m_fPatrolRadius)
@@ -359,7 +350,7 @@ void CRola::AI_Behaviour(_float fTimeDelta)
 			}
 			else if (!m_bIsAttacking)
 				m_eState = STATE::JUMP_ST;
-		}	
+		}
 	}
 	else
 		Patrol(fTimeDelta);
@@ -376,7 +367,7 @@ void CRola::Patrol(_float fTimeDelta)
 	if (m_eState == STATE::IDLE)
 	{
 		m_bJump = true;
-		m_eState = STATE::JUMP_ST;	
+		m_eState = STATE::JUMP_ST;
 	}
 
 }
@@ -386,90 +377,76 @@ _bool CRola::Moving_AttackPosition(_float fTimeDelta)
 	if (m_bSpecialAttack == true)
 		return true;
 
-	if (m_eAttackDir == RIGHT)
+
+	if (m_eState == STATE::IDLE)
 	{
-		_float Distance = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - XMLoadFloat4(&m_fRAttackPos)));
-		if (Distance < 0.5f)
-		{
-			m_pTransformCom->LookAt(XMLoadFloat4(&m_fLAttackPos));
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_fRAttackPos));
-			m_bSpecialAttack = true;
-			m_bJump = false;
-			
-		}
+		m_bJump = true;
+		m_eState = STATE::JUMP_ST;
+	}
+
+	CMonsterBullet* pRollingBullet = dynamic_cast<CMonsterBullet*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_TAILCAVE, TEXT("Layer_RulaRolling")));
+
+	if (m_eAttackDir == RIGHT)
+		m_vAttackPos = pRollingBullet->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(1.f, 0.f, 0.f, 0.f);
+	else
+		m_vAttackPos = pRollingBullet->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-1.f, 0.f, 0.f, 0.f);
+
+	_float Distance = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - m_vAttackPos));
+	if (Distance < 0.7f)
+	{
+		_vector vLook = m_eAttackDir == RIGHT ? XMVectorSet(-1.f, 0.f, 0.f, 0.f) : XMVectorSet(1.f, 0.f, 0.f, 0.f);
+		if (0 == XMVectorGetX(XMVectorEqual(Get_TransformState(CTransform::STATE_LOOK), vLook)))
+			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
 		else
 		{
-			_vector		vLook = XMLoadFloat4(&m_fLAttackPos) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-			_vector		vMyOriginalLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-
-			vMyOriginalLook = XMVectorSetY(vMyOriginalLook, XMVectorGetY(vLook));
-			_vector vLookDot = XMVector3AngleBetweenVectors(XMVector3Normalize(vLook), XMVector3Normalize(vMyOriginalLook));
-			_float fAngle = XMConvertToDegrees(XMVectorGetX(vLookDot));
-
-			_vector vCross = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vMyOriginalLook));
-			_vector vDot = XMVector3Dot(XMVector3Normalize(vCross), XMVector3Normalize(XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-
-			_float fScala = XMVectorGetX(vDot);
-
-			if (fScala < 0.f)
-				fAngle = 360.f - fAngle;
-
-			if (fAngle > 5)
-				m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), -1.f);
-			m_pTransformCom->Go_PosTarget(fTimeDelta, XMLoadFloat4(&m_fRAttackPos));
-
+			m_pTransformCom->LookDir(vLook);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vAttackPos);
+			m_bSpecialAttack = true;
+			m_bJump = false;
 		}
+
+
 	}
 	else
 	{
-		_float Distance = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - XMLoadFloat4(&m_fLAttackPos)));
-		if (Distance < 0.5f)
+		if (m_eState == JUMP_ED || m_eState == JUMP_ST)
 		{
-			
-			m_pTransformCom->LookAt(XMLoadFloat4(&m_fRAttackPos));
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_fLAttackPos));
-			m_bSpecialAttack = true;
-			m_bJump = false;
+			m_vDirection = pRollingBullet->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION);
+			return false;
 		}
-		else
-		{
-			_vector		vLook = XMLoadFloat4(&m_fRAttackPos) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-			_vector		vMyOriginalLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 
-			vMyOriginalLook = XMVectorSetY(vMyOriginalLook, XMVectorGetY(vLook));
-			_vector vLookDot = XMVector3AngleBetweenVectors(XMVector3Normalize(vLook), XMVector3Normalize(vMyOriginalLook));
-			_float fAngle = XMConvertToDegrees(XMVectorGetX(vLookDot));
+		m_pTransformCom->Go_PosTarget(fTimeDelta * 2, m_vAttackPos);
 
-			_vector vCross = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vMyOriginalLook));
-			_vector vDot = XMVector3Dot(XMVector3Normalize(vCross), XMVector3Normalize(XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-
-			_float fScala = XMVectorGetX(vDot);
-
-			if (fScala < 0.f)
-				fAngle = 360.f - fAngle;
-
-			if ( fAngle > 5)
-				m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), 1.f);
-			m_pTransformCom->Go_PosTarget(fTimeDelta, XMLoadFloat4(&m_fLAttackPos));
-		}
 	}
+
 	return false;
 }
 
 void CRola::Check_Navigation(_float fTimeDelta)
 {
-		if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
-			m_eState = IDLE;
-		else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
+	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
+		m_eState = IDLE;
+	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
+	{
+		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float fHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
+		if (fHeight > XMVectorGetY(vPosition))
 		{
-			_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-			_float fHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
-			if (fHeight > XMVectorGetY(vPosition))
-			{
-				vPosition = XMVectorSetY(vPosition, fHeight);
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-			}
+			vPosition = XMVectorSetY(vPosition, fHeight);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 		}
+	}
+}
+
+void CRola::Jumping_Attack(_float fTimeDelta)
+{
+	if (m_pTarget == nullptr)
+		return;
+
+	_vector vTargetPos = m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+
+	m_pTransformCom->LookDir(m_vDirection);
+	m_pTransformCom->Go_Straight(fTimeDelta*1.5f, m_pNavigationCom);
 }
 
 _uint CRola::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)

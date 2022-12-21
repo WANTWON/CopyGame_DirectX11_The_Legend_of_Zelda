@@ -6,6 +6,7 @@
 #include "Level_TailCave.h"
 #include "UIButton.h"
 #include "FootSwitch.h"
+#include "ObjectEffect.h"
 
 CDoor::CDoor(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -116,6 +117,12 @@ HRESULT CDoor::Render()
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_SpecularTexture", i, aiTextureType_SPECULAR)))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))
@@ -433,11 +440,42 @@ void CDoor::Change_Animation_ClosedDoor(_float fTimeDelta)
 	case Client::CDoor::CLOSE_CD:
 	case Client::CDoor::CLOSE2_CD:
 		m_bIsLoop = false;
+
+		m_fEffectTime += fTimeDelta;
+
+		if (m_fEffectTime > 0.5f && !m_bMakeEffect)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CObjectEffect::SMOKE;
+			EffectDesc.fDeadTime = 0.1f;
+			EffectDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook + XMVectorSet(0.f, 0.2f, 0.5f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook +  XMVectorSet(0.f, 0.2f, -0.5f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+			EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook * 0.3f + XMVectorSet(0.f, 0.2f, 0.5f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook * 0.3f + XMVectorSet(0.f, 0.2f, -0.5f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			
+			m_bMakeEffect = true;
+		}
+
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
 			if (m_bPlay)
 				CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
 			m_bPlay = false;
+			m_bMakeEffect = false;
+			m_fEffectTime = 0.f;
 		}
 		break;
 	case Client::CDoor::OPEN_CD:
@@ -580,7 +618,7 @@ _bool CDoor::Check_Open()
 			if (dynamic_cast<CBaseObj*>(iter)->Check_IsinFrustum() == false)
 				continue;
 
-			if (XMVectorGetX(XMVector3Length(dynamic_cast<CBaseObj*>(iter)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION))) >= 8.f)
+			if (XMVectorGetX(XMVector3Length(dynamic_cast<CBaseObj*>(iter)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION))) >= 13.f)
 				continue;
 
 			if (iter->Get_Dead() == false)

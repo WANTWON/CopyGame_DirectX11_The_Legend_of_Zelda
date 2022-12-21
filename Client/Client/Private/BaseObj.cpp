@@ -56,12 +56,15 @@ HRESULT CBaseObj::Render()
 }
 
 
-_bool CBaseObj::Check_IsinFrustum()
+_bool CBaseObj::Check_IsinFrustum(_float fOffset)
 {
 	if (m_bDead)
 		return false;
 
-	return CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), Get_Scale().y);
+	_float3 vScale = Get_Scale();
+	_float fCullingRadius = max(max(vScale.x, vScale.y), vScale.z);
+
+	return CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + fOffset);
 }
 
 void CBaseObj::SetUp_BillBoard()

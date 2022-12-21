@@ -5,6 +5,7 @@
 #include "GameInstance.h"
 #include "TreasureBox.h"
 #include "FightEffect.h"
+#include "CameraManager.h"
 
 CObjectEffect::CObjectEffect(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CEffect(pDevice, pContext)
@@ -845,12 +846,18 @@ void CObjectEffect::Tick_TreausureBox(_float fTimeDelta)
 
 void CObjectEffect::Tick_TreasureCross(_float fTimeDelta)
 {
-	
+	CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
+
 	SetUp_BillBoard();
 	Set_Scale(m_vScale);
 
 	if (!m_bMax)
 	{
+		m_fZoomValue -= 0.1f;
+		if (m_fZoomValue <= -1.f)
+			m_fZoomValue = -1.f;
+
 		m_fDeadtime += fTimeDelta;
 		if (m_fDeadtime < m_EffectDesc.fDeadTime*0.5f)
 		{
@@ -914,7 +921,7 @@ void CObjectEffect::Tick_TreasureCross(_float fTimeDelta)
 					EffectDesc.pTarget = nullptr;
 					EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 					EffectDesc.eEffectID = CObjectEffect::TREASURE_GLITTER;
-					EffectDesc.vInitScale = _float3(1.f, 1.f, 0.0f);
+					EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.5f);
 					EffectDesc.fDeadTime = 1.5f;
 					EffectDesc.iTextureNum = 1;
 					EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, 1.f, (rand() % 20 - 10) * 0.1f, 0.f);
@@ -924,6 +931,8 @@ void CObjectEffect::Tick_TreasureCross(_float fTimeDelta)
 
 
 				dynamic_cast<CTreasureBox*>(m_EffectDesc.pTarget)->Set_Visible(true);
+				CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+				pPlayer->Set_Stop(false);
 				m_bMax = true;
 			}
 				
@@ -940,6 +949,9 @@ void CObjectEffect::Tick_TreasureCross(_float fTimeDelta)
 		m_vScale.y -= 0.1f;
 		m_fAlpha -= 0.05f;
 
+		m_fZoomValue += 0.1f;
+		if (m_fZoomValue >= 0.f)
+			m_fZoomValue = 0.f;
 	}
 
 	if (m_fAlpha <= 0.f)

@@ -6,6 +6,7 @@
 
 BEGIN(Engine)
 class CModel;
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -39,7 +40,7 @@ public:
 public:
 	void Set_Target(CBaseObj* pObject) { m_pTarget = pObject; }
 	const BULLETDESC Get_BulletDesc() const { return m_BulletDesc; }
-
+	void Set_Rolling() { m_fSpeed = 1.f; }
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
 	virtual HRESULT SetUp_ShaderResources();
@@ -59,17 +60,22 @@ private:
 
 protected: /* For.Components */
 	CModel*					m_pModelCom = nullptr;
+	CNavigation*			m_pNavigationCom = nullptr;
 	CBaseObj*				m_pTarget = nullptr;
+	BULLETDESC				m_BulletDesc;
+
 
 	_float					m_fDeadtime = 0.f;
 	_float					m_fAnimSpeed = 1.f;
 	_float					m_fSpeed = 0.f;
+
+
 	_float					m_fEffectTimeEnd = 0.f;
 	_float					m_fEffectTime = 0.f;
 
-	
 
-	BULLETDESC				m_BulletDesc;
+	_bool					m_bCollision = false;
+	
 
 public:
 	static CMonsterBullet* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

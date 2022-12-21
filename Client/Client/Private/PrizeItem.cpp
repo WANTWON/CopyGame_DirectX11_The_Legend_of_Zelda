@@ -9,6 +9,7 @@
 #include "CameraManager.h"
 #include "Portal.h"
 #include "ObjectEffect.h"
+#include "InvenTile.h"
 
 CPrizeItem::CPrizeItem(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -408,6 +409,20 @@ void CPrizeItem::Setting_Get_Item()
 				continue;
 		}
 	}
+	else if (m_ItemDesc.eType == FEATHER)
+	{
+		list<CGameObject*>* pItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_Ineventile"));
+		for (auto& iter : *pItemList)
+		{
+			if (dynamic_cast<CInvenTile*>(iter)->Get_TextureNum() == CInvenItem::ITEM_NONE)
+			{
+				dynamic_cast<CInvenTile*>(iter)->Set_TextureNum(CInvenItem::ITEM_FEATHER);
+				break;
+			}
+			else
+				continue;
+		}
+	}
 	else if (m_ItemDesc.eType == NECKLACE)
 	{
 		list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_QuestItem"));
@@ -510,7 +525,7 @@ void CPrizeItem::Make_GetItemEffect()
 	EffectDesc.eEffectID = CObjectEffect::RAINBOW_RING;
 	EffectDesc.fDeadTime = 2.f;
 	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
-	EffectDesc.vDistance = XMVectorSet(0.0f, -0.01f, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.015f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 	EffectDesc.eEffectID = CObjectEffect::GRAD_RING;
@@ -525,7 +540,7 @@ void CPrizeItem::Make_GetItemEffect()
 	EffectDesc.fStartTime = 0.f;
 	EffectDesc.fDeadTime = 4.f;
 	EffectDesc.vInitScale = _float3(10.f, 10.f, 10.0f);
-	EffectDesc.vDistance = XMVectorSet(0.0f, -0.02f, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.03f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 
@@ -543,7 +558,7 @@ void CPrizeItem::Make_GetItemEffect()
 	EffectDesc.fStartTime = 1.f;
 	EffectDesc.fDeadTime = EffectDesc.fStartTime + 3.5f;
 	EffectDesc.vInitScale = _float3(1.f, 1.f, 1.0f);
-	EffectDesc.vDistance = XMVectorSet(0.0f, -0.01f, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.012f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 
@@ -559,14 +574,14 @@ void CPrizeItem::Make_GetItemEffect()
 	EffectDesc.iTextureNum = 6;
 	EffectDesc.fDeadTime = 1.25f;
 	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
-	EffectDesc.vDistance = XMVectorSet(0.0f, 0.f, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, 0.1f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 
 	EffectDesc.iTextureNum = 3;
 	EffectDesc.fDeadTime = 1.f;
 	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
-	EffectDesc.vDistance = XMVectorSet(0.0f, 0.f, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, 0.12f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 

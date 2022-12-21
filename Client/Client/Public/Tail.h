@@ -37,15 +37,15 @@ public:
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
-	virtual HRESULT SetUp_ShaderResources() override;
+	virtual HRESULT SetUp_ShaderID() override;
 	virtual _bool IsDead() override;
-
+	virtual void Follow_Target(_float fTimeDelta) override;
 private:
 	virtual void AI_Behaviour(_float fTimeDelta) override;
 	void Behaviour_Head(_float fTimeDelta);
 	void Behaviour_Tail(_float fTimeDelta);
 	HRESULT Create_Tail(TAILTYPE eType);
-	
+
 
 private:
 	TAILDESC m_TailDesc;

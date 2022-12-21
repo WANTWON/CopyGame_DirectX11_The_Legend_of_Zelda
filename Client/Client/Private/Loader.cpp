@@ -202,7 +202,7 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	
 	/* For.Prototype_Component_Navigation */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"),
-		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/TailCave_Navi.dat")))))
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/TailCave_Navi2.dat")))))
 		return E_FAIL;
 	
 	/* For.Prototype_Component_Navigation */
@@ -236,10 +236,10 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	lstrcpy(m_szLoadingText, TEXT("Static ¸ðµ¨ »ý¼º Áß."));
 	/*For.Prototype_Component_Model_Link*/
 	_matrix			PivotMatrix = XMMatrixIdentity();
-	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Link"),
-	//CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Link/Link.fbx", PivotMatrix))))
-	//	return E_FAIL;
+	/*PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Link"),
+	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Link/Link.fbx", PivotMatrix))))
+		return E_FAIL;*/
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("Link"), LEVEL_STATIC, CData_Manager::DATA_ANIM);
 
 	
@@ -539,7 +539,6 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 
 	/*For.Prototype_Component_Model_Octorock*/
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("Octorock"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("MoblinSword"), LEVEL_GAMEPLAY, CData_Manager::DATA_ANIM);
 
@@ -547,7 +546,7 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 	/*For.Prototype_Component_Model_TailStatue*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_TailStatue"),
 	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/TailStatue/TailStatue.fbx", PivotMatrix))))
-	return E_FAIL;
+		return E_FAIL;
 
 
 	/*For.Prototype_Component_Model_TailShutter*/

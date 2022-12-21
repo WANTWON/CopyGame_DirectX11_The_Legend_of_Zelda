@@ -30,6 +30,7 @@ HRESULT CCollapseTile::Initialize(void * pArg)
 
 	m_eObjectID = OBJ_KEY;
 
+
 	if (pArg != nullptr)
 	{
 		_vector vecPostion = XMLoadFloat3((_float3*)pArg);
@@ -77,6 +78,7 @@ void CCollapseTile::Late_Tick(_float fTimeDelta)
 	switch (m_TileDesc.eTileType)
 	{
 	case COLLAPSE:
+		m_eShaderID = SHADER_ALPHABLEND;
 		CollapseTile_Tick(fTimeDelta);
 		break;
 	case CRANE_TILE:

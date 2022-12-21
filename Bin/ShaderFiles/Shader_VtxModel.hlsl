@@ -93,7 +93,8 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
 	Out.vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
-	/*Out.vSpecular.yz = Out.vSpecular.x;*/
+	
+	Out.vDiffuse.a *= g_fAlpha;
 
 	if (Out.vDiffuse.a <= 0.3f)
 		discard;
@@ -109,6 +110,7 @@ PS_OUT PS_PICKED(PS_IN In)
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDiffuse.rgb += 0.2f;
 	Out.vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
+
 	if (Out.vDiffuse.a <= 0.3f)
 		discard;
 

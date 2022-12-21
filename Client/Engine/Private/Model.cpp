@@ -309,7 +309,7 @@ HRESULT CModel::Create_Materials(const char* pModelFilePath)
 		{
 			aiString		strPath;
 
-			if (j == 6)
+			if (j == 6 || j ==2)
 			{
 				if (FAILED(pAIMaterial->GetTexture(aiTextureType(1), 0, &strPath)))
 						continue;	
@@ -327,7 +327,17 @@ HRESULT CModel::Create_Materials(const char* pModelFilePath)
 
 			_splitpath_s(strPath.data, nullptr, 0, nullptr, 0, szName, MAX_PATH, nullptr, 0);
 
-			if (j == 6)
+			if (j == 2)
+			{
+				char* ptr = strstr(szName, "alb");
+
+				if (ptr) {
+					strncpy(ptr, "smt", 3);
+					puts(szName);
+				}
+
+			}
+			else if (j == 6)
 			{
 				char* ptr = strstr(szName, "alb");  
 

@@ -28,7 +28,6 @@ public:
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
-	virtual HRESULT SetUp_ShaderResources() override;
 	virtual _bool IsDead() override;
 	virtual void Find_Target() override;
 	virtual void Follow_Target(_float fTimeDelta) override;
@@ -38,7 +37,8 @@ private:
 	void Patrol(_float fTimeDelta);
 	_bool Moving_AttackPosition(_float fTimeDelta);
 	virtual void Check_Navigation(_float fTimeDelta) override;
-	
+	void Jumping_Attack(_float fTimeDelta);
+
 private:
 	STATE m_eState = IDLE;
 	STATE m_ePreState = PUSH;
@@ -46,11 +46,12 @@ private:
 	_bool m_bJump = false;
 	_bool m_bSpecialAttack = false;
 	_bool m_bBackStep = false;
-	_int  m_iDmgCount = 0;
+	_int  m_iDmgCount = 3;
 
-	_float4 m_fLAttackPos = _float4(102.f, 0.f, 33.75f, 1.f);
-	_float4 m_fRAttackPos = _float4(109.7f, 0.f, 33.75f, 1.f);
+	_vector m_vAttackPos = { 109.7f, 0.f, 33.75f, 1.f };
+
 	DIR		m_eAttackDir = LEFT;
+	_vector m_vDirection = { 0.f,0.f,0.f,0.f };
 
 public:
 	static CRola* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

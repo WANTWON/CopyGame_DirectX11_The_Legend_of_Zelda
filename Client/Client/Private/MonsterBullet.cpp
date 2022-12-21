@@ -54,6 +54,8 @@ HRESULT CMonsterBullet::Initialize(void * pArg)
 		//m_BulletDesc.vInitPositon = XMVectorSetY(m_BulletDesc.vInitPositon, PosY);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		m_pTransformCom->LookDir(m_BulletDesc.vLook);
+		m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
 		break;
 	}
 	case ALBATOSS:
@@ -78,7 +80,7 @@ HRESULT CMonsterBullet::Initialize(void * pArg)
 
 int CMonsterBullet::Tick(_float fTimeDelta)
 {
-	if (m_bDead)
+	if (m_bDead && m_BulletDesc.eBulletType != ROLA)
 	{
 		Make_DeathEffect();
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MBULLET, this);
@@ -196,18 +198,27 @@ HRESULT CMonsterBullet::Ready_Components(void * pArg)
 
 		break;
 	case ROLA:
+	{
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), iLevel, TEXT("Prototype_Component_Model_RolaBullet"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 
 		/* For.Com_OBB*/
-		ColliderDesc.vScale = _float3(5.f, 0.2f, 0.2f);
+		ColliderDesc.vScale = _float3(3.f, 0.2f, 0.2f);
 		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), iLevel, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 			return E_FAIL;
 
+		/* For.Com_Navigation */
+		CNavigation::NAVIDESC			NaviDesc;
+		ZeroMemory(&NaviDesc, sizeof NaviDesc);
+		NaviDesc.iCurrentCellIndex = 0;
+		if (FAILED(__super::Add_Components(TEXT("Com_Navigation_TailCave"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
+			return E_FAIL;
+
 		break;
+	}
 	case ALBATOSS:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), iLevel, TEXT("Albatoss_Feather"), (CComponent**)&m_pModelCom)))
@@ -297,8 +308,30 @@ void CMonsterBullet::Moving_RolaBullet(_float fTimeDelta)
 	Y += 1;
 	vAxis = XMVectorSetY(vAxis, Y);*/
 
-	m_pTransformCom->Turn(vAxis, 10.f);
-	m_pTransformCom->Go_PosDir(fTimeDelta*2, m_BulletDesc.vLook);
+	m_pTransformCom->Turn(vAxis, XMVectorGetX(m_BulletDesc.vLook));
+	if (m_pTransformCom->Go_PosDir(fTimeDelta * m_fSpeed, m_BulletDesc.vLook, m_pNavigationCom))
+	{
+		m_BulletDesc.vLook *= -1.f;
+		m_bCollision = true;
+	}
+	
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pOBBCom))
+	{
+		m_BulletDesc.vLook *= -1.f;
+		m_bCollision = true;
+	}
+
+	if (m_bCollision)
+	{
+		m_fSpeed -= 0.01f;
+		if (m_fSpeed <= 0.f)
+		{
+			m_fSpeed = 0.f;
+			m_bCollision = false;
+		}
+	}
+
+	
 }
 
 void CMonsterBullet::Moving_AlbatossBullet(_float fTimeDelta)
@@ -422,6 +455,7 @@ void CMonsterBullet::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pNavigationCom);
 
 	Safe_Release(m_pAABBCom);
 	Safe_Release(m_pOBBCom);

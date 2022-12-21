@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "..\Public\Togezo.h"
 #include "Player.h"
+#include "FightEffect.h"
+#include "MonsterBullet.h"
+#include "ObjectEffect.h"
 
 CTogezo::CTogezo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -74,13 +77,25 @@ void CTogezo::Late_Tick(_float fTimeDelta)
 			if (m_eState != REBOUND_ST)
 			{
 				pPlayer->Set_AnimState(CPlayer::SHIELD_HIT);
+				pPlayer->Make_GuardEffect(this);
 				m_eState = REBOUND_ST;
 				m_dwStunTime = GetTickCount();
 			}
 		
 		}
 		else if (m_eState != REBOUND_ST && m_eState != STUN && m_eState != STUN_ED &&  m_eState != IDLE)
+		{
 			m_eState = RUN_ED;
+
+			CMonsterBullet::BULLETDESC BulletDesc;
+			BulletDesc.eOwner = MONSTER_TOGEZO;
+			BulletDesc.eBulletType = CMonsterBullet::DEFAULT;
+			BulletDesc.vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+			Make_GetAttacked_Effect(m_pTarget);
+			dynamic_cast<CPlayer*>(m_pTarget)->Take_Damage(1.f, &BulletDesc, nullptr);
+		}
+			
 	
 	}
 		
@@ -93,6 +108,18 @@ void CTogezo::Late_Tick(_float fTimeDelta)
 		else
 			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
 		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection, m_pNavigationCom);
+	}
+
+	CBaseObj* pCollisionMonster = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_MONSTER, m_pOBBCom, &pCollisionMonster))
+	{
+
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionMonster->Get_TransformState(CTransform::STATE_POSITION);
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta, vDirection, m_pNavigationCom);
 	}
 	
 }
@@ -143,6 +170,7 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 	{
 	case Client::CTogezo::IDLE:
 	case Client::CTogezo::WALK:
+		m_bMakeEffect = false;
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
@@ -165,14 +193,32 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 	case Client::CTogezo::RUN:
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+
+		m_fEffectTimeEnd = 0.1f;
+		m_fEffectTime += fTimeDelta;
+		if (m_fEffectTime > m_fEffectTimeEnd)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CObjectEffect::SMOKE;
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+			EffectDesc.fDeadTime = 0.1f;
+			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			m_fEffectTime = 0.f;
+		}
+
 		if (m_pTransformCom->Go_Straight(fTimeDelta*2, m_pNavigationCom) == false)
 			m_eState = RUN_ED;
 		break;
 	case Client::CTogezo::RUN_ED:
 	case Client::CTogezo::STUN_ED:
+	case Client::CTogezo::DISCOVER:
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
+			m_bMakeEffect = false;
 			m_bIsAttacking = false;
 			m_dwAttackTime = GetTickCount();
 			m_eState = IDLE;
@@ -186,8 +232,8 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CTogezo::DEAD:
 	case Client::CTogezo::DEADFIRE:
-	case Client::CTogezo::DEADFALL:
 	{
+		Make_DeadEffect();
 		m_fAnimSpeed = 1.f;
 		m_bIsLoop = false;
 		m_pTransformCom->Go_PosDir(fTimeDelta * 2, XMVectorSet(0.f, -0.1f, 0.f, 0.f), m_pNavigationCom);
@@ -206,6 +252,7 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
+			m_bMakeEffect = false;
 			m_dwStunTime = GetTickCount();
 			m_eState = STUN;
 		}	
@@ -423,6 +470,7 @@ _uint CTogezo::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 		{
 			if (!m_bDead)
 			{
+				Make_GetAttacked_Effect(DamageCauser);
 				m_bHit = true;
 				m_eState = STATE::DAMAGE;
 				m_bMove = true;
@@ -439,10 +487,116 @@ _uint CTogezo::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 	}
 	else
 	{
+		Make_GuardEffect(m_pTarget);
 		m_eState = DISCOVER;
 	}
 
 	return 0;
+}
+
+void CTogezo::Make_GuardEffect(CBaseObj * Target)
+{
+	if (m_bMakeEffect)
+		return;
+	m_bMakeEffect = true;
+
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CFightEffect::GUARD_FLASH;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+	EffectDesc.vInitScale = _float3(1.5f, 1.5f, 1.5f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+	EffectDesc.eEffectID = CFightEffect::GUARD_RING;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK))*0.5f + XMVectorSet(0.f, Get_Scale().y*0.5f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - Target->Get_TransformState(CTransform::STATE_POSITION);
+	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+
+	for (int i = 0; i < 10; ++i)
+	{
+		EffectDesc.eEffectID = CFightEffect::GUARD_DUST;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+		_float iRandNum = (rand() % 10 + 10) * 0.1f;
+		EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
+		EffectDesc.fDeadTime = 0.8f;
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	}
+
+
+
+}
+
+void CTogezo::Make_GetAttacked_Effect(CBaseObj * DamageCauser)
+{
+	if (m_bMakeEffect)
+		return;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	CEffect::EFFECTDESC EffectDesc;
+
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CFightEffect::HITFLASH;
+
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = XMVector3Normalize((pTarget)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION));
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.2f, 0.f, 0.f);
+	EffectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CFightEffect::HITRING;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
+	EffectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
+	EffectDesc.fDeadTime = 0.8f;
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+	for (int i = 0; i < 10; ++i)
+	{
+		EffectDesc.eEffectID = CFightEffect::HITSPARK;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+		_float iRandNum = (rand() % 10 + 10) * 0.1f;
+		EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
+		EffectDesc.fDeadTime = 0.8f;
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	}
+
+
+
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.15f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.iTextureNum = 0;
+	EffectDesc.vInitScale = _float3(2.f, 2.f, 2.2f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.3f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.7f;
+	EffectDesc.iTextureNum = 1;
+	EffectDesc.vInitScale = _float3(3.5f, 3.5f, 3.5f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	EffectDesc.eEffectID = CFightEffect::HITFLASH_TEX;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.1f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.iTextureNum = 2;
+	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	m_bMakeEffect = true;
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 CTogezo * CTogezo::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

@@ -54,9 +54,9 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 
 int CMoblinSword::Tick(_float fTimeDelta)
 {
-	_float3 vScale = Get_Scale();
-	_float fCullingRadius = max(max(vScale.x, vScale.y), vScale.z);
-	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 2) == false)
+	
+
+	if(Check_IsinFrustum(2.f) == false)
 		return OBJ_NOEVENT;
 
 	if (__super::Tick(fTimeDelta))
@@ -70,9 +70,7 @@ int CMoblinSword::Tick(_float fTimeDelta)
 		m_pModelCom->Set_NextAnimIndex(m_eState);
 		m_ePreState = m_eState;
 	}
-
 	Change_Animation(fTimeDelta);
-
 	return OBJ_NOEVENT;
 }
 

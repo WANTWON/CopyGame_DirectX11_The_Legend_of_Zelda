@@ -36,6 +36,7 @@ HRESULT CMonster::Initialize(void* pArg)
 	//Set_Scale(_float3(0.5, 0.5, 0.5));
 
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
+	Change_Animation(0.f);
 	return S_OK;
 }
 
@@ -128,6 +129,12 @@ HRESULT CMonster::Render()
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_SpecularTexture", i, aiTextureType_SPECULAR)))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))

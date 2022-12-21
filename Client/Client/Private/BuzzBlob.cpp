@@ -66,11 +66,11 @@ void CBuzzBlob::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	CBaseObj* pCollisionBlock = nullptr;
-	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_MONSTER, m_pSPHERECom, &pCollisionBlock))
+	CBaseObj* pCollisionMonster = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_MONSTER, m_pOBBCom, &pCollisionMonster))
 	{
 
-		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionBlock->Get_TransformState(CTransform::STATE_POSITION);
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionMonster->Get_TransformState(CTransform::STATE_POSITION);
 		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
 			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
 		else

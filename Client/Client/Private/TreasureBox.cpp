@@ -73,25 +73,31 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 
 		_float fDistance = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - pTarget->Get_TransformState(CTransform::STATE_POSITION)));
 		CInvenItem* pInvenItem = dynamic_cast<CInvenItem*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Compass")));
-		if (fDistance < 15.f)
-		{
-			if (pInvenItem != nullptr)
-				pInvenItem->Set_CompassOn(true);
-		}
-		else
-		{
-			if (pInvenItem != nullptr)
-				pInvenItem->Set_CompassOn(false);
-		}
-
+		
 		if (!m_bCheck)
 		{
+			if (fDistance < 13.f)
+			{
+				if (pInvenItem != nullptr)
+					pInvenItem->Set_CompassOn(true);
+			}
+			else
+			{
+				if (pInvenItem != nullptr)
+					pInvenItem->Set_CompassOn(false);
+			}
+
+
 			if (!m_bEntranceEffect)
 				m_bEntranceEffect = Check_Visible();
 			else
 			{
 				Make_EntranceEffect();
+				dynamic_cast<CPlayer*>(pTarget)->Set_Stop(true);
 				m_bCheck = true;
+
+				if (pInvenItem != nullptr)
+					pInvenItem->Set_CompassOn(false);
 			}
 				
 		}
@@ -179,6 +185,12 @@ HRESULT CTreasureBox::Render()
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_SpecularTexture", i, aiTextureType_SPECULAR)))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))

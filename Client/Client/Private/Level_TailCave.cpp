@@ -129,7 +129,7 @@ HRESULT CLevel_TailCave::Ready_Lights()
 	_ulong dwByte = 0;
 	_uint iNum = 0;
 
-	hFile = CreateFile(TEXT("../../../Bin/Data/TailCave_Light2.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	hFile = CreateFile(TEXT("../../../Bin/Data/TailCave_Light3.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (0 == hFile)
 		return E_FAIL;
 

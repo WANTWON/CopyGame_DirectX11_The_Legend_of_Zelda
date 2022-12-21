@@ -76,7 +76,7 @@ HRESULT CPawn::Render()
 
 void CPawn::Check_Navigation(_float fTimeDelta)
 {
-	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
+	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP || m_pNavigationCom->Get_CurrentCelltype() == CCell::ONLYJUMP)
 	{
 		if (m_eState == DAMAGE)
 		{
@@ -91,7 +91,7 @@ void CPawn::Check_Navigation(_float fTimeDelta)
 			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
 		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection, m_pNavigationCom);
 	}
-	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
+	else if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE && 	m_eState != DEADFALL)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float fHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
@@ -124,7 +124,7 @@ void CPawn::Change_Animation(_float fTimeDelta)
 	{
 		m_fAnimSpeed = 1.f;
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
-		m_pTransformCom->Go_Backward(fTimeDelta, m_pNavigationCom);
+		m_pTransformCom->Go_Backward(fTimeDelta*2, m_pNavigationCom);
 		m_pTransformCom->Go_PosDir(fTimeDelta*2, XMVectorSet(0.f, -0.1f, 0.f, 0.f), m_pNavigationCom);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
@@ -182,7 +182,7 @@ HRESULT CPawn::Ready_Components(void * pArg)
 		return E_FAIL;
 
 	/* For.Com_SHPERE */
-	ColliderDesc.vScale = _float3(5.f, 5.f, 5.f);
+	ColliderDesc.vScale = _float3(7.f, 7.f, 7.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
@@ -290,7 +290,8 @@ void CPawn::AI_Behaviour(_float fTimeDelta)
 	// Check for Target, AggroRadius
 	Find_Target();
 
-	if (m_pTarget /*&& m_pSPHERECom->Collision(m_pTarget->Get_Collider()) == true*/)
+
+	if (m_pTarget && m_pSPHERECom->Collision(m_pTarget->Get_Collider()) == true)
 	{
 		m_bAggro = true;
 		// If in AttackRadius > Attack
@@ -309,8 +310,13 @@ void CPawn::AI_Behaviour(_float fTimeDelta)
 		if(m_bAggro)
 			Follow_Target(fTimeDelta);
 		else
+		{
 			m_eState = IDLE;
+			m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
+		}
+			
 	}
+	
 	
 }
 
