@@ -610,7 +610,7 @@ void CMonsterEffect::Tick_RolaEffect(_float fTimeDelta)
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 			EffectDesc.eEffectID = CMonsterEffect::ROLLING_FLASH2;
 			EffectDesc.fDeadTime = 0.5f;
-			EffectDesc.vLook = XMVectorSet( XMVectorGetX(m_EffectDesc.vLook), 0.1f, rand()%200*0.01 - 1.f, 0.f);
+			EffectDesc.vLook = XMVectorSet( XMVectorGetX(m_EffectDesc.vLook), 0.1f, rand()%200*0.01f - 1.f, 0.f);
 			EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.f);
 			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, +0.1f, rand() % 8 - 4.f, 0.f);
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);

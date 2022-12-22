@@ -12,6 +12,7 @@
 #include "InvenItem.h"
 #include "FieldNpc.h"
 #include "Npc.h"
+#include "UIName.h"
 
 IMPLEMENT_SINGLETON(CUI_Manager)
 
@@ -361,6 +362,66 @@ void CUI_Manager::Tick_Message()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CUI_Manager::Tick_Name(_float fTimeDelta)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CUIName* pName = dynamic_cast<CUIName*>(m_pNameBox);
+
+	if (m_fNameTime > 1.f && !m_bFirst)
+	{
+		LEVEL iLevelIndex = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
+
+		switch (iLevelIndex)
+		{
+		case Client::LEVEL_GAMEPLAY:
+			pName->Set_TexType(CUIName::NAME_FIELD);
+			pName->Set_Position(_float2(150, 150));
+			break;
+		case Client::LEVEL_TOWER:
+			pName->Set_TexType(CUIName::NAME_TOWER);
+			pName->Set_Position(_float2(g_iWinSizeX*0.5f, g_iWinSizeY*0.5f));
+			break;
+		case Client::LEVEL_ROOM:
+			pName->Set_Position(_float2(150, 150));
+			switch (m_eRoomType)
+			{
+			case Client::CUI_Manager::MARINHOUSE:
+				pName->Set_TexType(CUIName::NAME_MARINHOUSE);
+				break;
+			case Client::CUI_Manager::SHOP:
+				pName->Set_TexType(CUIName::NAME_SHOP);
+				break;
+			case Client::CUI_Manager::CRANEGAME:
+				pName->Set_TexType(CUIName::NAME_CRANEGAME);
+				break;
+			case Client::CUI_Manager::TELEPHONE:
+				pName->Set_TexType(CUIName::NAME_TELLROOM);
+				break;
+			default:
+				break;
+			}
+			break;
+		case Client::LEVEL_TAILCAVE:
+			pName->Set_TexType(CUIName::NAME_TAILCAVE);
+			pName->Set_Position(_float2(g_iWinSizeX*0.5f, g_iWinSizeY*0.5f));
+			break;
+		default:
+			break;
+		}
+
+		
+		pName->Set_Visible(true);
+		m_bFirst = true;
+	}
+
+	m_fNameTime += fTimeDelta;
+
+	if(m_fNameTime > 4.f)
+		pName->Set_Visible(false);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 void CUI_Manager::Setting_ChoiceButton()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -595,12 +656,12 @@ void CUI_Manager::Setting_ChoiceButton()
 }
 
 
-void CUI_Manager::Tick_UI()
+void CUI_Manager::Tick_UI(_float fTimeDelta)
 {
 	Tick_PlayerState();
 	Tick_Coin();
 	Tick_Message();
-	
+	Tick_Name(fTimeDelta);
 
 }
 

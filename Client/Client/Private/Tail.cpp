@@ -227,7 +227,6 @@ void CTail::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;
-		break;
 	default:
 		break;
 	}

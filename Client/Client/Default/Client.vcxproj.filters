@@ -226,6 +226,9 @@
     <Filter Include="02.GameObjects\01.Actor\02.Npc\TarinNpc">
       <UniqueIdentifier>{6aed2e3f-63e4-4bad-a215-8345ffe1dded}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.UI\06. NameBox">
+      <UniqueIdentifier>{f298ce46-a612-471b-8182-d01c8bc5f337}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -447,6 +450,9 @@
     <ClInclude Include="..\Public\MonsterEffect.h">
       <Filter>02.GameObjects\05.Effect\MonsterEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UIName.h">
+      <Filter>03.UI\06. NameBox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -652,6 +658,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MonsterEffect.cpp">
       <Filter>02.GameObjects\05.Effect\MonsterEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UIName.cpp">
+      <Filter>03.UI\06. NameBox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

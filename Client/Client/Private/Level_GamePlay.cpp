@@ -12,6 +12,7 @@
 #include "InvenItem.h"
 #include "UIButton.h"
 #include "BackGround.h"
+#include "UIName.h"
 
 /* Object */
 #include "NonAnim.h"
@@ -88,7 +89,7 @@ void CLevel_GamePlay::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);	
 
-	CUI_Manager::Get_Instance()->Tick_UI();
+	CUI_Manager::Get_Instance()->Tick_UI(fTimeDelta);
 
 
 	if (CUI_Manager::Get_Instance()->Get_NextLevelFinished())
@@ -173,9 +174,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 			return E_FAIL;
 		CPlayer* pPlayer = (CPlayer*)pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 		LEVEL ePastLevel = (LEVEL)CLevel_Manager::Get_Instance()->Get_PastLevelIndex();
-		//pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 0.f, 44.8f, 1.f));
+		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(36.3f, 0.f, 44.8f, 1.f));
 		//pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(16.3f, 0.f, 18.8f, 1.f));
-		pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(55.8f, 4.2f, 10.3f, 1.f));
+		//pPlayer->Set_State(CTransform::STATE_POSITION, XMVectorSet(55.8f, 4.2f, 10.3f, 1.f));
 		pPlayer->Change_Navigation(LEVEL_GAMEPLAY);
 		pPlayer->Compute_CurrentIndex(LEVEL_GAMEPLAY);
 
@@ -442,6 +443,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_Collect"), &ItemDesc)))
 			return E_FAIL;
 	}
+
+	CUIName::NAMEDESC NameDesc;
+	NameDesc.iTexNum = CUIName::NAME_FIELD;
+	NameDesc.vPosition = _float2(0.f, 0.f);
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_UIName"), LEVEL_STATIC, TEXT("Layer_Name"), &NameDesc)))
+		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 

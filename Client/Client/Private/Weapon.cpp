@@ -189,7 +189,7 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 	case WEAPON_END:
 		/* For.Com_OBB*/
 		ColliderDesc.vScale = _float3(0.4f, 0.2f, 0.2f);
-		ColliderDesc.vPosition = _float3(0.3f, 0.2f, 0.2f);
+		ColliderDesc.vPosition = _float3(0.3f, 0.1f, 0.15f);
 		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 			return E_FAIL;
 		break;

@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "..\Public\TailBoss.h"
 #include "Player.h"
+#include "CameraManager.h"
+#include "UIName.h"
+#include "MonsterEffect.h"
+#include "FightEffect.h"
 
 CTailBoss::CTailBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -23,6 +27,7 @@ HRESULT CTailBoss::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	m_fHitRedColor = 1.f;
 	m_tInfo.iMaxHp = 10;
 	m_tInfo.iDamage = 4;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
@@ -30,18 +35,20 @@ HRESULT CTailBoss::Initialize(void * pArg)
 	m_fAttackRadius = 1.5f;
 	m_eMonsterID = MONSTER_TAIL;
 
+	m_TailDesc.InitPostion = XMVectorSetY(m_TailDesc.InitPostion, 10.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_TailDesc.InitPostion);
+	m_pTransformCom->LookDir(XMVectorSet(0.f, 0.f, -1.f, 0.f));
 	m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
 
-	if(m_TailDesc.eTailType == TAIL1)
+	if (m_TailDesc.eTailType == TAIL1)
 		Set_Scale(_float3(1.3f, 1.3f, 1.3f));
 
 	if (m_TailDesc.eTailType != TAIL1)
 	{
 		_float3 fScale = m_TailDesc.pParent->Get_Scale();
-		
-		if(m_TailDesc.eTailType != TAIL5)	
+
+		if (m_TailDesc.eTailType != TAIL5)
 			Set_Scale(_float3(fScale.x*0.8f, fScale.y*0.8f, fScale.z*0.8f));
 		else
 			Set_Scale(_float3(0.8f, 0.8f, 0.8f));
@@ -50,27 +57,38 @@ HRESULT CTailBoss::Initialize(void * pArg)
 
 	Create_Tail(m_TailDesc.eTailType);
 
-	
+
 
 	return S_OK;
 }
 
 int CTailBoss::Tick(_float fTimeDelta)
 {
-	_float3 vScale = Get_Scale();
-	_float fCullingRadius = max(max(vScale.x, vScale.y), vScale.z);
-	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 2) == false)
+
+	if (Check_IsinFrustum(2.f) == false)
 		return OBJ_NOEVENT;
 
-	if (__super::Tick(fTimeDelta))
+	if (IsDead())
+	{
+		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
 		return OBJ_DEAD;
+	}
 
 
-	AI_Behaviour(fTimeDelta);
-	Check_Navigation(fTimeDelta);
+	if (!m_bOpeningMotion)
+		Opening_Motion(fTimeDelta);
+	else
+	{
+		AI_Behaviour(fTimeDelta);
+		Check_Navigation(fTimeDelta);
+	}
+
 
 	if (m_TailDesc.eTailType != TAIL1)
+	{
 		m_eState = dynamic_cast<CTailBoss*>(m_TailDesc.pParent)->Get_AnimState();
+	}
+
 
 	m_pModelCom->Set_NextAnimIndex(m_eState);
 	Change_Animation(fTimeDelta);
@@ -131,6 +149,8 @@ void CTailBoss::Check_Navigation(_float fTimeDelta)
 
 void CTailBoss::Change_Animation(_float fTimeDelta)
 {
+	CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+
 	switch (m_eState)
 	{
 	case Client::CTailBoss::DAMAGE_TURN:
@@ -159,23 +179,93 @@ void CTailBoss::Change_Animation(_float fTimeDelta)
 		{
 			m_bIsAttacking = false;
 			m_eState = IDLE;
-		}	
+		}
 		break;
 	case Client::CTailBoss::DEAD:
+		if (m_TailDesc.eTailType == TAIL1)
+		{
+			m_fEffectTimeEnd = 0.3f;
+			m_fEffectTime += fTimeDelta;
+			if (m_fEffectTime > m_fEffectTimeEnd)
+			{
+				CEffect::EFFECTDESC EffectDesc;
+				EffectDesc.pTarget = this;
+				EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+				EffectDesc.eEffectID = CMonsterEffect::ALBATROSSDEAD_SMOKE;
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(rand() % 2 == 0 ? -1.f : 1.f, 0.f, 0.f, 0.f);
+				EffectDesc.fDeadTime = 2.f;
+				EffectDesc.vColor = XMVectorSet(255, 63, 255, 255);
+				EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+				EffectDesc.eEffectID = CMonsterEffect::GLOW_SPHERE;
+				EffectDesc.vDistance = XMVectorSet((rand() % 200 * 0.01f) - 1.f, (rand() % 200 * 0.01f) - 1.f, 0.f, 0.f);
+				EffectDesc.iTextureNum = rand() % 2 == 0 ? 0 : 2;
+				EffectDesc.fDeadTime = 1.0f;
+				EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
+				EffectDesc.vColor = XMVectorSet(226, 0, 255, 255);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+				EffectDesc.eEffectID = CFightEffect::DEAD_FLASH;
+				EffectDesc.vDistance = XMVectorSet((rand() % 200 * 0.01f) - 1.f, (rand() % 200 * 0.01f) - 1.f, 0.f, 0.f);
+				EffectDesc.iTextureNum = rand() % 2 + 3;
+				EffectDesc.fDeadTime = 1.0f;
+				_int iRandNum = rand() % 20 * 0.1f + 0.5f;
+				EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
+				EffectDesc.vColor = XMVectorSet(226, 0, 255, 255);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+				m_fEffectTime = 0.f;
+			}
+
+			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
+			
+			m_fZoomValue -= 0.1f;
+			if (m_fZoomValue <= -1.f)
+				m_fZoomValue = -1.f;
+
+		}
+		m_fAlpha += 0.025f;
+		m_fAnimSpeed = 1.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
+			m_eState = DEAD;
+			Make_DeadEffect();
+			m_fZoomValue = 0.f;
+			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
 			m_bDead = true;
 		}
 		break;
 	case Client::CTailBoss::APPEAR:
-	case Client::CTailBoss::IDLE:
 	case Client::CTailBoss::WAIT_MOVE:
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;
-		break;
+	case Client::CTailBoss::IDLE:
+		m_fAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		m_fEffectTimeEnd = 0.3f;
+		m_fEffectTime += fTimeDelta;
+		if (m_fEffectTime > m_fEffectTimeEnd)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CMonsterEffect::ROLA_SMOKE;
+			EffectDesc.fDeadTime = 0.5f;
+			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+			EffectDesc.vInitScale = _float3(2.f, 2.f, 0.f);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(Get_TransformState(CTransform::STATE_RIGHT))*Get_Scale().x + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) - XMVector3Normalize(Get_TransformState(CTransform::STATE_RIGHT))*Get_Scale().x + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			m_fEffectTime = 0.f;
+			break;
+		}
 	default:
 		break;
 	}
@@ -185,6 +275,11 @@ HRESULT CTailBoss::Ready_Components(void * pArg)
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Components(TEXT("Com_Renderer"), LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), (CComponent**)&m_pRendererCom)))
+		return E_FAIL;
+
+
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Components(TEXT("Com_DissolveTexture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Dissolve"), (CComponent**)&m_pDissolveTexture)))
 		return E_FAIL;
 
 	/* For.Com_Transform */
@@ -234,15 +329,15 @@ HRESULT CTailBoss::Ready_Components(void * pArg)
 
 	/* For.Com_SHPERE */
 	ColliderDesc.vScale = _float3(1.8f, 1.8f, 1.8f);
-	if(m_TailDesc.eTailType == TAIL5)
+	if (m_TailDesc.eTailType == TAIL5)
 		ColliderDesc.vScale = _float3(0.5f, 1.5f, 0.5f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 
-	
+
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		return E_FAIL;
-	
+
 
 
 	/* For.Com_Navigation */
@@ -256,23 +351,15 @@ HRESULT CTailBoss::Ready_Components(void * pArg)
 	return S_OK;
 }
 
-HRESULT CTailBoss::SetUp_ShaderResources()
+
+HRESULT CTailBoss::SetUp_ShaderID()
 {
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
-		return E_FAIL;
-
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
-		return E_FAIL;
-
-	RELEASE_INSTANCE(CGameInstance);
+	if (m_eState == DEAD)
+		m_eShaderID = SHADER_ANIMDEAD;
+	else if (m_bHit)
+		m_eShaderID = SHADER_ANIMHIT;
+	else
+		m_eShaderID = SHADER_ANIMDEFAULT;
 
 	return S_OK;
 }
@@ -301,7 +388,7 @@ void CTailBoss::AI_Behaviour(_float fTimeDelta)
 
 	if (m_TailDesc.eTailType == TAIL1)
 		Behaviour_Head(fTimeDelta);
-	else 
+	else
 		Behaviour_Tail(fTimeDelta);
 
 }
@@ -309,9 +396,9 @@ void CTailBoss::AI_Behaviour(_float fTimeDelta)
 void CTailBoss::Behaviour_Head(_float fTimeDelta)
 {
 	Find_Target();
-	if (!m_bStart && m_fDistanceToTarget < 5.f)
+	if (!m_bStartIntro && m_fDistanceToTarget < 5.f)
 	{
-		m_bStart = true;
+		m_bStartIntro = true;
 		m_eState = IDLE;
 	}
 
@@ -350,7 +437,7 @@ void CTailBoss::Behaviour_Tail(_float fTimeDelta)
 		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
 
 	}
-	
+
 }
 
 HRESULT CTailBoss::Create_Tail(TAILTYPE eType)
@@ -370,6 +457,109 @@ HRESULT CTailBoss::Create_Tail(TAILTYPE eType)
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
+}
+
+void CTailBoss::Opening_Motion(_float fTimeDelta)
+{
+
+	if (m_bOpeningMotion)
+		return;
+
+	if (m_TailDesc.eTailType == TAIL1)
+		Opening_MotionHead(fTimeDelta);
+	else
+		Opening_MotionTail(fTimeDelta);
+
+}
+
+void CTailBoss::Opening_MotionHead(_float fTimeDelta)
+{
+	Find_Target();
+	if (!m_bStartIntro && !m_bFinishIntro &&  XMVectorGetZ(Get_TransformState(CTransform::STATE_POSITION)) - XMVectorGetZ(m_pTarget->Get_TransformState(CTransform::STATE_POSITION)) < 5.f)
+	{
+		m_bStartIntro = true;
+		m_eState = IDLE;
+	}
+
+	CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
+
+	if (m_bStartIntro && !m_bFinishIntro)
+	{
+		m_fZoomValue -= 0.1f;
+		if (m_fZoomValue <= -1.f)
+			m_fZoomValue = -1.f;
+
+		_float fHeight = m_pNavigationCom->Compute_Height(Get_TransformState(CTransform::STATE_POSITION), Get_Scale().y*0.25f);
+		_float fPositionY = XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION));
+		if (fPositionY > fHeight)
+			m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -1.f, 0.f, 0.f));
+		else
+		{
+			if (m_fNameBoxTime == 0.f)
+			{
+				CEffect::EFFECTDESC EffectDesc;
+				EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+				EffectDesc.eEffectID = CMonsterEffect::ROLA_SMOKE;
+				EffectDesc.fDeadTime = 0.5f;
+				EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+				EffectDesc.vInitScale = _float3(2.f, 2.f, 0.f);
+
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(1.f, 0.2f, 1.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(1.f, 0.2f, -1.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-1.f, 0.2f, 1.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-1.f, 0.2f, -1.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			}
+			m_fNameBoxTime += fTimeDelta;
+
+			if (m_fNameBoxTime > 1.f)
+			{
+				CUIName* pUIName = dynamic_cast<CUIName*>(CUI_Manager::Get_Instance()->Get_NameBox());
+				pUIName->Set_TexType(CUIName::NAME_TAILBOSS);
+				pUIName->Set_Position(_float2(g_iWinSizeX*0.5f, g_iWinSizeY*0.5f + 200.f));
+				pUIName->Set_Visible(true);
+				CUI_Manager::Get_Instance()->Set_NameTimeZero();
+				m_bFinishIntro = true;
+			}
+
+		}
+	}
+
+
+	if (m_bFinishIntro)
+	{
+		CUIName* pUIName = dynamic_cast<CUIName*>(CUI_Manager::Get_Instance()->Get_NameBox());
+		if (pUIName->Get_Visible() == false)
+		{
+			m_fZoomValue += 0.1f;
+			if (m_fZoomValue >= 0.f)
+			{
+				m_bOpeningMotion = true;
+				m_fZoomValue = 0.f;
+			}
+
+		}
+	}
+}
+
+void CTailBoss::Opening_MotionTail(_float fTimeDelta)
+{
+	if (m_TailDesc.pParent == nullptr)
+		return;
+
+	if (m_TailDesc.eTailType != TAIL1)
+	{
+		_vector vPosition = m_TailDesc.pParent->Get_TransformState(CTransform::STATE_POSITION);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+		m_bOpeningMotion = m_TailDesc.pParent->Get_IsOpening();
+	}
 }
 
 
@@ -399,15 +589,30 @@ _uint CTailBoss::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 			return fHp;
 		}
 		else
+		{
 			m_eState = STATE::DEAD;
+			m_fAlpha = 0.f;
+		}
+
 		Change_Parent_State(m_eState);
 	}
-	
+
 	return 0;
 }
 
 void CTailBoss::Change_Parent_State(STATE TailState)
 {
+	m_eState = TailState;
+
+	if (TailState == DAMAGE)
+	{
+		m_fHitRedColor -= 0.05f;
+		m_bHit = true;
+	}
+
+	if (TailState == DEAD)
+		m_fAlpha = 0.f;
+
 	if (m_TailDesc.pParent == nullptr)
 		return;
 

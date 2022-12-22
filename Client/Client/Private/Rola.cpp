@@ -83,7 +83,6 @@ int CRola::Tick(_float fTimeDelta)
 	}
 	Change_Animation(fTimeDelta);
 
-	m_pOBBCom->Update(m_pTransformCom->Get_WorldMatrix());
 	return OBJ_NOEVENT;
 }
 
@@ -92,7 +91,7 @@ void CRola::Late_Tick(_float fTimeDelta)
 	__super::Late_Tick(fTimeDelta);
 
 
-	if (m_pTarget != nullptr && true == m_pOBBCom->Collision(m_pTarget->Get_Collider()) && m_eState == JUMP_ED)
+	if (m_pTarget != nullptr && true == m_pSPHERECom->Collision(m_pTarget->Get_Collider()) && m_eState == JUMP_ED)
 	{
 		CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(m_pTarget)->Get_AnimState();
 		if (ePlayerState == CPlayer::SHIELD_HOLD_LP || ePlayerState == CPlayer::SHIELD)
@@ -344,11 +343,11 @@ HRESULT CRola::Ready_Components(void * pArg)
 	CCollider::COLLIDERDESC		ColliderDesc;
 
 
-	/* For.Com_OBB*/
-	ColliderDesc.vScale = _float3(1.f, 1.0f, 1.0f);
-	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.7f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+	/* For.Com_SHPERE */
+	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		return E_FAIL;
 
 	/* For.Com_Navigation */

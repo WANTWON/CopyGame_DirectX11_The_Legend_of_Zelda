@@ -162,7 +162,7 @@ HRESULT CMonsterBullet::Render()
 void CMonsterBullet::Set_Rolling(_uint Dir)
 {
 	m_fSpeed = Dir % 2 == 0 ? 1.5f : -1.5f;
-	m_fRotSpeed = Dir % 2 == 0 ? -5.f : 5.f;
+	m_fRotSpeed = Dir % 2 == 0 ? 5.f : -5.f;
 }
 
 HRESULT CMonsterBullet::Ready_Components(void * pArg)
@@ -330,7 +330,11 @@ void CMonsterBullet::Moving_RolaBullet(_float fTimeDelta)
 	{
 		if (m_fSpeed < 0.f)
 		{
-			m_fRotSpeed += 0.03f;
+			if (m_fRotSpeed < 0.f)
+				m_fRotSpeed += 0.03f;
+			else
+				m_fRotSpeed -= 0.03f;
+
 			m_fSpeed += 0.01f;
 			if (m_fSpeed >= 0.f)
 			{
@@ -341,8 +345,11 @@ void CMonsterBullet::Moving_RolaBullet(_float fTimeDelta)
 		}
 		else
 		{
+			if (m_fRotSpeed < 0.f)
+				m_fRotSpeed += 0.03f;
+			else
+				m_fRotSpeed -= 0.03f;
 
-			m_fRotSpeed -= 0.03f;
 			m_fSpeed -= 0.01f;
 			if (m_fSpeed <= 0.f)
 			{
@@ -351,6 +358,7 @@ void CMonsterBullet::Moving_RolaBullet(_float fTimeDelta)
 				m_bCollision = false;
 			}
 		}
+
 
 		
 	}

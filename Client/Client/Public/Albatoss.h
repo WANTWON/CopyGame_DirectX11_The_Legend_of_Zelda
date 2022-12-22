@@ -59,6 +59,7 @@ private:
 	_bool					m_bMessageAutoPass = false;
 	_bool					m_bDownHovering = false;
 	_bool					m_bMakeBullet = false;
+	_bool					m_bMakeUIName = false;
 
 	DWORD					m_dwOpeningTime = GetTickCount();
 	DWORD					m_dwFlappingTime = GetTickCount();

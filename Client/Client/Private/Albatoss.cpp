@@ -7,6 +7,7 @@
 #include "ObjectEffect.h"
 #include "MonsterEffect.h"
 #include "FightEffect.h"
+#include "UIName.h"
 
 CAlbatoss::CAlbatoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -681,6 +682,17 @@ void CAlbatoss::Opening_Motion(_float fTimeDelta)
 			m_vTargetDistance.x = 3.f;
 			m_vTargetDistance.y = 3.f;
 			m_vTargetDistance.z = 6.f;
+
+			if (!m_bMakeUIName)
+			{
+				CUIName* pUIName = dynamic_cast<CUIName*>(CUI_Manager::Get_Instance()->Get_NameBox());
+				pUIName->Set_TexType(CUIName::NAME_ALBATROSS);
+				pUIName->Set_Position(_float2(g_iWinSizeX*0.5f, g_iWinSizeY*0.5f + 200.f));
+				pUIName->Set_Visible(true);
+				CUI_Manager::Get_Instance()->Set_NameTimeZero();
+				m_bMakeUIName = true;
+			}
+			
 		}
 		else if (m_bFirst && m_dwOpeningTime + 15500 < GetTickCount())
 		{

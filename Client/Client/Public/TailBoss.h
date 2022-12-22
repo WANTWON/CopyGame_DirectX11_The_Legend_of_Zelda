@@ -31,13 +31,14 @@ public:
 public:
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
 	STATE Get_AnimState() { return m_eState; }
+	_bool Get_IsOpening() { return m_bOpeningMotion; }
 	void Set_AnimState(STATE eState) { m_eState = eState; }
 	void Change_Parent_State(STATE TailState);
 
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
-	virtual HRESULT SetUp_ShaderResources() override;
+	virtual HRESULT SetUp_ShaderID() override;
 	virtual _bool IsDead() override;
 
 private:
@@ -46,13 +47,26 @@ private:
 	void Behaviour_Tail(_float fTimeDelta);
 	HRESULT Create_Tail(TAILTYPE eType);
 	
+	void Opening_Motion(_float fTimeDelta);
+	void Opening_MotionHead(_float fTimeDelta);
+	void Opening_MotionTail(_float fTimeDelta);
 
 private:
 	TAILDESC m_TailDesc;
 	STATE m_eState = APPEAR;
 	_float m_fTurnAngle = 0.5f;
+	_float m_fZoomValue = 0.f;
+	_float m_fNameBoxTime = 0.f;
+
+	_float m_fEffectTimeEnd = 0.f;
+	_float m_fEffectTime = 0.f;
+
 	_bool m_bChangeDirection = false;
-	_bool m_bStart = false;
+	_bool m_bStartIntro = false;
+	_bool m_bFinishIntro = false;
+	_bool m_bOpeningMotion = false;
+
+	
 
 public:
 	static CTailBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

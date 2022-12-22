@@ -41,6 +41,7 @@
 #include "InvenItem.h"
 #include "PlayerState.h"
 #include "MessageBox.h"
+#include "UIName.h"
 
 //for Object 
 #include "Terrain.h"
@@ -968,6 +969,11 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	/*For.Prototype_GameObject_UIName*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UIName"),
+		CUIName::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	/*For.Prototype_GameObject_MonsterEffect*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MonsterEffect"),
 		CMonsterEffect::Create(m_pDevice, m_pContext))))
@@ -1216,6 +1222,10 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 HRESULT CLoader::Loading_For_UITexture()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Name"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Name/Name_%d.png"), 9))))
+		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_CraneGameTalk"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/CraneGameTalk_%d.dds"), 7))))

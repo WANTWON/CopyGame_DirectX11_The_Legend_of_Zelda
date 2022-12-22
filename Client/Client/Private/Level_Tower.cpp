@@ -69,7 +69,7 @@ void CLevel_Tower::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);	
 
-	CUI_Manager::Get_Instance()->Tick_UI();
+	CUI_Manager::Get_Instance()->Tick_UI(fTimeDelta);
 
 
 	if (CUI_Manager::Get_Instance()->Get_NextLevelFinished())

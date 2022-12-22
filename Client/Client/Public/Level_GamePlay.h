@@ -31,7 +31,7 @@ public:
 
 private:
 	CCollision_Manager* m_pCollision_Manager = nullptr;
-
+	
 
 public:
 	static CLevel_GamePlay* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
