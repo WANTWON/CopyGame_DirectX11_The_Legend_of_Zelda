@@ -1460,8 +1460,10 @@ HRESULT CLoader::Loading_For_Effect()
 
 
 
-
-
+	/*For.Prototype_Component_Texture_Blast */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Blast"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Blast/blast_%02d.dds"), 4))))
+		return E_FAIL;
 
 	/*For.Prototype_Component_Texture_Smoke */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke"),

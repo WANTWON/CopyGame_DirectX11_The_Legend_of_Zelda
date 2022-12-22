@@ -1077,7 +1077,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 			EffectDesc.eEffectID = CObjectEffect::SMOKE;
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.5f, 0.f, 0.f);
 			EffectDesc.fDeadTime = 0.1f;
 			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
 			EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
@@ -1100,7 +1100,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 			EffectDesc.eEffectID = CObjectEffect::SMOKE;
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.5f, 0.f, 0.f);
 			EffectDesc.fDeadTime = 0.1f;
 			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
 			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
@@ -1242,16 +1242,16 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
 		EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
 
-		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.2f, 0.5f, 0.f);
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.5f, 0.5f, 0.f);
 		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
-		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.2f, -0.5f, 0.f);
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.5f, -0.5f, 0.f);
 		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
-		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.2f, 0.5f, 0.f);
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.5f, 0.5f, 0.f);
 		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
-		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.2f, -0.5f, 0.f);
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.5f, -0.5f, 0.f);
 		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 		
 		for (int i = 0; i < 3; ++i)

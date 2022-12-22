@@ -17,6 +17,9 @@ public:
 		CLAW_SMOKE, CLAW_RING, FLAPPING_SMOKE, 
 		FEATHER, ALBATROSSDEAD_SMOKE, GLOW_SPHERE,
 
+		/* For Rola */
+		ROLLING_SMOKE, ROLA_SMOKE, ROLLING_FLASH, ROLLING_FLASH2,
+		ROLA_PUSHSPARK, ROLA_PUSHRING, ROLA_PUSHFLASH
 
 	};
 
@@ -50,6 +53,8 @@ private:
 	void Tick_Grass(_float fTimeDelta);
 	void Tick_OctoRockEffect(_float fTimeDelta);
 	void Tick_AlbatossEffect(_float fTimeDelta);
+	void Tick_GlowSphere(_float fTimeDelta);
+	void Tick_RolaEffect(_float fTimeDelta);
 
 private:
 	_float	m_fAngle = 0.f;

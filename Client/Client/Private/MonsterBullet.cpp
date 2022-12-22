@@ -54,7 +54,6 @@ HRESULT CMonsterBullet::Initialize(void * pArg)
 		//m_BulletDesc.vInitPositon = XMVectorSetY(m_BulletDesc.vInitPositon, PosY);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		m_pTransformCom->LookDir(m_BulletDesc.vLook);
-		m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 		break;
 	}
@@ -86,7 +85,7 @@ int CMonsterBullet::Tick(_float fTimeDelta)
 		CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_MBULLET, this);
 		return OBJ_DEAD;
 	}
-		
+
 
 	__super::Tick(fTimeDelta);
 
@@ -125,6 +124,9 @@ void CMonsterBullet::Late_Tick(_float fTimeDelta)
 	case OCTOROCK:
 		LateTick_Octorock(fTimeDelta);
 		break;
+	case ROLA:
+		LateTick_RulaBullet(fTimeDelta);
+		break;
 	default:
 		break;
 	}
@@ -157,6 +159,12 @@ HRESULT CMonsterBullet::Render()
 	return S_OK;
 }
 
+void CMonsterBullet::Set_Rolling(_uint Dir)
+{
+	m_fSpeed = Dir % 2 == 0 ? 1.5f : -1.5f;
+	m_fRotSpeed = Dir % 2 == 0 ? -5.f : 5.f;
+}
+
 HRESULT CMonsterBullet::Ready_Components(void * pArg)
 {
 	LEVEL iLevel = (LEVEL)CGameInstance::Get_Instance()->Get_DestinationLevelIndex();
@@ -168,7 +176,7 @@ HRESULT CMonsterBullet::Ready_Components(void * pArg)
 	/* For.Com_Transform */
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
-	if(m_BulletDesc.eBulletType == OCTOROCK)
+	if (m_BulletDesc.eBulletType == OCTOROCK)
 		TransformDesc.fSpeedPerSec = 5.0f;
 	else
 		TransformDesc.fSpeedPerSec = 2.0f;
@@ -204,17 +212,10 @@ HRESULT CMonsterBullet::Ready_Components(void * pArg)
 			return E_FAIL;
 
 		/* For.Com_OBB*/
-		ColliderDesc.vScale = _float3(3.f, 0.2f, 0.2f);
+		ColliderDesc.vScale = _float3(2.5f, 0.2f, 0.2f);
 		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
 		ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), iLevel, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
-			return E_FAIL;
-
-		/* For.Com_Navigation */
-		CNavigation::NAVIDESC			NaviDesc;
-		ZeroMemory(&NaviDesc, sizeof NaviDesc);
-		NaviDesc.iCurrentCellIndex = 0;
-		if (FAILED(__super::Add_Components(TEXT("Com_Navigation_TailCave"), LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"), (CComponent**)&m_pNavigationCom, &NaviDesc)))
 			return E_FAIL;
 
 		break;
@@ -298,40 +299,62 @@ void CMonsterBullet::Moving_OctorockBullet(_float fTimeDelta)
 	{
 		m_bDead = true;
 	}
-		
+
 }
 
 void CMonsterBullet::Moving_RolaBullet(_float fTimeDelta)
 {
-	_vector vAxis = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+	//_vector vAxis = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
 	/*_float Y = XMVectorGetY(vAxis);
 	Y += 1;
 	vAxis = XMVectorSetY(vAxis, Y);*/
 
-	m_pTransformCom->Turn(vAxis, XMVectorGetX(m_BulletDesc.vLook));
-	if (m_pTransformCom->Go_PosDir(fTimeDelta * m_fSpeed, m_BulletDesc.vLook, m_pNavigationCom))
+	m_pTransformCom->Turn(XMVectorSet(0.f,0.f,1.f,0.f), m_fRotSpeed);
+
+	m_pTransformCom->Go_PosDir(fTimeDelta * fabs(m_fSpeed), m_BulletDesc.vLook);
+
+
+	_float fPositionX = XMVectorGetX(Get_TransformState(CTransform::STATE_POSITION));
+	if (fPositionX < 99.5 || fPositionX > 112.9)
 	{
+		m_fRotSpeed *= -1.f;
+		m_fSpeed *= -1.f;
 		m_BulletDesc.vLook *= -1.f;
 		m_bCollision = true;
 	}
-	
-	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pOBBCom))
-	{
-		m_BulletDesc.vLook *= -1.f;
-		m_bCollision = true;
-	}
+
+
+
 
 	if (m_bCollision)
 	{
-		m_fSpeed -= 0.01f;
-		if (m_fSpeed <= 0.f)
+		if (m_fSpeed < 0.f)
 		{
-			m_fSpeed = 0.f;
-			m_bCollision = false;
+			m_fRotSpeed += 0.03f;
+			m_fSpeed += 0.01f;
+			if (m_fSpeed >= 0.f)
+			{
+				m_fRotSpeed = 0.f;
+				m_fSpeed = 0.f;
+				m_bCollision = false;
+			}
 		}
+		else
+		{
+
+			m_fRotSpeed -= 0.03f;
+			m_fSpeed -= 0.01f;
+			if (m_fSpeed <= 0.f)
+			{
+				m_fRotSpeed = 0.f;
+				m_fSpeed = 0.f;
+				m_bCollision = false;
+			}
+		}
+
+		
 	}
 
-	
 }
 
 void CMonsterBullet::Moving_AlbatossBullet(_float fTimeDelta)
@@ -358,10 +381,10 @@ void CMonsterBullet::Moving_AlbatossBullet(_float fTimeDelta)
 	{
 		m_fSpeed = 0.f;
 
-		if(XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) >= 16.f)
+		if (XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)) >= 16.f)
 			m_bDead = true;
 	}
-		
+
 
 }
 
@@ -380,6 +403,69 @@ void CMonsterBullet::LateTick_Octorock(_float fTimeDelta)
 		EffectDesc.vInitScale = _float3(0.7f, 0.7f, 0.7f);
 		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 		m_fEffectTime = 0.f;
+	}
+}
+
+void CMonsterBullet::LateTick_RulaBullet(_float fTimeDelta)
+{
+	if (m_fSpeed != 0)
+	{
+		m_fEffectTimeEnd = 0.4f;
+		m_fEffectTime += fTimeDelta;
+		if (m_fEffectTime > m_fEffectTimeEnd)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CMonsterEffect::ROLLING_SMOKE;
+			EffectDesc.fDeadTime = 0.5f;
+			EffectDesc.vColor = XMVectorSet(178, 169, 156, 255);
+			EffectDesc.vInitScale = _float3(1.5f, 1.5f, 1.5f);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, -0.1f, 4.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, -0.1f, 3.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, -0.1f, 2.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, -0.1f, 1.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, -0.1f, 0.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+			
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, -0.1f, -1.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, -0.1f, -2.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, -0.1f, -3.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, -0.1f, -4.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CMonsterEffect::ROLLING_FLASH;
+			EffectDesc.fDeadTime = 0.5f;
+			EffectDesc.vLook = Get_TransformState(CTransform::STATE_LOOK)*-1.f;
+			EffectDesc.vInitScale = _float3(1.f, 1.f, 0.f);
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, +0.1f, rand()%8 - 4.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, +0.1f, rand() % 8 - 4.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, +0.1f, rand() % 8 - 4.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+
+			m_fEffectTime = 0.f;
+		}
 	}
 }
 
@@ -406,7 +492,7 @@ void CMonsterBullet::Make_DeathEffect()
 		break;
 	}
 
-	
+
 	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 	EffectDesc.eEffectID = CObjectEffect::SMOKE;
 	EffectDesc.fDeadTime = 0.3f;
@@ -455,7 +541,6 @@ void CMonsterBullet::Free()
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
-	Safe_Release(m_pNavigationCom);
 
 	Safe_Release(m_pAABBCom);
 	Safe_Release(m_pOBBCom);

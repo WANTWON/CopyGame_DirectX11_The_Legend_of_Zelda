@@ -45,7 +45,7 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 		m_eShaderID = SHADERM_ONLY_TEXTURE;
 		break;
 	case GRASS_TEX:
-		m_eShaderID = SHADER_TWOCOLOR_NOT_ALPHASET;
+		m_eShaderID = SHADER_TWOCOLOR_NOTALPHASET;
 		m_vColorFront = XMVectorSet(80, 153, 36, 255);
 		m_vColorBack = XMVectorSet(17, 82, 34, 255);
 		m_vDirection = _float3((rand() % 20 - 10) * 0.1f, 1.f, (rand() % 20 - 10)* 0.1f);
@@ -135,7 +135,7 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 		m_fAlpha = 0.f;
 		break;
 	case SMOKE:
-		m_eShaderID = SHADER_ONECOLOR;
+		m_eShaderID = SHADER_ONECOLOR_NOTALPHASET;
 		m_EffectDesc.iTextureNum = rand() % 3;
 		m_vColorFront = m_EffectDesc.vColor;
 		break;
@@ -425,14 +425,14 @@ void CObjectEffect::Tick_Smoke(_float fTimeDelta)
 
 	SetUp_BillBoard();
 
-	m_fAlpha -= 0.01f;
+	m_fAlpha -= 0.02f;
 	m_vScale.x -= 0.02f;
 	m_vScale.y -= 0.02f;
 	m_vScale.z -= 0.02f;
 
 	Set_Scale(m_vScale);
 
-	if (m_vScale.x <= 0 || m_fAlpha <= 0)
+	if (m_vScale.x <= 0 && m_fAlpha <= 0)
 		m_bDead = true;
 }
 
@@ -446,7 +446,7 @@ void CObjectEffect::Tick_GlowEffect(_float fTimeDelta)
 	if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vDistance);
 
-	if (m_EffectDesc.fStartTime == 0)
+	if (m_vecColor.size() != 0)
 	{
 		if (m_fColorTime > m_EffectDesc.fDeadTime*0.3f)
 		{

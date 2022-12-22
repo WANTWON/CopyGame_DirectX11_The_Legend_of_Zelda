@@ -34,10 +34,14 @@ private:
 
 private:
 	virtual void AI_Behaviour(_float fTimeDelta) override;
-	void Patrol(_float fTimeDelta);
-	_bool Moving_AttackPosition(_float fTimeDelta);
 	virtual void Check_Navigation(_float fTimeDelta) override;
-	void Jumping_Attack(_float fTimeDelta);
+	virtual HRESULT SetUp_ShaderID() override;
+	
+	void	Patrol(_float fTimeDelta);
+	_bool	Moving_AttackPosition(_float fTimeDelta);
+	void	Jumping_Attack(_float fTimeDelta);
+	void	Make_PushEffect();
+	
 
 private:
 	STATE m_eState = IDLE;
@@ -50,9 +54,12 @@ private:
 
 	_vector m_vAttackPos = { 109.7f, 0.f, 33.75f, 1.f };
 
-	DIR		m_eAttackDir = LEFT;
+	DIR		m_eAttackDir = RIGHT;
 	_vector m_vDirection = { 0.f,0.f,0.f,0.f };
 
+	_float					m_fEffectTime = 0.f;
+	_float					m_fEffectTimeEnd = 0.f;
+	_float					m_fZoomValue = 0.f;
 public:
 	static CRola* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;

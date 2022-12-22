@@ -6,7 +6,6 @@
 
 BEGIN(Engine)
 class CModel;
-class CNavigation;
 END
 
 BEGIN(Client)
@@ -40,7 +39,7 @@ public:
 public:
 	void Set_Target(CBaseObj* pObject) { m_pTarget = pObject; }
 	const BULLETDESC Get_BulletDesc() const { return m_BulletDesc; }
-	void Set_Rolling() { m_fSpeed = 1.f; }
+	void Set_Rolling(_uint Dir);
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
 	virtual HRESULT SetUp_ShaderResources();
@@ -55,12 +54,11 @@ private:
 
 private:
 	void LateTick_Octorock(_float fTimeDelta);
+	void LateTick_RulaBullet(_float fTimeDelta);
 	void Make_DeathEffect();
-
 
 protected: /* For.Components */
 	CModel*					m_pModelCom = nullptr;
-	CNavigation*			m_pNavigationCom = nullptr;
 	CBaseObj*				m_pTarget = nullptr;
 	BULLETDESC				m_BulletDesc;
 
@@ -68,7 +66,7 @@ protected: /* For.Components */
 	_float					m_fDeadtime = 0.f;
 	_float					m_fAnimSpeed = 1.f;
 	_float					m_fSpeed = 0.f;
-
+	_float					m_fRotSpeed = 0.f;
 
 	_float					m_fEffectTimeEnd = 0.f;
 	_float					m_fEffectTime = 0.f;

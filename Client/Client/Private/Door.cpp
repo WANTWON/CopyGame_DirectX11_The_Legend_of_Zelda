@@ -448,22 +448,22 @@ void CDoor::Change_Animation_ClosedDoor(_float fTimeDelta)
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 			EffectDesc.eEffectID = CObjectEffect::SMOKE;
-			EffectDesc.fDeadTime = 0.1f;
+			EffectDesc.fDeadTime = 0.5f;
 			EffectDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
 			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
 			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
 
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook + XMVectorSet(0.f, 0.2f, 0.5f, 0.f);
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook + XMVectorSet(0.f, 0.4f, 0.5f, 0.f);
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook +  XMVectorSet(0.f, 0.2f, -0.5f, 0.f);
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook +  XMVectorSet(0.f, 0.4f, -0.5f, 0.f);
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
 			EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook * 0.3f + XMVectorSet(0.f, 0.2f, 0.5f, 0.f);
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook * 0.3f + XMVectorSet(0.f, 0.4f, 0.5f, 0.f);
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook * 0.3f + XMVectorSet(0.f, 0.2f, -0.5f, 0.f);
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook * 0.3f + XMVectorSet(0.f, 0.4f, -0.5f, 0.f);
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 			
 			m_bMakeEffect = true;
@@ -618,7 +618,7 @@ _bool CDoor::Check_Open()
 			if (dynamic_cast<CBaseObj*>(iter)->Check_IsinFrustum() == false)
 				continue;
 
-			if (XMVectorGetX(XMVector3Length(dynamic_cast<CBaseObj*>(iter)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION))) >= 13.f)
+			if (XMVectorGetX(XMVector3Length(dynamic_cast<CBaseObj*>(iter)->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION))) >= 15.f)
 				continue;
 
 			if (iter->Get_Dead() == false)

@@ -3,7 +3,9 @@
 #include "Player.h"
 #include "CameraManager.h"
 #include "MonsterBullet.h"
-
+#include "ObjectEffect.h"
+#include "MonsterEffect.h"
+#include "FightEffect.h"
 
 CRola::CRola(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -28,12 +30,12 @@ HRESULT CRola::Initialize(void * pArg)
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
 	m_fAttackRadius = 1.f;
-	m_fPatrolRadius = 7.f;
+	m_fPatrolRadius = 10.f;
 	m_eMonsterID = MONSTER_ROLA;
 
 	_vector vecPostion = XMLoadFloat3((_float3*)pArg);
 	vecPostion = XMVectorSetW(vecPostion, 1.f);
-	vecPostion = XMVectorSetZ(vecPostion, XMVectorGetZ(vecPostion) - 1.f);
+	vecPostion = XMVectorSetZ(vecPostion, XMVectorGetZ(vecPostion) - 1.5f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
 	m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
@@ -45,13 +47,23 @@ HRESULT CRola::Initialize(void * pArg)
 	CMonsterBullet::BULLETDESC BulletDesc;
 	BulletDesc.eOwner = MONSTER_ROLA;
 	BulletDesc.eBulletType = CMonsterBullet::ROLA;
-	BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + Get_TransformState(CTransform::STATE_LOOK);
+	BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + Get_TransformState(CTransform::STATE_LOOK) + XMVectorSet(0.f,0.5f,0.f,0.f);
 	BulletDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
 	BulletDesc.vLook = XMVectorSetY(BulletDesc.vLook, 0.f);
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterBullet"), LEVEL_TAILCAVE, TEXT("Layer_RulaRolling"), &BulletDesc)))
 		return E_FAIL;
+
+	CMonsterBullet* pRollingBullet = dynamic_cast<CMonsterBullet*>(pGameInstance->Get_Object(LEVEL_TAILCAVE, TEXT("Layer_RulaRolling")));
+	if (m_eAttackDir == RIGHT)
+		m_vAttackPos = pRollingBullet->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(2.f, 0.f, 0.f, 0.f);
+	else
+		m_vAttackPos = pRollingBullet->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-2.f, 0.f, 0.f, 0.f);
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vAttackPos);
 	RELEASE_INSTANCE(CGameInstance);
+
+
 
 	return S_OK;
 }
@@ -117,6 +129,8 @@ HRESULT CRola::Render()
 
 void CRola::Change_Animation(_float fTimeDelta)
 {
+	CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+
 	switch (m_eState)
 	{
 	case Client::CRola::IDLE:
@@ -125,15 +139,18 @@ void CRola::Change_Animation(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta * m_fAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CRola::PUSH:
+		if(m_dwAttackTime + 1000 < GetTickCount())
+			Make_PushEffect();
+
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_eAttackDir = m_eAttackDir == RIGHT ? LEFT : RIGHT;
 			m_eState = IDLE;
 			m_bIsAttacking = false;
+			m_bSpecialAttack = false;
 			m_bHit = false;
-			CMonsterBullet* pRollingBullet = dynamic_cast<CMonsterBullet*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_TAILCAVE, TEXT("Layer_RulaRolling")));
-			pRollingBullet->Set_Rolling();
+			m_bMakeEffect = false;
 		}
 		break;
 	case Client::CRola::DAMAGE:
@@ -143,17 +160,71 @@ void CRola::Change_Animation(_float fTimeDelta)
 		m_pTransformCom->Go_PosDir(fTimeDelta*0.5f, vDir);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
+			m_bMakeEffect = false;
 			m_eState = JUMP_ST;
 			m_bIsAttacking = false;
 			m_bHit = false;
 		}
 		break;		break;
 	case Client::CRola::DEAD:
+		dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
+
+		m_fZoomValue += 0.1f;
+		if (m_fZoomValue >= 0.f)
+			m_fZoomValue = 0.f;
+
+		m_fAnimSpeed = 1.f;
+		m_fAlpha += 0.01f;
+		Make_DeadEffect();
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+		{
+			m_fZoomValue = 0.f;
+			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
 			m_bDead = true;
+		}
 		break;
 	case Client::CRola::DEAD_ST:
+		dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
+		m_fAlpha += 0.01f;
+		m_fZoomValue -= 0.1f;
+		if (m_fZoomValue <= -1.f)
+			m_fZoomValue = -1.f;
+
+		m_fEffectTimeEnd = 0.3f;
+		m_fEffectTime += fTimeDelta;
+		if (m_fEffectTime > m_fEffectTimeEnd)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.pTarget = this;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CMonsterEffect::ALBATROSSDEAD_SMOKE;
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(rand() % 2 == 0 ? -1.f : 1.f, 0.f, 0.f, 0.f);
+			EffectDesc.fDeadTime = 2.f;
+			EffectDesc.vColor = XMVectorSet(255, 63, 255, 255);
+			EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			EffectDesc.eEffectID = CMonsterEffect::GLOW_SPHERE;
+			EffectDesc.vDistance = XMVectorSet((rand() % 200 * 0.01f) - 1.f, (rand() % 200 * 0.01f) - 1.f, 0.f, 0.f);
+			EffectDesc.iTextureNum = rand() % 2 == 0 ? 0 : 2;
+			EffectDesc.fDeadTime = 1.0f;
+			EffectDesc.vInitScale = _float3(0.0f, 0.0f, 0.0f);
+			EffectDesc.vColor = XMVectorSet(226, 0, 255, 255);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			EffectDesc.eEffectID = CFightEffect::DEAD_FLASH;
+			EffectDesc.vDistance = XMVectorSet((rand() % 200 * 0.01f) - 1.f, (rand() % 200 * 0.01f) - 1.f, 0.f, 0.f);
+			EffectDesc.iTextureNum = rand() % 2 + 3;
+			EffectDesc.fDeadTime = 1.0f;
+			_int iRandNum = rand() % 20 * 0.1f + 0.5f;
+			EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
+			EffectDesc.vColor = XMVectorSet(226, 0, 255, 255);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+			m_fEffectTime = 0.f;
+		}
+		m_fAnimSpeed = 0.5f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 			m_eState = DEAD;
@@ -175,11 +246,50 @@ void CRola::Change_Animation(_float fTimeDelta)
 	case Client::CRola::JUMP:
 		m_fAnimSpeed = 3.f;
 		m_bIsLoop = false;
-		if (m_iDmgCount % 4 != 3)
+		if (m_iDmgCount % 4 != 3 && !m_bBackStep)
 			Jumping_Attack(fTimeDelta);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_eState = JUMP_ED;
+
+
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CMonsterEffect::ROLA_SMOKE;
+			EffectDesc.fDeadTime = 0.5f;
+			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+			EffectDesc.vInitScale = _float3(2.f, 2.f, 0.f);
+
+			if (rand() % 2 == 0)
+			{
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(1.f, 0.2f, 1.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(1.f, 0.2f, -1.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-1.f, 0.2f, 1.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-1.f, 0.2f, -1.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+			}
+			else
+			{
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(1.f, 0.2f, 0.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, -1.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-1.f, 0.2f, 0.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, -1.f, 0.f);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			}
+		
 		}
 		break;
 	case Client::CRola::JUMP_ED:
@@ -213,7 +323,7 @@ HRESULT CRola::Ready_Components(void * pArg)
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(CTransform::TRANSFORMDESC));
 
-	TransformDesc.fSpeedPerSec = 2.0f;
+	TransformDesc.fSpeedPerSec = 5.0f;
 	TransformDesc.fRotationPerSec = XMConvertToRadians(3.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_Transform"), LEVEL_STATIC, TEXT("Prototype_Component_Transform"), (CComponent**)&m_pTransformCom, &TransformDesc)))
 		return E_FAIL;
@@ -324,14 +434,18 @@ void CRola::AI_Behaviour(_float fTimeDelta)
 	}
 
 
-
 	if (m_bBackStep)
 	{
-		if (m_fDistanceToTarget > 4.f)
+		if (m_fDistanceToTarget > 3.f)
+		{
+			m_iDmgCount = 3;
 			m_bBackStep = false;
+		}
+			
 
 		m_pTransformCom->LookAt(m_pTarget->Get_TransformState(CTransform::STATE_POSITION));
-		m_pTransformCom->Go_Backward(fTimeDelta * 2, m_pNavigationCom);
+		m_pTransformCom->Go_Backward(fTimeDelta*0.5f, m_pNavigationCom);
+		return;
 	}
 
 	if (m_iDmgCount % 4 == 3 && m_fDistanceToTarget < m_fPatrolRadius)
@@ -387,16 +501,16 @@ _bool CRola::Moving_AttackPosition(_float fTimeDelta)
 	CMonsterBullet* pRollingBullet = dynamic_cast<CMonsterBullet*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_TAILCAVE, TEXT("Layer_RulaRolling")));
 
 	if (m_eAttackDir == RIGHT)
-		m_vAttackPos = pRollingBullet->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(1.f, 0.f, 0.f, 0.f);
+		m_vAttackPos = pRollingBullet->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(2.f, 0.f, 0.f, 0.f);
 	else
-		m_vAttackPos = pRollingBullet->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-1.f, 0.f, 0.f, 0.f);
+		m_vAttackPos = pRollingBullet->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-2.f, 0.f, 0.f, 0.f);
 
 	_float Distance = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - m_vAttackPos));
-	if (Distance < 0.7f)
+	if (Distance < 1.f)
 	{
 		_vector vLook = m_eAttackDir == RIGHT ? XMVectorSet(-1.f, 0.f, 0.f, 0.f) : XMVectorSet(1.f, 0.f, 0.f, 0.f);
-		if (0 == XMVectorGetX(XMVectorEqual(Get_TransformState(CTransform::STATE_LOOK), vLook)))
-			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
+		if (0.1 < fabs(XMVectorGetX((Get_TransformState(CTransform::STATE_LOOK) - vLook))))
+			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f);
 		else
 		{
 			m_pTransformCom->LookDir(vLook);
@@ -412,6 +526,8 @@ _bool CRola::Moving_AttackPosition(_float fTimeDelta)
 		if (m_eState == JUMP_ED || m_eState == JUMP_ST)
 		{
 			m_vDirection = pRollingBullet->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION);
+			m_vDirection = XMVectorSetY(m_vDirection, 0.f);
+			m_pTransformCom->LookDir(m_vDirection);
 			return false;
 		}
 
@@ -430,11 +546,10 @@ void CRola::Check_Navigation(_float fTimeDelta)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float fHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
-		if (fHeight > XMVectorGetY(vPosition))
-		{
-			vPosition = XMVectorSetY(vPosition, fHeight);
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-		}
+		
+		vPosition = XMVectorSetY(vPosition, fHeight);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+		
 	}
 }
 
@@ -448,6 +563,69 @@ void CRola::Jumping_Attack(_float fTimeDelta)
 	m_pTransformCom->LookDir(m_vDirection);
 	m_pTransformCom->Go_Straight(fTimeDelta*1.5f, m_pNavigationCom);
 }
+
+void CRola::Make_PushEffect()
+{
+	if (m_bMakeEffect)
+		return;
+
+	m_bMakeEffect = true;
+	CMonsterBullet* pRollingBullet = dynamic_cast<CMonsterBullet*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_TAILCAVE, TEXT("Layer_RulaRolling")));
+	pRollingBullet->Set_Rolling(m_eAttackDir);
+
+
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CMonsterEffect::ROLA_PUSHRING;
+	EffectDesc.fDeadTime = 1.f;
+	EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+	EffectDesc.vInitScale = _float3(1.5f, 1.5f, 1.5f);
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook + XMVectorSet(0.f, 0.5f, 0.5f, 0.f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook + XMVectorSet(0.f, 0.5f, -0.5f, 0.f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.eEffectID = CMonsterEffect::ROLA_PUSHSPARK;
+	EffectDesc.fDeadTime = 1.f;
+	EffectDesc.iTextureNum = 3;
+	EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+	EffectDesc.vInitScale = _float3(3.f, 3.f, 0.f);
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_LOOK);
+
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook*1.5f + XMVectorSet(0.f, 0.6f, 0.5f, 0.f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook*1.5f + XMVectorSet(0.f, 0.6f, -0.5f, 0.f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+	EffectDesc.eEffectID = CMonsterEffect::ROLA_PUSHFLASH;
+	EffectDesc.iTextureNum = 1;
+	EffectDesc.vInitScale = _float3(3.f, 3.f, 0.f);
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook*1.5f + XMVectorSet(0.f, 0.6f, 0.5f, 0.f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook*1.5f + XMVectorSet(0.f, 0.6f, -0.5f, 0.f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+}
+
+HRESULT CRola::SetUp_ShaderID()
+{
+	if (m_eState == DEAD || m_eState == DEAD_ST)
+		m_eShaderID = SHADER_ANIMDEAD;
+	else if (m_bHit)
+		m_eShaderID = SHADER_ANIMHIT;
+	else
+		m_eShaderID = SHADER_ANIMDEFAULT;
+
+	return S_OK;
+}
+
+
 
 _uint CRola::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCauser)
 {
@@ -474,7 +652,11 @@ _uint CRola::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 		return iHp;
 	}
 	else
+	{
 		m_eState = STATE::DEAD_ST;
+		m_fAlpha = 0.f;
+	}
+		
 
 	return 0;
 }
