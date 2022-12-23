@@ -44,8 +44,8 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
-	virtual HRESULT Render();
-
+	virtual HRESULT Render() override;
+	virtual HRESULT Render_ShadowDepth() override;
 
 public: /* Getter & Setter */
 	ANIM	Get_AnimState() { return m_eState; }

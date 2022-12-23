@@ -410,7 +410,7 @@ void CTail::Behaviour_Tail(_float fTimeDelta)
 	if (m_TailDesc.pParent == nullptr)
 		return;
 
-	if (m_TailDesc.pParent->Get_Hited())
+	if (m_TailDesc.pParent->Get_Hited() && m_TailDesc.pParent->Get_Dead() || m_TailDesc.pParent->Get_AnimState() == DEAD)
 		m_bHit = true;
 
 

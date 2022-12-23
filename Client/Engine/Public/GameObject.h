@@ -25,7 +25,7 @@ public:
 	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
-
+	virtual HRESULT Render_ShadowDepth() { return NOERROR; }
 public:
 	virtual _bool Picking(_float3* PickingPoint) { return true; }
 	virtual void PickingTrue() { return; }

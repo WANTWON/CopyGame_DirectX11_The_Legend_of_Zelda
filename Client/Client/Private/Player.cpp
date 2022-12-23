@@ -149,6 +149,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOWDEPTH, this);
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, m_Parts[PARTS_WEAPON]);
 
 		if (m_Parts[PARTS_ITEM] != nullptr)
@@ -247,6 +248,48 @@ HRESULT CPlayer::Render()
 	}
 
 	
+
+	return S_OK;
+}
+
+HRESULT CPlayer::Render_ShadowDepth()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
+		return E_FAIL;
+
+	/*_vector		vLightEye ={ -40.f, 20.f, 90.f, 1.f };
+	_vector		vLightAt = { 30.f, -2.f, 0.f, 1.f };
+	_vector		vLightUp = { 0.f,  1.f,  0.f, 0.f };*/
+
+	_float4		vLightEye, vLightAt;
+
+	XMStoreFloat4(&vLightEye, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+	vLightAt = vLightEye;
+
+	vLightEye.x += 10.f;
+	vLightEye.y += 10.f;
+	vLightEye.z -= 10.f;
+
+	pGameInstance->Set_ShadowLightView(vLightEye, vLightAt);
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_ShadowLightView(), sizeof(_float4x4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
+		return E_FAIL;
+
+	_uint		iNumMeshes = m_pModelCom->Get_NumMeshContainers();
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, SHADER_ANIMSHADOW)))
+			return E_FAIL;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }
@@ -1429,6 +1472,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 				}
 					
 				m_pNavigationCom->Set_2DNaviGation(false);
+				m_b2D = false;
 			}
 			else
 			{
@@ -1489,8 +1533,19 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 
 void CPlayer::Check_Navigation(_float fTimeDelta)
 {
-	if (m_pNavigationCom->Get_CurrentCellIndex() == -1 || m_eState == DEAD || m_bDead)
+	if (  m_eState == DEAD || m_eState == LADDER_UP_ED
+		|| m_eState == STAIR_DOWN || m_bDead)
+	{
 		return;
+	}
+
+	if (m_pNavigationCom->Get_CurrentCellIndex() == -1)
+	{
+		m_pNavigationCom->Compute_CurrentIndex_byDistance(Get_TransformState(CTransform::STATE_POSITION));
+		if (m_pNavigationCom->Get_CurrentCellIndex() == -1)
+			return;
+	}
+
 
 
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)

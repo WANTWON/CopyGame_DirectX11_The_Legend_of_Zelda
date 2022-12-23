@@ -23,7 +23,7 @@ public:
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
 	void	Set_Angry(_bool type);
 	void	Set_State(STATE eState) { m_eState = eState; };
-
+	virtual HRESULT SetUp_ShaderID() override;
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;

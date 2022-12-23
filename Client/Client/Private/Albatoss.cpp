@@ -682,6 +682,13 @@ void CAlbatoss::Opening_Motion(_float fTimeDelta)
 			m_vTargetDistance.x = 3.f;
 			m_vTargetDistance.y = 3.f;
 			m_vTargetDistance.z = 6.f;
+			
+		}
+		else if (m_bFirst && m_dwOpeningTime + 15500 < GetTickCount())
+		{
+			m_vTargetDistance.x = 3.f;
+			m_vTargetDistance.y = 3.f;
+			m_vTargetDistance.z += 0.01f;
 
 			if (!m_bMakeUIName)
 			{
@@ -692,13 +699,6 @@ void CAlbatoss::Opening_Motion(_float fTimeDelta)
 				CUI_Manager::Get_Instance()->Set_NameTimeZero();
 				m_bMakeUIName = true;
 			}
-			
-		}
-		else if (m_bFirst && m_dwOpeningTime + 15500 < GetTickCount())
-		{
-			m_vTargetDistance.x = 3.f;
-			m_vTargetDistance.y = 3.f;
-			m_vTargetDistance.z += 0.01f;
 		}
 		else if(m_bFirst && m_dwOpeningTime + 13500 < GetTickCount())
 		{

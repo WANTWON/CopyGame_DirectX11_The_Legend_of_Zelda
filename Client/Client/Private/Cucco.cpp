@@ -450,6 +450,16 @@ void CCucco::Set_Angry(_bool type)
 	
 }
 
+HRESULT CCucco::SetUp_ShaderID()
+{
+	 if (m_bHit)
+		m_eShaderID = SHADER_ANIMHIT;
+	else
+		m_eShaderID = SHADER_ANIMDEFAULT;
+
+	return S_OK;
+}
+
 CCucco * CCucco::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CCucco*	pInstance = new CCucco(pDevice, pContext);

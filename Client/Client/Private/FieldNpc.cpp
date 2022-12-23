@@ -43,6 +43,9 @@ HRESULT CFieldNpc::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
 
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
+	char cName[MAX_PATH];
 	switch (m_NpcDesc.eNpcType)
 	{
 	case CUCCO_KEEPER:
@@ -74,17 +77,11 @@ HRESULT CFieldNpc::Initialize(void* pArg)
 		break;
 	}
 	
-	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	//	CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
-	//	char cName[MAX_PATH];
-	//	ZeroMemory(cName, sizeof(char) * MAX_PATH);
-	//	pData_Manager->TCtoC(TEXT("QuadrupletsMother"), cName);
-	//	pData_Manager->Conv_Bin_Model(m_pModelCom, cName, CData_Manager::DATA_ANIM);
-	//	//ERR_MSG(TEXT("Save_Bin_Model"));
-	//	RELEASE_INSTANCE(CData_Manager);
+		
+		RELEASE_INSTANCE(CData_Manager);
 
-	//RELEASE_INSTANCE(CGameInstance);
+	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }

@@ -208,7 +208,7 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 		break; 
 	case Client::CMoblinSword::DEAD_F:
 		Make_DeadEffect();
-		m_fAlpha += 0.015f;
+		m_fAlpha += 0.02f;
 		m_pTransformCom->Go_Backward(fTimeDelta * 1, m_pNavigationCom);
 		m_bIsLoop = false;
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
@@ -217,7 +217,7 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CMoblinSword::DEAD_B:
 		Make_DeadEffect();
-		m_fAlpha += 0.015f;
+		m_fAlpha += 0.02f;
 		m_pTransformCom->Go_Straight(fTimeDelta * 1, m_pNavigationCom);
 		m_bIsLoop = false;
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
@@ -226,7 +226,7 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CMoblinSword::DEAD_FIRE:
 		Make_DeadEffect();
-		m_fAlpha += 0.015f;
+		m_fAlpha += 0.02f;
 		m_bIsLoop = false;
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 0.1f, 0.f, 0.f));
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
@@ -318,7 +318,7 @@ HRESULT CMoblinSword::SetUp_ShaderID()
 
 _bool CMoblinSword::IsDead()
 {
-	if (m_bDead && m_eState == STATE::DEAD_F)//&& m_dwDeathTime + 1000 < GetTickCount())
+	if (m_bDead)//&& m_dwDeathTime + 1000 < GetTickCount())
 		return true;
 	else if (m_bDead && m_eState != STATE::DEAD_F)
 	{

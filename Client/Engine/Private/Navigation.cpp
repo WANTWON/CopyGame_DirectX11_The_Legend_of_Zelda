@@ -79,6 +79,8 @@ HRESULT CNavigation::Initialize(void * pArg)
 
 _float CNavigation::Compute_Height(_vector vPosition, _float foffset)
 {
+	if (m_NaviDesc.iCurrentCellIndex == -1)
+		return XMVectorGetY(vPosition);
 
 	_vector PointA = XMLoadFloat3(&m_Cells[m_NaviDesc.iCurrentCellIndex]->Get_PointValue(CCell::POINT_A));
 	PointA = XMVectorSetW(PointA, 1.f);

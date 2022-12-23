@@ -80,7 +80,7 @@ void CNonAnim::Late_Tick(_float fTimeDelta)
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	_float3 vScale = Get_Scale();
-	_float fCullingRadius = max( max(vScale.x, vScale.y), vScale.z);
+	_float fCullingRadius = max(max(vScale.x, vScale.y), vScale.z);
 
 	if (pGameInstance->Get_CurrentLevelIndex() == LEVEL_GAMEPLAY)
 		fCullingRadius += 8;
@@ -91,6 +91,7 @@ void CNonAnim::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pRendererCom && true == pGameInstance->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 4))
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		
 #ifdef _DEBUG
 		if (m_pAABBCom != nullptr)
 			m_pRendererCom->Add_Debug(m_pAABBCom);
@@ -100,9 +101,10 @@ void CNonAnim::Late_Tick(_float fTimeDelta)
 			m_pRendererCom->Add_Debug(m_pSPHERECom);
 #endif
 	}
-		
+
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
 
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -136,6 +138,44 @@ HRESULT CNonAnim::Render()
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))
 			return E_FAIL;
 	}
+
+	return S_OK;
+}
+
+HRESULT CNonAnim::Render_ShadowDepth()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
+		return E_FAIL;
+
+	_float4		vLightEye, vLightAt;
+
+	XMStoreFloat4(&vLightEye, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+	vLightAt = vLightEye;
+
+	vLightEye.x += 0.3f;
+	vLightEye.y += 50.f;
+	vLightEye.z += 0.3f;
+
+	pGameInstance->Set_ShadowLightView(vLightEye, vLightAt);
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_ShadowLightView(), sizeof(_float4x4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
+		return E_FAIL;
+
+	_uint		iNumMeshes = m_pModelCom->Get_NumMeshContainers();
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, SHADER_NONANIM_SHADOW)))
+			return E_FAIL;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }

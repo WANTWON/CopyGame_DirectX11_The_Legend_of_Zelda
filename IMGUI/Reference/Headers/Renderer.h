@@ -8,7 +8,7 @@ BEGIN(Engine)
 class ENGINE_DLL CRenderer final : public CComponent
 {
 public:
-	enum RENDERGROUP { RENDER_PRIORITY, RENDER_NONALPHABLEND, RENDER_NONLIGHT, RENDER_ALPHABLEND, RENDER_UI_FRONT, RENDER_UI_BACK, RENDER_END };
+	enum RENDERGROUP { RENDER_PRIORITY, RENDER_SHADOWDEPTH, RENDER_NONALPHABLEND, RENDER_NONLIGHT, RENDER_ALPHABLEND, RENDER_UI_FRONT, RENDER_UI_BACK, RENDER_END };
 
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -51,12 +51,14 @@ private:
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_NonAlphaBlend();
+	HRESULT Render_ShadowDepth();
+
 	HRESULT Render_Lights();
 	HRESULT Render_Blend();
 	HRESULT Render_NonLight();
 	HRESULT Render_AlphaBlend();
 	HRESULT Render_UI();
-
+	
 
 
 #ifdef _DEBUG
@@ -65,6 +67,7 @@ private:
 	bool	m_bRenderDebug = false;
 	bool	m_bRenderComponentDebug = false;
 #endif // _DEBUG
+
 public:
 	static CRenderer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CComponent* Clone(void* pArg = nullptr)override;

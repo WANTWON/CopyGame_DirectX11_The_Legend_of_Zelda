@@ -18,11 +18,16 @@ public:
 
 	HRESULT Add_MRT(const _tchar* pMRTTag, const _tchar* pTargetTag);
 	HRESULT Begin_MRT(ID3D11DeviceContext* pContext, const _tchar* pMRTTag);
+	HRESULT Begin_ShadowMRT(ID3D11DeviceContext* pContext, const _tchar* pMRTTag);
+
 	HRESULT End_MRT(ID3D11DeviceContext* pContext);
+	ID3D11DepthStencilView*		Get_DepthStencilView() { return m_pOldDSV; }
+
 
 public:
 	HRESULT Bind_ShaderResource(const _tchar* pTargetTag, class CShader* pShader, const char* pConstantName);
-
+	HRESULT Ready_ShadowDepthStencilRenderTargetView(ID3D11Device * pDevice, _uint iWinCX, _uint iWinCY);
+	
 #ifdef _DEBUG
 public:
 	HRESULT Ready_Debug(const _tchar* pTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
@@ -40,9 +45,7 @@ private:
 private:
 	ID3D11RenderTargetView*				m_pOldRTV = nullptr;
 	ID3D11DepthStencilView*				m_pOldDSV = nullptr;
-
-
-	
+	ID3D11DepthStencilView*				m_pShadowDeptheStencil = nullptr;
 
 private:
 	class CRenderTarget* Find_RenderTarget(const _tchar* pTargetTag);

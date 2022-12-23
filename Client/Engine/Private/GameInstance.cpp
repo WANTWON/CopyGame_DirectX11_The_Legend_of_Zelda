@@ -436,6 +436,22 @@ _uint CGameInstance::Get_LightSize()
 	return m_pLight_Manager->Get_LightSize();
 }
 
+HRESULT CGameInstance::Set_ShadowLightView(_float4 vEye, _float4 vAt)
+{
+	if (nullptr == m_pLight_Manager)
+		return E_FAIL;
+
+	return m_pLight_Manager->Set_ShadowLightView(vEye, vAt);
+}
+
+_float4x4 CGameInstance::Get_ShadowLightView()
+{
+	if (nullptr == m_pLight_Manager)
+		return _float4x4();
+
+	return m_pLight_Manager->Get_ShadowLightView();
+}
+
 HRESULT CGameInstance::Add_Fonts(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const _tchar * pFontTag, const _tchar * pFontFilePath)
 {
 	if (nullptr == m_pFont_Manager)

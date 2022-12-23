@@ -88,6 +88,9 @@ public: /* For.Light_Manager */
 	void Clear_AllLight();
 	void Clear_Light(_uint iIndex);
 	_uint Get_LightSize();
+	HRESULT	Set_ShadowLightView(_float4 vEye, _float4 vAt);
+	_float4x4	Get_ShadowLightView();
+
 
 public: /* For.Font_Manager */
 	HRESULT Add_Fonts(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontTag, const _tchar* pFontFilePath);

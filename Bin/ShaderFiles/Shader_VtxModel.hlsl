@@ -72,6 +72,7 @@ struct PS_OUT
 	float4		vNormal : SV_TARGET1;
 	float4		vDepth : SV_TARGET2;
 	float4		vSpecular : SV_TARGET3;
+	vector		vLightDepth : SV_TARGET4;
 };
 
 /* 이렇게 만들어진 픽셀을 PS_MAIN함수의 인자로 던진다. */
@@ -126,6 +127,17 @@ PS_OUT PS_SYMBOL(PS_IN In)
 	return Out;
 }
 
+
+PS_OUT PS_MAIN_SHADOW(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vLightDepth.r = In.vProjPos.w / 500.f;
+
+	Out.vLightDepth.a = 1.f;
+
+	return Out;
+}
 
 
 
@@ -185,6 +197,17 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_SYMBOL();
+	}
+
+	pass Shadow
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Priority, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
 	}
 
 }

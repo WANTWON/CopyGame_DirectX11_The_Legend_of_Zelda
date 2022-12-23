@@ -32,7 +32,7 @@ public:
 	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
-
+	virtual HRESULT Render_ShadowDepth() override;
 public:
 	virtual _bool Picking(_float3* PickingPoint) { return false; };
 	virtual void PickingTrue();
