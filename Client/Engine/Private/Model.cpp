@@ -245,6 +245,90 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iPassIndex)
 	return S_OK;
 }
 
+HRESULT CModel::RenderShadow(CShader * pShader, _uint iMeshIndex, _uint iLevelIndex, _uint iPassIndex)
+{
+	// 바닥 부분의 그림자를 제외하고 렌더해야하는데 
+	// 각 레벨마다, 또는 메시마다 바닥에 대한 인덱스가 달라서 예외처리를 진행함.
+
+	char		szName[MAX_PATH] = "";
+	strcpy(szName, m_Meshes[iMeshIndex]->Get_Name());
+
+	if (iLevelIndex == 3) // Level Game Play
+	{
+		char CheckName[] = "grass";
+		char CheckName2[] = "road";
+		char CheckName3[] = "sand";
+		char CheckName4[] = "water";
+		char CheckName5[] = "wall_a_01a";
+		char CheckName6[] = "hole";
+		char CheckName7[] = "TailGate";
+
+		char* ptr = strstr(szName, CheckName);
+		char* ptr2 = strstr(szName, CheckName2);
+		char* ptr3 = strstr(szName, CheckName3);
+		char* ptr4 = strstr(szName, CheckName4);
+		char* ptr5 = strstr(szName, CheckName5);
+		char* ptr6 = strstr(szName, CheckName6);
+		char* ptr7 = strstr(szName, CheckName7);
+
+		if (ptr != nullptr || ptr2 != nullptr || ptr3 != nullptr
+			|| ptr4 != nullptr || ptr5 != nullptr ||ptr6 != nullptr || ptr7!= nullptr)
+			return S_OK;
+	}
+	else if (iLevelIndex == 4) //Level Tail Cave
+	{
+		char CheckName[] = "floor";
+		char CheckName2[] = "wall";
+		char CheckName3[] = "Tile";
+		char CheckName4[] = "gate";
+
+
+		char* ptr = strstr(szName, CheckName);
+		char* ptr2 = strstr(szName, CheckName2);
+		char* ptr3 = strstr(szName, CheckName3);
+		char* ptr4 = strstr(szName, CheckName4);
+
+		if (ptr != nullptr || ptr2 != nullptr || ptr3 != nullptr ||ptr4 != nullptr )
+			return S_OK;
+	}
+	else if (iLevelIndex == 5) //Level Tower
+	{
+		char CheckName[] = "floor";
+		char CheckName2[] = "wall";
+		char CheckName3[] = "moss";
+	
+
+		char* ptr = strstr(szName, CheckName);
+		char* ptr2 = strstr(szName, CheckName2);
+		char* ptr3 = strstr(szName, CheckName3);
+	
+		if (ptr != nullptr || ptr2 != nullptr || ptr3 != nullptr)
+			return S_OK;
+	}
+	
+
+
+	/* 메시별로 그린다. */
+	/* 메시 당 영향ㅇ르 주는 뼈들의 행렬을 가져온다. */
+	if (TYPE_ANIM == m_eModelType)
+	{
+		_float4x4		BoneMatrix[256];
+
+		/* 메시에게 접근해서 니가 들고있는 뼈들을 배열에 담아와.
+		뼈 = 뼈의 오프셋 * 뼈의 컴바인드매트릭스 * 최초상태제어행렬 */
+		m_Meshes[iMeshIndex]->Get_BoneMatrices(BoneMatrix, XMLoadFloat4x4(&m_PivotMatrix));
+
+		pShader->Set_MatrixArray("g_BoneMatrices", BoneMatrix, 256);
+
+	}
+
+	pShader->Begin(iPassIndex);
+
+	m_Meshes[iMeshIndex]->Render();
+
+	return S_OK;
+}
+
 HRESULT CModel::Set_AnimationReset()
 {
 	m_Animations[m_iCurrentAnimIndex]->Set_TimeReset();

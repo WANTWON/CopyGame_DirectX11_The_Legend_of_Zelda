@@ -259,21 +259,19 @@ HRESULT CPlayer::Render_ShadowDepth()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
 		return E_FAIL;
 
-	/*_vector		vLightEye ={ -40.f, 20.f, 90.f, 1.f };
-	_vector		vLightAt = { 30.f, -2.f, 0.f, 1.f };
-	_vector		vLightUp = { 0.f,  1.f,  0.f, 0.f };*/
 
-	_float4		vLightEye, vLightAt;
+	//_float4		vLightEye, vLightAt;
 
-	XMStoreFloat4(&vLightEye, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	//XMStoreFloat4(&vLightEye, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
-	vLightAt = vLightEye;
+	//vLightAt = vLightEye;
+	////vLightAt.y = -0.5f;
 
-	vLightEye.x += 10.f;
-	vLightEye.y += 10.f;
-	vLightEye.z -= 10.f;
+	//vLightEye.x += 0.f;
+	//vLightEye.y += 50.f;
+	//vLightEye.z += 0.1f;
 
-	pGameInstance->Set_ShadowLightView(vLightEye, vLightAt);
+	//pGameInstance->Set_ShadowLightView(vLightEye, vLightAt);
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_ShadowLightView(), sizeof(_float4x4))))
 		return E_FAIL;
@@ -283,11 +281,21 @@ HRESULT CPlayer::Render_ShadowDepth()
 
 	_uint		iNumMeshes = m_pModelCom->Get_NumMeshContainers();
 
-	for (_uint i = 0; i < iNumMeshes; ++i)
-	{
-		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, SHADER_ANIMSHADOW)))
-			return E_FAIL;
-	}
+	if (FAILED(m_pModelCom->Render(m_pShaderCom, MESH_HAIR, SHADER_ANIMSHADOW)))
+		return S_OK;
+	if (FAILED(m_pModelCom->Render(m_pShaderCom, MESH_CLOTHES, SHADER_ANIMSHADOW)))
+		return S_OK;
+	if (FAILED(m_pModelCom->Render(m_pShaderCom, MESH_EAR, SHADER_ANIMSHADOW)))
+		return S_OK;
+	if (FAILED(m_pModelCom->Render(m_pShaderCom, MESH_HAT, SHADER_ANIMSHADOW)))
+		return S_OK;
+	if (FAILED(m_pModelCom->Render(m_pShaderCom, MESH_SHOES, SHADER_ANIMSHADOW)))
+		return S_OK;
+	if (FAILED(m_pModelCom->Render(m_pShaderCom, m_eLeftHand, SHADER_ANIMSHADOW)))
+		return S_OK;
+	if (FAILED(m_pModelCom->Render(m_pShaderCom, m_eRightHand, SHADER_ANIMSHADOW)))
+		return S_OK;
+
 
 	RELEASE_INSTANCE(CGameInstance);
 

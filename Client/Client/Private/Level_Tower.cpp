@@ -117,6 +117,14 @@ HRESULT CLevel_Tower::Ready_Lights()
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
 
+	_float4		vLightEye, vLightAt;
+
+	XMStoreFloat4(&vLightEye, XMVectorSet(20, 50, 0, 1.f));
+	XMStoreFloat4(&vLightAt, XMVectorSet(0, 0, 0, 1.f));
+
+	pGameInstance->Set_ShadowLightView(vLightEye, vLightAt);
+
+
 	///* For.Point */
 	//ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 

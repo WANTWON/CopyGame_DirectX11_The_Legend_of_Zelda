@@ -25,6 +25,7 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 	virtual HRESULT Bin_Initialize_Prototype(CModel::TYPE eModelType, DATA_BINMESH* pAIMesh, class CModel* pModel, _fmatrix PivotMatrix);	// 추가
 	virtual HRESULT Bin_Initialize(void* pArg);	// 추가
+	char* Get_Name() { return m_szName; }
 
 public:
 	HRESULT SetUp_Bones(class CModel* pModel);

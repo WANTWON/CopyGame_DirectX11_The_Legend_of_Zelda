@@ -147,6 +147,13 @@ HRESULT CLevel_TailCave::Ready_Lights()
 	CloseHandle(hFile);
 
 
+	_float4		vLightEye, vLightAt;
+
+	XMStoreFloat4(&vLightEye, XMVectorSet(36, 50, 70, 1.f));
+	XMStoreFloat4(&vLightAt, XMVectorSet(36, 0, 20, 1.f));
+
+	pGameInstance->Set_ShadowLightView(vLightEye, vLightAt);
+
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;

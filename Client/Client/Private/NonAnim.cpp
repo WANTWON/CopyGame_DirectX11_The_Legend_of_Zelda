@@ -79,16 +79,18 @@ void CNonAnim::Late_Tick(_float fTimeDelta)
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	_float3 vScale = Get_Scale();
-	_float fCullingRadius = max(max(vScale.x, vScale.y), vScale.z);
+	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
 
-	if (pGameInstance->Get_CurrentLevelIndex() == LEVEL_GAMEPLAY)
-		fCullingRadius += 8;
+	if (iLevel == LEVEL_GAMEPLAY && Check_IsinFrustum(8.f) == false)
+		goto FAILD_CULLING;
+	else if (iLevel == LEVEL_TAILCAVE && Check_IsinFrustum(4.f) == false)
+		goto FAILD_CULLING;
+	else if (iLevel == LEVEL_TOWER && Check_IsinFrustum(14.f) == false)
+		goto FAILD_CULLING;
 
-	if (pGameInstance->Get_CurrentLevelIndex() == LEVEL_TOWER)
-		fCullingRadius += 10.f;
 
-	if (nullptr != m_pRendererCom && true == pGameInstance->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 4))
+
+	if (nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 		
@@ -102,12 +104,42 @@ void CNonAnim::Late_Tick(_float fTimeDelta)
 #endif
 	}
 
+	CBaseObj* pPlayer = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	_float fDistanceX = fabsf(XMVectorGetX(pPlayer->Get_TransformState(CTransform::STATE_POSITION)) - XMVectorGetX(Get_TransformState(CTransform::STATE_POSITION)));
+	_float fDistanceZ = fabsf(XMVectorGetZ(pPlayer->Get_TransformState(CTransform::STATE_POSITION)) - XMVectorGetZ(Get_TransformState(CTransform::STATE_POSITION)));
+
+
+	if (iLevel == LEVEL_GAMEPLAY && fDistanceX < 30.f && fDistanceZ < 30.f)
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOWDEPTH, this);
+	else if (iLevel == LEVEL_TAILCAVE)
+	{
+		_float4		vLightEye, vLightAt;
+
+		XMStoreFloat4(&vLightEye, pPlayer->Get_TransformState(CTransform::STATE_POSITION));
+		vLightEye.y = 0.f;
+		vLightAt = vLightEye;
+		vLightEye.y += 50.f;
+		vLightEye.z += 50.f;
+
+		pGameInstance->Set_ShadowLightView(vLightEye, vLightAt);
+
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOWDEPTH, this);
+	}	
+	else if (iLevel == LEVEL_TOWER)
+	{
+	
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOWDEPTH, this);
+	}
+		
 
 	Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-
-
-
+	
 	RELEASE_INSTANCE(CGameInstance);
+	return;
+
+FAILD_CULLING:
+	RELEASE_INSTANCE(CGameInstance);
+	return;
 }
 
 HRESULT CNonAnim::Render()
@@ -149,17 +181,6 @@ HRESULT CNonAnim::Render_ShadowDepth()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
 		return E_FAIL;
 
-	_float4		vLightEye, vLightAt;
-
-	XMStoreFloat4(&vLightEye, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-
-	vLightAt = vLightEye;
-
-	vLightEye.x += 0.3f;
-	vLightEye.y += 50.f;
-	vLightEye.z += 0.3f;
-
-	pGameInstance->Set_ShadowLightView(vLightEye, vLightAt);
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_ShadowLightView(), sizeof(_float4x4))))
 		return E_FAIL;
@@ -167,13 +188,33 @@ HRESULT CNonAnim::Render_ShadowDepth()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
 		return E_FAIL;
 
+
+	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
+
 	_uint		iNumMeshes = m_pModelCom->Get_NumMeshContainers();
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, SHADER_NONANIM_SHADOW)))
+		if (FAILED(m_pModelCom->RenderShadow(m_pShaderCom, i, iLevel, SHADER_NONANIM_SHADOW)))
 			return E_FAIL;
+
 	}
+
+	//if (FAILED(m_pModelCom->RenderShadow(m_pShaderCom, 0, SHADER_NONANIM_SHADOW)))
+	//	return E_FAIL;
+
+	//if (FAILED(m_pModelCom->RenderShadow(m_pShaderCom, 1, SHADER_NONANIM_SHADOW)))
+	//	return E_FAIL;
+
+	//if (FAILED(m_pModelCom->RenderShadow(m_pShaderCom, 2, SHADER_NONANIM_SHADOW)))
+	//	return E_FAIL;
+
+	//if (FAILED(m_pModelCom->RenderShadow(m_pShaderCom, 3, SHADER_NONANIM_SHADOW)))
+	//	return E_FAIL;
+
+	//if (FAILED(m_pModelCom->RenderShadow(m_pShaderCom, 4, SHADER_NONANIM_SHADOW)))
+	//	return E_FAIL;
+
 
 	RELEASE_INSTANCE(CGameInstance);
 
