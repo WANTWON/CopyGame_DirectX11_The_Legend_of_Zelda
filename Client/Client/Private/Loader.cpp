@@ -66,6 +66,7 @@
 #include "PlayerEffect.h"
 #include "FightEffect.h"
 #include "MonsterEffect.h"
+#include "UIEffect.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -203,7 +204,7 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	
 	/* For.Prototype_Component_Navigation */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_TailCave"),
-		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/TailCave_Navi2.dat")))))
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/TailCave_Navi.dat")))))
 		return E_FAIL;
 	
 	/* For.Prototype_Component_Navigation */
@@ -969,6 +970,11 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	/*For.Prototype_GameObject_UIName*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UIEffect"),
+		CUIEffect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_UIName*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UIName"),
 		CUIName::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -1462,12 +1468,26 @@ HRESULT CLoader::Loading_For_Effect()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/SmokeSphere/SmokeSphere.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	/*For.Prototype_Component_Model_Octorok_ClawRing*/
+	/*For.Prototype_Component_Model_ClawRing*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_ClawRing"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Ring/DistRing1.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_Fire*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Fire"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Fire/Fire1.fbx", PivotMatrix))))
+		return E_FAIL;
 
+	/*For.Prototype_Component_Model_FireSide*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_FireSide"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Fire/Fire2.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+	/*For.Prototype_Component_Ripple */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Ripple"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Ripple/ripple_%02d.dds"), 4))))
+		return E_FAIL;
 
 	/*For.Prototype_Component_Texture_Blast */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Blast"),

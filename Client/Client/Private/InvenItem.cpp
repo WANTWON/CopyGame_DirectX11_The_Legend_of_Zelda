@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "InvenItem.h"
 #include "GameInstance.h"
-
+#include "UIEffect.h"
 
 CInvenItem::CInvenItem(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CObj_UI(pDevice, pContext)
@@ -86,13 +86,33 @@ void CInvenItem::Late_Tick(_float fTimeDelta)
 		{
 			m_falpha += 0.025f;
 			if (m_falpha >= 1.f)
+			{
 				m_falpha = 1.f;
+
+				
+			}
+				
 		}
 		else
 		{
 			m_falpha -= 0.025f;
 			if (m_falpha <= 0.f)
 				m_falpha = 0.f;
+
+			m_fEffectTimeEnd = 1.f;
+			m_fEffectTime += fTimeDelta;
+			if (m_fEffectTime > m_fEffectTimeEnd)
+			{
+				CUIEffect::EFFECTDESC EffectDesc;
+				EffectDesc.eEffectID = CUIEffect::COMPOSS_RING;
+				EffectDesc.vInitPositon = m_fPosition;
+				EffectDesc.fDeadTime = 1.f;
+				EffectDesc.vColor = XMVectorSet(255, 255, 255, 255);
+				EffectDesc.vInitScale = _float2(30, 30);
+				EffectDesc.iTextureNum = 2;
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+				m_fEffectTime = 0.f;
+			}
 
 		}
 			m_fPosition.x  = (1 - m_falpha) * 1200 + m_falpha *1400;

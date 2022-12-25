@@ -47,7 +47,7 @@ protected:
 protected:
 	_float2					m_fPosition, m_fSize;
 	_float4x4				m_ViewMatrix, m_ProjMatrix;
-	SHADERUI_ID				m_eShaderID = UI_ALPHABLEND;
+	_uint					m_eShaderID = UI_ALPHABLEND;
 	
 
 protected:

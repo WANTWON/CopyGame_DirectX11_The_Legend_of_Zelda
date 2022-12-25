@@ -54,6 +54,8 @@ private:
 	_bool m_bCompass = false; 
 
 	_float m_falpha = 1.f;
+	_float m_fEffectTime = 0.f;
+	_float m_fEffectTimeEnd = 0.f;
 
 public:
 	static CInvenItem* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

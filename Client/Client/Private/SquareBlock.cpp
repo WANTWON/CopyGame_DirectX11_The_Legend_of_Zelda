@@ -48,6 +48,7 @@ HRESULT CSquareBlock::Initialize(void * pArg)
 	
 	if (m_BlockDesc.eType == CRANEGAME_FENCE)
 		m_bOpen = true;
+		
 
 	return S_OK;
 }
@@ -351,7 +352,6 @@ void CSquareBlock::Tick_TailStatue(_float fTimeDelta)
 {
 	if (Check_IsinFrustum(2.f) == false)
 		return;
-
 
 	if (m_bOpen)
 		return;

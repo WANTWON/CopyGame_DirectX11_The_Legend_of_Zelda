@@ -50,7 +50,7 @@ void CEffect::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	if (nullptr != m_pRendererCom)
+	if (nullptr != m_pRendererCom && Check_IsinFrustum(2.f) == true)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
 
 	Compute_CamDistance(Get_TransformState(CTransform::STATE_POSITION));

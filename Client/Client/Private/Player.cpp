@@ -659,9 +659,10 @@ void CPlayer::Key_Input(_float fTimeDelta)
 			else
 				m_eState = SLASH;
 			m_pModelCom->Set_AnimationReset();
+			m_bMakeEffect = false;
 		}
 
-		Make_SlashEffect();
+	
 			
 		
 	}
@@ -1083,6 +1084,10 @@ void CPlayer::Make_GuardEffect(CBaseObj* pTarget)
 
 void CPlayer::Make_SlashEffect()
 {
+	if (m_bMakeEffect)
+		return;
+
+	m_bMakeEffect = true;
 	m_BulletLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
 	CPlayerBullet::BULLETDESC BulletDesc;
 	BulletDesc.eBulletType = CPlayerBullet::SLASH;
@@ -1378,6 +1383,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::SLASH:
 	case Client::CPlayer::S_SLASH:
 	{
+		Make_SlashEffect();
 		m_eAnimSpeed = 2.5f;
 		m_bIsLoop = false;
 
@@ -1386,6 +1392,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 			if (m_Parts[PARTS_EFFECT] != nullptr)
 				Safe_Release(m_Parts[PARTS_EFFECT]);
 			m_eState = IDLE;
+			m_bMakeEffect = false;
 		}
 
 		break;

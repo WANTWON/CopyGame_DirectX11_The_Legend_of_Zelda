@@ -229,6 +229,9 @@
     <Filter Include="03.UI\06. NameBox">
       <UniqueIdentifier>{f298ce46-a612-471b-8182-d01c8bc5f337}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.UI\07. UIEffect">
+      <UniqueIdentifier>{baf4a0f7-624a-4fde-b35e-49bf9b1981da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -453,6 +456,9 @@
     <ClInclude Include="..\Public\UIName.h">
       <Filter>03.UI\06. NameBox</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UIEffect.h">
+      <Filter>03.UI\07. UIEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -661,6 +667,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UIName.cpp">
       <Filter>03.UI\06. NameBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UIEffect.cpp">
+      <Filter>03.UI\07. UIEffect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

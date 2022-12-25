@@ -54,14 +54,12 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 
 int CMoblinSword::Tick(_float fTimeDelta)
 {
-	
-
-	if(Check_IsinFrustum(2.f) == false)
-		return OBJ_NOEVENT;
 
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
 
+	if (Check_IsinFrustum(2.f) == false)
+		return OBJ_NOEVENT;
 
 	AI_Behaviour(fTimeDelta);
 
@@ -318,13 +316,8 @@ HRESULT CMoblinSword::SetUp_ShaderID()
 
 _bool CMoblinSword::IsDead()
 {
-	if (m_bDead)//&& m_dwDeathTime + 1000 < GetTickCount())
+	if (m_bDead)
 		return true;
-	else if (m_bDead && m_eState != STATE::DEAD_F)
-	{
-		m_dwDeathTime = GetTickCount();
-		m_eState = STATE::DEAD_F;
-	}
 
 	return false;
 }

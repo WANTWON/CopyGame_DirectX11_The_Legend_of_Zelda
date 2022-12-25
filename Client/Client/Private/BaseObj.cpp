@@ -58,9 +58,6 @@ HRESULT CBaseObj::Render()
 
 _bool CBaseObj::Check_IsinFrustum(_float fOffset)
 {
-	if (m_bDead)
-		return false;
-
 	_float3 vScale = Get_Scale();
 	_float fCullingRadius = max(max(vScale.x, vScale.y), vScale.z);
 

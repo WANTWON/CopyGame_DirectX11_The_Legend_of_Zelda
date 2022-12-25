@@ -23,7 +23,11 @@ public:
 		TREASURE_CROSS, TREASURE_FLASH, TRASURE_ENTRANCEBOX,  
 
 		/*For Smoke*/
-		SMOKE 
+		SMOKE,
+
+		/*For Fire*/
+		FIRE_FRONT, FIRE_LEFT, FIRE_RIGHT, FIRE_GLOW,
+
 	};
 
 
@@ -53,6 +57,8 @@ private:
 private:
 	void Tick_Grass(_float fTimeDelta);
 	void Tick_Smoke(_float fTimeDelta);
+	void Tick_Fire(_float fTimeDelta);
+	void Tick_Composs(_float fTimeDelta);
 
 	/* For Get Item*/
 	void Tick_GlowEffect(_float fTimeDelta);
@@ -62,6 +68,8 @@ private:
 	void Tick_HaloEffect(_float fTimeDelta);
 	void Tick_GlitterEffect(_float fTimeDelta);
 	void Tick_Ray(_float fTimeDelta);
+
+	/* Fir TreasureBox */
 	void Tick_TreausureBox(_float fTimeDelta);
 	void Tick_TreasureCross(_float fTimeDelta);
 

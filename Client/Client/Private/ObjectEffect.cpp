@@ -178,6 +178,15 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 		m_vColorFront = XMVectorSet(247, 255, 139, 255.f);
 		m_vColorBack = XMVectorSet(255, 204, 127, 255.f);
 		break;
+	case FIRE_FRONT:
+	case FIRE_LEFT:
+	case FIRE_RIGHT:
+	case FIRE_GLOW:
+		m_fSpeed = 0.5f;
+		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
+		m_vColorFront = XMVectorSet(255, 153, 51, 255.f);
+		m_vColorBack = XMVectorSet(255, 51, 0, 255.f);
+		break;
 	default:
 		break;
 	}
@@ -253,6 +262,12 @@ int CObjectEffect::Tick(_float fTimeDelta)
 	case TREASURE_CROSS:
 		Tick_TreasureCross(fTimeDelta);
 		break;
+	case FIRE_FRONT:
+	case FIRE_LEFT:
+	case FIRE_RIGHT:
+	case FIRE_GLOW:
+		Tick_Fire(fTimeDelta);
+		break;
 	default:
 		break;
 	}
@@ -316,6 +331,7 @@ HRESULT CObjectEffect::Ready_Components(void * pArg)
 	case TREASURE_GLOW:
 	case TREASURE_GLITTER:
 	case GLITTER:
+	case FIRE_GLOW:
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
@@ -349,6 +365,15 @@ HRESULT CObjectEffect::Ready_Components(void * pArg)
 		break;
 	case TRASURE_ENTRANCEBOX:
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Treasure_EntranceBox"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case FIRE_FRONT:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Fire"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+		break;
+	case FIRE_LEFT:
+	case FIRE_RIGHT:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_FireSide"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
 	default:
@@ -433,6 +458,49 @@ void CObjectEffect::Tick_Smoke(_float fTimeDelta)
 	Set_Scale(m_vScale);
 
 	if (m_vScale.x <= 0 && m_fAlpha <= 0)
+		m_bDead = true;
+}
+
+void CObjectEffect::Tick_Fire(_float fTimeDelta)
+{
+
+	SetUp_BillBoard();
+
+	if (m_EffectDesc.eEffectID == FIRE_LEFT)
+	{
+		m_pTransformCom->Rotation(Get_TransformState(CTransform::STATE_LOOK), XMConvertToRadians(180));
+
+	}
+
+	
+}
+
+void CObjectEffect::Tick_Composs(_float fTimeDelta)
+{
+	SetUp_BillBoard();
+
+	if (m_fDeadtime < m_EffectDesc.fDeadTime)
+	{
+		m_vScale.x += 0.05f;
+		m_vScale.y += 0.05f;
+		//m_vScale.z += 0.05f;
+		m_fAlpha += 0.05f;
+
+		if (m_fAlpha >= 1.f)
+			m_fAlpha = 1.f;
+	}
+	else
+	{
+		m_vScale.x += 0.01f;
+		m_vScale.y += 0.01f;
+		//m_vScale.z += 0.01f;
+		m_fAlpha -= 0.05f;
+
+	}
+	
+	Set_Scale(m_vScale);
+
+	if (m_vScale.x <= 0 || m_fAlpha <= 0)
 		m_bDead = true;
 }
 
