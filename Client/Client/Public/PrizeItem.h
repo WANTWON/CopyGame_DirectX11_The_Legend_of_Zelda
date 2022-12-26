@@ -48,6 +48,7 @@ private:
 	void Setting_Get_Item();
 	void Setting_TelephoneMessage();
 	void Make_GetItemEffect();
+	virtual HRESULT SetUp_ShaderResources() override;
 
 private:
 	ITEMDESC				m_ItemDesc;
@@ -58,6 +59,8 @@ private:
 	_float					m_fHeight= 0.f;
 	_float					m_fMoveTime = 0.f;
 	_bool					m_bTimeMax = false;
+
+	CTexture*				m_pGlowTexture = nullptr;
 
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;

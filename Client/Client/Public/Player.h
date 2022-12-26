@@ -52,6 +52,8 @@ public: /* Getter & Setter */
 	OBJINFO Get_Info() { return m_tInfo; }
 	_uint	Get_PartsItemType();
 	CWeapon::WEAPONDESC Get_WeaponDesc() { return m_WeaponDesc; }
+	_bool	Get_2DMode() { return m_b2D; }
+
 	void	Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void	Set_AnimState(ANIM eAnim);
 	void	Set_Carry(_bool type) { m_bCarry = type; }

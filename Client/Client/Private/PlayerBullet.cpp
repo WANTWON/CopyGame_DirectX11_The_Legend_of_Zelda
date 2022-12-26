@@ -36,14 +36,6 @@ HRESULT CPlayerBullet::Initialize(void * pArg)
 
 	switch (m_BulletDesc.eBulletType)
 	{
-	case SLASH:
-		Set_Scale(_float3(3.f, 3.f, 3.f));
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
-		m_pTransformCom->LookDir(m_BulletDesc.vLook);
-		m_eShaderID = SHADERM_SLASH;
-		m_fTexUV = 1.f;
-		//m_bSocket = true;
-		break;
 	default:
 		break;
 	}
@@ -66,9 +58,6 @@ int CPlayerBullet::Tick(_float fTimeDelta)
 
 	switch (m_BulletDesc.eBulletType)
 	{
-	case SLASH:
-		Moving_SwordBullet(fTimeDelta);
-		break;
 	case BOW:
 		Moving_BowBullet(fTimeDelta);
 		break;
@@ -155,21 +144,6 @@ HRESULT CPlayerBullet::Ready_Components(void * pArg)
 	/* For.Com_Model*/
 	switch (m_BulletDesc.eBulletType)
 	{
-	case SLASH:
-	{
-		/* For.Com_Model*/
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut"), (CComponent**)&m_pModelCom)))
-			return E_FAIL;
-
-		///* For.Com_OBB*/
-		//CCollider::COLLIDERDESC		ColliderDesc;
-		//ColliderDesc.vScale = _float3(1.f, 0.2f, 0.4f);
-		//ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
-		//ColliderDesc.vPosition = _float3(0.f, 0.f, 0.5f);
-		//if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
-		//	return E_FAIL;
-		break;
-	}
 	case BOW:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), iLevel, TEXT("Prototype_Component_Model_Octorock"), (CComponent**)&m_pModelCom)))

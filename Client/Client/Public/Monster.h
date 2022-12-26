@@ -29,7 +29,7 @@ public:
 	virtual int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-
+	virtual HRESULT Render_ShadowDepth() override;
 public:
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser);
 	virtual void Check_Navigation(_float fTimeDelta);

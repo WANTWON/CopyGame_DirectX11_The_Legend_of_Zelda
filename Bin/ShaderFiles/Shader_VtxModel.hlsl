@@ -103,29 +103,6 @@ PS_OUT PS_MAIN(PS_IN In)
 	return Out;
 }
 
-PS_OUT PS_PICKED(PS_IN In)
-{
-	PS_OUT		Out = (PS_OUT)0;
-
-	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDiffuse.rgb += 0.2f;
-	Out.vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
-
-	if (Out.vDiffuse.a <= 0.3f)
-		discard;
-
-	return Out;
-}
-
-PS_OUT PS_SYMBOL(PS_IN In)
-{
-	PS_OUT		Out = (PS_OUT)0;
-	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDiffuse = float4(1.f,0.f,1.f,1.f);
-	Out.vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
-	return Out;
-}
 
 
 PS_OUT PS_MAIN_SHADOW(PS_IN In)
@@ -140,7 +117,49 @@ PS_OUT PS_MAIN_SHADOW(PS_IN In)
 }
 
 
+PS_OUT PS_BLOOM(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
 
+	float4 vTextureNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
+	float3 vNormal;
+
+	vNormal = float3(vTextureNormal.x, vTextureNormal.y, sqrt(1 - vTextureNormal.x * vTextureNormal.x - vTextureNormal.y * vTextureNormal.y));
+	float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+	vNormal = mul(vNormal, WorldMatrix);
+	Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
+	Out.vNormal = vector(1.f, 1.f, 1.f, 0.f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+	Out.vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
+
+
+	float4 vTextureColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	//float luminance = dot(vTextureColor, float3(0.3, 0.59, 0.11));
+	//float threshold = 0.5;
+	////if (luminance > threshold)
+	////{
+	//	// Sample the texture multiple times at offsets from the current texel
+	//	float2 offsets[9] = {
+	//		float2(-1, -1), float2(0, -1), float2(1, -1),
+	//		float2(-1,  0), float2(0,  0), float2(1,  0),
+	//		float2(-1,  1), float2(0,  1), float2(1,  1)
+	//	};
+	//	float4 sum = 0;
+	//	for (int i = 0; i < 9; i++)
+	//	{
+	//		sum += g_DiffuseTexture.Sample(LinearSampler, In.vTexUV + offsets[i] * 0.004);
+	//	}
+	//	// Average the samples and blend with the original image
+	//	float4 blur = sum / 9;
+	//	// blend the original image with the blurred bright pixels
+	//	float blendFactor = 0.5;
+	//	vTextureColor = lerp(vTextureColor, blur, blendFactor);
+	////}
+
+	vTextureColor.rgb += 0.1f;
+	Out.vDiffuse = vTextureColor;
+	return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -166,39 +185,6 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
-	pass Wire
-	{
-		SetRasterizerState(RS_Wireframe);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
-		SetDepthStencilState(DSS_Default, 0);
-
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_MAIN();
-	}
-
-	pass Picked
-	{
-		SetRasterizerState(RS_Default);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
-		SetDepthStencilState(DSS_Default, 0);
-
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_PICKED();
-	}
-
-	pass PickingSymbol
-	{
-		SetRasterizerState(RS_Default);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
-		SetDepthStencilState(DSS_Default, 0);
-
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_SYMBOL();
-	}
-
 	pass Shadow
 	{
 		SetRasterizerState(RS_Default);
@@ -208,6 +194,17 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
+	}
+
+	pass Glow_Shader
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_BLOOM();
 	}
 
 }

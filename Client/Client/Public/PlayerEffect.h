@@ -9,7 +9,7 @@ BEGIN(Client)
 class CPlayerEffect final : public CEffect
 {
 public:
-	enum TYPE { ROLLCUT,};
+	enum TYPE { SLASH, SWORD_SLASH, ROLLCUT,};
 
 
 
@@ -32,12 +32,15 @@ public:
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
 	virtual HRESULT SetUp_ShaderID();
+	virtual HRESULT SetUp_ShaderResources();
 	virtual void Change_Animation(_float fTimeDelta);
 	virtual void Change_Texture(_float fTimeDelta) override;
 
 private:
 	void Tick_RollCut(_float fTimeDelta);
+	void Tick_Slash(_float fTimeDelta);
 
+	CTexture*  m_pGlowTexture = nullptr;
 	
 
 public:

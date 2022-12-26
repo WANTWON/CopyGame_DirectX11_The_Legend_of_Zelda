@@ -259,20 +259,6 @@ HRESULT CPlayer::Render_ShadowDepth()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
 		return E_FAIL;
 
-
-	//_float4		vLightEye, vLightAt;
-
-	//XMStoreFloat4(&vLightEye, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-
-	//vLightAt = vLightEye;
-	////vLightAt.y = -0.5f;
-
-	//vLightEye.x += 0.f;
-	//vLightEye.y += 50.f;
-	//vLightEye.z += 0.1f;
-
-	//pGameInstance->Set_ShadowLightView(vLightEye, vLightAt);
-
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_ShadowLightView(), sizeof(_float4x4))))
 		return E_FAIL;
 
@@ -1088,19 +1074,23 @@ void CPlayer::Make_SlashEffect()
 		return;
 
 	m_bMakeEffect = true;
+
+	
 	m_BulletLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
-	CPlayerBullet::BULLETDESC BulletDesc;
-	BulletDesc.eBulletType = CPlayerBullet::SLASH;
-	BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.5f, 0.f, 0.f);
-
-	BulletDesc.vLook = m_BulletLook;
-	BulletDesc.fDeadTime = 0.5f;
-	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
-
 	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.pTarget = this;
+
 	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CPlayerEffect::SLASH;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.45f, 0.f, 0.f);
+	EffectDesc.vLook = m_BulletLook;
+	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
+	EffectDesc.fDeadTime = 0.5f;
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+
 	EffectDesc.eEffectID = CPlayerEffect::ROLLCUT;
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, 0.5f, 0.f, 0.f);
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) +XMVectorSet(0.f, 0.5f, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.5f;
 	EffectDesc.vLook = m_BulletLook;
 	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);

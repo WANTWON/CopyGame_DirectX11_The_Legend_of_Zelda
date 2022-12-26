@@ -30,11 +30,18 @@ public:
 	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
+
+private:
 	void Make_GetItemEffect();
+	virtual HRESULT SetUp_ShaderResources() override; 
+
 private:
 	DGNKEYDESC				m_eKeyDesc;
 	_bool					m_bGet = false;
 	_bool					m_bMakeEffect = false;
+	CTexture*				m_pGlowTexture = nullptr;
+
+
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;
 

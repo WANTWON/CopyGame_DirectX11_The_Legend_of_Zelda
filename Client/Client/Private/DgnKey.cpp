@@ -34,6 +34,7 @@ HRESULT CDgnKey::Initialize(void * pArg)
 	//CPickingMgr::Get_Instance()->Add_PickingGroup(this);
 
 	m_eObjectID = OBJ_KEY;
+	m_eShaderID = SHADER_GLOWSHADER;
 
 	if (pArg != nullptr)
 	{
@@ -265,6 +266,13 @@ void CDgnKey::Make_GetItemEffect()
 	RELEASE_INSTANCE(CGameInstance);
 
 	m_bMakeEffect = true;
+}
+
+HRESULT CDgnKey::SetUp_ShaderResources()
+{
+	__super::SetUp_ShaderResources();
+
+	return S_OK;
 }
 
 HRESULT CDgnKey::Ready_Components(void * pArg)

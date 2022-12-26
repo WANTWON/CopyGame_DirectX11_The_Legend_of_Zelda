@@ -1366,6 +1366,16 @@ HRESULT CLoader::Loading_For_Effect()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/SwordBeam/SwordBeam.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_SwordSwish0*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_SwordSwish0"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Slash/Swish_0.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_SwordSwish1*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_SwordSwish1"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Slash/Swish_2.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	/*For.Prototype_Component_Model_RolCut0*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/RollCut/RollCut_2.fbx", PivotMatrix))))
@@ -1374,6 +1384,8 @@ HRESULT CLoader::Loading_For_Effect()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut_Blast"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/RollCut/RollCut_1.fbx", PivotMatrix))))
 		return E_FAIL;
+
+#pragma endregion SwordEffect
 
 	/*For.Prototype_Component_Model_HitFlash*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_HitFlash"),
@@ -1543,6 +1555,12 @@ HRESULT CLoader::Loading_For_Effect()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Ray"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Ray/ray_00.dds"), 1))))
 		return E_FAIL;
+
+	///*For.Prototype_Component_Texture_Distorition */
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Distorition"),
+	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Distorition/distortion_%02d.dds"), 4))))
+	//	return E_FAIL;
+
 
 #pragma endregion SwordEffect
 

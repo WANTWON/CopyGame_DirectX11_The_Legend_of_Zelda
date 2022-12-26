@@ -13,7 +13,7 @@ BEGIN(Client)
 class CPlayerBullet final : public CBaseObj
 {
 public:
-	enum BULLETTYPE { SLASH, BOW, BOOMERANG, BULLET_END};
+	enum BULLETTYPE { BOW, BOOMERANG, BULLET_END};
 
 	typedef struct Bullettag
 	{

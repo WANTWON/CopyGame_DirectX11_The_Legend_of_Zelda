@@ -39,7 +39,7 @@ HRESULT CCollapseTile::Initialize(void * pArg)
 	}
 
 	Set_Scale(_float3(3.f, 3.f, 3.f));
-	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_INTERACT, this);
+	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLITION_TILE, this);
 
 	return S_OK;
 }
@@ -232,7 +232,7 @@ void CCollapseTile::Free()
 {
 	__super::Free();
 
-	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_INTERACT, this);
+	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLITION_TILE, this);
 
 	Safe_Release(m_pNavigationCom);
 }

@@ -4,6 +4,7 @@
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float			g_fAlpha = 1.f;
 texture2D		g_DiffuseTexture;
+texture2D		g_GlowTexture;
 float			g_TexUV = 1.f;
 
 vector			g_ColorBack = vector(1.f, 1.f, 1.f, 1.f);
@@ -81,6 +82,12 @@ PS_OUT PS_MAIN(PS_IN In)
 	if (1 - g_TexUV < In.vTexUV.x)
 		discard;
 
+
+	Out.vDiffuse.a *= g_fAlpha;
+	if (Out.vDiffuse.a <= 0.0f)
+		discard;
+
+
 	return Out;
 }
 
@@ -90,15 +97,25 @@ PS_OUT PS_MAIN_RollCut(PS_IN In)
 	PS_OUT		Out = (PS_OUT)0;
 
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	Out.vDiffuse.a = Out.vDiffuse.r;
+	Out.vDiffuse.a = Out.vDiffuse.r*2.f;
 
+	vector vColor1 = vector(1, 1, 0, 1);
+	vector vColor2 = vector(1, 0.1, 0.1, 1);
 
-	Out.vDiffuse.rg = 1.f;
-	Out.vDiffuse.g -= 0.2f;
-	Out.vDiffuse.b  = (1 - Out.vDiffuse.a);
+	Out.vDiffuse.rgb = vColor2.rgb * (1 - Out.vDiffuse.r) + vColor1.rgb *(Out.vDiffuse.r+0.1);
+	vector vGlowColor = g_GlowTexture.Sample(LinearSampler, In.vTexUV);
+	vGlowColor.b = vGlowColor.r;
 
-	if (1 - g_TexUV < In.vTexUV.x)
+	if (  1 - (1 - g_TexUV) > In.vTexUV.y)
 		discard;
+
+	vGlowColor *= Out.vDiffuse;
+	Out.vDiffuse = Out.vDiffuse + vGlowColor;
+
+	Out.vDiffuse.a *= g_fAlpha;
+	if (Out.vDiffuse.a <= 0.0f)
+		discard;
+
 
 	return Out;
 }

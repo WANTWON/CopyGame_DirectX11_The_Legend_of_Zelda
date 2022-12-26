@@ -70,7 +70,7 @@ void CGameObject::Compute_CamDistance(_vector vWorldPos)
 
 	CPipeLine*			pPipeLine = GET_INSTANCE(CPipeLine);
 
-	m_fCamDistance = XMVectorGetX(XMVector3Length(XMLoadFloat4(&pPipeLine->Get_CamPosition()) - vWorldPos));
+	m_fCamDistance = XMVectorGetX(XMVector3Length(vWorldPos - XMLoadFloat4(&pPipeLine->Get_CamPosition())));
 
 	RELEASE_INSTANCE(CPipeLine);
 

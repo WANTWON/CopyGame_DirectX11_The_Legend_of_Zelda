@@ -175,6 +175,7 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 
 	if (m_bGet)
 	{
+		m_eShaderID = SHADER_GLOWSHADER;
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 		_vector pPlayerPostion = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
 
@@ -518,7 +519,7 @@ void CPrizeItem::Make_GetItemEffect()
 
 	CEffect::EFFECTDESC EffectDesc;
 	
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, -0.2f, 0.f, 0.f);
 	EffectDesc.pTarget = this;
 
 	EffectDesc.eEffectType = CEffect::MODEL;
@@ -532,7 +533,7 @@ void CPrizeItem::Make_GetItemEffect()
 	EffectDesc.fStartTime = 1.f;
 	EffectDesc.fDeadTime = EffectDesc.fStartTime + 3.f;
 	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
-	EffectDesc.vDistance = XMVectorSet(0.0f, -0.02f, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.05f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 
@@ -540,7 +541,7 @@ void CPrizeItem::Make_GetItemEffect()
 	EffectDesc.fStartTime = 0.f;
 	EffectDesc.fDeadTime = 4.f;
 	EffectDesc.vInitScale = _float3(10.f, 10.f, 10.0f);
-	EffectDesc.vDistance = XMVectorSet(0.0f, -0.03f, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.04f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 
@@ -549,7 +550,7 @@ void CPrizeItem::Make_GetItemEffect()
 	EffectDesc.iTextureNum = 5;
 	EffectDesc.fDeadTime = 2.f;
 	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
-	EffectDesc.vDistance = XMVectorSet(0.0f, -0.01f, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.03f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 
@@ -558,7 +559,7 @@ void CPrizeItem::Make_GetItemEffect()
 	EffectDesc.fStartTime = 1.f;
 	EffectDesc.fDeadTime = EffectDesc.fStartTime + 3.5f;
 	EffectDesc.vInitScale = _float3(1.f, 1.f, 1.0f);
-	EffectDesc.vDistance = XMVectorSet(0.0f, -0.012f, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.02f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 
@@ -566,7 +567,7 @@ void CPrizeItem::Make_GetItemEffect()
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.fDeadTime = 2.f;
 	EffectDesc.vInitScale = _float3(0.f, 0.f, 0.0f);
-	EffectDesc.vDistance = XMVectorSet(0.0f, 0.f, 0.f, 0.f);
+	EffectDesc.vDistance = XMVectorSet(0.0f, -0.01f, 0.f, 0.f);
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 
@@ -588,6 +589,13 @@ void CPrizeItem::Make_GetItemEffect()
 	RELEASE_INSTANCE(CGameInstance);
 
 	m_bMakeEffect = true;
+}
+
+HRESULT CPrizeItem::SetUp_ShaderResources()
+{
+	__super::SetUp_ShaderResources();
+
+	return S_OK;
 }
 
 HRESULT CPrizeItem::Ready_Components(void * pArg)
@@ -724,7 +732,7 @@ HRESULT CPrizeItem::Ready_Components(void * pArg)
 	default:
 		break;
 	}
-	
+
 	
 	CCollider::COLLIDERDESC		ColliderDesc;
 
