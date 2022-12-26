@@ -9,7 +9,15 @@ BEGIN(Client)
 class CPlayerEffect final : public CEffect
 {
 public:
-	enum TYPE { SLASH, SWORD_SLASH, ROLLCUT,};
+	enum TYPE { 
+	
+	/* Slash */
+	SLASH, SWISH,
+	
+	/* Charge */
+	CROSS, RIPPLE
+
+	};
 
 
 
@@ -39,9 +47,12 @@ private:
 private:
 	void Tick_RollCut(_float fTimeDelta);
 	void Tick_Slash(_float fTimeDelta);
+	void Tick_Cross(_float fTimeDelta);
+	void Tick_Ripple(_float fTimeDelta);
 
 	CTexture*  m_pGlowTexture = nullptr;
-	
+	_float		m_fSpeed = 0.f;
+	_float3		m_vMaxScale = _float3(0.f, 0.f, 0.f);
 
 public:
 	static CPlayerEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

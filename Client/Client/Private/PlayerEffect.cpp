@@ -35,7 +35,7 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case ROLLCUT:
+	case SWISH:
 		m_eShaderID = SHADERM_ROLLCUT;
 		m_fTexUV = 1.f;
 		m_fAlpha = 1.f;
@@ -48,11 +48,36 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 		m_fTexUV = 1.f;
 		m_fAlpha = 1.f;
 		break;
+	case CROSS:
+	{
+		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
+		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
+		_int iRandNum = rand() % 5 + 1;
+		if (iRandNum == 1) m_vColorBack = XMVectorSet(255.f, 63.f, 63.f, 255.f);
+		else if (iRandNum == 2) m_vColorBack = XMVectorSet(255.f, 127.f, 0.f, 255.f);
+		else if (iRandNum == 3)	m_vColorBack = XMVectorSet(0.f, 255.f, 0.f, 255.f);
+		else if (iRandNum == 4)	m_vColorBack = XMVectorSet(63.f, 127.f, 255.f, 255.f);
+		else  m_vColorBack = XMVectorSet(255.f, 63.f, 63.f, 255.f);
+		m_fSpeed = 0.1f;
+		m_vMaxScale = m_EffectDesc.vInitScale;
+		break;
+	}
+	case RIPPLE:
+		m_vScale = _float3(0.f, 0.f, 0.f);
+		m_vMaxScale = m_EffectDesc.vInitScale;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.vInitPositon);
+		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
+		m_vColorFront = XMVectorSet(255, 232, 0, 255.f);
+		m_vColorBack = XMVectorSet(255, 76, 0, 255.f);
+		m_fAlpha = 0.f;
+		break;
 	default:
 		break;
 	}
 
-	if (dynamic_cast<CPlayer*>(m_EffectDesc.pTarget)->Get_2DMode())
+
+
+	if (dynamic_cast<CPlayer*>(m_EffectDesc.pTarget)->Get_2DMode() && ( m_EffectDesc.eEffectID == SWISH || m_EffectDesc.eEffectID == SLASH) )
 	{
 		
 		if (XMVectorGetX(m_EffectDesc.vLook) == 1.f)
@@ -87,8 +112,14 @@ int CPlayerEffect::Tick(_float fTimeDelta)
 	case SLASH:
 		Tick_Slash(fTimeDelta);
 		break;
-	case ROLLCUT:
+	case SWISH:
 		Tick_RollCut(fTimeDelta);
+		break;
+	case CROSS:
+		Tick_Cross(fTimeDelta);
+		break;
+	case RIPPLE:
+		Tick_Ripple(fTimeDelta);
 		break;
 	default:
 		break;
@@ -119,26 +150,34 @@ HRESULT CPlayerEffect::Ready_Components(void * pArg)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case ROLLCUT:
+	case SWISH:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_SwordSwish0"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
+
+		if (FAILED(__super::Add_Components(TEXT("Com_GlowTexture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pGlowTexture)))
+			return E_FAIL;
 		break;
 	case SLASH:
-	{
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RollCut"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
+
+		if (FAILED(__super::Add_Components(TEXT("Com_GlowTexture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pGlowTexture)))
+			return E_FAIL;
 		break;
-	}
+	case CROSS:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case RIPPLE:
+		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Ripple"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
 	default:
 		break;
 	}
 
-	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pGlowTexture)))
-		return E_FAIL;
-
-	
 
 	return S_OK;
 }
@@ -153,9 +192,12 @@ HRESULT CPlayerEffect::SetUp_ShaderResources()
 {
 	__super::SetUp_ShaderResources();
 
+	if (m_pGlowTexture != nullptr)
+	{
+		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_GlowTexture", m_pGlowTexture->Get_SRV(0))))
+			return E_FAIL;
+	}
 
-	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_GlowTexture", m_pGlowTexture->Get_SRV(0))))
-		return E_FAIL;
 
 	return S_OK;
 }
@@ -212,6 +254,102 @@ void CPlayerEffect::Tick_Slash(_float fTimeDelta)
 			m_bDead = true;
 	}
 
+}
+
+void CPlayerEffect::Tick_Cross(_float fTimeDelta)
+{
+	m_fDeadtime += fTimeDelta;
+
+	SetUp_BillBoard();
+
+	if (m_fDeadtime < m_EffectDesc.fDeadTime*0.2f)
+	{
+		m_vScale.x += 0.05f;
+		m_vScale.y += 0.05f;
+
+		if (m_vScale.x >= m_vMaxScale.x)
+		{
+			m_vScale = m_vMaxScale;
+		}
+	}
+	else if (m_fDeadtime < m_EffectDesc.fDeadTime*0.4f)
+	{
+		m_vScale.x -= 0.05f;
+		m_vScale.y -= 0.05f;
+	}
+	else if (m_fDeadtime < m_EffectDesc.fDeadTime*0.6f)
+	{
+		m_vScale.x += 0.05f;
+		m_vScale.y += 0.05f;
+
+		if (m_vScale.x >= m_vMaxScale.x)
+		{
+			m_vScale = m_vMaxScale;
+		}
+	}
+	else if (m_fDeadtime < m_EffectDesc.fDeadTime*0.8f)
+	{
+		m_vScale.x -= 0.05f;
+		m_vScale.y -= 0.05f;
+	}
+	else if (m_fDeadtime < m_EffectDesc.fDeadTime)
+	{
+		m_vScale.x += 0.05f;
+		m_vScale.y += 0.05f;
+
+		if (m_vScale.x >= m_vMaxScale.x)
+		{
+			m_vScale = m_vMaxScale;
+		}
+	}
+	else
+	{
+		m_vScale.x -= 0.05f;
+		m_vScale.y -= 0.05f;
+		m_fAlpha -= 0.25f;
+	}
+
+	Set_Scale(m_vScale);
+
+	if (m_fAlpha <= 0.f)
+		m_bDead = true;
+}
+
+void CPlayerEffect::Tick_Ripple(_float fTimeDelta)
+{
+	m_fDeadtime += fTimeDelta;
+
+	if (m_fDeadtime <= m_EffectDesc.fStartTime)
+		return;
+	
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f,0.5f,0.f,0.f));
+	SetUp_BillBoard();
+	m_pTransformCom->Turn(XMVectorSet(-1.f, 0.f, 0.f, 0.f), -40.f);
+	m_pTransformCom->LookDir(XMVectorSet(0.f, 90.f, 1.f, 0.f));
+
+
+	if (m_vScale.x < m_vMaxScale.x)
+	{
+		m_fAlpha += 0.1f;
+		m_vScale.x += 0.05f;
+		m_vScale.y += 0.05f;
+
+		if (m_fAlpha >= 1.f)
+			m_fAlpha = 1.f;
+	}
+	else
+	{
+		m_vScale.x += 0.01f;
+		m_vScale.y += 0.01f;
+		m_fAlpha -= 0.02f;
+	}
+
+	Set_Scale(m_vScale);
+
+	if (m_fAlpha <= 0.f)
+		m_bDead = true;
+
+	
 }
 
 CPlayerEffect * CPlayerEffect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

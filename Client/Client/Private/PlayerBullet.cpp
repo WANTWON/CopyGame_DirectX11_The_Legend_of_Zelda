@@ -34,11 +34,6 @@ HRESULT CPlayerBullet::Initialize(void * pArg)
 		return E_FAIL;
 
 
-	switch (m_BulletDesc.eBulletType)
-	{
-	default:
-		break;
-	}
 
 	//CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PBULLET, this);
 	

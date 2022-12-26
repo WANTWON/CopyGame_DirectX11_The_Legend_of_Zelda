@@ -6,10 +6,15 @@ texture2D		g_DiffuseTexture;
 texture2D		g_NormalTexture;
 texture2D		g_DissolveTexture;
 
+
 float			g_HitRed = 0.2f;
 float			g_fAlpha = 1.f;
+float			g_fColorPercent = 0.f;
 float			g_DissolveSize = 1.5f;
 vector			g_DissolveColor = vector(1.f, 0.7f, 0.f, 1);
+vector			g_vColor = vector(1.f, 1.f, 1.f, 1);
+
+
 texture2D		g_SpecularTexture;
 
 /* 정점들에게 곱해져야할 행렬. */
@@ -198,6 +203,31 @@ PS_OUT PS_MAIN_SHADOW(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_CHARGE(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+	float4 vTextureNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV);
+	float3 vNormal;
+
+	vNormal = float3(vTextureNormal.x, vTextureNormal.y, sqrt(1 - vTextureNormal.x * vTextureNormal.x - vTextureNormal.y * vTextureNormal.y));
+
+	float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+	vNormal = mul(vNormal, WorldMatrix);
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+	Out.vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
+
+	vector GetColor = g_vColor / 255.f;
+
+	Out.vDiffuse.rgb += GetColor.rgb * g_fColorPercent;
+
+	if (Out.vDiffuse.a <= 0.1f)
+		discard;
+
+	return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -243,5 +273,16 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
+	}
+
+	pass Charge
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_CHARGE();
 	}
 }

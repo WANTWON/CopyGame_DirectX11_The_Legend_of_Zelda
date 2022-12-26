@@ -573,7 +573,6 @@ void CFightEffect::Tick_GlowEffect(_float fTimeDelta)
 
 void CFightEffect::Tick_GuardEffect(_float fTimeDelta)
 {
-
 	m_fDeadtime += fTimeDelta;
 
 	m_pTransformCom->LookDir(m_EffectDesc.vLook);
@@ -604,6 +603,7 @@ void CFightEffect::Tick_GuardEffect(_float fTimeDelta)
 
 	if (m_fAlpha <= 0.f || m_vScale.x <= 0.f)
 		m_bDead = true;
+
 }
 
 void CFightEffect::Tick_SparkEffect(_float fTimeDelta)

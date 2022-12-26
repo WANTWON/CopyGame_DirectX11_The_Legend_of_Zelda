@@ -77,7 +77,7 @@ public:
 public:
 	void Make_GuardEffect(CBaseObj* pTarget = nullptr);
 	void Make_SlashEffect();
-
+	void Make_ChargeEffect();
 
 private:
 	void Key_Input(_float fTimeDelta);
@@ -132,8 +132,13 @@ private:
 	_float					m_fHitRedColor = 0.5f;
 	_float					m_fMaxRed = 1.f;
 	_float					m_fMinRed = 0.4f;
-	_bool					m_bRed = false;
+	_bool					m_bMax = false;
 	_bool					m_bMakeEffect = false;
+
+	_bool					m_bCharge = false;
+	_vector					m_vColor = { 0.f,0.f,0.f,0.f };
+	_float					m_fColorPercent = 0.f;
+
 
 	/* For Item&Weapon */
 	//LeftHand : MESH_SHEILD, MESH_OCARINA 
@@ -147,9 +152,11 @@ private:
 	_float					m_fTime = 0.f;
 	_float					m_fEffectTime = 0.f;
 	_float					m_fEffectTimeEnd = 0.f;
+	_float					m_fChargeTime = 0.f;
 	DWORD					m_dwDashTime = GetTickCount();
 	DWORD					m_dwPressedTime = GetTickCount();
 	DWORD					m_dwHitTime = GetTickCount();
+	DWORD					m_dwChargeTime = GetTickCount();
 
 	/* For Portal */
 	_float3					m_vPortalPos = _float3(0.f, 0.f, 0.f);

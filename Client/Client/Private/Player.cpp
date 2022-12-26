@@ -66,6 +66,11 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 	//RELEASE_INSTANCE(CGameInstance);
 
+
+	m_vColor = XMVectorSet(255, 230, 0.f, 255);
+
+
+
 	return S_OK;
 }
 
@@ -78,13 +83,13 @@ int CPlayer::Tick(_float fTimeDelta)
 	if (m_bHit)
 	{
 
-		if (!m_bRed)
+		if (!m_bMax)
 		{
 			m_fHitRedColor += 0.05f;
 			if (m_fHitRedColor >= m_fMaxRed)
 			{
 				m_fHitRedColor = m_fMaxRed;
-				m_bRed = true;
+				m_bMax = true;
 			}
 
 
@@ -94,15 +99,41 @@ int CPlayer::Tick(_float fTimeDelta)
 			m_fHitRedColor -= 0.05f;
 			if (m_fHitRedColor <= m_fMinRed)
 			{
-				m_bRed = false;
+				m_bMax = false;
 				m_fHitRedColor = m_fMinRed;
 			}
 		}
 	}
 
-	if (m_dwHitTime + 1500 < GetTickCount() && !m_bRed)
+	if (m_dwHitTime + 1500 < GetTickCount() && !m_bMax)
 	{
 		m_bHit = false;
+	}
+
+
+	if (m_bCharge)
+	{
+
+		if (!m_bMax)
+		{
+			m_fColorPercent += 0.05f;
+			if (m_fColorPercent >= 1.f)
+			{
+				m_fColorPercent = 1.f;
+				m_bMax = true;
+			}
+
+
+		}
+		else
+		{
+			m_fColorPercent -= 0.05f;
+			if (m_fColorPercent <= 0.f)
+			{
+				m_fColorPercent = 0.f;
+				m_bMax = false;
+			}
+		}
 	}
 
 
@@ -835,6 +866,17 @@ HRESULT CPlayer::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_HitRed", &m_fHitRedColor, sizeof(_float))))
 		return E_FAIL;
 
+	if (m_bCharge)
+	{
+	
+		if (FAILED(m_pShaderCom->Set_RawValue("g_fColorPercent", &m_fColorPercent, sizeof(_float))))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Set_RawValue("g_vColor", &m_vColor, sizeof(_float4))))
+			return E_FAIL;
+	}
+		
+
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
@@ -842,7 +884,9 @@ HRESULT CPlayer::SetUp_ShaderResources()
 
 HRESULT CPlayer::SetUp_ShaderID()
 {
-	if (m_bHit)
+	if(m_bCharge)
+		m_eShaderID = SHADER_ANIMCHARGE;
+	else if (m_bHit)
 		m_eShaderID = SHADER_ANIMHIT;
 	else
 		m_eShaderID = SHADER_ANIMDEFAULT;
@@ -1089,18 +1133,37 @@ void CPlayer::Make_SlashEffect()
 	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
 
-	EffectDesc.eEffectID = CPlayerEffect::ROLLCUT;
+	EffectDesc.eEffectID = CPlayerEffect::SWISH;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) +XMVectorSet(0.f, 0.5f, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.5f;
 	EffectDesc.vLook = m_BulletLook;
 	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
 	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
-	/*if (FAILED(Ready_Parts_Bullet(CWeapon::SLASH, PARTS_EFFECT)))
-	{
-	RELEASE_INSTANCE(CGameInstance);
-	return;
-	}*/
+}
+
+void CPlayer::Make_ChargeEffect()
+{
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.pTarget = this;
+	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+	EffectDesc.eEffectID = CPlayerEffect::RIPPLE;
+	EffectDesc.vLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+	EffectDesc.iTextureNum = 2;
+	EffectDesc.vInitScale = _float3(5.f, 5.f, 5.f);
+	EffectDesc.fDeadTime = 1.5f;
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+	
+
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.4f, 0.f, 0.f);
+	EffectDesc.fStartTime = 0.5f;
+	EffectDesc.iTextureNum = 0;
+	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
+	EffectDesc.fDeadTime = 1.5f;
+	//CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+	
+	m_bCharge = true;
 }
 
 void CPlayer::Change_Animation(_float fTimeDelta)
@@ -1174,7 +1237,13 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	}
 	case Client::CPlayer::LADDER_UP:
 	case Client::CPlayer::LADDER_WAIT:
-	
+	case Client::CPlayer::ITEM_GET_LP:
+	case Client::CPlayer::PULL_LP:
+	case Client::CPlayer::EV_TELL_LP:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
+		break;
 	case Client::CPlayer::SLASH_HOLD_F:
 	case Client::CPlayer::SLASH_HOLD_B:
 	case Client::CPlayer::SLASH_HOLD_L:
@@ -1182,12 +1251,41 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::SLASH_HOLD_LP:
 	case Client::CPlayer::SHIELD_HOLD_F:
 	case Client::CPlayer::SHIELD_HOLD_LP:
-	case Client::CPlayer::ITEM_GET_LP:
-	case Client::CPlayer::PULL_LP:
-	case Client::CPlayer::EV_TELL_LP:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
+
+		m_fChargeTime += fTimeDelta;
+		m_fEffectTime += fTimeDelta;
+		m_fEffectTimeEnd = 0.5f;
+		if (m_fChargeTime > 2.f)
+		{
+			Make_ChargeEffect();
+			m_fChargeTime = 0.f;
+		}
+			
+
+		if (m_fEffectTime > m_fEffectTimeEnd)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.pTarget = this;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CPlayerEffect::CROSS;
+			EffectDesc.vLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook*1.8f + XMVectorSet(0.f, 0.6f, 0.f, 0.f);
+			EffectDesc.iTextureNum = 1;
+			EffectDesc.fDeadTime = 1.0f;
+
+			if (!m_bCharge)
+				EffectDesc.vInitScale = _float3(1.2f, 1.2f, 0.f);		
+			else
+				EffectDesc.vInitScale = _float3(2.f, 2.f, 0.f);
+			
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			m_fEffectTime = 0.f;
+		}
+
+
 		break;
 	case Client::CPlayer::SHIELD_HOLD_L:
 	case Client::CPlayer::SHIELD_HOLD_R:
@@ -1262,9 +1360,29 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	}
 	case Client::CPlayer::SLASH_HOLD_ST:
 		m_bIsLoop = false;
-		m_eAnimSpeed = 4.f;
+		m_eAnimSpeed = 2.f;
+		m_fEffectTime += fTimeDelta;
+		m_fEffectTimeEnd = 0.5f;
+		if (m_fEffectTime > m_fEffectTimeEnd)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.pTarget = this;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CPlayerEffect::CROSS;
+			EffectDesc.vLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook*1.8f + XMVectorSet(0.f, 0.6f, 0.f, 0.f);
+			EffectDesc.iTextureNum = 1;
+			EffectDesc.vInitScale = _float3(1.2f, 1.2f, 0.f);
+			EffectDesc.fDeadTime = 1.0f;
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			m_fEffectTime = 0.f;
+		}
+
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
 			m_eState = SLASH_HOLD_LP;
+			m_bMakeEffect = false;
+		}	
 		break;
 	case Client::CPlayer::SHIELD:
 	case Client::CPlayer::SHIELD_HIT:
@@ -1372,6 +1490,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CPlayer::SLASH:
 	case Client::CPlayer::S_SLASH:
+	case Client::CPlayer::SLASH_HOLD_ED:
 	{
 		Make_SlashEffect();
 		m_eAnimSpeed = 2.5f;
@@ -1383,6 +1502,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 				Safe_Release(m_Parts[PARTS_EFFECT]);
 			m_eState = IDLE;
 			m_bMakeEffect = false;
+			m_bCharge = false;
 		}
 
 		break;
@@ -1417,7 +1537,6 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	}
 	case Client::CPlayer::DASH_ED:
 	case Client::CPlayer::SHIELD_HOLD_ED:
-	case Client::CPlayer::SLASH_HOLD_ED:
 		m_eAnimSpeed = 3.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))

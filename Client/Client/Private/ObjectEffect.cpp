@@ -118,7 +118,7 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 		break;
 	case GLITTER:
 	{
-		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
+		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
 		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
 		_int iRandNum = rand() % 5 + 1;
 		if (iRandNum == 1) m_vColorBack = XMVectorSet(255.f, 63.f, 63.f, 255.f);
