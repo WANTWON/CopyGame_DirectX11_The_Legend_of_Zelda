@@ -54,6 +54,9 @@ HRESULT COctorock::Initialize(void * pArg)
 
 int COctorock::Tick(_float fTimeDelta)
 {
+	if (CUI_Manager::Get_Instance()->Get_UI_OpenType() != CUI_Manager::UI_END)
+		return OBJ_NOEVENT;
+
 	_float3 vScale = Get_Scale();
 	_float fCullingRadius = max(max(vScale.x, vScale.y), vScale.z);
 	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 2) == false)

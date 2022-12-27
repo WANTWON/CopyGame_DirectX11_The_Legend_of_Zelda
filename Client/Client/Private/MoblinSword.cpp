@@ -54,6 +54,8 @@ HRESULT CMoblinSword::Initialize(void * pArg)
 
 int CMoblinSword::Tick(_float fTimeDelta)
 {
+	if (CUI_Manager::Get_Instance()->Get_UI_OpenType() != CUI_Manager::UI_END)
+		return OBJ_NOEVENT;
 
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;

@@ -109,12 +109,6 @@
     <Filter Include="03.UI">
       <UniqueIdentifier>{db326884-8e5c-47c6-bd6b-1b276e8834a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.UI\01. BackGround">
-      <UniqueIdentifier>{57566d9b-4982-490a-9436-a60395b8dd99}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.UI\04. UIButton">
-      <UniqueIdentifier>{1301e89d-dc8c-4c2b-bb34-ee43c21d52d0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03.UI\00. ObjUI%28Base%29">
       <UniqueIdentifier>{c5474d07-5e19-48f3-a029-fbff9831b93d}</UniqueIdentifier>
     </Filter>
@@ -232,6 +226,15 @@
     <Filter Include="03.UI\07. UIEffect">
       <UniqueIdentifier>{baf4a0f7-624a-4fde-b35e-49bf9b1981da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.UI\08. Icon">
+      <UniqueIdentifier>{b8591639-b497-4480-a8bb-e38d99eafa35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\01. Screen">
+      <UniqueIdentifier>{57566d9b-4982-490a-9436-a60395b8dd99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\04. Button">
+      <UniqueIdentifier>{1301e89d-dc8c-4c2b-bb34-ee43c21d52d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -273,9 +276,6 @@
     <ClInclude Include="..\Public\Camera_Dynamic.h">
       <Filter>04.Camera\00.Dynamic</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\BackGround.h">
-      <Filter>03.UI\01. BackGround</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\InvenTile.h">
       <Filter>03.UI\02. Inventory\00. InvenTile</Filter>
     </ClInclude>
@@ -283,7 +283,7 @@
       <Filter>03.UI\00. ObjUI%28Base%29</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UIButton.h">
-      <Filter>03.UI\04. UIButton</Filter>
+      <Filter>03.UI\04. Button</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\InvenItem.h">
       <Filter>03.UI\02. Inventory\01. InvenItem</Filter>
@@ -459,6 +459,12 @@
     <ClInclude Include="..\Public\UIEffect.h">
       <Filter>03.UI\07. UIEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UIIcon.h">
+      <Filter>03.UI\08. Icon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UIScreen.h">
+      <Filter>03.UI\01. Screen</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -488,9 +494,6 @@
     <ClCompile Include="..\Private\Camera_Dynamic.cpp">
       <Filter>04.Camera\00.Dynamic</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\BackGround.cpp">
-      <Filter>03.UI\01. BackGround</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\InvenTile.cpp">
       <Filter>03.UI\02. Inventory\00. InvenTile</Filter>
     </ClCompile>
@@ -498,7 +501,7 @@
       <Filter>03.UI\00. ObjUI%28Base%29</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UIButton.cpp">
-      <Filter>03.UI\04. UIButton</Filter>
+      <Filter>03.UI\04. Button</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\InvenItem.cpp">
       <Filter>03.UI\02. Inventory\01. InvenItem</Filter>
@@ -670,6 +673,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\UIEffect.cpp">
       <Filter>03.UI\07. UIEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UIIcon.cpp">
+      <Filter>03.UI\08. Icon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UIScreen.cpp">
+      <Filter>03.UI\01. Screen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -216,7 +216,7 @@ void CRola::Change_Animation(_float fTimeDelta)
 			EffectDesc.vDistance = XMVectorSet((rand() % 200 * 0.01f) - 1.f, (rand() % 200 * 0.01f) - 1.f, 0.f, 0.f);
 			EffectDesc.iTextureNum = rand() % 2 + 3;
 			EffectDesc.fDeadTime = 1.0f;
-			_int iRandNum = rand() % 20 * 0.1f + 0.5f;
+			_float iRandNum = rand() % 20 * 0.1f + 0.5f;
 			EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
 			EffectDesc.vColor = XMVectorSet(226, 0, 255, 255);
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);

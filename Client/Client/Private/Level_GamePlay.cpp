@@ -11,7 +11,7 @@
 #include "InvenTile.h"
 #include "InvenItem.h"
 #include "UIButton.h"
-#include "BackGround.h"
+#include "UIScreen.h"
 #include "UIName.h"
 
 /* Object */
@@ -63,6 +63,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_Portal(TEXT("Layer_Portal"))))
 		return E_FAIL;
 
+	if (FAILED(Ready_Layer_Warp(TEXT("Layer_Warp"))))
+		return E_FAIL;
+	
 	//if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	//	return E_FAIL;	
 
@@ -320,9 +323,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_UI"), LEVEL_GAMEPLAY, pLayerTag)))
 		//return E_FAIL;
 
-	CBackGround::BACKGROUNDESC BackgroundDesc;
-	BackgroundDesc.eVisibleScreen = CBackGround::VISIBLE_PLAYGAME;
-	BackgroundDesc.pTextureTag = TEXT("Prototype_Component_Texture_InventoryBackGround_UI");
+	CUIScreen::BACKGROUNDESC BackgroundDesc;
+	BackgroundDesc.eVisibleScreen = CUIScreen::VISIBLE_PLAYGAME;
+	BackgroundDesc.pTextureTag = TEXT("Prototype_Component_Texture_GamePlayScreen_UI");
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, pLayerTag, 
 		&BackgroundDesc)))
 		return E_FAIL;
@@ -587,31 +590,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Object(const _tchar * pLayerTag)
 
 	CloseHandle(hFile);
 
-
-	hFile = 0;
-	dwByte = 0;
-	CTreasureBox::BOXTAG  TreasureBoxDesc;
-	iNum = 0;
-
-	hFile = CreateFile(TEXT("../../../Bin/Data/Field_TreasureBox.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
-		return E_FAIL;
-
-	/* 타일의 개수 받아오기 */
-	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
-
-	for (_uint i = 0; i < iNum; ++i)
-	{
-		ReadFile(hFile, &(TreasureBoxDesc), sizeof(CTreasureBox::BOXTAG), &dwByte, nullptr);
-
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBox"), LEVEL_GAMEPLAY, pLayerTag, &TreasureBoxDesc)))
-			return E_FAIL;
-
-	}
-
-	CloseHandle(hFile);
-
-
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
@@ -679,6 +657,15 @@ HRESULT CLevel_GamePlay::Ready_Layer_Portal(const _tchar * pLayerTag)
 	PortalDesc.vInitPos = ModelDesc.vPosition;
 	PortalDesc.eConnectLevel = LEVEL_ROOM;
 	PortalDesc.eRoomType = CPortal::TELEPHONE;
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
+		return E_FAIL;
+
+	ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+	PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
+	PortalDesc.vInitPos = ModelDesc.vPosition;
+	PortalDesc.eConnectLevel = LEVEL_TAILCAVE;
+	PortalDesc.eRoomType = CPortal::ROOM_END;
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_GAMEPLAY, pLayerTag, &PortalDesc)))
 		return E_FAIL;
 
@@ -823,6 +810,40 @@ HRESULT CLevel_GamePlay::Ready_Layer_Npc(const _tchar * pLayerTag)
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_NonAnim"), LEVEL_GAMEPLAY, pLayerTag, &ModelDesc)))
 				return E_FAIL;
 		}
+
+	}
+
+	CloseHandle(hFile);
+	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_Warp(const _tchar * pLayerTag)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	HANDLE hFile = 0;
+	_ulong dwByte = 0;
+	CNonAnim::NONANIMDESC  ModelDesc;
+	_uint iNum = 0;
+
+	hFile = CreateFile(TEXT("../../../Bin/Data/Filed_Warp.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
+		return E_FAIL;
+
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+	for (_uint i = 0; i < iNum; ++i)
+	{
+		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+
+		CSquareBlock::BLOCKDESC BlockDesc;
+		BlockDesc.eType = CSquareBlock::WARP_HOLE;
+		BlockDesc.vInitPosition = ModelDesc.vPosition;
+		BlockDesc.fAngle = ModelDesc.m_fAngle;
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_SquareBlock"), LEVEL_GAMEPLAY, pLayerTag, &BlockDesc)))
+			return E_FAIL;
 
 	}
 

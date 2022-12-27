@@ -34,7 +34,7 @@ public:
 	virtual int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-
+	virtual HRESULT Render_ShadowDepth() override;
 public:
 	virtual void Check_Navigation(_float fTimeDelta);
 	virtual void Send_Answer_toNPC(_uint iTextureNum) {};

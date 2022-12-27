@@ -13,6 +13,7 @@
 #include "FieldNpc.h"
 #include "Npc.h"
 #include "UIName.h"
+#include "UIIcon.h"
 
 IMPLEMENT_SINGLETON(CUI_Manager)
 
@@ -46,40 +47,40 @@ void CUI_Manager::Tick_Inventory()
 
 	if (pGameInstance->Key_Up(DIK_RIGHT))
 	{
-		m_iPickedIndex++;
+		m_iInvenIndex++;
 
-		if (m_iPickedIndex >= m_InvenTile.size())
-			m_iPickedIndex = 0;
+		if (m_iInvenIndex >= m_InvenTile.size())
+			m_iInvenIndex = 0;
 	}
 		
 
 	if (pGameInstance->Key_Up(DIK_LEFT))
 	{
-		m_iPickedIndex--;
+		m_iInvenIndex--;
 
-		if (m_iPickedIndex < 0)
-			m_iPickedIndex = (int)m_InvenTile.size() -1 ;
+		if (m_iInvenIndex < 0)
+			m_iInvenIndex = (int)m_InvenTile.size() -1 ;
 	}
 	
 
 	if (pGameInstance->Key_Up(DIK_DOWN))
 	{
-		m_iPickedIndex += 4;
+		m_iInvenIndex += 4;
 
-		if (m_iPickedIndex >= m_InvenTile.size())
-			m_iPickedIndex %= 4;
+		if (m_iInvenIndex >= m_InvenTile.size())
+			m_iInvenIndex %= 4;
 	}
 
 	if (pGameInstance->Key_Up(DIK_UP))
 	{
-		m_iPickedIndex -= 4;
+		m_iInvenIndex -= 4;
 
-		if (m_iPickedIndex < 0)
-			m_iPickedIndex += 12;
+		if (m_iInvenIndex < 0)
+			m_iInvenIndex += 12;
 	}
 		
 	dynamic_cast<CInvenTile*>(m_pPickedTile)->Set_SelectTile(false);
-	m_pPickedTile = m_InvenTile[m_iPickedIndex];
+	m_pPickedTile = m_InvenTile[m_iInvenIndex];
 	dynamic_cast<CInvenTile*>(m_pPickedTile)->Set_SelectTile(true);
 
 
@@ -102,6 +103,151 @@ void CUI_Manager::Tick_Inventory()
 		dynamic_cast<CInvenTile*>(m_EquipTile[EQUIP_Y])->Set_TileState(CInvenTile::STATE_EQUIP);
 	}
 		
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CUI_Manager::Tick_Map()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (pGameInstance->Key_Up(DIK_RIGHT))
+	{
+		_int iIndex = 0;
+		_float fMinDistance = MIN_DISTANCE;
+		for (auto& iter : m_WarpGroup)
+		{
+			_float fXDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().x - iter->Get_Position().x;
+			if (fXDistance < fMinDistance && fXDistance > 0)
+			{
+				fMinDistance = fXDistance;
+				m_iWarpIndex = iIndex;
+			}
+			iIndex++;
+		}
+
+		if (fMinDistance == MIN_DISTANCE)
+		{
+			iIndex = 0;
+			_float fMaxDistance = MAX_DISTANCE;
+			for (auto& iter : m_WarpGroup)
+			{
+				_float fXDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().x - iter->Get_Position().x;
+				if (fXDistance > fMaxDistance && fXDistance < 0)
+				{
+					fMaxDistance = fXDistance;
+					m_iWarpIndex = iIndex;
+				}
+				iIndex++;
+			}
+		}
+	}
+	else if (pGameInstance->Key_Up(DIK_LEFT))
+	{
+		_int iIndex = 0;
+		_float fMaxDistance = MAX_DISTANCE;
+		for (auto& iter : m_WarpGroup)
+		{
+			_float fXDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().x - iter->Get_Position().x;
+			if (fXDistance > fMaxDistance && fXDistance < 0)
+			{
+				fMaxDistance = fXDistance;
+				m_iWarpIndex = iIndex;
+			}
+			iIndex++;
+		}
+
+		if (fMaxDistance == MAX_DISTANCE)
+		{
+			iIndex = 0;
+			_float fMinDistance = MIN_DISTANCE;
+			for (auto& iter : m_WarpGroup)
+			{
+				_float fXDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().x - iter->Get_Position().x;
+				if (fXDistance < fMinDistance && fXDistance > 0)
+				{
+					fMinDistance = fXDistance;
+					m_iWarpIndex = iIndex;
+				}
+				iIndex++;
+			}
+		}
+	}
+	else if (pGameInstance->Key_Up(DIK_DOWN))
+	{
+		_int iIndex = 0;
+		_float fMaxDistance = MAX_DISTANCE;
+		for (auto& iter : m_WarpGroup)
+		{
+			_float fYDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().y - iter->Get_Position().y;
+			if (fYDistance > fMaxDistance && fYDistance < 0)
+			{
+				fMaxDistance = fYDistance;
+				m_iWarpIndex = iIndex;
+			}
+			iIndex++;
+		}
+
+		if (fMaxDistance == MAX_DISTANCE)
+		{
+			iIndex = 0;
+			_float fMinDistance = MIN_DISTANCE;
+			for (auto& iter : m_WarpGroup)
+			{
+				_float fYDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().y - iter->Get_Position().y;
+				if (fYDistance < fMinDistance && fYDistance > 0)
+				{
+					fMinDistance = fYDistance;
+					m_iWarpIndex = iIndex;
+				}
+				iIndex++;
+			}
+
+		}
+	}
+	else if (pGameInstance->Key_Up(DIK_UP))
+	{
+		_int iIndex = 0;
+		_float fMinDistance = MIN_DISTANCE;
+		for (auto& iter : m_WarpGroup)
+		{
+			_float fYDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().y - iter->Get_Position().y;
+			if (fYDistance < fMinDistance && fYDistance > 0)
+			{
+				fMinDistance = fYDistance;
+				m_iWarpIndex = iIndex;
+			}
+			iIndex++;
+		}
+
+		if (fMinDistance == MIN_DISTANCE)
+		{
+			iIndex = 0;
+			_float fMaxDistance = MAX_DISTANCE;
+			for (auto& iter : m_WarpGroup)
+			{
+				_float fYDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().y - iter->Get_Position().y;
+				if (fYDistance > fMaxDistance && fYDistance < 0)
+				{
+					fMaxDistance = fYDistance;
+					m_iWarpIndex = iIndex;
+				}
+				iIndex++;
+			}
+		}
+	}
+
+	dynamic_cast<CUIIcon*>(m_pPickedWarp)->Set_TexutureNum(CUIIcon::ICON_WARP);
+	m_pPickedTile = m_WarpGroup[m_iWarpIndex];
+	dynamic_cast<CUIIcon*>(m_pPickedWarp)->Set_TexutureNum(CUIIcon::ICON_WARP_ON);
+
+
+	if (pGameInstance->Key_Up(DIK_X))
+	{
+		_vector vWarpPosition =  dynamic_cast<CUIIcon*>(m_pPickedTile)->Get_IconDesc().pTarget->Get_TransformState(CTransform::STATE_POSITION);
+
+	}
+
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -662,18 +808,27 @@ void CUI_Manager::Tick_UI(_float fTimeDelta)
 	Tick_Coin();
 	Tick_Message();
 	Tick_Name(fTimeDelta);
-
 }
 
-void CUI_Manager::Set_UI_Open()
+void CUI_Manager::Set_UI_OpenType(UITYPE eUIType)
 {
-	m_bUIOpen = !m_bUIOpen;
+	if (m_eUIType == eUIType)
+		m_eUIType = UI_END;
+	else
+		m_eUIType = eUIType;
 
 	for(_uint i =0; i < m_InvenTile.size() ; ++i)
 		dynamic_cast<CInvenTile*>(m_InvenTile[i])->Set_SelectTile(false);
 
 	m_pPickedTile = m_InvenTile[0];
 	dynamic_cast<CInvenTile*>( m_pPickedTile)->Set_SelectTile(true);
+
+
+	for (_uint i = 0; i < m_WarpGroup.size(); ++i)
+		dynamic_cast<CUIIcon*>(m_WarpGroup[i])->Set_TexutureNum(CUIIcon::ICON_WARP);
+
+	m_pPickedWarp = m_WarpGroup[0];
+	dynamic_cast<CUIIcon*>(m_pPickedWarp)->Set_TexutureNum(CUIIcon::ICON_WARP);
 }
 
 void CUI_Manager::Set_EquipItem(EQUIP_BT eEquipBt, CObj_UI * pObj)

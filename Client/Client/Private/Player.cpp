@@ -11,6 +11,7 @@
 #include "PlayerEffect.h"
 #include "ObjectEffect.h"
 #include "FightEffect.h"
+#include "UIIcon.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -54,6 +55,13 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_pModelCom->Set_CurrentAnimIndex(m_eState);
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_PLAYER, this);
 	
+	CUIIcon::ICONDESC IconDesc;
+	IconDesc.iTexureNum = CUIIcon::ICON_PLAYER;
+	IconDesc.pTarget = this;
+	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+		return E_FAIL;
+
+
 	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	//	CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
@@ -137,7 +145,7 @@ int CPlayer::Tick(_float fTimeDelta)
 	}
 
 
-	if (CUI_Manager::Get_Instance()->Get_UI_Open() != true )
+	if (CUI_Manager::Get_Instance()->Get_UI_OpenType() == CUI_Manager::UI_END)
 	{
 		Key_Input(fTimeDelta);
 		Change_Direction(fTimeDelta);
@@ -582,26 +590,12 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 	if (pGameInstance->Key_Pressing(DIK_0))
 		m_tInfo.iCoin++;
-	if (pGameInstance->Key_Pressing(DIK_MINUS))
+	if (pGameInstance->Key_Pressing(DIK_8))
 	{
 		m_tInfo.iCoin--;
 		if(m_tInfo.iCoin < 0)
 			m_tInfo.iCoin = 0;
 	}
-	if (pGameInstance->Key_Up(DIK_8))
-	{
-		/*_uint	iNumMeshes = m_pModelCom->Get_NumMeshContainers();
-		++iRenderNum;
-
-		if (iRenderNum >= iNumMeshes)
-			iRenderNum = 0;
-		}*/
-
-		m_tInfo.iCurrentHp--;
-		if (m_tInfo.iCurrentHp < 0)
-			m_tInfo.iCurrentHp = 0;
-	}
-
 
 
 	if (m_eState == ITEM_GET_ST || m_eState == ITEM_GET_LP)

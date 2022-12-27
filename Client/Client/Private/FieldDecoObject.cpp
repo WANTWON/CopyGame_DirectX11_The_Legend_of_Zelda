@@ -43,7 +43,7 @@ HRESULT CFieldDecoObject::Initialize(void * pArg)
 	case BIRD_ORANGE:
 		m_eState = IDLE;
 		Set_Scale(_float3(0.8f, 0.8f, 0.8f));
-		CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_TRAP, this);
+		CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_INTERACT, this);
 		break;
 	case WEATHER_CLOCK:
 	case MOOSH:
@@ -117,16 +117,18 @@ int CFieldDecoObject::Tick(_float fTimeDelta)
 void CFieldDecoObject::Late_Tick(_float fTimeDelta)
 {
 	
-	if (Check_IsinFrustum() == false)
-	{
+	if (Check_IsinFrustum(2.f) == false)
 		return;
-	}
 
 	__super::Late_Tick(fTimeDelta);
 
 
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOWDEPTH, this);
+	}
+		
 	SetUp_ShaderID();
 
 	Check_Navigation(fTimeDelta);
@@ -152,10 +154,44 @@ HRESULT CFieldDecoObject::Render()
 		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
 			return E_FAIL;
 
+		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->SetUp_Material(m_pShaderCom, "g_SpecularTexture", i, aiTextureType_SPECULAR)))
+			return E_FAIL;
+
+
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_eShaderID)))
 			return E_FAIL;
 	}
 
+
+	return S_OK;
+}
+
+HRESULT CFieldDecoObject::Render_ShadowDepth()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_ShadowLightView(), sizeof(_float4x4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
+		return E_FAIL;
+
+	_uint		iNumMeshes = m_pModelCom->Get_NumMeshContainers();
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, SHADER_ANIMSHADOW)))
+			return S_OK;
+	}
+
+
+	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }
@@ -258,7 +294,7 @@ void CFieldDecoObject::Bird_Tick(_float fTimeDelta)
 	}
 
 	CBaseObj* pCollisionBird = nullptr;
-	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_TRAP, m_pSPHERECom, &pCollisionBird))
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_INTERACT, m_pSPHERECom, &pCollisionBird))
 	{
 
 		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionBird->Get_TransformState(CTransform::STATE_POSITION);

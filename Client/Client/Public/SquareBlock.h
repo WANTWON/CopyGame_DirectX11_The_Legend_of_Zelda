@@ -8,7 +8,7 @@ BEGIN(Client)
 class CSquareBlock final : public CNonAnim
 {
 public:
-	enum TYPE {SQUARE_BLOCK , LOCK_BLOCK, TAIL_STATUE, CRANEGAME_FENCE };
+	enum TYPE {SQUARE_BLOCK , LOCK_BLOCK, TAIL_STATUE, CRANEGAME_FENCE, WARP_HOLE };
 
 	typedef struct BlockTag
 	{

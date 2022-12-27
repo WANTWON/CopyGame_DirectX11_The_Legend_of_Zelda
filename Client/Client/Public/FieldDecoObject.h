@@ -31,7 +31,7 @@ public:
 	virtual int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-
+	virtual HRESULT Render_ShadowDepth() override;
 private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
 	virtual HRESULT SetUp_ShaderResources() override;

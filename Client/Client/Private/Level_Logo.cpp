@@ -3,7 +3,7 @@
 
 #include "GameInstance.h"
 #include "Level_Loading.h"
-#include "BackGround.h"
+#include "UIScreen.h"
 
 CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -54,15 +54,15 @@ HRESULT CLevel_Logo::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	CGameInstance*			pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
-	CBackGround::BACKGROUNDESC BackgroundDesc;
+	CUIScreen::BACKGROUNDESC BackgroundDesc;
 
-	BackgroundDesc.eVisibleScreen = CBackGround::VISIBLE_LOGO;
+	BackgroundDesc.eVisibleScreen = CUIScreen::VISIBLE_LOGO;
 	BackgroundDesc.pTextureTag = TEXT("Prototype_Component_Texture_TitleScreen");
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_LOGO, pLayerTag,
 		&BackgroundDesc)))
 		return E_FAIL;
 
-	BackgroundDesc.eVisibleScreen = CBackGround::VISIBLE_SCREEN;
+	BackgroundDesc.eVisibleScreen = CUIScreen::VISIBLE_SCREEN;
 	BackgroundDesc.pTextureTag = nullptr;
 	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, TEXT("UI_Screen"),
 		&BackgroundDesc)))

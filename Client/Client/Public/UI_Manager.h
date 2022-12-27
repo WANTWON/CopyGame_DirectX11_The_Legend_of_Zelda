@@ -9,10 +9,14 @@ class CUI_Manager final : public CBase
 {
 	DECLARE_SINGLETON(CUI_Manager)
 public:
+	enum UITYPE { UI_INVEN, UI_MAP, UI_OPTION, UI_END };
+
 	/* For Message*/
 	enum MSG_TYPE { PASSABLE, MUST_CHOICE };
 	
-	enum CHOICE_TYPE { BUY_NOBUY, TALK_NOTTALK, MARIN_PERFUME, MARIN_CHANGE, MARIN_VECTOR, MARIN_DOT, MARIN_CHARM, MARIN_DATEME, DO_UNDO};
+	enum CHOICE_TYPE { BUY_NOBUY, TALK_NOTTALK, MARIN_PERFUME, 
+		MARIN_CHANGE, MARIN_VECTOR, MARIN_DOT, MARIN_CHARM, 
+		MARIN_DATEME, DO_UNDO};
 	
 	typedef struct MessageTag
 	{
@@ -21,10 +25,7 @@ public:
 		CHOICE_TYPE eChoiceType = BUY_NOBUY;
 	}MSGDESC;
 
-
-	enum UITYPE { UI_INVEN, UI_MAP, UI_OPTION, UI_END};
 	enum EQUIP_BT { EQUIP_X, EQUIP_Y, EQUIP_END };
-
 	enum ROOMTYPE {MARINHOUSE, SHOP, CRANEGAME, TELEPHONE};
 
 
@@ -37,6 +38,7 @@ public:
 	void Initialize_PlayerState();
 	void Tick_UI(_float fTimeDelta);
 	void Tick_Inventory();
+	void Tick_Map();
 	void Tick_PlayerState();
 	void Tick_Coin();
 	void Tick_Message();
@@ -44,7 +46,7 @@ public:
 	void Setting_ChoiceButton();
 	
 public: /*Getter Setter*/
-	void		Set_UI_Open();
+	void		Set_UI_OpenType(UITYPE eUIType);
 	void		Set_EquipItem(EQUIP_BT eEquipBt, CObj_UI* pObj);
 	void		Set_NextLevelIndex(LEVEL eLevel) { m_eNextLevel = eLevel; }
 	void		Set_NextLevel(_bool type) 
@@ -61,7 +63,7 @@ public: /*Getter Setter*/
 	void		Get_Key();
 	_uint		Get_KeySize() { return (_uint)m_KeyList.size(); }
 	_uint		Get_MessageSize() { return (_uint)m_vecMsgDecs.size(); }
-	_bool		Get_UI_Open() { return m_bUIOpen; }
+	UITYPE		Get_UI_OpenType() { return m_eUIType; }
 	_bool		Get_OpenMessage() { return m_bOpenMessage; }
 	_bool		Get_Talking() { return m_bTalking; }
 	_bool		Get_NpcGet() { return m_bNpcGet; }
@@ -84,7 +86,8 @@ public:  /* Adder */
 	void		Add_Button(CObj_UI* pObj) { m_pInteractButton = pObj; }
 	void		Add_NameBox(CObj_UI* pObj) { m_pNameBox = pObj; }
 	void		Add_ChoiceButton(CObj_UI* pObj) { m_vecChoiceButton.push_back(pObj); }
-	void		Add_InvenGroup(CObj_UI* pObj) { m_InvenTile.push_back(pObj);  }
+	void		Add_InvenGroup(CObj_UI* pObj) { m_InvenTile.push_back(pObj); }
+	void		Add_WarpGroup(CObj_UI* pObj) { m_WarpGroup.push_back(pObj);  }
 	void		Add_HpGroup(CObj_UI* pObj) { m_HpList.push_back(pObj); }
 	void		Add_KeyGroup(CObj_UI* pObj) { m_KeyList.push_back(pObj); }
 	void		Add_RubyGroup(CObj_UI* pObj) { m_RubyList.push_back(pObj); }
@@ -96,7 +99,7 @@ public:  /* Adder */
 private:
 	LEVEL				m_eNextLevel = LEVEL_GAMEPLAY;
 	ROOMTYPE			m_eRoomType = MARINHOUSE;
-	_bool				m_bUIOpen = false;
+	UITYPE				m_eUIType = UI_END;
 	_bool				m_bNextLevel = false;
 	_bool				m_bFinishedReady = false;
 	_bool				m_bTellEnd = false;
@@ -113,7 +116,7 @@ private:
 	_bool				m_bPlayGame = false;
 	
 	/*For Inventory*/
-	_int				m_iPickedIndex = 0;
+	_int				m_iInvenIndex = 0;
 	CObj_UI*			m_pPickedTile = nullptr;
 	CObj_UI*			m_EquipTile[EQUIP_END] = { nullptr };
 	vector<CObj_UI*>	m_InvenTile;
@@ -132,6 +135,11 @@ private:
 	_float				m_fNameTime = 0.f;
 	_bool				m_bFirst = false;
 	_bool				m_bBossNameBox = false;
+
+	/* For Warp */
+	vector<CObj_UI*>	m_WarpGroup;
+	_int				m_iWarpIndex = 0;
+	CObj_UI*			m_pPickedWarp = nullptr;
 public:
 	void Free() override;
 };

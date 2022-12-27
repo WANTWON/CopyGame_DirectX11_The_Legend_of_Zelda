@@ -151,7 +151,7 @@ CUIName * CUIName::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		ERR_MSG(TEXT("Failed to Created : CInvenTile"));
+		ERR_MSG(TEXT("Failed to Created : CUIName"));
 		Safe_Release(pInstance);
 	}
 
@@ -165,7 +165,7 @@ CGameObject * CUIName::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		ERR_MSG(TEXT("Failed to Cloned : CUIButton"));
+		ERR_MSG(TEXT("Failed to Cloned : CUIName"));
 		Safe_Release(pInstance);
 	}
 

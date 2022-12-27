@@ -2,6 +2,7 @@
 #include "..\Public\NonAnim.h"
 #include "GameInstance.h"
 
+
 CNonAnim::CNonAnim(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
 {
@@ -41,6 +42,7 @@ HRESULT CNonAnim::Initialize(void * pArg)
 	}
 
 
+	
 
 	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 

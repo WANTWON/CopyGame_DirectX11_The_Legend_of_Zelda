@@ -7,6 +7,7 @@
 #include "Door.h"
 #include "Npc.h"
 #include "CraneGameNpc.h"
+#include "UIIcon.h"
 
 CSquareBlock::CSquareBlock(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -44,11 +45,21 @@ HRESULT CSquareBlock::Initialize(void * pArg)
 	}
 
 	Set_Scale(_float3(3.f, 3.f, 3.f));
+
+	if(m_BlockDesc.eType != WARP_HOLE)
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
 	
 	if (m_BlockDesc.eType == CRANEGAME_FENCE)
 		m_bOpen = true;
 		
+	if (m_BlockDesc.eType == WARP_HOLE)
+	{
+		CUIIcon::ICONDESC IconDesc;
+		IconDesc.iTexureNum = CUIIcon::ICON_WARP;
+		IconDesc.pTarget = this;
+		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -61,7 +72,8 @@ int CSquareBlock::Tick(_float fTimeDelta)
 
 		if (m_fAlpha <= 0)
 		{
-			CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+			if (m_BlockDesc.eType != WARP_HOLE)
+				CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
 			return OBJ_DEAD;
 		}
 	}
@@ -85,6 +97,19 @@ void CSquareBlock::Late_Tick(_float fTimeDelta)
 		break;
 	case CRANEGAME_FENCE:
 		Tick_CraneGameFence(fTimeDelta);
+		break;
+	case WARP_HOLE:
+		if (Check_IsinFrustum(2.f) == false)
+			return;
+
+		if (nullptr != m_pRendererCom)
+		{
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOWDEPTH, this);
+		}
+
+
+		Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		break;
 	}
 
@@ -219,6 +244,12 @@ HRESULT CSquareBlock::Ready_Components(void * pArg)
 		if (FAILED(__super::Add_Components(TEXT("Com_AABB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"), (CComponent**)&m_pAABBCom, &ColliderDesc)))
 			return E_FAIL;
 
+		break;
+
+	case WARP_HOLE:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_WarpHole"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
 		break;
 		
 	}

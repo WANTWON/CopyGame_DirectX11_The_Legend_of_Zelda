@@ -45,7 +45,7 @@ HRESULT CFieldNpc::Initialize(void* pArg)
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CData_Manager* pData_Manager = GET_INSTANCE(CData_Manager);
-	char cName[MAX_PATH];
+
 	switch (m_NpcDesc.eNpcType)
 	{
 	case CUCCO_KEEPER:

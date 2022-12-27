@@ -80,7 +80,7 @@ void CInvenTile::Late_Tick(_float fTimeDelta)
 
 	__super::Late_Tick(fTimeDelta);
 
-	if (!CUI_Manager::Get_Instance()->Get_UI_Open() && m_InvenDesc.eTileType != EQUIP_TILE)
+	if (CUI_Manager::Get_Instance()->Get_UI_OpenType() != CUI_Manager::UI_INVEN && m_InvenDesc.eTileType != EQUIP_TILE)
 		dynamic_cast<CInvenItem*>(m_pItem)->Set_bShow(false);
 	else
 		dynamic_cast<CInvenItem*>(m_pItem)->Set_bShow(true);
@@ -110,7 +110,7 @@ void CInvenTile::Late_Tick(_float fTimeDelta)
 
 HRESULT CInvenTile::Render()
 {
-	if (!CUI_Manager::Get_Instance()->Get_UI_Open() && m_InvenDesc.eTileType != EQUIP_TILE)
+	if (CUI_Manager::Get_Instance()->Get_UI_OpenType() != CUI_Manager::UI_INVEN && m_InvenDesc.eTileType != EQUIP_TILE)
 		return E_FAIL;
 		
 
@@ -184,7 +184,7 @@ HRESULT CInvenTile::SetUp_ShaderResources()
 	
 	if (m_InvenDesc.eTileType == EQUIP_TILE)
 	{
-		if (CUI_Manager::Get_Instance()->Get_UI_Open())
+		if (CUI_Manager::Get_Instance()->Get_UI_OpenType() == CUI_Manager::UI_INVEN)
 			m_InvenDesc.eState = STATE_EQUIP;
 		else
 			m_InvenDesc.eState = STATE_DEFAULT;

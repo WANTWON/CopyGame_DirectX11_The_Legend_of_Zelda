@@ -243,7 +243,7 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
-    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
+    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxModelforMaptool.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>

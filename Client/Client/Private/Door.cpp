@@ -172,26 +172,56 @@ HRESULT CDoor::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_Shader"), LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
+	CCollider::COLLIDERDESC		ColliderDesc;
+
 	switch (m_DoorDesc.eType)
 	{
 	case DOOR_CLOSED:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_ClosedDoor"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(3.f, 2.f, 0.7f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.5f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+			return E_FAIL;
 		break;
 	case DOOR_KEY:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_LockDoor"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(3.f, 2.f, 0.7f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.5f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 			return E_FAIL;
 		break;
 	case DOOR_BOSS:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Model_BossDoor"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(3.f, 2.f, 0.7f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.5f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
+			return E_FAIL;
 		break;
 	case DOOR_TAIL:
 		/* For.Com_Model*/
 		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_TailCaveShutter"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		/* For.Com_OBB*/
+		ColliderDesc.vScale = _float3(3.f, 2.f, 1.5f);
+		ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
+		ColliderDesc.vPosition = _float3(0.f, 0.5f, 0.f);
+		if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
 			return E_FAIL;
 		break;
 	default:
@@ -200,13 +230,8 @@ HRESULT CDoor::Ready_Components(void * pArg)
 
 	
 
-	CCollider::COLLIDERDESC		ColliderDesc;
-	/* For.Com_OBB*/
-	ColliderDesc.vScale = _float3(3.f, 2.f, 0.7f);
-	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(0.0f), 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.5f, 0.f);
-	if (FAILED(__super::Add_Components(TEXT("Com_OBB"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), (CComponent**)&m_pOBBCom, &ColliderDesc)))
-		return E_FAIL;
+	
+	
 
 
 	return S_OK;
@@ -417,12 +442,6 @@ void CDoor::Tick_TailDoor(_float fTimeDelta)
 		m_eState = OPEN_TAIL;
 	}
 		
-	if (m_eState == OPEN_WAIT_TAIL && CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pOBBCom))
-	{
-		CUI_Manager::Get_Instance()->Set_NextLevelIndex(LEVEL_TAILCAVE);
-		CUI_Manager::Get_Instance()->Set_NextLevel(true);
-	}
-
 
 	if (m_eState != m_ePreState)
 	{
@@ -564,6 +583,7 @@ void CDoor::Change_Animation_TailDoor(_float fTimeDelta)
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
+			CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
 			m_eState = OPEN_WAIT_TAIL;
 		}
 		break;

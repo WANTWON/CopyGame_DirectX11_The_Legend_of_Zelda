@@ -171,7 +171,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Bin\ShaderFiles\Client_Shader_Defines.hpp" />
     <ClInclude Include="..\Public\Albatoss.h" />
-    <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\public\UIScreen.h" />
     <ClInclude Include="..\Public\BaseObj.h" />
     <ClInclude Include="..\Public\BladeTrap.h" />
     <ClInclude Include="..\Public\Camera_2D.h" />
@@ -235,6 +235,7 @@
     <ClInclude Include="..\Public\TreasureBox.h" />
     <ClInclude Include="..\Public\UIButton.h" />
     <ClInclude Include="..\Public\UIEffect.h" />
+    <ClInclude Include="..\Public\UIIcon.h" />
     <ClInclude Include="..\Public\UIName.h" />
     <ClInclude Include="..\Public\UI_Manager.h" />
     <ClInclude Include="..\Public\Weapon.h" />
@@ -246,7 +247,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Albatoss.cpp" />
-    <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\private\UIScreen.cpp" />
     <ClCompile Include="..\Private\BaseObj.cpp" />
     <ClCompile Include="..\Private\BladeTrap.cpp" />
     <ClCompile Include="..\Private\Camera_2D.cpp" />
@@ -309,6 +310,7 @@
     <ClCompile Include="..\Private\TreasureBox.cpp" />
     <ClCompile Include="..\Private\UIButton.cpp" />
     <ClCompile Include="..\Private\UIEffect.cpp" />
+    <ClCompile Include="..\Private\UIIcon.cpp" />
     <ClCompile Include="..\Private\UIName.cpp" />
     <ClCompile Include="..\Private\UI_Manager.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />

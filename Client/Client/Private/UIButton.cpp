@@ -90,7 +90,15 @@ void CUIButton::Late_Tick(_float fTimeDelta)
 
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+	{
+
+		if(m_ButtonDesc.eButtonType == BTN_INTERACT && CUI_Manager::Get_Instance()->Get_UI_OpenType() == CUI_Manager::UI_END)
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+		else if (m_ButtonDesc.eButtonType != BTN_INTERACT)
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+		
+	}
+		
 
 	if (m_ButtonDesc.eButtonType == BTN_INTERACT || m_ButtonDesc.eButtonType == BTN_CHOICE)
 	{
@@ -124,7 +132,7 @@ HRESULT CUIButton::Render()
 	if (!m_bShow && m_fAlpha <= 0)
 		return E_FAIL;
 
-	if (!CUI_Manager::Get_Instance()->Get_UI_Open() && m_ButtonDesc.eButtonType == BTN_INVEN)
+	if (CUI_Manager::Get_Instance()->Get_UI_OpenType() == CUI_Manager::UI_END && m_ButtonDesc.eButtonType == BTN_INVEN)
 		return E_FAIL;
 
 	if (m_ButtonDesc.eButtonType == BTN_INVEN && nullptr == CUI_Manager::Get_Instance()->Get_EquipItem((CUI_Manager::EQUIP_BT)m_ButtonDesc.eState))
@@ -198,7 +206,7 @@ HRESULT CUIButton::SetUp_ShaderResources()
 
 	if (m_ButtonDesc.eButtonType == BTN_FIX)
 	{
-		if (CUI_Manager::Get_Instance()->Get_UI_Open())
+		if (CUI_Manager::Get_Instance()->Get_UI_OpenType() == CUI_Manager::UI_INVEN)
 			m_ButtonDesc.iTexNum = BTN_GREEN;
 		else
 			m_ButtonDesc.iTexNum = BTN_BLACK;

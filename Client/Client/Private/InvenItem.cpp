@@ -76,7 +76,7 @@ void CInvenItem::Late_Tick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 
 	if (m_ItemDesc.eItemType != ITEM_USABLE && m_ItemDesc.eItemType != ITEM_PRIZE)
-		m_bShow = CUI_Manager::Get_Instance()->Get_UI_Open();
+		m_bShow = CUI_Manager::Get_Instance()->Get_UI_OpenType() == CUI_Manager::UI_INVEN ? true : false;
 
 
 	if (m_ItemDesc.eItemType == ITEM_PRIZE && m_ItemDesc.m_iTextureNum == COMPASS)

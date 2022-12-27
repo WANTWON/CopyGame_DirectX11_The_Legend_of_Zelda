@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "Player.h"
 #include "UI_Manager.h"
+#include "UIIcon.h"
 
 CPortal::CPortal(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CNonAnim(pDevice, pContext)
@@ -35,6 +36,49 @@ HRESULT CPortal::Initialize(void * pArg)
 		_vector vecPostion = XMLoadFloat3(&m_PortalDesc.vInitPos);
 		vecPostion = XMVectorSetW(vecPostion, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
+
+		CUIIcon::ICONDESC IconDesc;
+		IconDesc.pTarget = this;
+	
+
+		switch (m_PortalDesc.eRoomType)
+		{
+		case MARINHOUSE:
+			IconDesc.iTexureNum = CUIIcon::ICON_HOUSE;
+			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+				return E_FAIL;
+			break;
+		case SHOP:
+			IconDesc.iTexureNum = CUIIcon::ICON_SHOP;
+			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+				return E_FAIL;
+			break;
+		case CRANE_GAME:
+			IconDesc.iTexureNum = CUIIcon::ICON_HOUSE;
+			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+				return E_FAIL;
+			break;
+		case TELEPHONE:
+			IconDesc.iTexureNum = CUIIcon::ICON_TELL;
+			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+				return E_FAIL;
+			break;
+		default:
+			break;
+		}
+
+		switch (m_PortalDesc.eConnectLevel)
+		{
+		case LEVEL_TAILCAVE:
+		case LEVEL_TOWER:
+			IconDesc.iTexureNum = CUIIcon::ICON_DGN;
+			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+				return E_FAIL;
+			break;
+		default:
+			break;
+		}
+		
 	}
 
 	Set_Scale(_float3(3.f, 3.f, 3.f));

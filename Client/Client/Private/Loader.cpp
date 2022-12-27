@@ -35,13 +35,14 @@
 #include "TarinNpc.h"
 
 //for UI
-#include "BackGround.h"
+#include "UIScreen.h"
 #include "InvenTile.h"
 #include "UIButton.h"
 #include "InvenItem.h"
 #include "PlayerState.h"
 #include "MessageBox.h"
 #include "UIName.h"
+#include "UIIcon.h"
 
 //for Object 
 #include "Terrain.h"
@@ -199,7 +200,7 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
 	/* For.Prototype_Component_Navigation */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Navigation_Field"),
-		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Filed_Navi.dat")))))
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Data/Filed_Navi2.dat")))))
 		return E_FAIL;
 	
 	/* For.Prototype_Component_Navigation */
@@ -256,6 +257,11 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	
 	PivotMatrix = XMMatrixIdentity();
 
+	/*For.Prototype_Component_Model_Warp*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_WarpHole"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/WarpHole/WarpHole.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	/*For.Prototype_Component_Model_BladeTrap*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Boulder"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Boulder/Boulder.fbx", PivotMatrix))))
@@ -272,7 +278,8 @@ HRESULT CLoader::Loading_ForStaticLevel()
 
 
 	PivotMatrix = XMMatrixIdentity();
-	
+
+
 	/*For.Prototype_Component_Model_Arrow*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Arrow"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/Arrow/Arrow.fbx", PivotMatrix))))
@@ -538,6 +545,9 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 			pData_Manager->Add_ModelTag(pModeltag);
 		}
 	}
+
+	
+
 
 	/*For.Prototype_Component_Model_Octorock*/
 	PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
@@ -969,7 +979,12 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	/*For.Prototype_GameObject_UIName*/
+	/*For.Prototype_GameObject_UIIcon*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UIIcon"),
+		CUIIcon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_UIEffect*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UIEffect"),
 		CUIEffect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -1138,7 +1153,7 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround_UI"),
-		CBackGround::Create(m_pDevice, m_pContext))))
+		CUIScreen::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 
@@ -1228,6 +1243,11 @@ HRESULT CLoader::Loading_For_UITexture()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Icon/Icon_%02d.png"), 7))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Name"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Name/Name_%d.png"), 9))))
 		return E_FAIL;
@@ -1280,8 +1300,8 @@ HRESULT CLoader::Loading_For_UITexture()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/TitleScreen.dds"), 1))))
 		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_InventoryBackGround_UI"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Inventory.dds"), 1))))
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_GamePlayScreen_UI"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/PlayGameScreen_%d.dds"), 2))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_InvenTile"),
