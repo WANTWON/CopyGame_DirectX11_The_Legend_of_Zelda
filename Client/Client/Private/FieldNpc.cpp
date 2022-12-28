@@ -592,9 +592,9 @@ int CFieldNpc::Child_Tick(_float fTimeDelta)
 
 void CFieldNpc::Make_ChildEffect(_float fTimeDelta)
 {
-	m_fEffectTimeEnd = 0.3f;
+	m_fEffectEndTime = 0.3f;
 	m_fEffectTime += fTimeDelta;
-	if (m_fEffectTime > m_fEffectTimeEnd)
+	if (m_fEffectTime > m_fEffectEndTime)
 	{
 		CEffect::EFFECTDESC EffectDesc;
 		EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;

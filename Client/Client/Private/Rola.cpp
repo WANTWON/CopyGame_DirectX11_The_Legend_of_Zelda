@@ -190,9 +190,9 @@ void CRola::Change_Animation(_float fTimeDelta)
 		if (m_fZoomValue <= -1.f)
 			m_fZoomValue = -1.f;
 
-		m_fEffectTimeEnd = 0.3f;
+		m_fEffectEndTime = 0.3f;
 		m_fEffectTime += fTimeDelta;
-		if (m_fEffectTime > m_fEffectTimeEnd)
+		if (m_fEffectTime > m_fEffectEndTime)
 		{
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.pTarget = this;

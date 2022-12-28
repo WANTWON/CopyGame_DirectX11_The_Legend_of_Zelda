@@ -83,7 +83,7 @@ private:
 	DWORD					m_dwClawCount = GetTickCount();
 
 	_float					m_fEffectTime = 0.f;
-	_float					m_fEffectTimeEnd = 0.f;
+	_float					m_fEffectEndTime = 0.f;
 	_float					m_fClawTime = 0.f;
 	_float					m_fClawTimeEnd = 0.f;
 

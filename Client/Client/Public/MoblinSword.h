@@ -43,7 +43,7 @@ private:
 	STATE m_ePreState = FIND;
 
 	_float					m_fEffectTime = 0.f;
-	_float					m_fEffectTimeEnd = 0.f;
+	_float					m_fEffectEndTime = 0.f;
 
 public:
 	static CMoblinSword* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

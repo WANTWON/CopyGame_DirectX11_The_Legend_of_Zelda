@@ -163,9 +163,9 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 	case Client::CMoblinSword::FIND:
 	case Client::CMoblinSword::STANCE_WALK:
 
-		m_fEffectTimeEnd = 0.1f;
+		m_fEffectEndTime = 0.1f;
 		m_fEffectTime += fTimeDelta;
-		if (m_fEffectTime > m_fEffectTimeEnd)
+		if (m_fEffectTime > m_fEffectEndTime)
 		{
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;

@@ -184,9 +184,9 @@ void CTailBoss::Change_Animation(_float fTimeDelta)
 	case Client::CTailBoss::DEAD:
 		if (m_TailDesc.eTailType == TAIL1)
 		{
-			m_fEffectTimeEnd = 0.3f;
+			m_fEffectEndTime = 0.3f;
 			m_fEffectTime += fTimeDelta;
-			if (m_fEffectTime > m_fEffectTimeEnd)
+			if (m_fEffectTime > m_fEffectEndTime)
 			{
 				CEffect::EFFECTDESC EffectDesc;
 				EffectDesc.pTarget = this;
@@ -247,9 +247,9 @@ void CTailBoss::Change_Animation(_float fTimeDelta)
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
-		m_fEffectTimeEnd = 0.3f;
+		m_fEffectEndTime = 0.3f;
 		m_fEffectTime += fTimeDelta;
-		if (m_fEffectTime > m_fEffectTimeEnd)
+		if (m_fEffectTime > m_fEffectEndTime)
 		{
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;

@@ -48,7 +48,20 @@ int CUIScreen::Tick(_float fTimeDelta)
 
 void CUIScreen::Late_Tick(_float fTimeDelta)
 {
-	__super::Late_Tick(fTimeDelta);
+	if (CGameInstance::Get_Instance()->Get_CurrentLevelIndex() == LEVEL_LOADING
+		|| CGameInstance::Get_Instance()->Get_CurrentLevelIndex() == LEVEL_LOGO)
+	{
+		if (m_BackgroundDesc.eVisibleScreen != VISIBLE_LOGO)
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+		else
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_BACK, this);
+	}
+	else
+		__super::Late_Tick(fTimeDelta);
+		
+
+
+		
 
 	if (m_BackgroundDesc.eVisibleScreen == VISIBLE_SCREEN)
 	{
@@ -79,8 +92,21 @@ HRESULT CUIScreen::Render()
 	if (CUI_Manager::Get_Instance()->Get_UI_OpenType() == CUI_Manager::UI_END && m_BackgroundDesc.eVisibleScreen == VISIBLE_PLAYGAME)
 		return E_FAIL;
 
-	if (FAILED(__super::Render()))
+	if (nullptr == m_pShaderCom ||
+		nullptr == m_pVIBufferCom)
 		return E_FAIL;
+
+	if (FAILED(SetUp_ShaderID()))
+		return E_FAIL;
+
+	if (FAILED(SetUp_ShaderResources()))
+		return E_FAIL;
+
+	m_pShaderCom->Begin(m_eShaderID);
+
+	m_pVIBufferCom->Render();
+
+	return S_OK;
 	
 	return S_OK;
 }

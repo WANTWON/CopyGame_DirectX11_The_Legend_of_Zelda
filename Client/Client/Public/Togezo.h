@@ -44,7 +44,7 @@ private:
 	STATE m_eState = IDLE;
 	DWORD m_dwStunTime = GetTickCount();
 	_float					m_fEffectTime = 0.f;
-	_float					m_fEffectTimeEnd = 0.f;
+	_float					m_fEffectEndTime = 0.f;
 public:
 	static CTogezo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;

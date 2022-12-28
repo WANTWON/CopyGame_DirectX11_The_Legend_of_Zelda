@@ -126,9 +126,9 @@ void CAlbatoss::Check_Navigation(_float fTimeDelta)
 	m_pNavigationCom->Compute_CurrentIndex_byDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE && m_eState == RUSH)
 	{
-		m_fEffectTimeEnd = 0.1f;
+		m_fEffectEndTime = 0.1f;
 		m_fEffectTime += fTimeDelta;
-		if (m_fEffectTime > m_fEffectTimeEnd)
+		if (m_fEffectTime > m_fEffectEndTime)
 		{
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
@@ -159,9 +159,9 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		m_bMakeEffect = false;
-		m_fEffectTimeEnd = 0.3f;
+		m_fEffectEndTime = 0.3f;
 		m_fEffectTime += fTimeDelta;
-		if (m_fEffectTime > m_fEffectTimeEnd)
+		if (m_fEffectTime > m_fEffectEndTime)
 		{
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::MODEL;
@@ -188,9 +188,9 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
-		m_fEffectTimeEnd = 0.3f;
+		m_fEffectEndTime = 0.3f;
 		m_fEffectTime += fTimeDelta;
-		if (m_fEffectTime > m_fEffectTimeEnd)
+		if (m_fEffectTime > m_fEffectEndTime)
 		{
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::MODEL;
@@ -375,9 +375,9 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		m_fAlpha += 0.01f;
 		m_fAnimSpeed = 1.5f;
 
-		m_fEffectTimeEnd = 0.2f;
+		m_fEffectEndTime = 0.2f;
 		m_fEffectTime += fTimeDelta;
-		if (m_fEffectTime > m_fEffectTimeEnd)
+		if (m_fEffectTime > m_fEffectEndTime)
 		{
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.pTarget = this;
@@ -1014,9 +1014,9 @@ void CAlbatoss::Flapping_Attack(_float fTimeDelta)
 
 			}
 
-			m_fEffectTimeEnd = 0.1f;
+			m_fEffectEndTime = 0.1f;
 			m_fEffectTime += fTimeDelta;
-			if (m_fEffectTime > m_fEffectTimeEnd)
+			if (m_fEffectTime > m_fEffectEndTime)
 			{
 				CEffect::EFFECTDESC EffectDesc;
 				EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
@@ -1050,9 +1050,9 @@ void CAlbatoss::Flapping_Attack(_float fTimeDelta)
 
 void CAlbatoss::Make_ClawEffect(_float fTimeDelta)
 {
-	m_fEffectTimeEnd = 0.1f;
+	m_fEffectEndTime = 0.1f;
 	m_fEffectTime += fTimeDelta;
-	if (m_fEffectTime > m_fEffectTimeEnd)
+	if (m_fEffectTime > m_fEffectEndTime)
 	{
 		CEffect::EFFECTDESC EffectDesc;
 		EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;

@@ -65,6 +65,7 @@ public: /* Getter & Setter */
 	void	Set_2DMode(_bool type);
 	void	Set_WarpPosition(_vector vPosition) { m_vWarpPos = vPosition; }
 
+
 public:
 	void	Change_Navigation(LEVEL eLevel);
 	void	Compute_CurrentIndex(LEVEL eLevel);
@@ -78,6 +79,7 @@ public:
 	void Make_GuardEffect(CBaseObj* pTarget = nullptr);
 	void Make_SlashEffect();
 	void Make_ChargeEffect();
+	void Make_DefaultEffect(_float fTimeDelta, ANIM eState);
 
 private:
 	void Key_Input(_float fTimeDelta);
@@ -85,7 +87,8 @@ private:
 	void Change_Animation(_float fTimeDelta);
 	void Check_Navigation(_float fTimeDelta);
 	void Render_Model(MESH_NAME eMeshName);
-	
+	void Play_Sound_by_State(_float fTimeDelta);
+
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;
 	virtual HRESULT SetUp_ShaderResources() override; /* 셰이더 전역변수에 값을 전달한다. */
@@ -151,12 +154,15 @@ private:
 	/* For State Timer */
 	_float					m_fTime = 0.f;
 	_float					m_fEffectTime = 0.f;
-	_float					m_fEffectTimeEnd = 0.f;
+	_float					m_fEffectEndTime = 0.f;
 	_float					m_fChargeTime = 0.f;
+	_float					m_fSoundTime = 0.f;
+	_float					m_fSoundEndTime = 0.f;
 	DWORD					m_dwDashTime = GetTickCount();
 	DWORD					m_dwPressedTime = GetTickCount();
 	DWORD					m_dwHitTime = GetTickCount();
 	DWORD					m_dwChargeTime = GetTickCount();
+
 
 	/* For Portal */
 	_float3					m_vPortalPos = _float3(0.f, 0.f, 0.f);

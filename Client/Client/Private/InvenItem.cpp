@@ -99,9 +99,9 @@ void CInvenItem::Late_Tick(_float fTimeDelta)
 			if (m_falpha <= 0.f)
 				m_falpha = 0.f;
 
-			m_fEffectTimeEnd = 1.f;
+			m_fEffectEndTime = 1.f;
 			m_fEffectTime += fTimeDelta;
-			if (m_fEffectTime > m_fEffectTimeEnd)
+			if (m_fEffectTime > m_fEffectEndTime)
 			{
 				CUIEffect::EFFECTDESC EffectDesc;
 				EffectDesc.eEffectID = CUIEffect::COMPOSS_RING;

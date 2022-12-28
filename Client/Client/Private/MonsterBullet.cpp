@@ -398,9 +398,9 @@ void CMonsterBullet::Moving_AlbatossBullet(_float fTimeDelta)
 
 void CMonsterBullet::LateTick_Octorock(_float fTimeDelta)
 {
-	m_fEffectTimeEnd = 0.1f;
+	m_fEffectEndTime = 0.1f;
 	m_fEffectTime += fTimeDelta;
-	if (m_fEffectTime > m_fEffectTimeEnd)
+	if (m_fEffectTime > m_fEffectEndTime)
 	{
 		CEffect::EFFECTDESC EffectDesc;
 		EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
@@ -418,9 +418,9 @@ void CMonsterBullet::LateTick_RulaBullet(_float fTimeDelta)
 {
 	if (m_fSpeed != 0)
 	{
-		m_fEffectTimeEnd = 0.4f;
+		m_fEffectEndTime = 0.4f;
 		m_fEffectTime += fTimeDelta;
-		if (m_fEffectTime > m_fEffectTimeEnd)
+		if (m_fEffectTime > m_fEffectEndTime)
 		{
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;

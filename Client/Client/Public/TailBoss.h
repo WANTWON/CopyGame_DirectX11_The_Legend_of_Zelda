@@ -58,7 +58,7 @@ private:
 	_float m_fZoomValue = 0.f;
 	_float m_fNameBoxTime = 0.f;
 
-	_float m_fEffectTimeEnd = 0.f;
+	_float m_fEffectEndTime = 0.f;
 	_float m_fEffectTime = 0.f;
 
 	_bool m_bChangeDirection = false;

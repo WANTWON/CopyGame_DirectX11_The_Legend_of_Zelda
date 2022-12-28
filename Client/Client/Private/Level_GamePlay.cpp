@@ -86,8 +86,10 @@ HRESULT CLevel_GamePlay::Initialize()
 	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
 	CUI_Manager::Get_Instance()->Set_NextLevel(false);
 
-
-	CGameInstance::Get_Instance()->PlayBGM(TEXT("1-08 Field (Normal).mp3"), 0.5f);
+	
+	g_fBGMVolume = 0.f;
+	CGameInstance::Get_Instance()->StopAll();
+	CGameInstance::Get_Instance()->PlayBGM(TEXT("1_0 Field (Normal).mp3"), g_fBGMVolume);
 	return S_OK;
 }
 
@@ -96,6 +98,11 @@ void CLevel_GamePlay::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);	
 
 	CUI_Manager::Get_Instance()->Tick_UI(fTimeDelta);
+
+	g_fBGMVolume += 0.002f;
+	if (g_fBGMVolume >= 0.3f)
+		g_fBGMVolume = 0.2f;
+	CGameInstance::Get_Instance()->SetChannelVolume(SOUND_BGM, g_fBGMVolume);
 
 
 	if (CUI_Manager::Get_Instance()->Get_NextLevelFinished())
@@ -128,6 +135,24 @@ void CLevel_GamePlay::Late_Tick(_float fTimeDelta)
 
 	m_pCollision_Manager->Update_Collider();
 	m_pCollision_Manager->CollisionwithBullet();
+
+
+	Setting_Light();
+}
+
+void CLevel_GamePlay::Setting_Light()
+{
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+	
+
+
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return;
 }
 
 HRESULT CLevel_GamePlay::Ready_Lights()

@@ -68,7 +68,7 @@ protected: /* For.Components */
 	_float					m_fSpeed = 0.f;
 	_float					m_fRotSpeed = 0.f;
 
-	_float					m_fEffectTimeEnd = 0.f;
+	_float					m_fEffectEndTime = 0.f;
 	_float					m_fEffectTime = 0.f;
 
 

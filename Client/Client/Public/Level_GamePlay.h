@@ -16,6 +16,7 @@ public:
 	virtual HRESULT Initialize();
 	virtual void Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
+	void Setting_Light();
 
 public:
 	HRESULT Ready_Lights();
@@ -29,6 +30,8 @@ public:
 	HRESULT Ready_Layer_Portal(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Npc(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Warp(const _tchar* pLayerTag);
+
+
 private:
 	CCollision_Manager* m_pCollision_Manager = nullptr;
 	

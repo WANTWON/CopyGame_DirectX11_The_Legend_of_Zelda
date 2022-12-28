@@ -5,6 +5,9 @@
 #include "Level_Loading.h"
 #include "UIScreen.h"
 
+
+float g_fBGMVolume = 0.f;
+
 CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
 {
@@ -18,6 +21,8 @@ HRESULT CLevel_Logo::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
+	CGameInstance::Get_Instance()->PlayBGM(TEXT("0_Title (No Intro Version).mp3"), g_fBGMVolume);
+	CUI_Manager::Get_Instance()->Set_NextLevel(false);
 	return S_OK;
 }
 
@@ -35,11 +40,18 @@ void CLevel_Logo::Tick(_float fTimeDelta)
 		Safe_Release(pGameInstance);
 	}
 
+	g_fBGMVolume += 0.002f;
+	if (g_fBGMVolume >= 0.3f)
+		g_fBGMVolume = 0.2f;
+	CGameInstance::Get_Instance()->SetChannelVolume(SOUND_BGM, g_fBGMVolume);
+
 
 	if (GetKeyState(VK_SPACE) & 0x8000)
+	{
 		CUI_Manager::Get_Instance()->Set_NextLevel(true);
-
-
+		CUI_Manager::Get_Instance()->Set_NextLevelFinished(false);
+	}
+		
 }
 
 void CLevel_Logo::Late_Tick(_float fTimeDelta)
@@ -62,12 +74,14 @@ HRESULT CLevel_Logo::Ready_Layer_BackGround(const _tchar * pLayerTag)
 		&BackgroundDesc)))
 		return E_FAIL;
 
+
 	BackgroundDesc.eVisibleScreen = CUIScreen::VISIBLE_SCREEN;
 	BackgroundDesc.pTextureTag = nullptr;
 	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, TEXT("UI_Screen"),
 		&BackgroundDesc)))
 		return E_FAIL;
 
+	
 	Safe_Release(pGameInstance);
 
 	return S_OK;
