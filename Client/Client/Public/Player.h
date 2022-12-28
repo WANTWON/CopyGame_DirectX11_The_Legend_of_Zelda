@@ -87,7 +87,7 @@ private:
 	void Change_Animation(_float fTimeDelta);
 	void Check_Navigation(_float fTimeDelta);
 	void Render_Model(MESH_NAME eMeshName);
-	void Play_Sound_by_State(_float fTimeDelta);
+	void Sound_PlayerVoice_by_State(_float fTimeDelta);
 
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;
@@ -120,7 +120,7 @@ private:
 	_bool					m_bFirst = false;
 	_bool					m_bUpDown = false;
 	_bool					m_bCarry = false;
-
+	_bool					m_bSoundOnce = false;
 
 	//For Jump
 	_float					m_fStartHeight = 2.2f;

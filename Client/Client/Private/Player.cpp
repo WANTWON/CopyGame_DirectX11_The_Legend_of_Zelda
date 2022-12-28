@@ -158,6 +158,7 @@ int CPlayer::Tick(_float fTimeDelta)
 	{
 		m_pModelCom->Set_NextAnimIndex(m_eState);
 		m_ePreState = m_eState;
+		m_bSoundOnce = false;
 	}
 
 	if(!m_bDead)
@@ -178,7 +179,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		return;
 
 
-	Play_Sound_by_State(fTimeDelta);
+	Sound_PlayerVoice_by_State(fTimeDelta);
 
 	for (auto& pParts : m_Parts)
 	{
@@ -905,8 +906,12 @@ void CPlayer::Render_Model(MESH_NAME eMeshName)
 		return;
 }
 
-void CPlayer::Play_Sound_by_State(_float fTimeDelta)
+void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 {
+
+	if (m_bSoundOnce)
+		return;
+
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
 	_uint iNum = 0;
@@ -919,8 +924,16 @@ void CPlayer::Play_Sound_by_State(_float fTimeDelta)
 	{
 	case Client::CPlayer::WALK_CARRY:
 	case Client::CPlayer::RUN:
+	case Client::CPlayer::SHIELD_HOLD_L:
+	case Client::CPlayer::SHIELD_HOLD_R:
+	case Client::CPlayer::SHIELD_HOLD_B:
+	case Client::CPlayer::SLASH_HOLD_F:
+	case Client::CPlayer::SLASH_HOLD_B:
+	case Client::CPlayer::SLASH_HOLD_L:
+	case Client::CPlayer::SLASH_HOLD_R:
+	case Client::CPlayer::SHIELD_HOLD_F:
 		m_fSoundEndTime = 0.2f;
-		fVolume = 0.3f;
+		fVolume = 0.2f;
 		iNum = rand() % 5 + 1;
 		if (iLevel == LEVEL_GAMEPLAY)
 		{
@@ -933,38 +946,44 @@ void CPlayer::Play_Sound_by_State(_float fTimeDelta)
 		wsprintf(szFullPath, szFullPath, iNum);
 		break;
 	case Client::CPlayer::DASH_LP:
+		m_fSoundEndTime = 0.1f;
+		fVolume = 0.2f;
+		iNum = rand() % 5 + 1;
+		if (iLevel == LEVEL_GAMEPLAY)
+		{
+			wcscpy_s(szFullPath, TEXT("1_Field_FootStep (%d).wav"));
+		}
+		else
+		{
+			wcscpy_s(szFullPath, TEXT("2_Dgn_FootStep (%d).wav"));
+		}
+		wsprintf(szFullPath, szFullPath, iNum);
 		break;
 	case Client::CPlayer::LADDER_UP:
 	case Client::CPlayer::LADDER_WAIT:
 	case Client::CPlayer::ITEM_GET_LP:
 	case Client::CPlayer::PULL_LP:
 	case Client::CPlayer::EV_TELL_LP:
-	
 		break;
-	case Client::CPlayer::SLASH_HOLD_F:
-	case Client::CPlayer::SLASH_HOLD_B:
-	case Client::CPlayer::SLASH_HOLD_L:
-	case Client::CPlayer::SLASH_HOLD_R:
 	case Client::CPlayer::SLASH_HOLD_LP:
-	case Client::CPlayer::SHIELD_HOLD_F:
 	case Client::CPlayer::SHIELD_HOLD_LP:
-		
-		break;
-	case Client::CPlayer::SHIELD_HOLD_L:
-	case Client::CPlayer::SHIELD_HOLD_R:
-	case Client::CPlayer::SHIELD_HOLD_B:
-		
 		break;
 	case Client::CPlayer::PUSH_LP:
-	
+		break;
 	case Client::CPlayer::PUSH_WAIT:
-		
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		iNum = rand() % 4 + 1;
+		wcscpy_s(szFullPath, TEXT("Link_Push.wav"));
+		wsprintf(szFullPath, szFullPath, iNum);
 		break;
 	case Client::CPlayer::JUMP:
-		break;
-	
 	case Client::CPlayer::D_JUMP:
-
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		iNum = rand() % 5 + 1;
+		wcscpy_s(szFullPath, TEXT("Link_Jump (%d).wav"));
+		wsprintf(szFullPath, szFullPath, iNum);
 		break;
 	case Client::CPlayer::D_FALL:
 		break;
@@ -980,22 +999,42 @@ void CPlayer::Play_Sound_by_State(_float fTimeDelta)
 		break;
 	case Client::CPlayer::LAND:
 	case Client::CPlayer::D_LAND:
-		
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		if (iLevel == LEVEL_GAMEPLAY)
+		{
+			wcscpy_s(szFullPath, TEXT("1_Field_FootStep (3).wav"));
+		}
+		else
+		{
+			wcscpy_s(szFullPath, TEXT("2_Dgn_FootStep (3).wav"));
+		}
+		wsprintf(szFullPath, szFullPath, iNum);
 		break;
 	case Client::CPlayer::DMG_PRESS:
-		
-		break;
 	case Client::CPlayer::DMG_B:
-		
-		break;
 	case Client::CPlayer::DMG_F:
 	case Client::CPlayer::DMG_QUAKE:
-		
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		iNum = rand() % 5 + 1;
+		wcscpy_s(szFullPath, TEXT("Link_Damage(%d).wav"));
+		wsprintf(szFullPath, szFullPath, iNum);
 		break;
 	case Client::CPlayer::SLASH:
 	case Client::CPlayer::S_SLASH:
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		iNum = rand() % 3 + 1;
+		wcscpy_s(szFullPath, TEXT("Link_Sword_Swing (%d).wav"));
+		wsprintf(szFullPath, szFullPath, iNum);
+		break;
 	case Client::CPlayer::SLASH_HOLD_ED:
-		
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		iNum = rand() % 3 + 1;
+		wcscpy_s(szFullPath, TEXT("Link_Sword_360 (%d).wav"));
+		wsprintf(szFullPath, szFullPath, iNum);
 		break;
 	case Client::CPlayer::DASH_ST:
 		
@@ -1021,7 +1060,11 @@ void CPlayer::Play_Sound_by_State(_float fTimeDelta)
 		break;
 	case Client::CPlayer::FALL_HOLE:
 	case Client::CPlayer::FALL_ANTLION:
-		
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		iNum = rand() % 4 + 1;
+		wcscpy_s(szFullPath, TEXT("Link_Fall(%d).wav"));
+		wsprintf(szFullPath, szFullPath, iNum);
 		break;
 	case Client::CPlayer::STAIR_DOWN:
 	case Client::CPlayer::LADDER_UP_ED:
@@ -1052,7 +1095,7 @@ void CPlayer::Play_Sound_by_State(_float fTimeDelta)
 		break;
 	}
 
-	if (m_fSoundTime > m_fSoundEndTime)
+	if (m_fSoundTime > m_fSoundEndTime || m_bSoundOnce)
 	{
 		pGameInstance->PlaySounds(szFullPath, SOUND_PLAYER, fVolume);
 		m_fSoundTime = 0.f;
@@ -1333,9 +1376,9 @@ void CPlayer::Make_DefaultEffect(_float fTimeDelta, ANIM eState)
 		{
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 			EffectDesc.eEffectID = CObjectEffect::SMOKE;
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.5f, 0.f, 0.f);
-			EffectDesc.fDeadTime = 0.1f;
-			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.6f, 0.f, 0.f);
+			EffectDesc.fDeadTime = 0.2f;
+			EffectDesc.vColor = XMVectorSet(255, 255, 255, 255);
 			EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
 			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 			m_fEffectTime = 0.f;

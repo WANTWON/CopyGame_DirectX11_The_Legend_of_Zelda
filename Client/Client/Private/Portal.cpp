@@ -165,6 +165,11 @@ void CPortal::Portal_Level_Tick(_float fTimeDelta)
 	CBaseObj* pTarget = nullptr;
 	if (pUI_Manager->Get_NextLevel() == false && CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_PLAYER, m_pOBBCom, &pTarget) == true)
 	{
+		if (dynamic_cast<CPlayer*>(pTarget)->Get_AnimState() == CPlayer::WARP_LP)
+		{
+			RELEASE_INSTANCE(CUI_Manager)
+			return;
+		}
 		pUI_Manager->Set_NextLevelIndex(m_PortalDesc.eConnectLevel);
 		pUI_Manager->Set_NextLevel(true);
 		pUI_Manager->Set_RoomType((CUI_Manager::ROOMTYPE)m_PortalDesc.eRoomType);

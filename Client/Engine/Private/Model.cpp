@@ -263,6 +263,7 @@ HRESULT CModel::RenderShadow(CShader * pShader, _uint iMeshIndex, _uint iLevelIn
 		char CheckName6[] = "hole";
 		char CheckName7[] = "TailGate";
 		char CheckName8[] = "tile";
+		char CheckName9[] = "Flower";
 
 		char* ptr = strstr(szName, CheckName);
 		char* ptr2 = strstr(szName, CheckName2);
@@ -272,10 +273,11 @@ HRESULT CModel::RenderShadow(CShader * pShader, _uint iMeshIndex, _uint iLevelIn
 		char* ptr6 = strstr(szName, CheckName6);
 		char* ptr7 = strstr(szName, CheckName7);
 		char* ptr8 = strstr(szName, CheckName8);
+		char* ptr9 = strstr(szName, CheckName9);
 
 		if (ptr != nullptr || ptr2 != nullptr || ptr3 != nullptr
-			|| ptr4 != nullptr || ptr5 != nullptr ||ptr6 != nullptr 
-			|| ptr7 != nullptr || ptr8 != nullptr)
+			|| ptr4 != nullptr || ptr5 != nullptr || ptr6 != nullptr 
+			|| ptr7 != nullptr || ptr8 != nullptr || ptr9 != nullptr)
 			return S_OK;
 	}
 	else if (iLevelIndex == 4) //Level Tail Cave
