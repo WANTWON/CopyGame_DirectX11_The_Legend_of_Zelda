@@ -30,7 +30,7 @@ public:
 	virtual int Tick(_float fTimeDelta);
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
-	void Set_TexutureNum(_uint iNum) { m_IconDesc.iTexureNum = iNum; }
+ 	void Set_TexutureNum(_uint iNum) { m_IconDesc.iTexureNum = iNum; }
 	ICONDESC Get_IconDesc() { return m_IconDesc; }
 
 private:

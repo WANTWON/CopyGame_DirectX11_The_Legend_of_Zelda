@@ -139,6 +139,7 @@ private:
 	/* For Warp */
 	vector<CObj_UI*>	m_WarpGroup;
 	_int				m_iWarpIndex = 0;
+	_int				m_iMInMaxIndex = 0;
 	CObj_UI*			m_pPickedWarp = nullptr;
 public:
 	void Free() override;

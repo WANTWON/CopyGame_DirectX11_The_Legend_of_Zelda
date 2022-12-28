@@ -117,11 +117,11 @@ void CUI_Manager::Tick_Map()
 		_float fMinDistance = MIN_DISTANCE;
 		for (auto& iter : m_WarpGroup)
 		{
-			_float fXDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().x - iter->Get_Position().x;
+			_float fXDistance = iter->Get_Position().x - m_WarpGroup[m_iWarpIndex]->Get_Position().x;
 			if (fXDistance < fMinDistance && fXDistance > 0)
 			{
 				fMinDistance = fXDistance;
-				m_iWarpIndex = iIndex;
+				m_iMInMaxIndex = iIndex;
 			}
 			iIndex++;
 		}
@@ -133,10 +133,10 @@ void CUI_Manager::Tick_Map()
 			for (auto& iter : m_WarpGroup)
 			{
 				_float fXDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().x - iter->Get_Position().x;
-				if (fXDistance > fMaxDistance && fXDistance < 0)
+				if (fXDistance > fMaxDistance && fXDistance > 0)
 				{
 					fMaxDistance = fXDistance;
-					m_iWarpIndex = iIndex;
+					m_iMInMaxIndex = iIndex;
 				}
 				iIndex++;
 			}
@@ -148,11 +148,11 @@ void CUI_Manager::Tick_Map()
 		_float fMaxDistance = MAX_DISTANCE;
 		for (auto& iter : m_WarpGroup)
 		{
-			_float fXDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().x - iter->Get_Position().x;
+			_float fXDistance = iter->Get_Position().x - m_WarpGroup[m_iWarpIndex]->Get_Position().x;
 			if (fXDistance > fMaxDistance && fXDistance < 0)
 			{
 				fMaxDistance = fXDistance;
-				m_iWarpIndex = iIndex;
+				m_iMInMaxIndex = iIndex;
 			}
 			iIndex++;
 		}
@@ -164,26 +164,26 @@ void CUI_Manager::Tick_Map()
 			for (auto& iter : m_WarpGroup)
 			{
 				_float fXDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().x - iter->Get_Position().x;
-				if (fXDistance < fMinDistance && fXDistance > 0)
+				if (fXDistance < fMinDistance && fXDistance < 0)
 				{
 					fMinDistance = fXDistance;
-					m_iWarpIndex = iIndex;
+					m_iMInMaxIndex = iIndex;
 				}
 				iIndex++;
 			}
 		}
 	}
-	else if (pGameInstance->Key_Up(DIK_DOWN))
+	else if (pGameInstance->Key_Up(DIK_UP))
 	{
 		_int iIndex = 0;
 		_float fMaxDistance = MAX_DISTANCE;
 		for (auto& iter : m_WarpGroup)
 		{
-			_float fYDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().y - iter->Get_Position().y;
+			_float fYDistance = iter->Get_Position().y - m_WarpGroup[m_iWarpIndex]->Get_Position().y;
 			if (fYDistance > fMaxDistance && fYDistance < 0)
 			{
 				fMaxDistance = fYDistance;
-				m_iWarpIndex = iIndex;
+				m_iMInMaxIndex = iIndex;
 			}
 			iIndex++;
 		}
@@ -195,27 +195,27 @@ void CUI_Manager::Tick_Map()
 			for (auto& iter : m_WarpGroup)
 			{
 				_float fYDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().y - iter->Get_Position().y;
-				if (fYDistance < fMinDistance && fYDistance > 0)
+				if (fYDistance < fMinDistance && fYDistance < 0)
 				{
 					fMinDistance = fYDistance;
-					m_iWarpIndex = iIndex;
+					m_iMInMaxIndex = iIndex;
 				}
 				iIndex++;
 			}
 
 		}
 	}
-	else if (pGameInstance->Key_Up(DIK_UP))
+	else if (pGameInstance->Key_Up(DIK_DOWN))
 	{
 		_int iIndex = 0;
 		_float fMinDistance = MIN_DISTANCE;
 		for (auto& iter : m_WarpGroup)
 		{
-			_float fYDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().y - iter->Get_Position().y;
+			_float fYDistance = iter->Get_Position().y - m_WarpGroup[m_iWarpIndex]->Get_Position().y;
 			if (fYDistance < fMinDistance && fYDistance > 0)
 			{
 				fMinDistance = fYDistance;
-				m_iWarpIndex = iIndex;
+				m_iMInMaxIndex = iIndex;
 			}
 			iIndex++;
 		}
@@ -227,25 +227,30 @@ void CUI_Manager::Tick_Map()
 			for (auto& iter : m_WarpGroup)
 			{
 				_float fYDistance = m_WarpGroup[m_iWarpIndex]->Get_Position().y - iter->Get_Position().y;
-				if (fYDistance > fMaxDistance && fYDistance < 0)
+				if (fYDistance > fMaxDistance && fYDistance > 0)
 				{
 					fMaxDistance = fYDistance;
-					m_iWarpIndex = iIndex;
+					m_iMInMaxIndex = iIndex;
 				}
 				iIndex++;
 			}
 		}
 	}
 
+	m_iWarpIndex = m_iMInMaxIndex;
 	dynamic_cast<CUIIcon*>(m_pPickedWarp)->Set_TexutureNum(CUIIcon::ICON_WARP);
-	m_pPickedTile = m_WarpGroup[m_iWarpIndex];
+	m_pPickedWarp = m_WarpGroup[m_iWarpIndex];
 	dynamic_cast<CUIIcon*>(m_pPickedWarp)->Set_TexutureNum(CUIIcon::ICON_WARP_ON);
 
 
-	if (pGameInstance->Key_Up(DIK_X))
+	if (pGameInstance->Key_Up(DIK_SPACE))
 	{
-		_vector vWarpPosition =  dynamic_cast<CUIIcon*>(m_pPickedTile)->Get_IconDesc().pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		_vector vWarpPosition =  dynamic_cast<CUIIcon*>(m_pPickedWarp)->Get_IconDesc().pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+		pPlayer->Set_WarpPosition(vWarpPosition);
+		pPlayer->Set_AnimState(CPlayer::WARP_ST);
 
+		Set_UI_OpenType(UI_END);
 	}
 
 

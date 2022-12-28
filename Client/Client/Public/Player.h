@@ -19,7 +19,7 @@ public:
 	enum ANIM {
 		IDLE, RUN, WALK, STAIR_DOWN, STAIR_UP,FALL, LADDER_UP, LADDER_UP_ED, LADDER_WAIT, IDLE_CARRY, ITEM_CARRY, WALK_CARRY, 
 		DEAD, SHIELD_HOLD_B, SHIELD_HOLD_F, SHIELD_HOLD_L, SHIELD_HOLD_R, S_ITEM_GET_ED, S_ITEM_GET_LP, S_ITEM_GET_ST, EV_TELL_ED, EV_TELL_LP, EV_TELL_ST,
-		D_FALL, D_JUMP, D_LAND, JUMP, LAND, S_SLASH, SLASH, SLASH_HOLD_B, SLASH_HOLD_ED, SLASH_HOLD_F,
+		WARP_ED, WARP_LP, WARP_ST, D_FALL, D_JUMP, D_LAND, JUMP, LAND, S_SLASH, SLASH, SLASH_HOLD_B, SLASH_HOLD_ED, SLASH_HOLD_F,
 		SLASH_HOLD_L, SLASH_HOLD_LP, SLASH_HOLD_R, SLASH_HOLD_ST, SHIELD_HOLD_ED, SHIELD_HOLD_LP, SHIELD, SHIELD_HIT,
 		BOW_ED, BOW_ST, DASH_ED, DASH_LP, DASH_ST, DMG_B, DMG_F, DMG_PRESS, DMG_QUAKE, ITEM_GET_ED, ITEM_GET_LP, ITEM_GET_ST,
 		KEY_OPEN, FALL_ANTLION, FALL_FROMTOP, FALL_HOLE, PULL_LP, PUSH_LP, PUSH_WAIT
@@ -63,7 +63,7 @@ public: /* Getter & Setter */
 	void	Set_JumpingHeight(_float fHeight) { m_fStartHeight = fHeight; m_fEndHeight = fHeight; }
 	void	Set_NextPortal(_float3 vPosition, _bool is2D) { m_vPortalPos = vPosition; m_b2D = is2D;}
 	void	Set_2DMode(_bool type);
-
+	void	Set_WarpPosition(_vector vPosition) { m_vWarpPos = vPosition; }
 
 public:
 	void	Change_Navigation(LEVEL eLevel);
@@ -160,6 +160,7 @@ private:
 
 	/* For Portal */
 	_float3					m_vPortalPos = _float3(0.f, 0.f, 0.f);
+	_vector					m_vWarpPos = { 0.f, 0.f, 0.f , 0.f};
 	_bool					m_b2D = false;
 	
 

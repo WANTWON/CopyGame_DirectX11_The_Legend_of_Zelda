@@ -32,8 +32,8 @@ namespace Client
 		
 	}OBJINFO;
 
-#define MAX_DISTANCE -999.f
-#define MIN_DISTANCE 999.f
+#define MAX_DISTANCE -999999.f
+#define MIN_DISTANCE 999999.f
 
 }
 

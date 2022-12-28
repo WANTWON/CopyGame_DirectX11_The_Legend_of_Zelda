@@ -239,10 +239,10 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	lstrcpy(m_szLoadingText, TEXT("Static ¸ðµ¨ »ý¼º Áß."));
 	/*For.Prototype_Component_Model_Link*/
 	_matrix			PivotMatrix = XMMatrixIdentity();
-	/*PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Link"),
-	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Link/Link.fbx", PivotMatrix))))
-		return E_FAIL;*/
+	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Link"),
+	//CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Bin/Resources/Meshes/Anim/Link/Link.fbx", PivotMatrix))))
+	//	return E_FAIL;
 	CData_Manager::Get_Instance()->Create_Try_BinModel(TEXT("Link"), LEVEL_STATIC, CData_Manager::DATA_ANIM);
 
 	

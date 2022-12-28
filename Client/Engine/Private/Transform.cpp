@@ -192,7 +192,7 @@ _bool CTransform::Go_PosLerp(_float fTimeDelta, _vector TargetPos, _float fVecOf
 	vPos += XMVector3Normalize(vDir)*fVec*m_TransformDesc.fSpeedPerSec*fVecOffset;
 	Set_State(CTransform::STATE_POSITION, vPos);
 
-	if (fVec == 0.0f)
+	if (fVec == 0.0f || fLength < 0.1f)
 		return true;
 
 	return false;

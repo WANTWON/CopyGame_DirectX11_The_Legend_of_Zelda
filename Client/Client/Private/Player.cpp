@@ -12,6 +12,7 @@
 #include "ObjectEffect.h"
 #include "FightEffect.h"
 #include "UIIcon.h"
+#include "MonsterEffect.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -569,7 +570,8 @@ void CPlayer::Key_Input(_float fTimeDelta)
 
 	if (m_eState == DMG_B || m_eState == DMG_F || m_eState == FALL_FROMTOP ||
 		m_eState == FALL_HOLE || m_eState == FALL_ANTLION || m_eState == KEY_OPEN ||
-		m_eState == STAIR_DOWN || m_eState == STAIR_UP || m_bStop || m_eState == LAND || m_eState == D_LAND || m_eState == SHIELD_HIT)
+		m_eState == STAIR_DOWN || m_eState == STAIR_UP || m_bStop || m_eState == LAND 
+		|| m_eState == D_LAND || m_eState == SHIELD_HIT || m_eState == WARP_ED || m_eState == WARP_ST|| m_eState == WARP_LP)
 		return;
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -911,7 +913,7 @@ void CPlayer::Change_Direction(_float fTimeDelta)
 		m_eState == FALL_ANTLION || m_eState == KEY_OPEN || m_eState == STAIR_DOWN || m_eState == STAIR_UP || m_eState == LADDER_UP_ED ||
 		m_eState == ITEM_CARRY || m_bDead  || m_eState == S_ITEM_GET_ST || m_eState == S_ITEM_GET_LP || m_eState == S_ITEM_GET_ED ||
 		m_eState == EV_TELL_ST || m_eState == EV_TELL_LP || m_eState == EV_TELL_ED || m_eState == LAND || m_eState == D_LAND || 
-		m_eState == SHIELD_HIT || m_eState == DEAD)
+		m_eState == SHIELD_HIT || m_eState == DEAD || m_eState == WARP_ED || m_eState == WARP_ST || m_eState == WARP_LP)
 		return;
 
 	if (m_eState == SLASH_HOLD_ED || m_eState == DASH_ST || m_eState == DASH_ED)
@@ -1343,13 +1345,6 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
 		m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, -1.f, 0.f, 0.f), m_pNavigationCom);
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-
-		/*if (m_fWalkingHeight >= XMVectorGetY(vPosition))
-		{
-			vPosition = XMVectorSetY(vPosition, m_fWalkingHeight);
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-			m_eState = LAND;
-		}*/
 		break;
 	}
 	case Client::CPlayer::SLASH_HOLD_ST:
@@ -1638,6 +1633,61 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
 			m_bDead = true;
+		}
+		break;
+	case Client::CPlayer::WARP_ST:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		m_fEffectTime += fTimeDelta;
+		m_fEffectTimeEnd = 0.1f;
+		if (m_fEffectTime > m_fEffectTimeEnd)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CMonsterEffect::ROLA_SMOKE;
+			EffectDesc.fDeadTime = 0.5f;
+			EffectDesc.vColor = XMVectorSet(255, 255, 255, 255);
+			EffectDesc.vInitScale = _float3(2.f, 2.f, 0.f);
+
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(1.f, 0.5f, 1.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(1.f, 0.5f, -1.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-1.f, 0.5f, 1.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-1.f, 0.5f, -1.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			m_fEffectTime = 0.f;
+		}
+
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			m_fEffectTime = 0.f;
+			m_eState = WARP_LP;
+		}
+		break;
+	case Client::CPlayer::WARP_LP:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
+		m_vWarpPos = XMVectorSetY(m_vWarpPos, XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)));
+		if (m_pTransformCom->Go_PosLerp(fTimeDelta, m_vWarpPos, 1.f))
+		{
+			m_pNavigationCom->Compute_CurrentIndex_byDistance(Get_TransformState(CTransform::STATE_POSITION));
+			m_eState = WARP_ED;
+		}
+			
+		break;
+	case Client::CPlayer::WARP_ED:
+		m_eAnimSpeed = 2.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			m_eState = IDLE;
 		}
 		break;
 	default:
