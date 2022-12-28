@@ -85,6 +85,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	CCamera* pCamera = pCameraManager->Get_CurrentCamera();
 	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
 	CUI_Manager::Get_Instance()->Set_NextLevel(false);
+
+
+	CGameInstance::Get_Instance()->PlayBGM(TEXT("1-08 Field (Normal).mp3"), 0.5f);
 	return S_OK;
 }
 

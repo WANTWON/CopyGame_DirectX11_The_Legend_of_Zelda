@@ -15,7 +15,9 @@ CGameInstance::CGameInstance()
 	, m_pPicking(CPicking::Get_Instance())
 	, m_pFrustum(CFrustum::Get_Instance())
 	, m_pTarget_Manager(CTarget_Manager::Get_Instance())
+	, m_pSound_Manager(CSound_Manager::Get_Instance())
 {	
+	Safe_AddRef(m_pSound_Manager);
 	Safe_AddRef(m_pTarget_Manager);
 	Safe_AddRef(m_pFrustum);
 	Safe_AddRef(m_pPicking);
@@ -50,7 +52,8 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, cons
 		return E_FAIL;
 
 	/* 사운드 디바이스를 초기화한다. */
-
+	if (FAILED(m_pSound_Manager->Initialize()))
+		return E_FAIL;
 
 	/* 컨테이너의 공간을 확보해둔다. */
 	if (FAILED(m_pObject_Manager->Reserve_Container(iNumLevels)))
@@ -500,6 +503,71 @@ HRESULT CGameInstance::Bind_RenderTarget_SRV(const _tchar * pTargetTag, CShader 
 	return m_pTarget_Manager->Bind_ShaderResource(pTargetTag, pShader, pConstantName);
 }
 
+
+void CGameInstance::PlaySounds(TCHAR * pSoundKey, const _uint & eID, const float & fVolume)
+{
+	if (nullptr == m_pSound_Manager)
+		return;
+
+	m_pSound_Manager->PlaySoundW(pSoundKey, eID, fVolume);
+}
+
+void CGameInstance::PlayBGM(TCHAR * pSoundKey, const float & fVolume)
+{
+	if (nullptr == m_pSound_Manager)
+		return;
+
+	m_pSound_Manager->PlayBGM(pSoundKey, fVolume);
+}
+
+void CGameInstance::StopSound(const _uint & eID)
+{
+	if (nullptr == m_pSound_Manager)
+		return;
+
+	m_pSound_Manager->StopSound(eID);
+}
+
+void CGameInstance::StopAll()
+{
+	if (nullptr == m_pSound_Manager)
+		return;
+
+	m_pSound_Manager->StopAll();
+}
+
+void CGameInstance::SetChannelVolume(const _uint & eID, const float & fVolume)
+{
+	if (nullptr == m_pSound_Manager)
+		return;
+
+	m_pSound_Manager->SetChannelVolume(eID, fVolume);
+}
+
+int CGameInstance::VolumeUp(const _uint & eID, const _float & _vol)
+{
+	if (nullptr == m_pSound_Manager)
+		return 0;
+
+	return m_pSound_Manager->VolumeUp(eID, _vol);
+}
+
+int CGameInstance::VolumeDown(const _uint & eID, const _float & _vol)
+{
+	if (nullptr == m_pSound_Manager)
+		return 0;
+
+	return m_pSound_Manager->VolumeDown(eID, _vol);
+}
+
+int CGameInstance::Pause(const _uint & eID)
+{
+	if (nullptr == m_pSound_Manager)
+		return 0;
+
+	return m_pSound_Manager->Pause(eID);
+}
+
 void CGameInstance::Release_Engine()
 {
 	CGameInstance::Get_Instance()->Destroy_Instance();
@@ -511,6 +579,8 @@ void CGameInstance::Release_Engine()
 	CComponent_Manager::Get_Instance()->Destroy_Instance();
 	
 	CPipeLine::Get_Instance()->Destroy_Instance();
+
+	CSound_Manager::Get_Instance()->Destroy_Instance();
 
 	CLight_Manager::Get_Instance()->Destroy_Instance();
 
@@ -531,6 +601,7 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {	
+	Safe_Release(m_pSound_Manager);
 	Safe_Release(m_pTarget_Manager);
 	Safe_Release(m_pFrustum);
 	Safe_Release(m_pPicking);

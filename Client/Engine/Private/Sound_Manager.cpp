@@ -44,26 +44,16 @@ void CSound_Manager::PlaySound(TCHAR * pSoundKey, const _uint& eID, const float&
 	FMOD_BOOL bPlay = FALSE;
 
 	m_pSystem->playSound(iter->second, 0, false, &m_pChannelArr[eID]);
-
-
-
-	//if (FMOD_Channel_IsPlaying(m_pChannelArr[eID], &bPlay))
-	//{
-	//	FMOD_System_PlaySound(m_pSystem, FMOD_CHANNEL_FREE, iter->second, FALSE, &m_pChannelArr[eID]);
-	//}
-
 	m_pChannelArr[eID]->setVolume(fVolume);
-	//FMOD_Channel_SetVolume(m_pChannelArr[eID], fVolume);
+
 
 	m_pSystem->update();
-	//FMOD_System_Update(m_pSystem);
 }
 
 void CSound_Manager::PlayBGM(TCHAR * pSoundKey, const float& fVolume)
 {
 	std::map<TCHAR*, FMOD::Sound*>::iterator iter;
 
-	// iter = find_if(m_mapSound.begin(), m_mapSound.end(), CTag_Finder(pSoundKey));
 	iter = std::find_if(m_mapSound.begin(), m_mapSound.end(), [&](auto& iter)->bool
 	{
 		return !lstrcmp(pSoundKey, iter.first);
@@ -73,21 +63,15 @@ void CSound_Manager::PlayBGM(TCHAR * pSoundKey, const float& fVolume)
 		return;
 	m_pSystem->playSound(iter->second, 0, false, &m_pChannelArr[0]);
 
-	//FMOD_System_PlaySound(m_pSystem, FMOD_CHANNEL_FREE, iter->second, FALSE, &m_pChannelArr[0]);
-
 	m_pChannelArr[0]->setMode(FMOD_LOOP_NORMAL);
 	m_pChannelArr[0]->setVolume(fVolume);
-	//FMOD_Channel_SetMode(m_pChannelArr[0], FMOD_LOOP_NORMAL);
 
-	//FMOD_Channel_SetVolume(m_pChannelArr[0], fVolume);
 	m_pSystem->update();
-	//FMOD_System_Update(m_pSystem);
 }
 
 void CSound_Manager::StopSound(const _uint& eID)
 {
 	m_pChannelArr[eID]->stop();
-	//FMOD_Channel_Stop(m_pChannelArr[eID]);
 }
 
 void CSound_Manager::StopAll()
@@ -95,16 +79,13 @@ void CSound_Manager::StopAll()
 	for (int i = 0; i < SOUND_MAX; ++i)
 	{
 		m_pChannelArr[i]->stop();
-		//FMOD_Channel_Stop(m_pChannelArr[i]);
 	}
 }
 
 void CSound_Manager::SetChannelVolume(const _uint& eID, const float& fVolume)
 {
 	m_pChannelArr[eID]->setVolume(fVolume);
-	//FMOD_Channel_SetVolume(m_pChannelArr[eID], fVolume);
-
-	//FMOD_System_Update(m_pSystem);
+	
 	m_pSystem->update();
 }
 
@@ -115,8 +96,7 @@ int CSound_Manager::VolumeUp(const _uint & eID, const _float & _vol)
 	}
 
 	m_pChannelArr[eID]->setVolume(m_volume);
-	//FMOD_Channel_SetVolume(m_pChannelArr[eID], m_volume);
-
+	
 	return 0;
 }
 
@@ -127,8 +107,7 @@ int CSound_Manager::VolumeDown(const _uint & eID, const _float & _vol)
 	}
 
 	m_pChannelArr[eID]->setVolume(m_volume);
-	//FMOD_Channel_SetVolume(m_pChannelArr[eID], m_volume);
-
+	
 	return 0;
 }
 
@@ -136,8 +115,6 @@ int CSound_Manager::Pause(const _uint & eID)
 {
 	m_bPause = !m_pChannelArr[eID]->getPaused(&m_bPause);
 	m_pChannelArr[eID]->setPaused(m_bPause);
-
-	//FMOD_Channel_SetPaused(m_pChannelArr[eID], m_bPause);
 
 	return 0;
 }
@@ -149,27 +126,25 @@ void CSound_Manager::LoadSoundFile()
 
 	// _findfirst : <io.h>에서 제공하며 사용자가 설정한 경로 내에서 가장 첫 번째 파일을 찾는 함수
 	//intptr_t handle = _findfirst("../../Client/Bin/Resources/Sounds/*.*", &fd);
-	intptr_t handle = _findfirst("../../Client/Bin/Resources/Sounds/*", &fd);
+	intptr_t handle = _findfirst("../../../Bin/Sounds/*", &fd);
 	
 	if (handle == -1)
 		return;
 
 	int iResult = 0;
 
-	char szCurPath[128] = "../../Client/Bin/Resources/Sounds/";
+	char szCurPath[128] = "../../../Bin/Sounds/";
 	char szFullPath[128] = "";
 
 	while (iResult != -1)
 	{
 		strcpy_s(szFullPath, szCurPath);	// "../Sound/"
-		strcat_s(szFullPath, fd.name);		// "../ Sound/Success.wav"
+		strcat_s(szFullPath, fd.name);		// "../Sound/Success.wav"
 		
-		//FMOD_SOUND* pSound = nullptr; 
 		FMOD::Sound* pSound = nullptr;
 
 		FMOD_RESULT eRes = m_pSystem->createSound(szFullPath, FMOD_LOOP_OFF, 0, &pSound);
-		//FMOD_RESULT eRes = FMOD_System_CreateSound(m_pSystem, szFullPath, FMOD_HARDWARE, 0, &pSound);
-
+	
 		if (eRes == FMOD_OK)
 		{
 			size_t iLength = strlen(fd.name) + 1;
@@ -187,8 +162,7 @@ void CSound_Manager::LoadSoundFile()
 	}
 
 	m_pSystem->update();
-	//FMOD_System_Update(m_pSystem);
-
+	
 	_findclose(handle);
 }
 
@@ -198,12 +172,9 @@ void CSound_Manager::Free()
 	{
 		delete[] Mypair.first;
 		Mypair.second->release();
-		//FMOD_Sound_Release(Mypair.second);
 	}
 	m_mapSound.clear();
 
 	m_pSystem->release();
 	m_pSystem->close();
-	//FMOD_System_Release(m_pSystem);
-	//FMOD_System_Close(m_pSystem);
 }

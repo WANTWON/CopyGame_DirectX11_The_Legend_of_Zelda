@@ -14,6 +14,7 @@
 #include "Picking.h"
 #include "GameObject.h"
 #include "Target_Manager.h"
+#include "Sound_Manager.h"
 
 BEGIN(Engine)
 
@@ -106,6 +107,15 @@ public: /* For.Frustum */
 public: /* For.Target_Manager */
 	HRESULT Bind_RenderTarget_SRV(const _tchar* pTargetTag, class CShader* pShader, const char* pConstantName);
 
+public: /* For. Sound Manager */
+	void PlaySounds(TCHAR* pSoundKey, const _uint& eID, const float& fVolume);
+	void PlayBGM(TCHAR * pSoundKey, const float& fVolume);
+	void StopSound(const _uint& eID);
+	void StopAll();
+	void SetChannelVolume(const _uint& eID, const float& fVolume);
+	int  VolumeUp(const _uint& eID, const _float& _vol);
+	int  VolumeDown(const _uint& eID, const _float& _vol);
+	int  Pause(const _uint& eID);
 
 public:
 	static void Release_Engine();
@@ -123,6 +133,7 @@ private:
 	CPicking*						m_pPicking = nullptr;
 	CFrustum*						m_pFrustum = nullptr;
 	CTarget_Manager*				m_pTarget_Manager = nullptr;
+	CSound_Manager*					m_pSound_Manager = nullptr;
 public:
 	virtual void Free() override;
 };
