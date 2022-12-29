@@ -44,24 +44,29 @@ HRESULT CLevel_Room::Initialize()
 
 
 	CUI_Manager::ROOMTYPE eRoomType = CUI_Manager::Get_Instance()->Get_RoomType();
+	CGameInstance::Get_Instance()->StopAll();
 
 	switch (eRoomType)
 	{
 	case Client::CUI_Manager::MARINHOUSE:
 		if (FAILED(Ready_Layer_MarinObject(TEXT("Layer_Object"))))
 			return E_FAIL;
+		CGameInstance::Get_Instance()->PlayBGM(TEXT("1-17 Inside a House.mp3"), g_fBGMVolume);
 		break;
 	case Client::CUI_Manager::SHOP:
 		if (FAILED(Ready_Layer_ShopObject(TEXT("Layer_Object"))))
 			return E_FAIL;
+		CGameInstance::Get_Instance()->PlayBGM(TEXT("1-12 Shop (Items, Witch).mp3"), g_fBGMVolume);
 		break;
 	case Client::CUI_Manager::CRANEGAME:
 		if (FAILED(Ready_Layer_CraneGameObject(TEXT("Layer_Object"))))
 			return E_FAIL;
+		CGameInstance::Get_Instance()->PlayBGM(TEXT("1-14 Game Shop.mp3"), g_fBGMVolume);
 		break;
 	case Client::CUI_Manager::TELEPHONE:
 		if (FAILED(Ready_Layer_TelephoneObject(TEXT("Layer_Object"))))
 			return E_FAIL;
+		CGameInstance::Get_Instance()->PlayBGM(TEXT("1-29 Telephone Booth.mp3"), g_fBGMVolume);
 		break;
 	default:
 		break;
@@ -77,6 +82,7 @@ HRESULT CLevel_Room::Initialize()
 	CCamera* pCamera = pCameraManager->Get_CurrentCamera();
 	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_ROOM);
 
+	g_fBGMVolume = 0.f;
 	
 	CUI_Manager::Get_Instance()->Set_NextLevel(false);
 	return S_OK;
@@ -85,6 +91,11 @@ HRESULT CLevel_Room::Initialize()
 void CLevel_Room::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);	
+
+	g_fBGMVolume += 0.002f;
+	if (g_fBGMVolume >= 0.2f)
+		g_fBGMVolume = 0.2f;
+	CGameInstance::Get_Instance()->SetChannelVolume(SOUND_BGM, g_fBGMVolume);
 
 	CUI_Manager::Get_Instance()->Tick_UI(fTimeDelta);
 

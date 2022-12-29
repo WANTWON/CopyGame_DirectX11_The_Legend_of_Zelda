@@ -7,6 +7,8 @@
 
 
 float g_fBGMVolume = 0.f;
+float g_fObjVolume = 0.2f;
+float g_fUIVolume = 0.4f;
 
 CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -48,6 +50,8 @@ void CLevel_Logo::Tick(_float fTimeDelta)
 
 	if (GetKeyState(VK_SPACE) & 0x8000)
 	{
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Sys_Do_Start.wav"), SOUND_SYSTEM, 0.4f);
+		
 		CUI_Manager::Get_Instance()->Set_NextLevel(true);
 		CUI_Manager::Get_Instance()->Set_NextLevelFinished(false);
 	}

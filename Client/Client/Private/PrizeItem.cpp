@@ -166,6 +166,13 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 			pUI_Manager->Open_Message(true);
 			Make_GetItemEffect();
 
+			if(m_ItemDesc.eType == DRUM || m_ItemDesc.eType ==  HORN || m_ItemDesc.eType== BELL || m_ItemDesc.eType == CELLO)
+				pGameInstance->PlaySounds(TEXT("4_Event_Siren's Instrument Fanfare.wav"), SOUND_SYSTEM, 0.4f);
+			else if (m_ItemDesc.eType == FEATHER || m_ItemDesc.eType == BOSS_KEY)
+				pGameInstance->PlaySounds(TEXT("4_Event_Get Important Item Fanfare.wav"), SOUND_SYSTEM, 0.4f);
+			else
+				pGameInstance->PlaySounds(TEXT("4_Event_Get Item Fanfare.wav"), SOUND_SYSTEM, 0.4f);
+
 
 		}
 
@@ -290,6 +297,7 @@ void CPrizeItem::LateTick_TelephoneModeItem(_float fTimeDelta)
 		{
 			if (!m_bGet)
 			{
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Button_On.wav"), SOUND_SYSTEM, g_fUIVolume);
 				m_bGet = true;
 			
 				pPlayer->Set_AnimState(CPlayer::EV_TELL_ST);
@@ -324,7 +332,7 @@ void CPrizeItem::Setting_Get_Item()
 		ItemDesc.m_iTextureNum = CInvenItem::COMPASS;
 		ItemDesc.vPosition = _float2(1400, 200);
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_Compass"), &ItemDesc)))
-			int a = 0;
+			int a = 0;	
 	}
 	else if (m_ItemDesc.eType == TAIL_KEY)
 	{
@@ -444,7 +452,18 @@ void CPrizeItem::Setting_Get_Item()
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
 		pPlayer->Set_RubyAdd(100);
 	}
-
+	else if (m_ItemDesc.eType == RUBY_GREEN)
+	{
+		CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+		pPlayer->Set_RubyAdd(50);
+	}
+	else if (m_ItemDesc.eType == HEART_CONTAINER)
+	{
+		CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+		pPlayer->Set_MaxHp();
+	}
 
 	RELEASE_INSTANCE(CUI_Manager);
 	RELEASE_INSTANCE(CGameInstance);

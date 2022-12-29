@@ -30,6 +30,7 @@ private:
 	virtual _bool IsDead() override;
 	virtual void Find_Target() override;
 	virtual void Follow_Target(_float fTimeDelta) override;
+	virtual void Sound_By_State(_float fTimeDelta) override;
 	void Check_Navigation(_float fTimeDelta);
 
 private:
@@ -41,6 +42,8 @@ private:
 	_bool m_bAngry = false;
 	_float m_fHeight = 0.f;
 	_float m_fTime = 0.0f;
+	_float m_fVoiceTime = 0.f;
+
 	
 public:
 	static CCucco* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

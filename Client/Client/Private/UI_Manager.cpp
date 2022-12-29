@@ -47,6 +47,8 @@ void CUI_Manager::Tick_Inventory()
 
 	if (pGameInstance->Key_Up(DIK_RIGHT))
 	{
+		
+		pGameInstance->PlaySounds(TEXT("6_UI_Sys_SlideSelect.wav"), SOUND_SYSTEM, g_fUIVolume + 0.3f);
 		m_iInvenIndex++;
 
 		if (m_iInvenIndex >= m_InvenTile.size())
@@ -56,6 +58,8 @@ void CUI_Manager::Tick_Inventory()
 
 	if (pGameInstance->Key_Up(DIK_LEFT))
 	{
+		pGameInstance->PlaySounds(TEXT("6_UI_Sys_SlideSelect.wav"), SOUND_SYSTEM, g_fUIVolume + 0.3f);
+
 		m_iInvenIndex--;
 
 		if (m_iInvenIndex < 0)
@@ -65,6 +69,7 @@ void CUI_Manager::Tick_Inventory()
 
 	if (pGameInstance->Key_Up(DIK_DOWN))
 	{
+		pGameInstance->PlaySounds(TEXT("6_UI_Sys_SlideSelect.wav"), SOUND_SYSTEM, g_fUIVolume + 0.3f);
 		m_iInvenIndex += 4;
 
 		if (m_iInvenIndex >= m_InvenTile.size())
@@ -73,6 +78,7 @@ void CUI_Manager::Tick_Inventory()
 
 	if (pGameInstance->Key_Up(DIK_UP))
 	{
+		pGameInstance->PlaySounds(TEXT("6_UI_Sys_SlideSelect.wav"), SOUND_SYSTEM, g_fUIVolume + 0.3f);
 		m_iInvenIndex -= 4;
 
 		if (m_iInvenIndex < 0)
@@ -86,6 +92,7 @@ void CUI_Manager::Tick_Inventory()
 
 	if (pGameInstance->Key_Up(DIK_X))
 	{
+		pGameInstance->PlaySounds(TEXT("6_UI_Sys_ShortCut_EquipDecide.wav"), SOUND_SYSTEM, g_fUIVolume);
 		if(m_EquipTile[EQUIP_X] != nullptr)
 			dynamic_cast<CInvenTile*>(m_EquipTile[EQUIP_X])->Set_TileState(CInvenTile::STATE_DEFAULT);
 
@@ -96,6 +103,7 @@ void CUI_Manager::Tick_Inventory()
 
 	if (pGameInstance->Key_Up(DIK_Y))
 	{
+		pGameInstance->PlaySounds(TEXT("6_UI_Sys_ShortCut_EquipDecide.wav"), SOUND_SYSTEM, g_fUIVolume);
 		if (m_EquipTile[EQUIP_Y] != nullptr)
 			dynamic_cast<CInvenTile*>(m_EquipTile[EQUIP_Y])->Set_TileState(CInvenTile::STATE_DEFAULT);
 
@@ -113,6 +121,7 @@ void CUI_Manager::Tick_Map()
 
 	if (pGameInstance->Key_Up(DIK_RIGHT))
 	{
+		pGameInstance->PlaySounds(TEXT("6_UI_Sys_CheckPoint.wav"), SOUND_SYSTEM, g_fUIVolume);
 		_int iIndex = 0;
 		_float fMinDistance = MIN_DISTANCE;
 		for (auto& iter : m_WarpGroup)
@@ -144,6 +153,7 @@ void CUI_Manager::Tick_Map()
 	}
 	else if (pGameInstance->Key_Up(DIK_LEFT))
 	{
+		pGameInstance->PlaySounds(TEXT("6_UI_Sys_CheckPoint.wav"), SOUND_SYSTEM, g_fUIVolume);
 		_int iIndex = 0;
 		_float fMaxDistance = MAX_DISTANCE;
 		for (auto& iter : m_WarpGroup)
@@ -175,6 +185,7 @@ void CUI_Manager::Tick_Map()
 	}
 	else if (pGameInstance->Key_Up(DIK_UP))
 	{
+		pGameInstance->PlaySounds(TEXT("6_UI_Sys_CheckPoint.wav"), SOUND_SYSTEM, g_fUIVolume);
 		_int iIndex = 0;
 		_float fMaxDistance = MAX_DISTANCE;
 		for (auto& iter : m_WarpGroup)
@@ -207,6 +218,7 @@ void CUI_Manager::Tick_Map()
 	}
 	else if (pGameInstance->Key_Up(DIK_DOWN))
 	{
+		pGameInstance->PlaySounds(TEXT("6_UI_Sys_CheckPoint.wav"), SOUND_SYSTEM, g_fUIVolume);
 		_int iIndex = 0;
 		_float fMinDistance = MIN_DISTANCE;
 		for (auto& iter : m_WarpGroup)
@@ -245,6 +257,7 @@ void CUI_Manager::Tick_Map()
 
 	if (pGameInstance->Key_Up(DIK_SPACE))
 	{
+		pGameInstance->PlaySounds(TEXT("6_UI_Map_SensorOn.wav"), SOUND_SYSTEM, g_fUIVolume);
 		_vector vWarpPosition =  dynamic_cast<CUIIcon*>(m_pPickedWarp)->Get_IconDesc().pTarget->Get_TransformState(CTransform::STATE_POSITION);
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 		pPlayer->Set_WarpPosition(vWarpPosition);
@@ -421,6 +434,7 @@ void CUI_Manager::Tick_Message()
 
 				if (m_iChoiceIndex < 0)
 					m_iChoiceIndex = 0;
+				pGameInstance->PlaySounds(TEXT("6_UI_Sys_SlideSwitch_On.wav"), SOUND_SYSTEM, g_fUIVolume);
 			}
 
 			if (pGameInstance->Key_Up(DIK_DOWN))
@@ -429,6 +443,8 @@ void CUI_Manager::Tick_Message()
 
 				if (m_iChoiceIndex >= m_vecChoiceButton.size())
 					m_iChoiceIndex = (_int)(m_vecChoiceButton.size() - 1);
+				pGameInstance->PlaySounds(TEXT("6_UI_Sys_SlideSwitch_On.wav"), SOUND_SYSTEM, g_fUIVolume);
+
 			}
 
 			if (m_vecChoiceButton.size() != 0)
@@ -449,13 +465,19 @@ void CUI_Manager::Tick_Message()
 			{
 				m_pTalkingNpc->Send_Answer_toNPC(dynamic_cast<CUIButton*>(m_vecChoiceButton[m_iChoiceIndex])->Get_TextureType());
 				m_vecMsgDecs.pop_front();
+				pGameInstance->PlaySounds(TEXT("6_UI_Sys_SoftwareKeyboard_Decide.wav"), SOUND_SYSTEM, g_fUIVolume);
+
 			
 			}
 		}
 		else
 		{
 			if (CGameInstance::Get_Instance()->Key_Up(DIK_SPACE))
+			{
+				pGameInstance->PlaySounds(TEXT("6_UI_Sys_Talk_Next.wav"), SOUND_SYSTEM, g_fUIVolume);
 				m_vecMsgDecs.pop_front();
+			}
+				
 
 			if (m_vecMsgDecs.size() == 0)
 			{
@@ -503,6 +525,7 @@ void CUI_Manager::Tick_Message()
 			pPlayer->Set_PlayerState_Defaut();
 
 			
+			pGameInstance->PlaySounds(TEXT("6_UI_Sys_Talk_End.wav"), SOUND_SYSTEM, g_fUIVolume);
 			m_pTalkingNpc = nullptr;
 			m_bTalking = false;
 			m_bChoice = false;
@@ -818,9 +841,16 @@ void CUI_Manager::Tick_UI(_float fTimeDelta)
 void CUI_Manager::Set_UI_OpenType(UITYPE eUIType)
 {
 	if (m_eUIType == eUIType)
+	{
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Event_MamoNum_CountDownEnd.wav"), SOUND_SYSTEM, 1.f);
 		m_eUIType = UI_END;
+	}
 	else
+	{
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Event_MamoNum_CountDown.wav"), SOUND_SYSTEM, 1.f);
 		m_eUIType = eUIType;
+	}
+		
 
 	for(_uint i =0; i < m_InvenTile.size() ; ++i)
 		dynamic_cast<CInvenTile*>(m_InvenTile[i])->Set_SelectTile(false);

@@ -372,7 +372,7 @@ void CKeese::Make_GetAttacked_Effect(CBaseObj * DamageCauser)
 	for (int i = 0; i < 10; ++i)
 	{
 		EffectDesc.eEffectID = CFightEffect::HITSPARK;
-		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, Get_Scale().y - g_fUIVolume, 0.f, 0.f);
 		_float iRandNum = (rand() % 10 + 10) * 0.1f;
 		EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
 		EffectDesc.fDeadTime = 0.8f;

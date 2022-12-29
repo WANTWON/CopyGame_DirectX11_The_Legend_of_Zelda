@@ -40,6 +40,7 @@ protected:
 	virtual HRESULT SetUp_ShaderResources();
 	virtual HRESULT SetUp_ShaderID();
 	virtual void Change_Animation(_float fTimeDelta) {};
+	virtual void Sound_By_State(_float fTimeDelta);
 
 
 public: // Get& Set
@@ -77,7 +78,7 @@ protected:
 	_bool					m_bRed = false;
 	_bool					m_bMove = true;
 	_bool					m_bMakeEffect = false;
-
+	
 
 	//For Move Time
 	DWORD m_dwDeathTime = GetTickCount();

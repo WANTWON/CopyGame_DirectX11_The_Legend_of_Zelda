@@ -440,7 +440,7 @@ void CMarinNpc::GiveItemMode()
 
 	CEffect::EFFECTDESC EffectDesc;
 
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, Get_Scale().y - g_fUIVolume, 0.f, 0.f);
 	EffectDesc.pTarget = this;
 
 	EffectDesc.eEffectType = CEffect::MODEL;

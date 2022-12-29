@@ -52,13 +52,14 @@ HRESULT CCucco::Initialize(void * pArg)
 
 int CCucco::Tick(_float fTimeDelta)
 {
-	_float3 vScale = Get_Scale();
-	_float fCullingRadius = max(max(vScale.x, vScale.y), vScale.z);
-	if (CGameInstance::Get_Instance()->isIn_WorldFrustum(m_pTransformCom->Get_State(CTransform::STATE_POSITION), fCullingRadius + 2) == false)
+	if (CUI_Manager::Get_Instance()->Get_UI_OpenType() != CUI_Manager::UI_END)
 		return OBJ_NOEVENT;
 
 	if (m_bDead)
 		return OBJ_DEAD;
+
+	if(Check_IsinFrustum(1.f) == false)
+		return OBJ_NOEVENT;
 
 	if (__super::Tick(fTimeDelta))
 		return OBJ_DEAD;
@@ -259,6 +260,54 @@ void CCucco::Follow_Target(_float fTimeDelta)
 	m_bIsAttacking = false;
 }
 
+void CCucco::Sound_By_State(_float fTimeDelta)
+{
+	if (m_bSoundOnce)
+		return;
+
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
+	_uint iNum = 0;
+	_tchar	sz_SoundMonster[MAX_PATH];
+	_float fVolume = 0.5f;
+
+
+	switch (m_eState)
+	{
+	case Client::CCucco::RUN:
+	case Client::CCucco::FLY_ATTACK:
+		m_fSoundTime += fTimeDelta;
+		m_fVoiceTime += fTimeDelta;
+
+		m_fSoundEndTime = 0.2f;
+		fVolume = 0.05f;
+		iNum = rand() % 5 + 1;
+		wcscpy_s(sz_SoundMonster, TEXT("3_Monster_Kokko_Wing (%d).wav"));
+		wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
+		break;
+	default:
+		break;
+	}
+
+	if (m_fSoundTime > m_fSoundEndTime || m_bSoundOnce)
+	{
+		pGameInstance->PlaySounds(sz_SoundMonster, SOUND_MEFFECT, fVolume);
+		m_fSoundTime = 0.f;
+	}
+
+	if (m_fVoiceTime > 1.f)
+	{
+		iNum = rand() % 5 + 1;
+		wcscpy_s(sz_SoundMonster, TEXT("3_Monster_Kokko_Shout (%d).wav"));
+		wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
+
+		pGameInstance->PlaySounds(sz_SoundMonster, SOUND_MONSTER, 0.4);
+		m_fVoiceTime = 0.f;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 void CCucco::Check_Navigation(_float fTimeDelta)
 {
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::ACCESSIBLE)
@@ -319,6 +368,14 @@ void CCucco::Patrol(_float fTimeDelta)
 	{
 		if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 3 + 1) + 3000)
 		{
+			_uint iNum = 0;
+			_tchar	sz_SoundMonster[MAX_PATH];
+			_float fVolume = 0.5f;
+			iNum = rand() % 6 + 1;
+			wcscpy_s(sz_SoundMonster, TEXT("3_Monster_Kokko (%d).wav"));
+			wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_SoundMonster, SOUND_MONSTER, 0.4f);
+
 			m_eState = STATE::WALK;
 			m_dwWalkTime = GetTickCount();
 
@@ -359,6 +416,15 @@ _uint CCucco::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCau
 			m_bHit = true;
 			m_eState = STATE::LANDING;
 			m_bMove = true;
+
+			_uint iNum = 0;
+			_tchar	sz_SoundMonster[MAX_PATH];
+			_float fVolume = 0.5f;
+			iNum = rand() % 6 + 1;
+			wcscpy_s(sz_SoundMonster, TEXT("3_Monster_Kokko_Shout (%d).wav"));
+			wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_SoundMonster, SOUND_MONSTER, 0.4f);
+			
 		}
 
 		m_bAggro = true;
@@ -371,6 +437,14 @@ _uint CCucco::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCau
 	{
 		m_bAngry = true;
 		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+		_uint iNum = 0;
+		_tchar	sz_SoundMonster[MAX_PATH];
+		_float fVolume = 0.5f;
+		iNum = rand() % 6 + 1;
+		wcscpy_s(sz_SoundMonster, TEXT("3_Monster_Kokko_Shout (%d).wav"));
+		wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_SoundMonster, SOUND_MONSTER, 0.4f);
 
 		for (int i = 0; i < 10; ++i)
 		{
@@ -454,6 +528,9 @@ HRESULT CCucco::SetUp_ShaderID()
 {
 	 if (m_bHit)
 		m_eShaderID = SHADER_ANIMHIT;
+	else if (m_bAngry)
+		 m_eShaderID = SHADER_ANIMCHARGE;
+		
 	else
 		m_eShaderID = SHADER_ANIMDEFAULT;
 

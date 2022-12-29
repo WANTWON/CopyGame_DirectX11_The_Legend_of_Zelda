@@ -45,7 +45,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 	Set_Scale(_float3(1.2f, 1.2f, 1.2f));
 	
-	m_tInfo.iMaxHp = 52;
+	m_tInfo.iMaxHp = 20;
 	m_tInfo.iDamage = 20;
 	m_tInfo.iCurrentHp = m_tInfo.iMaxHp;
 
@@ -77,7 +77,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 
 	m_vColor = XMVectorSet(255, 230, 0.f, 255);
-
+	m_eState = WARP_ED;
 
 
 	return S_OK;

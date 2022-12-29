@@ -71,6 +71,12 @@ protected:
 	_bool			m_bStop = false;
 	_bool			m_bSocket = false;
 
+
+	_bool					m_bSoundOnce = false;
+	_float					m_fSoundTime = 0.f;
+	_float					m_fSoundEndTime = 0.f;
+
+
 	LEVEL			m_iCurrentLevel = LEVEL_END;
 	_uint			m_eShaderID = SHADER_DEFAULT;
 	OBJID			m_eObjectID = OBJ_END;

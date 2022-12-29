@@ -272,7 +272,7 @@ void CPlayerEffect::Tick_Cross(_float fTimeDelta)
 			m_vScale = m_vMaxScale;
 		}
 	}
-	else if (m_fDeadtime < m_EffectDesc.fDeadTime*0.4f)
+	else if (m_fDeadtime < m_EffectDesc.fDeadTime*g_fUIVolume)
 	{
 		m_vScale.x -= 0.05f;
 		m_vScale.y -= 0.05f;

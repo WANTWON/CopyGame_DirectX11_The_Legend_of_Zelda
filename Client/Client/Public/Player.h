@@ -121,7 +121,6 @@ private:
 	_bool					m_bFirst = false;
 	_bool					m_bUpDown = false;
 	_bool					m_bCarry = false;
-	_bool					m_bSoundOnce = false;
 
 	//For Jump
 	_float					m_fStartHeight = 2.2f;
@@ -157,8 +156,6 @@ private:
 	_float					m_fEffectTime = 0.f;
 	_float					m_fEffectEndTime = 0.f;
 	_float					m_fChargeTime = 0.f;
-	_float					m_fSoundTime = 0.f;
-	_float					m_fSoundEndTime = 0.f;
 	DWORD					m_dwDashTime = GetTickCount();
 	DWORD					m_dwPressedTime = GetTickCount();
 	DWORD					m_dwHitTime = GetTickCount();

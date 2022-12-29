@@ -122,9 +122,11 @@ void CGrass::Late_Tick(_float fTimeDelta)
 
 		if (ePlayerState == CPlayer::SLASH)
 		{
+			
 			m_bCut = true;
 
 			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+			pGameInstance->PlaySounds(TEXT("5_Obj_GrassCut.wav"), SOUND_OBJECT, g_fObjVolume);
 
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::MODEL;
