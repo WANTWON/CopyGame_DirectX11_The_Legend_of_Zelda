@@ -346,11 +346,18 @@ void CPlayer::Set_AnimState(ANIM eAnim)
 		m_eState = eAnim; 
 }
 
+void CPlayer::Set_RubyAdd(_int iCoin)
+{
+	 m_tInfo.iCoin += iCoin;
+	 CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Rupee_Count_Up.wav"), SOUND_SYSTEM, 0.4f);
+}
+
 _bool CPlayer::Set_RubyUse(_int iCoin)
 {
 	if (m_tInfo.iCoin < iCoin)
 		return false;
 		
+	CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Rupee_Count_Down.wav"), SOUND_SYSTEM, 0.4f);
 	m_tInfo.iCoin -= iCoin;
 	return true;
 }
@@ -387,6 +394,7 @@ _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 	{
 		m_tInfo.iCurrentHp = 0;
 		m_eState = DEAD;
+		return 0;
 	}
 	
 
@@ -673,6 +681,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 				m_eState = SLASH;
 			m_pModelCom->Set_AnimationReset();
 			m_bMakeEffect = false;
+			m_bSoundOnce = false;
 		}
 
 	
@@ -915,8 +924,13 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
 	_uint iNum = 0;
-	_tchar	szFullPath[MAX_PATH];
+	_tchar	sz_SoundPlayer[MAX_PATH];
 	_float fVolume = 0.5f;
+
+
+	_tchar	sz_SoundEffect[MAX_PATH];
+	_float fEffectVolume = 0.3f;
+
 
 	m_fSoundTime += fTimeDelta;
 
@@ -937,13 +951,13 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		iNum = rand() % 5 + 1;
 		if (iLevel == LEVEL_GAMEPLAY)
 		{
-			wcscpy_s(szFullPath, TEXT("1_Field_FootStep (%d).wav"));
+			wcscpy_s(sz_SoundPlayer, TEXT("1_Field_FootStep (%d).wav"));
 		}
 		else
 		{
-			wcscpy_s(szFullPath, TEXT("2_Dgn_FootStep (%d).wav"));
+			wcscpy_s(sz_SoundPlayer, TEXT("2_Dgn_FootStep (%d).wav"));
 		}
-		wsprintf(szFullPath, szFullPath, iNum);
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::DASH_LP:
 		m_fSoundEndTime = 0.1f;
@@ -951,18 +965,24 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		iNum = rand() % 5 + 1;
 		if (iLevel == LEVEL_GAMEPLAY)
 		{
-			wcscpy_s(szFullPath, TEXT("1_Field_FootStep (%d).wav"));
+			wcscpy_s(sz_SoundPlayer, TEXT("1_Field_FootStep (%d).wav"));
 		}
 		else
 		{
-			wcscpy_s(szFullPath, TEXT("2_Dgn_FootStep (%d).wav"));
+			wcscpy_s(sz_SoundPlayer, TEXT("2_Dgn_FootStep (%d).wav"));
 		}
-		wsprintf(szFullPath, szFullPath, iNum);
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::LADDER_UP:
 	case Client::CPlayer::LADDER_WAIT:
 	case Client::CPlayer::ITEM_GET_LP:
 	case Client::CPlayer::PULL_LP:
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		iNum = rand() % 4 + 1;
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Pull.wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
+		break;
 	case Client::CPlayer::EV_TELL_LP:
 		break;
 	case Client::CPlayer::SLASH_HOLD_LP:
@@ -974,16 +994,16 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		m_bSoundOnce = true;
 		fVolume = 0.5f;
 		iNum = rand() % 4 + 1;
-		wcscpy_s(szFullPath, TEXT("Link_Push.wav"));
-		wsprintf(szFullPath, szFullPath, iNum);
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Push.wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::JUMP:
 	case Client::CPlayer::D_JUMP:
 		m_bSoundOnce = true;
 		fVolume = 0.5f;
 		iNum = rand() % 5 + 1;
-		wcscpy_s(szFullPath, TEXT("Link_Jump (%d).wav"));
-		wsprintf(szFullPath, szFullPath, iNum);
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Jump (%d).wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::D_FALL:
 		break;
@@ -1003,13 +1023,13 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		fVolume = 0.5f;
 		if (iLevel == LEVEL_GAMEPLAY)
 		{
-			wcscpy_s(szFullPath, TEXT("1_Field_FootStep (3).wav"));
+			wcscpy_s(sz_SoundPlayer, TEXT("1_Field_FootStep (3).wav"));
 		}
 		else
 		{
-			wcscpy_s(szFullPath, TEXT("2_Dgn_FootStep (3).wav"));
+			wcscpy_s(sz_SoundPlayer, TEXT("2_Dgn_FootStep (3).wav"));
 		}
-		wsprintf(szFullPath, szFullPath, iNum);
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::DMG_PRESS:
 	case Client::CPlayer::DMG_B:
@@ -1018,23 +1038,33 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		m_bSoundOnce = true;
 		fVolume = 0.5f;
 		iNum = rand() % 5 + 1;
-		wcscpy_s(szFullPath, TEXT("Link_Damage(%d).wav"));
-		wsprintf(szFullPath, szFullPath, iNum);
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Damage (%d).wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::SLASH:
 	case Client::CPlayer::S_SLASH:
 		m_bSoundOnce = true;
 		fVolume = 0.5f;
 		iNum = rand() % 3 + 1;
-		wcscpy_s(szFullPath, TEXT("Link_Sword_Swing (%d).wav"));
-		wsprintf(szFullPath, szFullPath, iNum);
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Sword_Swing (%d).wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
+
+		fEffectVolume = 0.3f;
+		iNum = rand() % 5 + 1;
+		wcscpy_s(sz_SoundEffect, TEXT("LSword_Swing%d.wav"));
+		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
 		break;
 	case Client::CPlayer::SLASH_HOLD_ED:
 		m_bSoundOnce = true;
 		fVolume = 0.5f;
 		iNum = rand() % 3 + 1;
-		wcscpy_s(szFullPath, TEXT("Link_Sword_360 (%d).wav"));
-		wsprintf(szFullPath, szFullPath, iNum);
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Sword_360 (%d).wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
+
+		fEffectVolume = 0.3f;
+		iNum = rand() % 4 + 1;
+		wcscpy_s(sz_SoundEffect, TEXT("LSword_AttackCharging%d.wav"));
+		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
 		break;
 	case Client::CPlayer::DASH_ST:
 		
@@ -1063,8 +1093,8 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		m_bSoundOnce = true;
 		fVolume = 0.5f;
 		iNum = rand() % 4 + 1;
-		wcscpy_s(szFullPath, TEXT("Link_Fall(%d).wav"));
-		wsprintf(szFullPath, szFullPath, iNum);
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Fall(%d).wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::STAIR_DOWN:
 	case Client::CPlayer::LADDER_UP_ED:
@@ -1097,7 +1127,8 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 
 	if (m_fSoundTime > m_fSoundEndTime || m_bSoundOnce)
 	{
-		pGameInstance->PlaySounds(szFullPath, SOUND_PLAYER, fVolume);
+		pGameInstance->PlaySounds(sz_SoundPlayer, SOUND_PLAYER, fVolume);
+		pGameInstance->PlaySounds(sz_SoundEffect, SOUND_PEFFECT, fEffectVolume);
 		m_fSoundTime = 0.f;
 	}
 	
@@ -1394,8 +1425,12 @@ void CPlayer::Make_DefaultEffect(_float fTimeDelta, ANIM eState)
 			EffectDesc.fDeadTime = 0.1f;
 			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
 			EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 			m_fEffectTime = 0.f;
+
+			if (pGameInstance->Get_CurrentLevelIndex() != LEVEL_GAMEPLAY)
+				break;
+
 			for (int i = 0; i < 3; ++i)
 			{
 				EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
@@ -1431,7 +1466,7 @@ void CPlayer::Make_DefaultEffect(_float fTimeDelta, ANIM eState)
 			else
 				EffectDesc.vInitScale = _float3(2.f, 2.f, 0.f);
 
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 			m_fEffectTime = 0.f;
 		}
 		break;
@@ -1444,16 +1479,16 @@ void CPlayer::Make_DefaultEffect(_float fTimeDelta, ANIM eState)
 		EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
 
 		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.5f, 0.5f, 0.f);
-		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
 		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.5f, 0.5f, -0.5f, 0.f);
-		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
 		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.5f, 0.5f, 0.f);
-		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
 		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-0.5f, 0.5f, -0.5f, 0.f);
-		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+		pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
 		for (int i = 0; i < 3; ++i)
 		{
@@ -1462,7 +1497,7 @@ void CPlayer::Make_DefaultEffect(_float fTimeDelta, ANIM eState)
 			EffectDesc.vInitScale = _float3(1.f, 1.f, 1.f);
 			EffectDesc.fDeadTime = 0.5f;
 			EffectDesc.iTextureNum = rand() % 3;
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 		}
 		break;
@@ -1479,16 +1514,16 @@ void CPlayer::Make_DefaultEffect(_float fTimeDelta, ANIM eState)
 			EffectDesc.vInitScale = _float3(2.f, 2.f, 0.f);
 
 			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(1.f, 0.5f, 1.f, 0.f);
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
 			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(1.f, 0.5f, -1.f, 0.f);
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
 			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-1.f, 0.5f, 1.f, 0.f);
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
 			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-1.f, 0.5f, -1.f, 0.f);
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 			m_fEffectTime = 0.f;
 		}
 		break;
