@@ -382,7 +382,7 @@ _bool CTailBoss::IsDead()
 
 void CTailBoss::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_eState == DAMAGE || m_eState == DEAD || m_eState == FEINT)
+	if (!m_bMoveSound || m_eState == DAMAGE || m_eState == DEAD || m_eState == FEINT)
 		return;
 
 
@@ -579,7 +579,7 @@ _uint CTailBoss::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 			{
 				m_bHit = true;
 				m_eState = STATE::DAMAGE;
-				m_bMove = true;
+				m_bMoveSound = true;
 			}
 
 			m_bAggro = true;

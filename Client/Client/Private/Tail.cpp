@@ -356,7 +356,7 @@ void CTail::AI_Behaviour(_float fTimeDelta)
 
 	if (m_TailDesc.eTailType == TAIL1)
 	{
-		if (!m_bMove || m_eState == DEAD || m_eState == PIYO)
+		if (!m_bMoveSound || m_eState == DEAD || m_eState == PIYO)
 			return;
 		Behaviour_Head(fTimeDelta);
 	}
@@ -466,7 +466,7 @@ _uint CTail::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 		{
 			m_bHit = true;
 			m_eState = STATE::DAMAGE;
-			m_bMove = true;
+			m_bMoveSound = true;
 		}
 
 		m_bAggro = true;

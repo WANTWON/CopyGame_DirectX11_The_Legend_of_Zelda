@@ -88,7 +88,7 @@ PS_OUT PS_PICKED(PS_IN In)
 	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vColor.rgb += 0.1f;
 	Out.vColor.rg += 0.1f;
-
+	Out.vColor.a *= g_fAlpha;
 	return Out;
 }
 

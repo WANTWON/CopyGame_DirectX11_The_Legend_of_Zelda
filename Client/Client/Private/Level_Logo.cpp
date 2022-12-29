@@ -42,8 +42,8 @@ void CLevel_Logo::Tick(_float fTimeDelta)
 		Safe_Release(pGameInstance);
 	}
 
-	g_fBGMVolume += 0.002f;
-	if (g_fBGMVolume >= 0.3f)
+	g_fBGMVolume += 0.001f;
+	if (g_fBGMVolume >= 0.2f)
 		g_fBGMVolume = 0.2f;
 	CGameInstance::Get_Instance()->SetChannelVolume(SOUND_BGM, g_fBGMVolume);
 

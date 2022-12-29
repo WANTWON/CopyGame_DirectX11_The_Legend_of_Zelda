@@ -264,7 +264,7 @@ void CBuzzBlob::Follow_Target(_float fTimeDelta)
 
 void CBuzzBlob::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_eState == DEAD || m_eState == DAMAGE)
+	if (!m_bMoveSound || m_eState == DEAD || m_eState == DAMAGE)
 		return;
 
 	// Check for Target, AggroRadius
@@ -311,7 +311,7 @@ _uint CBuzzBlob::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 		{
 			m_bHit = true;
 			m_eState = STATE::DAMAGE;
-			m_bMove = true;
+			m_bMoveSound = true;
 		}
 
 		m_bAggro = true;

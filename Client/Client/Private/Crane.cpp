@@ -57,7 +57,9 @@ int CCrane::Tick(_float fTimeDelta)
 		_float fPositionX = XMVectorGetX(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		_float fPositionZ = XMVectorGetZ(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
-		if (m_bUp && fPositionY < 3)
+		m_fMoveSoundTime += fTimeDelta;
+
+		if (m_bUp && fPositionY < 4)
 			m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(0.f, 1.f, 0.f, 0.f));
 		else if (m_bUp && fPositionX > -4.5f)
 			m_pTransformCom->Go_PosDir(fTimeDelta, XMVectorSet(-1.f, 0.f, 0.f, 0.f));
@@ -68,6 +70,7 @@ int CCrane::Tick(_float fTimeDelta)
 			if (!m_bFinished)
 				CUI_Manager::Get_Instance()->Set_PlayGame(false);
 			m_bFinished = true;
+			CGameInstance::Get_Instance()->StopSound(SOUND_OBJECT);
 			
 		}
 			
@@ -78,6 +81,16 @@ int CCrane::Tick(_float fTimeDelta)
 			m_bUp = true;
 		
 
+		if (m_fMoveSoundTime > 3.f && !m_bFinished && m_bUp)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Crane_Move.wav"), SOUND_OBJECT, 0.6f);
+			m_fMoveSoundTime = 0.f;
+		}
+		else if (!m_bUp && !m_bMoveSound)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Crane_Move2.wav"), SOUND_OBJECT, 0.4f);
+			m_bMoveSound = true;
+		}
 
 	}
 	else
@@ -90,11 +103,20 @@ int CCrane::Tick(_float fTimeDelta)
 			_vector vDir = XMVectorSet(m_eDir[DIR_X], 0.f, m_eDir[DIR_Z], 0.f);
 			vPosition = vPosition + vDir*m_fVelocity;
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+
+			if (!m_bMoveSound)
+			{
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Crane_Move.wav"), SOUND_OBJECT, 0.4f);
+				m_bMoveSound = true;
+			}
+
 		}
 		if (m_fVelocity <= 0)
 		{
+			CGameInstance::Get_Instance()->StopSound(SOUND_OBJECT);
 			m_IsMoved[m_eInputDir] = true;
 			m_fVelocity = 0.f;
+			m_bMoveSound = false;
 		}
 
 
@@ -133,7 +155,12 @@ void CCrane::Late_Tick(_float fTimeDelta)
 			else
 			{
 				_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-				m_pCollisionObj->Set_State(CTransform::STATE_POSITION, vPosition);
+				_vector vItemPosition = m_pCollisionObj->Get_TransformState(CTransform::STATE_POSITION);
+				_vector vDirection = XMVector3Normalize(vPosition - vItemPosition);
+
+				vItemPosition += fTimeDelta*vDirection*3.f;
+
+				m_pCollisionObj->Set_State(CTransform::STATE_POSITION, vItemPosition);
 			}
 		}
 	}
@@ -155,7 +182,12 @@ void CCrane::Late_Tick(_float fTimeDelta)
 			else
 			{
 				_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-				m_pCollisionObj->Set_State(CTransform::STATE_POSITION, vPosition);
+				_vector vItemPosition = m_pCollisionObj->Get_TransformState(CTransform::STATE_POSITION);
+				_vector vDirection = XMVector3Normalize(vPosition - vItemPosition);
+
+				vItemPosition += fTimeDelta*vDirection*3.f;
+
+				m_pCollisionObj->Set_State(CTransform::STATE_POSITION, vItemPosition);
 			}
 			
 		}

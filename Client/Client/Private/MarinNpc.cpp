@@ -160,6 +160,9 @@ void CMarinNpc::Late_Tick(_float fTimeDelta)
 
 		if (CGameInstance::Get_Instance()->Key_Up(DIK_A) && m_eState != TALK)
 		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("8_Npc_Marin_Default"), SOUND_OBJECT, 0.5f);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Button_On.wav"), SOUND_SYSTEM, g_fUIVolume);
+
 			CUI_Manager::Get_Instance()->Add_TalkingNpc(this);
 			CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
 			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TALK);
@@ -221,8 +224,15 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 
 	pUI_Manager->Clear_ChoiceButton();
 
+	_tchar	sz_FullPath[MAX_PATH];
+	
+
 	if (iTextureNum == CUIButton::NPC_TALK)
 	{
+		_int iNum = rand() % 3 + 1;
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_Marin_Question (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		CUI_Manager::MSGDESC eMsgDesc;
 		switch (m_eTalkingMode)
 		{
@@ -266,6 +276,10 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 
 	if (iTextureNum == CUIButton::PERFUME_COMPLETE)
 	{
+		_int iNum = rand() % 3 + 1;
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_Marin_Happy (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		CUI_Manager::MSGDESC eMsgDesc;
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = MARIN_A1_COMPLETE;
@@ -276,6 +290,10 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 	}
 	else if (iTextureNum == CUIButton::PERFUME_FAIL1 || iTextureNum == CUIButton::PERFUME_FAIL2 || iTextureNum == CUIButton::PERFUME_FAIL3)
 	{
+		_int iNum = rand() % 3 + 1;
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_Marin_Sad (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		CUI_Manager::MSGDESC eMsgDesc;
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = MARIN_A1_FAIL;
@@ -286,6 +304,10 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 
 	if (iTextureNum == CUIButton::CHANGE_COMPLETE)
 	{
+		_int iNum = rand() % 3 + 1;
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_Marin_Happy (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		CUI_Manager::MSGDESC eMsgDesc;
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = MARIN_A2_COMPLETE;
@@ -296,6 +318,10 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 	}
 	else if (iTextureNum == CUIButton::CHANGE_FAIL1 || iTextureNum == CUIButton::CHANGE_FAIL2 || iTextureNum == CUIButton::CHANGE_FAIL3)
 	{
+		_int iNum = rand() % 3 + 1;
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_Marin_Sad (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		CUI_Manager::MSGDESC eMsgDesc;
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = MARIN_A2_FAIL;
@@ -315,6 +341,10 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 	}
 	else if (iTextureNum == CUIButton::CROSS_FAIL1 || iTextureNum == CUIButton::CROSS_FAIL2 )
 	{
+		_int iNum = rand() % 3 + 1;
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_Marin_Sad (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		CUI_Manager::MSGDESC eMsgDesc;
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = MARIN_Q3_VECTOR_FAIL;
@@ -329,6 +359,10 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 
 	if (iTextureNum == CUIButton::DOT_COMPLETE)
 	{
+		_int iNum = rand() % 3 + 1;
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_Marin_Happy (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		CUI_Manager::MSGDESC eMsgDesc;
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = MARIN_Q3_COMPLETE;
@@ -338,6 +372,10 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 	}
 	else if (iTextureNum == CUIButton::DOT_FAIL1 || iTextureNum == CUIButton::DOT_FAIL2)
 	{
+		_int iNum = rand() % 3 + 1;
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_Marin_Sad (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		CUI_Manager::MSGDESC eMsgDesc;
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = MARIN_Q3_DOT_FAIL;
@@ -352,6 +390,10 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 
 	if (iTextureNum == CUIButton::CHARM_1 || iTextureNum == CUIButton::CHARM_2 || iTextureNum == CUIButton::CHARM_3 || iTextureNum == CUIButton::CHARM_4)
 	{
+		_int iNum = rand() % 3 + 1;
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_Marin_Happy (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		CUI_Manager::MSGDESC eMsgDesc;
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = MARIN_A4_COMPLETE;
@@ -367,9 +409,22 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 			CUI_Manager::MSGDESC eMsgDesc;
 			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 			if (m_iHeart > 10)
+			{
+				_int iNum = rand() % 3 + 1;
+				wcscpy_s(sz_FullPath, TEXT("8_Npc_Marin_Happy (%d).wav"));
+				wsprintf(sz_FullPath, sz_FullPath, iNum);
 				eMsgDesc.iTextureNum = MARIN_TALKEND_COMPLETE;
+			}
+				
 			else
+			{
+				_int iNum = rand() % 3 + 1;
+				wcscpy_s(sz_FullPath, TEXT("8_Npc_Marin_Sad (%d).wav"));
+				wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 				eMsgDesc.iTextureNum = MARIN_LOVEUFAIL;
+			}
+				
 			pUI_Manager->Add_MessageDesc(eMsgDesc);
 		}
 		else if (m_eTalkingMode == FINAL)
@@ -416,6 +471,9 @@ void CMarinNpc::Send_Answer_toNPC(_uint iTextureNum)
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		m_eState = DEPRESS;
 	}
+
+	
+	CGameInstance::Get_Instance()->PlaySounds(sz_FullPath, SOUND_OBJECT, 0.5f);
 
 	RELEASE_INSTANCE(CUI_Manager);
 	RELEASE_INSTANCE(CGameInstance);

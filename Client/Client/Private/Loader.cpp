@@ -385,7 +385,7 @@ HRESULT CLoader::Loading_ForStaticLevel()
 
 	/*For.Prototype_Component_Model_Bow*/
 	PivotMatrix = XMMatrixIdentity();
-	PivotMatrix = XMMatrixTranslation(0.f, 0.2f, 0.2f);
+	PivotMatrix = XMMatrixScaling(2.f, 2.f, 2.f) * XMMatrixTranslation(0.f, 0.2f, 0.2f);
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Bow"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Link/Bow.fbx", PivotMatrix))))
 		return E_FAIL;

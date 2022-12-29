@@ -281,7 +281,7 @@ HRESULT CPlayer::Render()
 
 
 	if (m_eState != EV_TELL_ST && m_eState != EV_TELL_LP && m_eState != EV_TELL_ED &&
-		m_eState != IDLE_CARRY && m_eState != ITEM_CARRY)
+		m_eState != IDLE_CARRY && m_eState != ITEM_CARRY && m_eState  != WALK_CARRY)
 	{
 		Render_Model(m_eLeftHand);
 		Render_Model(m_eRightHand);
@@ -947,7 +947,7 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	case Client::CPlayer::SLASH_HOLD_R:
 	case Client::CPlayer::SHIELD_HOLD_F:
 		m_fSoundEndTime = 0.2f;
-		fVolume = 0.2f;
+		fVolume = 0.1f;
 		iNum = rand() % 5 + 1;
 		if (iLevel == LEVEL_GAMEPLAY)
 		{
@@ -961,7 +961,7 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		break;
 	case Client::CPlayer::DASH_LP:
 		m_fSoundEndTime = 0.1f;
-		fVolume = 0.2f;
+		fVolume = 0.1f;
 		iNum = rand() % 5 + 1;
 		if (iLevel == LEVEL_GAMEPLAY)
 		{
@@ -976,6 +976,16 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	case Client::CPlayer::LADDER_UP:
 	case Client::CPlayer::LADDER_WAIT:
 	case Client::CPlayer::ITEM_GET_LP:
+	case Client::CPlayer::ITEM_GET_ST:
+		g_fBGMVolume -= 0.01f;
+		if (g_fBGMVolume <= 0.05f)
+			g_fBGMVolume = 0.05f;
+		break;
+	case Client::CPlayer::ITEM_GET_ED:
+		g_fBGMVolume += 0.01f;
+		if (g_fBGMVolume >= 0.2f)
+			g_fBGMVolume = 0.2f;
+		break;
 	case Client::CPlayer::PULL_LP:
 		m_bSoundOnce = true;
 		fVolume = 0.5f;
@@ -1069,9 +1079,7 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	case Client::CPlayer::DASH_ST:
 		
 		break;
-	case Client::CPlayer::ITEM_GET_ST:
 	
-		break;
 	case Client::CPlayer::S_ITEM_GET_ST:
 	
 		break;
@@ -1079,7 +1087,6 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	case Client::CPlayer::SHIELD_HOLD_ED:
 	
 		break;
-	case Client::CPlayer::ITEM_GET_ED:
 	case Client::CPlayer::S_ITEM_GET_ED:
 	case Client::CPlayer::KEY_OPEN:
 	case Client::CPlayer::STAIR_UP:
@@ -1101,7 +1108,9 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		
 		break;
 	case Client::CPlayer::ITEM_CARRY:
-		
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_itemSet.wav"));
 		break;
 	case Client::CPlayer::EV_TELL_ST:
 		
@@ -1110,7 +1119,11 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	
 		break;
 	case Client::CPlayer::DEAD:
-		
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		iNum = rand() % 3 + 1;
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Dead (%d).wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::WARP_ST:
 		
@@ -1571,8 +1584,6 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::SLASH_HOLD_L:
 	case Client::CPlayer::SLASH_HOLD_R:
 	case Client::CPlayer::SLASH_HOLD_LP:
-	case Client::CPlayer::SHIELD_HOLD_F:
-	case Client::CPlayer::SHIELD_HOLD_LP:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
@@ -1587,6 +1598,8 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::SHIELD_HOLD_L:
 	case Client::CPlayer::SHIELD_HOLD_R:
 	case Client::CPlayer::SHIELD_HOLD_B:
+	case Client::CPlayer::SHIELD_HOLD_F:
+	case Client::CPlayer::SHIELD_HOLD_LP:
 		m_eAnimSpeed = 4.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);

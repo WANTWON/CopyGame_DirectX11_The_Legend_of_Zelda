@@ -189,6 +189,10 @@ HRESULT CInvenTile::SetUp_ShaderResources()
 		else
 			m_InvenDesc.eState = STATE_DEFAULT;
 	}
+
+	_float m_fAlpha = 1.f;
+	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+		return E_FAIL;
 	
 	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_InvenDesc.eState))))
 		return E_FAIL;

@@ -167,11 +167,11 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 			Make_GetItemEffect();
 
 			if(m_ItemDesc.eType == DRUM || m_ItemDesc.eType ==  HORN || m_ItemDesc.eType== BELL || m_ItemDesc.eType == CELLO)
-				pGameInstance->PlaySounds(TEXT("4_Event_Siren's Instrument Fanfare.wav"), SOUND_SYSTEM, 0.4f);
+				pGameInstance->PlaySounds(TEXT("4_Event_Siren's Instrument Fanfare.mp3"), SOUND_SYSTEM, 0.4f);
 			else if (m_ItemDesc.eType == FEATHER || m_ItemDesc.eType == BOSS_KEY)
-				pGameInstance->PlaySounds(TEXT("4_Event_Get Important Item Fanfare.wav"), SOUND_SYSTEM, 0.4f);
+				pGameInstance->PlaySounds(TEXT("4_Event_Get Important Item Fanfare.mp3"), SOUND_SYSTEM, 0.4f);
 			else
-				pGameInstance->PlaySounds(TEXT("4_Event_Get Item Fanfare.wav"), SOUND_SYSTEM, 0.4f);
+				pGameInstance->PlaySounds(TEXT("4_Event_Get Item Fanfare.mp3"), SOUND_SYSTEM, 0.4f);
 
 
 		}
@@ -446,6 +446,49 @@ void CPrizeItem::Setting_Get_Item()
 				continue;
 		}
 	}
+	else if (m_ItemDesc.eType == MAGIC_ROD)
+	{
+		list<CGameObject*>* pItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_Ineventile"));
+		for (auto& iter : *pItemList)
+		{
+			if (dynamic_cast<CInvenTile*>(iter)->Get_TextureNum() == CInvenItem::ITEM_NONE)
+			{
+				dynamic_cast<CInvenTile*>(iter)->Set_TextureNum(CInvenItem::ITEM_WAND);
+				break;
+			}
+			else
+				continue;
+		}
+	}
+	else if (m_ItemDesc.eType == DOGFOOD)
+	{
+		list<CGameObject*>* pQuestItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_QuestItem"));
+		for (auto& iter : *pQuestItemList)
+		{
+			if (dynamic_cast<CInvenItem*>(iter)->Get_TextureNum() == CInvenItem::ITEM_NONE)
+			{
+				dynamic_cast<CInvenItem*>(iter)->Set_TextureNum(CInvenItem::DOG_FOOD);
+				break;
+
+			}
+			else
+				continue;
+		}
+	}
+	else if (m_ItemDesc.eType == BOW)
+	{
+		list<CGameObject*>* pItemList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_Ineventile"));
+		for (auto& iter : *pItemList)
+		{
+			if (dynamic_cast<CInvenTile*>(iter)->Get_TextureNum() == CInvenItem::ITEM_NONE)
+			{
+				dynamic_cast<CInvenTile*>(iter)->Set_TextureNum(CInvenItem::ITEM_BOW);
+				break;
+			}
+			else
+				continue;
+		}
+	}
 	else if (m_ItemDesc.eType == RUBYPURPLE)
 	{
 		CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
@@ -463,6 +506,7 @@ void CPrizeItem::Setting_Get_Item()
 		CGameObject* pTarget = pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
 		pPlayer->Set_MaxHp();
+		pGameInstance->Clear_Layer(LEVEL_STATIC, TEXT("Layer_Hp"));
 	}
 
 	RELEASE_INSTANCE(CUI_Manager);

@@ -100,7 +100,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	Out.vDiffuse.a *= g_fAlpha;
 
-	if (Out.vDiffuse.a <= 0.01f)
+	if (Out.vDiffuse.a <= 0.00f)
 		discard;
 
 	return Out;
@@ -124,11 +124,11 @@ PS_OUT PS_MAIN_SOFTEFFECT(PS_IN_SOFTEFFECT In)
 	float	fViewZ = In.vProjPos.w;
 	float	fOldViewZ = vDepthDesc.y*500.f;
 
-	Out.vDiffuse.a = Out.vDiffuse.a * (fOldViewZ - fViewZ);
+	//Out.vDiffuse.a = Out.vDiffuse.a * (fOldViewZ - fViewZ);
 
 	Out.vDiffuse.a *= g_fAlpha;
 
-	if (Out.vDiffuse.a <= 0.01f)
+	if (Out.vDiffuse.a <= 0.00f)
 		discard;
 
 

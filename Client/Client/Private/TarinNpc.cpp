@@ -88,6 +88,13 @@ void CTarinNpc::Late_Tick(_float fTimeDelta)
 
 		if (CGameInstance::Get_Instance()->Key_Up(DIK_A) && m_eState != TALK)
 		{
+			_tchar	sz_FullPath[MAX_PATH];
+			_int iNum = rand() % 2 + 1;
+			wcscpy_s(sz_FullPath, TEXT("8_Npc_Tarin (%d).wav"));
+			wsprintf(sz_FullPath, sz_FullPath, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_FullPath, SOUND_OBJECT, 0.5f);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Button_On.wav"), SOUND_SYSTEM, g_fUIVolume);
+
 			CUI_Manager::Get_Instance()->Add_TalkingNpc(this);
 			CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
 			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TALK);

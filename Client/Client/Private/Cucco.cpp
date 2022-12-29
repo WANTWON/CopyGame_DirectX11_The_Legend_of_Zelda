@@ -332,7 +332,7 @@ void CCucco::Check_Navigation(_float fTimeDelta)
 
 void CCucco::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove && m_eState == LANDING)
+	if (!m_bMoveSound && m_eState == LANDING)
 		return;
 
 	// Check for Target, AggroRadius
@@ -374,7 +374,7 @@ void CCucco::Patrol(_float fTimeDelta)
 			iNum = rand() % 6 + 1;
 			wcscpy_s(sz_SoundMonster, TEXT("3_Monster_Kokko (%d).wav"));
 			wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
-			CGameInstance::Get_Instance()->PlaySounds(sz_SoundMonster, SOUND_MONSTER, 0.4f);
+			CGameInstance::Get_Instance()->PlaySounds(sz_SoundMonster, SOUND_MONSTER, 0.2f);
 
 			m_eState = STATE::WALK;
 			m_dwWalkTime = GetTickCount();
@@ -415,7 +415,7 @@ _uint CCucco::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCau
 		{
 			m_bHit = true;
 			m_eState = STATE::LANDING;
-			m_bMove = true;
+			m_bMoveSound = true;
 
 			_uint iNum = 0;
 			_tchar	sz_SoundMonster[MAX_PATH];

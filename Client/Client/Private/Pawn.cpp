@@ -284,7 +284,7 @@ void CPawn::Follow_Target(_float fTimeDelta)
 
 void CPawn::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_eState == DAMAGE  || m_eState == DEADFALL || Check_IsinFrustum() == false)
+	if (!m_bMoveSound || m_eState == DAMAGE  || m_eState == DEADFALL || Check_IsinFrustum() == false)
 		return;
 
 	// Check for Target, AggroRadius
@@ -336,7 +336,7 @@ _uint CPawn::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 			m_bHit = true;
 			Make_GuardEffect(m_pTarget);
 			m_eState = STATE::DAMAGE;
-			m_bMove = true;
+			m_bMoveSound = true;
 		}
 
 		m_bAggro = true;

@@ -421,7 +421,7 @@ void CRola::Follow_Target(_float fTimeDelta)
 
 void CRola::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_eState == DEAD || m_eState == DEAD_ST || m_bHit || m_bIsAttacking)
+	if (!m_bMoveSound || m_eState == DEAD || m_eState == DEAD_ST || m_bHit || m_bIsAttacking)
 		return;
 
 	// Check for Target, AggroRadius
@@ -640,7 +640,7 @@ _uint CRola::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 			m_bHit = true;
 			m_iDmgCount++;
 			m_eState = STATE::DAMAGE;
-			m_bMove = true;
+			m_bMoveSound = true;
 		}
 
 

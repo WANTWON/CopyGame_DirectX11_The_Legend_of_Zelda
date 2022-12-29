@@ -43,6 +43,7 @@ private:
 	BLOCKDESC m_BlockDesc;
 	_bool	  m_bOpen = false;
 	_bool	  m_bCollisionSet = false;
+	_bool	  m_bPlayGame = false;
 
 public:
 	static CSquareBlock* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -388,7 +388,7 @@ void CMoblinSword::Check_Navigation(_float fTimeDelta)
 
 void CMoblinSword::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMove || m_bHit ||
+	if (!m_bMoveSound || m_bHit ||
 		m_eState == DEAD_F || m_eState == STAGGER || m_eState == DEAD_B || m_eState == GUARD)
 		return;
 
@@ -508,7 +508,7 @@ _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CBaseObj * Dam
 				m_eState = STATE::DAMAGE_F;
 			else
 				m_eState = STATE::DAMAGE_B;
-			m_bMove = true;
+			m_bMoveSound = true;
 		}
 
 

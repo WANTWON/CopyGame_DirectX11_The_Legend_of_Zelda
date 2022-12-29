@@ -47,6 +47,11 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);	
 
+	g_fBGMVolume -= 0.001f;
+	if (g_fBGMVolume <= 0.01f)
+		g_fBGMVolume = 0.01f;
+	CGameInstance::Get_Instance()->SetChannelVolume(SOUND_BGM, g_fBGMVolume);
+
 	if (true == m_pLoader->Get_Finished())
 	{
 			/* 넥스트레벨에 대한 준비가 끝나면 실제 넥스트레벨을 할당한다. */

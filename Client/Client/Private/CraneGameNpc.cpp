@@ -86,6 +86,13 @@ void CCraneGameNpc::Late_Tick(_float fTimeDelta)
 
 		if (CGameInstance::Get_Instance()->Key_Up(DIK_A) && m_eState != TALK)
 		{
+			_tchar	sz_FullPath[MAX_PATH];
+			_int iNum = rand() % 2 + 1;
+			wcscpy_s(sz_FullPath, TEXT("8_Npc_CraneGame (%d).wav"));
+			wsprintf(sz_FullPath, sz_FullPath, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_FullPath, SOUND_ACTOR, 0.5f);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Button_On.wav"), SOUND_SYSTEM, g_fUIVolume);
+
 			CUI_Manager::Get_Instance()->Add_TalkingNpc(this);
 			CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
 			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TALK);
@@ -135,6 +142,7 @@ void CCraneGameNpc::Send_Answer_toNPC(_uint iTextureNum)
 	{
 		if (pPlayer->Set_RubyUse(10))
 		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Event_Buy.wav"), SOUND_PEFFECT, 0.5f);
 			CUI_Manager::MSGDESC eMsgDesc;
 			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 			eMsgDesc.iTextureNum = HOW_TO_PLAY;

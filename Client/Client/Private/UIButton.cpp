@@ -94,7 +94,9 @@ void CUIButton::Late_Tick(_float fTimeDelta)
 
 		if(m_ButtonDesc.eButtonType == BTN_INTERACT && CUI_Manager::Get_Instance()->Get_UI_OpenType() == CUI_Manager::UI_END)
 			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
-		else if (m_ButtonDesc.eButtonType != BTN_INTERACT)
+		else if (m_ButtonDesc.eButtonType == BTN_INVEN && CUI_Manager::Get_Instance()->Get_UI_OpenType() == CUI_Manager::UI_INVEN)
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+		else
 			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 		
 	}
@@ -109,13 +111,13 @@ void CUIButton::Late_Tick(_float fTimeDelta)
 
 	if (m_bShow)
 	{
-		m_fAlpha += 0.1f;
+		m_fAlpha += 0.05f;
 		if (m_fAlpha >= 1.f)
 			m_fAlpha = 1.f;
 	}
 	else
 	{
-		m_fAlpha -= 0.1f;
+		m_fAlpha -= 0.05f;
 		if (m_fAlpha <= 0.f)
 		{
 			m_fAlpha = 0.f;

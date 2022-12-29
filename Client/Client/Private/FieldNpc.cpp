@@ -156,6 +156,7 @@ void CFieldNpc::Late_Tick(_float fTimeDelta)
 			&& CUI_Manager::Get_Instance()->Get_TalkingNpc() == nullptr)
 		{
 			CUI_Manager::Get_Instance()->Add_TalkingNpc(this);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Button_On.wav"), SOUND_SYSTEM, g_fUIVolume);
 			CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
 			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TALK);
 			pButton->Set_Visible(false);
@@ -198,7 +199,11 @@ void CFieldNpc::GiveItemMode()
 		CPrizeItem::ITEMDESC ItemDesc;
 		ItemDesc.eType = (CPrizeItem::TYPE)m_iGiveItemTexNum;
 		ItemDesc.eInteractType = CPrizeItem::PRIZE;
-		XMStoreFloat3(&ItemDesc.vPosition, Get_TransformState(CTransform::STATE_POSITION));
+
+		_vector vPlayerPos = dynamic_cast<CBaseObj*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")))->Get_TransformState(CTransform::STATE_POSITION);
+		_vector vDir = XMVector3Normalize(vPlayerPos - Get_TransformState(CTransform::STATE_POSITION));
+
+		XMStoreFloat3(&ItemDesc.vPosition, Get_TransformState(CTransform::STATE_POSITION) + vDir);
 
 		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_GAMEPLAY, TEXT("Layer_Item"), &ItemDesc)))
 			return;
@@ -340,10 +345,14 @@ void CFieldNpc::Change_Message()
 	MessageDesc.m_eMsgType = CMessageBox::FIELDNPC_TALK;
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &MessageDesc);
 
-
+	_tchar	sz_FullPath[MAX_PATH];
+	_int iNum = rand() % 2 + 1;
 	switch (m_NpcDesc.eNpcType)
 	{
 	case CUCCO_KEEPER:
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_CuccoKeeper (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = TALKMSG_CUCCO;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
@@ -351,6 +360,9 @@ void CFieldNpc::Change_Message()
 	case MADAM:
 		if (pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_QuestItem"), CInvenItem::DOG_FOOD))
 		{
+			wcscpy_s(sz_FullPath, TEXT("8_Npc_Madam (%d).wav"));
+			wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 			eMsgDesc.iTextureNum = THANKYOU_MADAM;
 			pUI_Manager->Add_MessageDesc(eMsgDesc);
@@ -363,17 +375,26 @@ void CFieldNpc::Change_Message()
 		}
 		else
 		{
+			wcscpy_s(sz_FullPath, TEXT("8_Npc_Madam_Complete (%d).wav"));
+			wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 			eMsgDesc.iTextureNum = TALKMSG_MADAM;
 			pUI_Manager->Add_MessageDesc(eMsgDesc);
 		}
 		break;
 	case GRANDMA:
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_Grandma (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = TALKMSG_GRANDMA;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
 		break;
 	case CHILD:
+		wcscpy_s(sz_FullPath, TEXT("8_Npc_Child_Laugh (%d).wav"));
+		wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 		eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 		eMsgDesc.iTextureNum = TALKMSG_CHILD;
 		pUI_Manager->Add_MessageDesc(eMsgDesc);
@@ -381,6 +402,9 @@ void CFieldNpc::Change_Message()
 	case MOTHER:
 		if (pUI_Manager->Get_Is_HaveItem(LEVEL_STATIC, TEXT("Layer_QuestItem"), CInvenItem::YOSHI))
 		{
+			wcscpy_s(sz_FullPath, TEXT("8_Npc_ChildMother (%d).wav"));
+			wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 			eMsgDesc.iTextureNum = THANKYOU_MOM;
 			pUI_Manager->Add_MessageDesc(eMsgDesc);
@@ -393,6 +417,9 @@ void CFieldNpc::Change_Message()
 		}
 		else
 		{
+			wcscpy_s(sz_FullPath, TEXT("8_Npc_ChildMother_Complete (%d).wav"));
+			wsprintf(sz_FullPath, sz_FullPath, iNum);
+
 			eMsgDesc.eMsgType = CUI_Manager::PASSABLE;
 			eMsgDesc.iTextureNum = TALKMSG_MOM;
 			pUI_Manager->Add_MessageDesc(eMsgDesc);
@@ -403,6 +430,7 @@ void CFieldNpc::Change_Message()
 	}
 
 	pUI_Manager->Open_Message(true);
+	CGameInstance::Get_Instance()->PlaySounds(sz_FullPath, SOUND_OBJECT, 0.5f);
 
 	RELEASE_INSTANCE(CUI_Manager);
 	RELEASE_INSTANCE(CGameInstance);

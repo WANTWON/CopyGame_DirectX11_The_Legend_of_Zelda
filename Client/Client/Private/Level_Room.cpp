@@ -92,7 +92,7 @@ void CLevel_Room::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);	
 
-	g_fBGMVolume += 0.002f;
+	g_fBGMVolume += 0.001f;
 	if (g_fBGMVolume >= 0.2f)
 		g_fBGMVolume = 0.2f;
 	CGameInstance::Get_Instance()->SetChannelVolume(SOUND_BGM, g_fBGMVolume);

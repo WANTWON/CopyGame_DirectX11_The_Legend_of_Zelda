@@ -37,7 +37,7 @@ private:
 	STATE					m_ePreState = RIGHT_OFF;
 	_bool					m_bFirst = false;
 	_bool					m_bPlay = false;
-
+	_bool					m_bSoundOnce = false;
 	
 
 public:

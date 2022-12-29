@@ -46,6 +46,7 @@ int CCraneButton::Tick(_float fTimeDelta)
 	{
 		m_pModelCom->Set_NextAnimIndex(m_eState);
 		m_ePreState = m_eState;
+		m_bSoundOnce = false; 
 	}
 
 	Change_Animation(fTimeDelta);
@@ -169,6 +170,12 @@ void CCraneButton::Change_Animation(_float fTimeDelta)
 	case Client::CCraneButton::RIGHTUP_ON_LP:
 	case Client::CCraneButton::UP_ON_LP:
 	case Client::CCraneButton::RIGHTUP_OFF_LP:
+		if (!m_bSoundOnce)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Crane_Button_On.wav"), SOUND_SYSTEM, 0.5f);
+			m_bSoundOnce = true;
+		}
+	
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta * 2, m_bIsLoop);
 		break;

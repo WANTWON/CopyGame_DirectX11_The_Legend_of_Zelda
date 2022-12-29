@@ -36,7 +36,7 @@ private:
 	virtual HRESULT SetUp_ShaderID();
 	virtual void Change_Animation(_float fTimeDelta);
 	void	Change_Message();
-
+	void	ReMake_Item();
 
 private:
 	STATE m_eState = IDLE;

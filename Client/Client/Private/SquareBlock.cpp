@@ -487,11 +487,21 @@ void CSquareBlock::Tick_CraneGameFence(_float fTimeDelta)
 
 	CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
 	if (pUI_Manager->Get_Talking() == false)
-	{
-		if(pUI_Manager->Get_PlayGame() == true)
-			Set_Open(false);
-		else
-			Set_Open(true);
+	{	
+		if (m_bPlayGame != pUI_Manager->Get_PlayGame())
+		{
+			m_bPlayGame = pUI_Manager->Get_PlayGame();
+			if (m_bPlayGame == true)
+			{
+				Set_Open(false);
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_CraneFence_Close.wav"), SOUND_ACTOR, 0.8f);
+			}
+			else
+			{
+				Set_Open(true);
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_CraneFence_Open.wav"), SOUND_ACTOR, 0.8f);
+			}
+		}
 	}
 		
 
