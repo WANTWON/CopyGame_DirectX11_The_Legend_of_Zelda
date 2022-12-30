@@ -430,7 +430,7 @@ void CFieldNpc::Change_Message()
 	}
 
 	pUI_Manager->Open_Message(true);
-	CGameInstance::Get_Instance()->PlaySounds(sz_FullPath, SOUND_OBJECT, 0.5f);
+	CGameInstance::Get_Instance()->PlaySounds(sz_FullPath, SOUND_ACTOR, 0.8f);
 
 	RELEASE_INSTANCE(CUI_Manager);
 	RELEASE_INSTANCE(CGameInstance);
@@ -624,6 +624,19 @@ void CFieldNpc::Make_ChildEffect(_float fTimeDelta)
 	m_fEffectTime += fTimeDelta;
 	if (m_fEffectTime > m_fEffectEndTime)
 	{
+		_vector vPlayerPos = dynamic_cast<CBaseObj*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")))->Get_TransformState(CTransform::STATE_POSITION);
+		_float  vDistance = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vPlayerPos));
+
+		if (vDistance < 5)
+		{
+			_uint iNum = rand() % 3 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.2f;
+			wcscpy_s(sz_Sound, TEXT("1_Field_FootStep (%d).wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_ACTOR, 0.2f);
+		}
+
 		CEffect::EFFECTDESC EffectDesc;
 		EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 		EffectDesc.eEffectID = CObjectEffect::SMOKE;

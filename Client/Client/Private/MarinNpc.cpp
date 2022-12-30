@@ -158,9 +158,9 @@ void CMarinNpc::Late_Tick(_float fTimeDelta)
 		fPosition.y -= 30.f;
 		pButton->Set_Position(fPosition);
 
-		if (CGameInstance::Get_Instance()->Key_Up(DIK_A) && m_eState != TALK)
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_A) && CUI_Manager::Get_Instance()->Get_TalkingNpc() == nullptr && m_eState != TALK)
 		{
-			CGameInstance::Get_Instance()->PlaySounds(TEXT("8_Npc_Marin_Default"), SOUND_OBJECT, 0.5f);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("8_Npc_Marin_Default.wav"), SOUND_OBJECT, 0.5f);
 			CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Button_On.wav"), SOUND_SYSTEM, g_fUIVolume);
 
 			CUI_Manager::Get_Instance()->Add_TalkingNpc(this);
@@ -488,6 +488,7 @@ void CMarinNpc::GiveItemMode()
 	CMessageBox::MSGDESC MessageDesc;
 	MessageDesc.m_eMsgType = CMessageBox::GET_ITEM;
 	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_MessageBox"), LEVEL_STATIC, TEXT("Layer_UI"), &MessageDesc);
+	pGameInstance->PlaySounds(TEXT("4_Event_Get Important Item Fanfare.mp3"), SOUND_SYSTEM, 0.4f);
 
 	CUI_Manager::MSGDESC MsgDesc;
 	MsgDesc.eMsgType = CUI_Manager::PASSABLE;
@@ -597,7 +598,7 @@ HRESULT CMarinNpc::Ready_Components(void * pArg)
 	CCollider::COLLIDERDESC		ColliderDesc;
 
 	/* For.Com_SPHERE */
-	ColliderDesc.vScale = _float3(3.f, 3.f, 3.f);
+	ColliderDesc.vScale = _float3(2.5f, 2.5f, 2.5f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))

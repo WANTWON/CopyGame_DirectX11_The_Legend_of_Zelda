@@ -86,7 +86,7 @@ void CTarinNpc::Late_Tick(_float fTimeDelta)
 		fPosition.y -= 30.f;
 		pButton->Set_Position(fPosition);
 
-		if (CGameInstance::Get_Instance()->Key_Up(DIK_A) && m_eState != TALK)
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_A) && CUI_Manager::Get_Instance()->Get_TalkingNpc() == nullptr && m_eState != TALK)
 		{
 			_tchar	sz_FullPath[MAX_PATH];
 			_int iNum = rand() % 2 + 1;
@@ -164,7 +164,7 @@ HRESULT CTarinNpc::Ready_Components(void * pArg)
 	CCollider::COLLIDERDESC		ColliderDesc;
 
 	/* For.Com_SPHERE */
-	ColliderDesc.vScale = _float3(3.f, 3.f, 3.f);
+	ColliderDesc.vScale = _float3(2.5f, 2.5f, 2.5f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_STATIC, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
@@ -261,7 +261,10 @@ void CTarinNpc::GiveItemMode()
 	CPrizeItem::ITEMDESC ItemDesc;
 	ItemDesc.eType = (CPrizeItem::TYPE)m_iGiveItemTexNum;
 	ItemDesc.eInteractType = CPrizeItem::PRIZE;
-	XMStoreFloat3(&ItemDesc.vPosition, Get_TransformState(CTransform::STATE_POSITION));
+	_vector vPlayerPos = dynamic_cast<CBaseObj*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")))->Get_TransformState(CTransform::STATE_POSITION);
+	_vector vDir = XMVector3Normalize(vPlayerPos - Get_TransformState(CTransform::STATE_POSITION));
+
+	XMStoreFloat3(&ItemDesc.vPosition, Get_TransformState(CTransform::STATE_POSITION) + vDir);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PrizeItem"), LEVEL_ROOM, TEXT("Layer_Item"), &ItemDesc)))
 		return;

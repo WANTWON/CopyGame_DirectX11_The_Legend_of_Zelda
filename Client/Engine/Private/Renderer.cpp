@@ -323,6 +323,17 @@ HRESULT CRenderer::Render_UI()
 	}
 
 	m_GameObjects[RENDER_UI_FRONT].clear();
+
+	for (auto& pGameObject : m_GameObjects[RENDER_UI_TOP])
+	{
+		if (nullptr != pGameObject)
+		{
+			pGameObject->Render();
+			Safe_Release(pGameObject);
+		}
+	}
+
+	m_GameObjects[RENDER_UI_TOP].clear();
 	return S_OK;
 }
 

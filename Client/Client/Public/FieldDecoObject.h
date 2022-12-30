@@ -49,6 +49,7 @@ private:
 	_float					m_fAnimSpeed = 0.f;
 	_float					m_fAngle = 0.f;
 	_float					m_fHeight = 0.f;
+	_bool					m_bFIrst = false;
 
 	DWORD					m_dwIdleTime = GetTickCount();
 	DWORD					m_dwWalkTime = GetTickCount();

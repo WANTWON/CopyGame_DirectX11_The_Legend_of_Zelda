@@ -974,7 +974,10 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::LADDER_UP:
-	case Client::CPlayer::LADDER_WAIT:
+		m_fSoundEndTime = 0.2f;
+		fVolume = 0.1f;
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Ladder.wav"));
+		break;
 	case Client::CPlayer::ITEM_GET_LP:
 	case Client::CPlayer::ITEM_GET_ST:
 		g_fBGMVolume -= 0.01f;

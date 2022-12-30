@@ -62,6 +62,10 @@ HRESULT CLevel_Tower::Initialize()
 	CCamera* pCamera = pCameraManager->Get_CurrentCamera();
 	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
 	CUI_Manager::Get_Instance()->Set_NextLevel(false);
+
+	g_fBGMVolume = 0.f;
+	CGameInstance::Get_Instance()->StopAll();
+	CGameInstance::Get_Instance()->PlayBGM(TEXT("1-08 Level 7 - Eagle's Tower.mp3"), g_fBGMVolume);
 	return S_OK;
 }
 
@@ -71,6 +75,10 @@ void CLevel_Tower::Tick(_float fTimeDelta)
 
 	CUI_Manager::Get_Instance()->Tick_UI(fTimeDelta);
 
+	g_fBGMVolume += 0.001f;
+	if (g_fBGMVolume >= 0.2f)
+		g_fBGMVolume = 0.2f;
+	CGameInstance::Get_Instance()->SetChannelVolume(SOUND_BGM, g_fBGMVolume);
 
 	if (CUI_Manager::Get_Instance()->Get_NextLevelFinished())
 	{

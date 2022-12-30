@@ -368,13 +368,19 @@ void CCucco::Patrol(_float fTimeDelta)
 	{
 		if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 3 + 1) + 3000)
 		{
-			_uint iNum = 0;
-			_tchar	sz_SoundMonster[MAX_PATH];
-			_float fVolume = 0.5f;
-			iNum = rand() % 6 + 1;
-			wcscpy_s(sz_SoundMonster, TEXT("3_Monster_Kokko (%d).wav"));
-			wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
-			CGameInstance::Get_Instance()->PlaySounds(sz_SoundMonster, SOUND_MONSTER, 0.2f);
+			_vector vPlayerPos = dynamic_cast<CBaseObj*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")))->Get_TransformState(CTransform::STATE_POSITION);
+			_float  vDistance = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vPlayerPos));
+
+			if (vDistance < 5)
+			{
+				_uint iNum = rand() % 6 + 1;
+				_tchar	sz_SoundMonster[MAX_PATH];
+				_float fVolume = 0.5f;
+				wcscpy_s(sz_SoundMonster, TEXT("3_Monster_Kokko (%d).wav"));
+				wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
+				CGameInstance::Get_Instance()->PlaySounds(sz_SoundMonster, SOUND_MONSTER, 0.2f);
+			}
+			
 
 			m_eState = STATE::WALK;
 			m_dwWalkTime = GetTickCount();

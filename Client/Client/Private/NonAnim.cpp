@@ -83,7 +83,7 @@ void CNonAnim::Late_Tick(_float fTimeDelta)
 
 	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
 
-	if (iLevel == LEVEL_GAMEPLAY && Check_IsinFrustum(8.f) == false)
+	if (iLevel == LEVEL_GAMEPLAY && Check_IsinFrustum(10.f) == false)
 		goto FAILD_CULLING;
 	else if (iLevel == LEVEL_TAILCAVE && Check_IsinFrustum(4.f) == false)
 		goto FAILD_CULLING;

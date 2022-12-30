@@ -255,6 +255,16 @@ void CFieldDecoObject::Bird_Tick(_float fTimeDelta)
 
 	if (fDistanceToTarget < 3)
 	{
+		if (!m_bFIrst)
+		{
+			_uint iNum = rand() % 3 + 1;
+			_tchar	sz_SoundMonster[MAX_PATH];
+			_float fVolume = 0.2f;
+			wcscpy_s(sz_SoundMonster, TEXT("5_Obj_Bird_Wait (%d).wav"));
+			wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_SoundMonster, SOUND_OBJECT, 0.2f);
+			m_bFIrst = true;
+		}
 	m_eState = WALK;
 	m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
 	vDir = XMVectorSetY(vDir, 0.f);
@@ -267,6 +277,16 @@ void CFieldDecoObject::Bird_Tick(_float fTimeDelta)
 		{
 			if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 3 + 1) + 3000)
 			{
+				if (fDistanceToTarget < 5)
+				{
+					_uint iNum = rand() % 3 + 1;
+					_tchar	sz_SoundMonster[MAX_PATH];
+					_float fVolume = 0.2f;
+					wcscpy_s(sz_SoundMonster, TEXT("5_Obj_Bird_Wait (%d).wav"));
+					wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
+					CGameInstance::Get_Instance()->PlaySounds(sz_SoundMonster, SOUND_OBJECT, 0.2f);
+				}
+					
 				m_eState = STATE::WALK;
 				m_dwWalkTime = GetTickCount();
 
@@ -279,6 +299,7 @@ void CFieldDecoObject::Bird_Tick(_float fTimeDelta)
 		{
 			if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 3 + 1) + 1500)
 			{
+				m_bFIrst = false;
 				m_eState = STATE::IDLE;
 				m_dwIdleTime = GetTickCount();
 			}
