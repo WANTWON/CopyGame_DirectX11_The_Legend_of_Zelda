@@ -44,6 +44,9 @@ HRESULT CMonsterBullet::Initialize(void * pArg)
 		Set_Scale(_float3(2, 2, 2));
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_BulletDesc.vInitPositon);
 		m_pTransformCom->LookDir(m_BulletDesc.vLook);
+
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("Octarock_BulletFlying.wav"), SOUND_MEFFECT, 0.3f);
+
 		break;
 	}
 	case ROLA:
@@ -495,6 +498,10 @@ void CMonsterBullet::Make_DeathEffect()
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
 
 		}
+
+		CGameInstance::Get_Instance()->StopSound(SOUND_MEFFECT);
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("Octarock_ShotBreak01.wav"), SOUND_MEFFECT, 0.4f);
+
 		break;
 	default:
 		break;

@@ -23,7 +23,7 @@ public:
 
 public:
 	virtual _uint Take_Damage(float fDamage, void* DamageType, CBaseObj* DamageCauser) override;
-
+	virtual void Sound_By_State(_float fTimeDelta) override;
 
 private:
 	virtual void Change_Animation(_float fTimeDelta) override;
@@ -42,6 +42,7 @@ private:
 	STATE m_eState = IDLE;
 	STATE m_ePreState = FIND;
 
+	_bool					m_bFirst = false;
 	_float					m_fEffectTime = 0.f;
 	_float					m_fEffectEndTime = 0.f;
 

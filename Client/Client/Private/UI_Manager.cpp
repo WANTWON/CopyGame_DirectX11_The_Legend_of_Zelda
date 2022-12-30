@@ -548,9 +548,17 @@ void CUI_Manager::Tick_Name(_float fTimeDelta)
 		switch (iLevelIndex)
 		{
 		case Client::LEVEL_GAMEPLAY:
-			pName->Set_TexType(CUIName::NAME_FIELD);
+		{
+			CPlayer* pPlayer = dynamic_cast<CPlayer*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+
+			_float fPositionZ = XMVectorGetZ(pPlayer->Get_TransformState(CTransform::STATE_POSITION));
+			if (fPositionZ < 30.f)
+				pName->Set_TexType(CUIName::NAME_FOREST);
+			else
+				pName->Set_TexType(CUIName::NAME_FIELD);
 			pName->Set_Position(_float2(150, 150));
 			break;
+		}
 		case Client::LEVEL_TOWER:
 			pName->Set_TexType(CUIName::NAME_TOWER);
 			pName->Set_Position(_float2(g_iWinSizeX*0.5f, g_iWinSizeY*0.5f));

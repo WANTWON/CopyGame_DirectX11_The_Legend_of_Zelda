@@ -1228,10 +1228,10 @@ void CPlayer::SetDirection_byLook(_float fTimeDelta)
 				m_pTransformCom->Go_PosDir(fTimeDelta, vDir, m_pNavigationCom);
 			}
 			else
-				m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+				m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, 0.f);
 		}	
 		else
-			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, 0.f);
 	}
 
 }

@@ -94,6 +94,12 @@ void COctorock::Change_Animation(_float fTimeDelta)
 	switch (m_eState)
 	{
 	case Client::COctorock::IDLE:
+		m_bFirst = false;
+		m_fAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		m_bMakeEffect = false;
+		break;
 	case Client::COctorock::WALK:
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
@@ -105,6 +111,7 @@ void COctorock::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Octarock_Shot01.wav"), SOUND_MONSTER, 0.5f);
 			m_eState = ATTACK_ED;
 			Make_Bullet();
 		}
@@ -279,11 +286,10 @@ void COctorock::Check_Navigation(_float fTimeDelta)
 	{
 		_vector vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float fHeight = m_pNavigationCom->Compute_Height(vPosition, 0.f);
-		if (fHeight > XMVectorGetY(vPosition))
-		{
-			vPosition = XMVectorSetY(vPosition, fHeight);
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-		}
+		
+		vPosition = XMVectorSetY(vPosition, fHeight);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
+		
 
 	}
 }
@@ -328,6 +334,7 @@ void COctorock::Patrol(_float fTimeDelta)
 	{
 		if (GetTickCount() > m_dwIdleTime + (rand() % 1500) * (rand() % 2 + 1) + 3000)
 		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Octarock_Walk01.wav"), SOUND_MONSTER, 0.03f);
 			m_eState = STATE::WALK;
 			m_dwWalkTime = GetTickCount();
 
@@ -340,6 +347,7 @@ void COctorock::Patrol(_float fTimeDelta)
 	{
 		if (GetTickCount() > m_dwWalkTime + (rand() % 3000) * (rand() % 2 + 1) + 1500)
 		{
+			CGameInstance::Get_Instance()->StopSound(SOUND_MONSTER);
 			m_eState = STATE::IDLE;
 			m_dwIdleTime = GetTickCount();
 		}
@@ -405,6 +413,13 @@ _uint COctorock::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 	{
 		if (!m_bDead)
 		{
+			_uint iNum = rand() % 3 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.5f;
+			wcscpy_s(sz_Sound, TEXT("Octarock_Vo_Damage0%d.wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+
 			m_bHit = true;
 			m_eState = STATE::DAMAGE;
 			m_bMoveSound = true;
@@ -418,6 +433,13 @@ _uint COctorock::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 	}
 	else
 	{
+		_uint iNum = rand() % 2 + 1;
+		_tchar	sz_Sound[MAX_PATH];
+		_float fVolume = 0.5f;
+		wcscpy_s(sz_Sound, TEXT("Octarock_Vo_Damage_Electric0%d.wav"));
+		wsprintf(sz_Sound, sz_Sound, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+
 		m_eState = STATE::DEAD;
 		m_fAlpha = 0.f;
 	}

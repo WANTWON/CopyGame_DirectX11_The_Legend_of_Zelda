@@ -41,6 +41,7 @@ private:
 private:
 	STATE m_eState = IDLE;
 	_bool m_bMakeBullet = false;
+	_bool m_bFirst = false;
 
 public:
 	static COctorock* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

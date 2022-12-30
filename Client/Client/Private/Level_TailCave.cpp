@@ -69,6 +69,10 @@ HRESULT CLevel_TailCave::Initialize()
 	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_TERRAIN);
 	CUI_Manager::Get_Instance()->Set_NextLevel(false);
 
+	g_fBGMVolume = 0.f;
+
+	CGameInstance::Get_Instance()->StopAll();
+	CGameInstance::Get_Instance()->PlayBGM(TEXT("1-20 Level 1 - Tail Cave.mp3"), g_fBGMVolume);
 	return S_OK;
 }
 
@@ -77,6 +81,11 @@ void CLevel_TailCave::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);	
 
 	CUI_Manager::Get_Instance()->Tick_UI(fTimeDelta);
+
+	g_fBGMVolume += 0.001f;
+	if (g_fBGMVolume >= 0.2f)
+		g_fBGMVolume = 0.2f;
+	CGameInstance::Get_Instance()->SetChannelVolume(SOUND_BGM, g_fBGMVolume);
 
 	if (CUI_Manager::Get_Instance()->Get_NextLevelFinished())
 	{

@@ -150,6 +150,81 @@ void CLevel_GamePlay::Setting_Light()
 
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	
+	_float fPositionZ = XMVectorGetZ(pPlayer->Get_TransformState(CTransform::STATE_POSITION));
+	LIGHTDESC			LightDesc = *pGameInstance->Get_LightDesc(0);
+
+	if (fPositionZ < 30.f)
+	{
+		if (m_eMusic == FIELD)
+		{
+			g_fBGMVolume -= 0.005f;
+			if (g_fBGMVolume <= 0.f)
+			{
+				pGameInstance->StopSound(SOUND_BGM);
+				pGameInstance->PlayBGM(TEXT("1-10 Mysterious Forest.mp3"), g_fBGMVolume);
+				CUI_Manager::Get_Instance()->Set_NextLevel(false);
+				m_eMusic = MYSTERY;
+			}
+
+			
+		}
+
+
+		if (LightDesc.vDiffuse.x > 0.5f)
+		{
+			LightDesc.vDiffuse.x -= 0.005f;
+			LightDesc.vDiffuse.y -= 0.005f;
+			LightDesc.vSpecular.x -= 0.005f;
+			LightDesc.vSpecular.y -= 0.005f;
+
+			if (LightDesc.vSpecular.x <= 0.4f)
+			{
+				LightDesc.vSpecular.x = 0.4f;
+				LightDesc.vSpecular.y = 0.4f;
+
+			}
+				
+			pGameInstance->Set_LightDesc(0, &LightDesc);
+		}
+		
+
+	}
+	else
+	{
+
+		if (m_eMusic == MYSTERY)
+		{
+			g_fBGMVolume -= 0.005f;
+			if (g_fBGMVolume <= 0.f)
+			{
+				pGameInstance->StopSound(SOUND_BGM);
+				pGameInstance->PlayBGM(TEXT("1_0 Field (Normal).mp3"), g_fBGMVolume);
+				CUI_Manager::Get_Instance()->Set_NextLevel(false);
+				m_eMusic = FIELD;
+			}
+
+			
+		}
+
+		if (LightDesc.vDiffuse.x < 1.f)
+		{
+			LightDesc.vDiffuse.x += 0.005f;
+			LightDesc.vDiffuse.y += 0.005f;
+			//LightDesc.vDiffuse.z -= 0.005f;
+			LightDesc.vSpecular.x += 0.005f;
+			LightDesc.vSpecular.y += 0.005f;
+
+			if (LightDesc.vSpecular.x >= 0.7f)
+			{
+				LightDesc.vSpecular.x = 0.7f;
+				LightDesc.vSpecular.y = 0.7f;
+
+			}
+			//if (LightDesc.vDiffuse.z <= 0.8f)
+			//	LightDesc.vDiffuse.z = 0.8f;
+			pGameInstance->Set_LightDesc(0, &LightDesc);
+		}
+	}
 
 
 

@@ -69,6 +69,8 @@ int CMoblinSword::Tick(_float fTimeDelta)
 	{
 		m_pModelCom->Set_NextAnimIndex(m_eState);
 		m_ePreState = m_eState;
+		m_bSoundOnce = false;
+		m_bFirst = false;
 	}
 	Change_Animation(fTimeDelta);
 	return OBJ_NOEVENT;
@@ -76,9 +78,13 @@ int CMoblinSword::Tick(_float fTimeDelta)
 
 void CMoblinSword::Late_Tick(_float fTimeDelta)
 {
+
+	if (Check_IsinFrustum(2.f) == false)
+		return;
+
 	__super::Late_Tick(fTimeDelta);
 
-
+	Sound_By_State(fTimeDelta);
 
 
 	if (m_bAggro&& m_bIsAttacking &&m_pTarget != nullptr 
@@ -162,7 +168,12 @@ void CMoblinSword::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CMoblinSword::FIND:
 	case Client::CMoblinSword::STANCE_WALK:
-
+		if (!m_bFirst)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Moriblin_Vo_Attack00.wav"), SOUND_MONSTER, 0.4f);
+			m_bFirst = true;
+		}
+		
 		m_fEffectEndTime = 0.1f;
 		m_fEffectTime += fTimeDelta;
 		if (m_fEffectTime > m_fEffectEndTime)
@@ -489,6 +500,15 @@ _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CBaseObj * Dam
 	{
 		m_eState = GUARD;
 
+		_uint iNum = rand() % 4 + 1;
+		_tchar	sz_Sound[MAX_PATH];
+		_float fVolume = 0.3f;
+		wcscpy_s(sz_Sound, TEXT("Guard_Metal_Metal_%d.wav"));
+		wsprintf(sz_Sound, sz_Sound, iNum);
+
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Albatross_Hit.wav"), SOUND_MEFFECT, 0.5f);
+
+
 		Make_GuardEffect(m_pTarget);
 
 		m_pTransformCom->LookAt(dynamic_cast<CPlayer*>(m_pTarget)->Get_TransformState(CTransform::STATE_POSITION));
@@ -509,6 +529,14 @@ _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CBaseObj * Dam
 			else
 				m_eState = STATE::DAMAGE_B;
 			m_bMoveSound = true;
+
+			_uint iNum = rand() % 2 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.3f;
+			wcscpy_s(sz_Sound, TEXT("Moriblin_Vo_Damage%02d.wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+		
 		}
 
 
@@ -526,10 +554,72 @@ _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CBaseObj * Dam
 			m_eState = STATE::DEAD_F;
 		else
 			m_eState = STATE::DEAD_B;
+
+		_uint iNum = rand() % 2 + 1;
+		_tchar	sz_Sound[MAX_PATH];
+		_float fVolume = 0.3f;
+		wcscpy_s(sz_Sound, TEXT("Moriblin_Vo_Die%02d.wav"));
+		wsprintf(sz_Sound, sz_Sound, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
 	}
 
 
 	return 0;
+}
+
+void CMoblinSword::Sound_By_State(_float fTimeDelta)
+{
+	if (m_bSoundOnce)
+		return;
+
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+	LEVEL iLevel = (LEVEL)pGameInstance->Get_CurrentLevelIndex();
+	_uint iNum = 0;
+	_tchar	sz_SoundMonster[MAX_PATH];
+	_float fVolume = 0.5f;
+
+
+	_tchar	sz_SoundEffect[MAX_PATH];
+	_float fEffectVolume = 0.3f;
+
+
+	m_fSoundTime += fTimeDelta;
+
+	switch (m_eState)
+	{
+	case Client::CMoblinSword::KYOROKYORO:
+		m_bSoundOnce = true;
+		fVolume = 0.3f;
+		iNum = rand() % 2 + 1;
+		wcscpy_s(sz_SoundMonster, TEXT("Moriblin_Vo_Search%02d.wav"));
+		wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
+		break;
+	case Client::CMoblinSword::WALK:
+		m_fSoundEndTime = 1.f;
+		fVolume = 0.3f;
+		iNum = rand() % 4 + 1;
+		wcscpy_s(sz_SoundMonster, TEXT("Moriblin_Walk (%d).wav"));
+		wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
+		break;
+	case Client::CMoblinSword::STANCE_WALK:
+		m_fSoundEndTime = 0.5f;
+		fVolume = 0.2f;
+		iNum = rand() % 4 + 1;
+		wcscpy_s(sz_SoundMonster, TEXT("Moriblin_Walk (%d).wav"));
+		wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
+		break;
+	default:
+		break;
+	}
+
+	if (m_fSoundTime > m_fSoundEndTime || m_bSoundOnce)
+	{
+		//pGameInstance->PlaySounds(sz_SoundMonster, SOUND_MONSTER, fVolume);
+		pGameInstance->PlaySounds(sz_SoundMonster, SOUND_MEFFECT, fVolume);
+		m_fSoundTime = 0.f;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 CMoblinSword * CMoblinSword::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

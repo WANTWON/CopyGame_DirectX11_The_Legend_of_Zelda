@@ -154,10 +154,17 @@ HRESULT CLevel_Room::Ready_Lights()
 	LightDesc.vDirection = _float4(0.f, -1.f, 0.0f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);	
+	LightDesc.vSpecular = _float4(0.7f, 0.7f, 0.7f, 0.7f);	
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
+
+	_float4		vLightEye, vLightAt;
+
+	XMStoreFloat4(&vLightEye, XMVectorSet(0, 20, 10, 1.f));
+	XMStoreFloat4(&vLightAt, XMVectorSet(0, 0, 0, 1.f));
+
+	pGameInstance->Set_ShadowLightView(vLightEye, vLightAt);
 
 	///* For.Point */
 	//ZeroMemory(&LightDesc, sizeof(LIGHTDESC));

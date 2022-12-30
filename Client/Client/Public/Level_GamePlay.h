@@ -8,6 +8,9 @@ BEGIN(Client)
 
 class CLevel_GamePlay final : public CLevel
 {
+public:
+	enum MUSIC { FIELD, MYSTERY};
+
 private:
 	CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CLevel_GamePlay() = default;
@@ -34,7 +37,7 @@ public:
 
 private:
 	CCollision_Manager* m_pCollision_Manager = nullptr;
-	
+	MUSIC m_eMusic = FIELD;
 
 public:
 	static CLevel_GamePlay* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

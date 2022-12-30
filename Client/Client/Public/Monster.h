@@ -7,6 +7,7 @@
 BEGIN(Engine)
 class CModel;
 class CTexture;
+class CNavigation;
 END
 
 BEGIN(Client)

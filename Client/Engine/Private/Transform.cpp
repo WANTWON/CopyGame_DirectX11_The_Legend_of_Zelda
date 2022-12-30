@@ -40,7 +40,7 @@ HRESULT CTransform::Initialize(void * pArg)
 	return S_OK;
 }
 
-bool CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
+bool CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation, _float fRadius)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);
@@ -50,7 +50,7 @@ bool CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
 	if (nullptr == pNavigation)
 		Set_State(CTransform::STATE_POSITION, vPosition);
 
-	else if (true == pNavigation->isMove(vPosition))
+	else if (true == pNavigation->isMove(vPosition + XMVector3Normalize(vLook)*fRadius))
 		Set_State(CTransform::STATE_POSITION, vPosition);
 	else
 		return false;
@@ -58,7 +58,7 @@ bool CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
 	return true;
 }
 
-bool CTransform::Go_StraightSliding(_float fTimeDelta, CNavigation * pNavigation)
+bool CTransform::Go_StraightSliding(_float fTimeDelta, CNavigation * pNavigation,  _float fRadius)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector		vLook = Get_State(CTransform::STATE_LOOK);
@@ -72,7 +72,7 @@ bool CTransform::Go_StraightSliding(_float fTimeDelta, CNavigation * pNavigation
 
 	if (nullptr == pNavigation)
 		Set_State(CTransform::STATE_POSITION, vPosition);
-	else if (true == pNavigation->isMove(vPosition))
+	else if (true == pNavigation->isMove(vPosition + XMVector3Normalize(vLook)*fRadius))
 	{
 		if (pNavigation->Get_CurrentCelltype() == CCell::DROP)
 		{
@@ -83,7 +83,7 @@ bool CTransform::Go_StraightSliding(_float fTimeDelta, CNavigation * pNavigation
 			_vector vSliding = XMVector3Normalize(vLook + vNormal);
 			_vector vPos = Get_State(CTransform::STATE_POSITION);
 			vPos += vSliding*fTimeDelta*m_TransformDesc.fSpeedPerSec;
-			if (true == pNavigation->isMove(vPos) && pNavigation->Get_CurrentCelltype() != CCell::DROP)
+			if (true == pNavigation->isMove(vPos + XMVector3Normalize(vLook)*fRadius) && pNavigation->Get_CurrentCelltype() != CCell::DROP)
 				Set_State(CTransform::STATE_POSITION, vPos);
 			return false;
 		}
@@ -91,7 +91,7 @@ bool CTransform::Go_StraightSliding(_float fTimeDelta, CNavigation * pNavigation
 			Set_State(CTransform::STATE_POSITION, vPosition);
 	}
 		
-	else if (false == pNavigation->isMove(vPosition))
+	else if (false == pNavigation->isMove(vPosition + XMVector3Normalize(vLook)*fRadius))
 	{
 		_vector vNormal = XMVector3Normalize(pNavigation->Get_LastNormal());
 
@@ -100,7 +100,7 @@ bool CTransform::Go_StraightSliding(_float fTimeDelta, CNavigation * pNavigation
 		_vector vSliding = XMVector3Normalize(vLook + vNormal);
 		_vector vPos = Get_State(CTransform::STATE_POSITION);
 		vPos += vSliding*fTimeDelta*m_TransformDesc.fSpeedPerSec;
-		if (true == pNavigation->isMove(vPos))
+		if (true == pNavigation->isMove(vPos + XMVector3Normalize(vLook)*fRadius))
 			Set_State(CTransform::STATE_POSITION, vPos);
 		return false;
 	}

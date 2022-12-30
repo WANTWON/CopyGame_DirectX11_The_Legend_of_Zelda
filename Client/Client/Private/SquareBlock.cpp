@@ -432,6 +432,10 @@ void CSquareBlock::Tick_TailStatue(_float fTimeDelta)
 				dynamic_cast<CPlayer*>(pPlayer)->Set_AnimState(CPlayer::KEY_OPEN);
 				CGameObject* pDoor = CGameInstance::Get_Instance()->Get_Object(LEVEL_GAMEPLAY, TEXT("Layer_Shutter"));
 				dynamic_cast<CDoor*>(pDoor)->Set_OpenDoor(true);
+				
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Door Open.wav"), SOUND_OBJECT, 0.5f);
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_TailKeyUse.wav"), SOUND_ACTOR, 0.5f);
+
 				m_bDead = true;
 			}
 

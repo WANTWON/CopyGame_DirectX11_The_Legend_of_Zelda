@@ -6,6 +6,7 @@
 
 BEGIN(Engine)
 class CModel;
+class CNavigation;
 END
 
 BEGIN(Client)

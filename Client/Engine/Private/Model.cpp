@@ -310,7 +310,20 @@ HRESULT CModel::RenderShadow(CShader * pShader, _uint iMeshIndex, _uint iLevelIn
 		if (ptr != nullptr || ptr2 != nullptr || ptr3 != nullptr)
 			return S_OK;
 	}
-	
+	else if (iLevelIndex == 6) //Level Room
+	{
+		char CheckName[] = "floor";
+		char CheckName2[] = "wall";
+		char CheckName3[] = "moss";
+
+
+		char* ptr = strstr(szName, CheckName);
+		char* ptr2 = strstr(szName, CheckName2);
+		char* ptr3 = strstr(szName, CheckName3);
+
+		if (ptr != nullptr || ptr2 != nullptr || ptr3 != nullptr)
+			return S_OK;
+	}
 
 
 	/* 메시별로 그린다. */

@@ -7,6 +7,7 @@
 #include "UIButton.h"
 #include "FootSwitch.h"
 #include "ObjectEffect.h"
+#include "CameraManager.h"
 
 CDoor::CDoor(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -572,19 +573,35 @@ void CDoor::Change_Animation_BossDoor(_float fTimeDelta)
 
 void CDoor::Change_Animation_TailDoor(_float fTimeDelta)
 {
+	CGameObject* pTarget = CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player"));
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pTarget);
+
 	switch (m_eState)
 	{
 	case Client::CDoor::CLOSE_TAIL:
 	case Client::CDoor::OPEN_WAIT_TAIL:
+		g_fBGMVolume += 0.01f;
+		if (g_fBGMVolume >= 0.2f)
+			g_fBGMVolume = 0.2f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
 		break;
 	case Client::CDoor::OPEN_TAIL:
+		pPlayer->Set_Stop(true);
+
+		g_fBGMVolume -= 0.01f;
+		if (g_fBGMVolume <= 0.05f)
+			g_fBGMVolume = 0.05f;
+
+		dynamic_cast<CCamera_Dynamic*>(CCameraManager::Get_Instance()->Get_CurrentCamera())->Set_ZoomValue(2.f);
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
-			CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+			pPlayer->Set_Stop(false);
 			m_eState = OPEN_WAIT_TAIL;
+			CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
+			dynamic_cast<CCamera_Dynamic*>(CCameraManager::Get_Instance()->Get_CurrentCamera())->Set_ZoomValue(0.f);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("1-40 Puzzle Solved Jingle.mp3"), SOUND_SYSTEM, 0.5f);
 		}
 		break;
 	default:
