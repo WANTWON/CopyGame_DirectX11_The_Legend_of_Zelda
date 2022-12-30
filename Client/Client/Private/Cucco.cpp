@@ -371,7 +371,7 @@ void CCucco::Patrol(_float fTimeDelta)
 			_vector vPlayerPos = dynamic_cast<CBaseObj*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")))->Get_TransformState(CTransform::STATE_POSITION);
 			_float  vDistance = XMVectorGetX(XMVector3Length(Get_TransformState(CTransform::STATE_POSITION) - vPlayerPos));
 
-			if (vDistance < 5)
+			if (vDistance < 10.f)
 			{
 				_uint iNum = rand() % 6 + 1;
 				_tchar	sz_SoundMonster[MAX_PATH];

@@ -100,7 +100,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	Out.vDiffuse.a *= g_fAlpha;
 
-	if (Out.vDiffuse.a <= 0.00f)
+	if (Out.vDiffuse.a <= 0.01f)
 		discard;
 
 	return Out;

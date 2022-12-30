@@ -168,7 +168,7 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 
 			if(m_ItemDesc.eType == DRUM || m_ItemDesc.eType ==  HORN || m_ItemDesc.eType== BELL || m_ItemDesc.eType == CELLO)
 				pGameInstance->PlaySounds(TEXT("4_Event_Siren's Instrument Fanfare.mp3"), SOUND_SYSTEM, 0.4f);
-			else if (m_ItemDesc.eType == FEATHER || m_ItemDesc.eType == BOSS_KEY)
+			else if (m_ItemDesc.eType == FEATHER || m_ItemDesc.eType == BOSS_KEY || m_ItemDesc.eType == TAIL_KEY)
 				pGameInstance->PlaySounds(TEXT("4_Event_Get Important Item Fanfare.mp3"), SOUND_SYSTEM, 0.4f);
 			else
 				pGameInstance->PlaySounds(TEXT("4_Event_Get Item Fanfare.mp3"), SOUND_SYSTEM, 0.4f);
@@ -182,7 +182,7 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 
 	if (m_bGet)
 	{
-		m_eShaderID = SHADER_GLOWSHADER;
+		//m_eShaderID = SHADER_GLOWSHADER;
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 		_vector pPlayerPostion = pPlayer->Get_TransformState(CTransform::STATE_POSITION);
 

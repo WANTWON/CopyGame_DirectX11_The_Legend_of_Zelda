@@ -95,6 +95,8 @@ public:  /* Adder */
 	void		Add_MessageDesc(MSGDESC eType) { m_vecMsgDecs.push_back(eType); }
 	void		Open_Message(_bool type) { m_bOpenMessage = type;}
 	void		Clear_ChoiceButton();
+	void		Clear_WarpGroup();
+
 	void		Use_Key();
 private:
 	LEVEL				m_eNextLevel = LEVEL_GAMEPLAY;

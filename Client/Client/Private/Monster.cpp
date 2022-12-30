@@ -473,14 +473,14 @@ _uint CMonster::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageC
 		return m_tInfo.iCurrentHp;
 	}
 
-	CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Hit.wav"), SOUND_MEFFECT, 0.4f);
+	CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Hit.wav"), SOUND_MEFFECT, 0.2f);
 
 	_tchar	sz_SoundMonster[MAX_PATH];
 	_float fVolume = 0.5f;
 	_uint iNum = rand() % 2 + 1;
 	wcscpy_s(sz_SoundMonster, TEXT("LSword_Slash (%d).wav"));
 	wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
-	CGameInstance::Get_Instance()->PlaySounds(sz_SoundMonster, SOUND_PEFFECT, 0.4f);
+	CGameInstance::Get_Instance()->PlaySounds(sz_SoundMonster, SOUND_PEFFECT, 0.2f);
 	Make_GetAttacked_Effect(DamageCauser);
 
 	m_bHit = true;

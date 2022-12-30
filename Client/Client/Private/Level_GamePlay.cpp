@@ -36,6 +36,9 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_GamePlay::Initialize()
 {
+	CGameInstance::Get_Instance()->Clear_Layer(LEVEL_GAMEPLAY, TEXT("UI_ICON"));
+	CUI_Manager::Get_Instance()->Clear_WarpGroup();
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
@@ -88,6 +91,7 @@ HRESULT CLevel_GamePlay::Initialize()
 
 	
 	g_fBGMVolume = 0.f;
+	
 	CGameInstance::Get_Instance()->StopAll();
 	CGameInstance::Get_Instance()->PlayBGM(TEXT("1_0 Field (Normal).mp3"), g_fBGMVolume);
 	return S_OK;

@@ -873,8 +873,12 @@ void CUI_Manager::Set_EquipItem(EQUIP_BT eEquipBt, CObj_UI * pObj)
 
 void CUI_Manager::Set_NextMessage()
 {
-	 if (m_vecMsgDecs.size() != 0) 
-		 m_vecMsgDecs.pop_front(); 
+	if (m_vecMsgDecs.size() != 0)
+	{
+		m_vecMsgDecs.pop_front();
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Sys_Talk_Next.wav"), SOUND_SYSTEM, g_fUIVolume);
+	}
+		
 
 	 if (m_vecMsgDecs.size() == 0)
 	 {
@@ -934,6 +938,11 @@ void CUI_Manager::Clear_ChoiceButton()
 	m_vecChoiceButton.clear();
 	m_iChoiceIndex = 0;
 	m_bChoice = false;
+}
+
+void CUI_Manager::Clear_WarpGroup()
+{
+	m_WarpGroup.clear();
 }
 
 

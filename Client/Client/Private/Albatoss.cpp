@@ -155,6 +155,19 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 	switch (m_eState)
 	{
 	case Client::CAlbatoss::WEAK_HOVERING:
+		m_fSoundTime += fTimeDelta;
+
+		if (m_fSoundTime > 2.f)
+		{
+			_uint iNum = rand() % 4 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.3f;
+			wcscpy_s(sz_Sound, TEXT("3_Monster_Albatross_Flapping (%d).wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+			m_fSoundTime = 0.f;
+		}
+
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
@@ -185,7 +198,7 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 	case Client::CAlbatoss::HOVERING_LP_FAST:
 		m_fSoundTime += fTimeDelta;
 
-		if (m_fSoundTime > 1.f)
+		if (m_fSoundTime > 0.5f)
 		{
 			_uint iNum = rand() % 4 + 1;
 			_tchar	sz_Sound[MAX_PATH];
@@ -205,7 +218,7 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 	case Client::CAlbatoss::ATTACK_FLAPPING:
 		m_fSoundTime += fTimeDelta;
 
-		if (m_fSoundTime > 0.5f)
+		if (m_fSoundTime > 0.3f)
 		{
 			_uint iNum = rand() % 4 + 1;
 			_tchar	sz_Sound[MAX_PATH];
@@ -246,16 +259,18 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
 
-		g_fBGMVolume -= 0.002f;
-		if (g_fBGMVolume <= 0.0f)
+		if (!m_bChanged)
 		{
-			g_fBGMVolume = 0.f;
-			CGameInstance::Get_Instance()->StopSound(SOUND_BGM);
-			CGameInstance::Get_Instance()->PlayBGM(TEXT("1-09 Boss Battle (Eagle's Tower Version).mp3"), g_fBGMVolume);
+			g_fBGMVolume -= 0.002f;
+			if (g_fBGMVolume <= 0.0f)
+			{
+				g_fBGMVolume = 0.f;
+				CGameInstance::Get_Instance()->StopSound(SOUND_BGM);
+				CGameInstance::Get_Instance()->PlayBGM(TEXT("1-09 Boss Battle (Eagle's Tower Version).mp3"), g_fBGMVolume);
+				m_bChanged = true;
+			}
 		}
-			
-
-
+		
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_bFirst = false;
@@ -292,10 +307,22 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		}
 		break;
 	case Client::CAlbatoss::RUSH_RETURN:
+		if (!m_bFirst)
+		{
+			_uint iNum = rand() % 4 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.3f;
+			wcscpy_s(sz_Sound, TEXT("3_Monster_Albatross_Flapping (%d).wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MEFFECT, fVolume);
+			m_fSoundTime = 0.f;
+			m_bFirst = true;
+		}
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
+			m_bFirst = false;
 			for (int i = 0; i<5; ++i)
 			{
 				CEffect::EFFECTDESC EffectDesc;
@@ -321,7 +348,6 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 	case Client::CAlbatoss::DAMAGE_RUSH:
 		if (!m_bFirst)
 		{
-			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Albatross_Hit"), SOUND_MONSTER, 0.5f);
 			for (int i = 0; i<5; ++i)
 			{
 				CEffect::EFFECTDESC EffectDesc;
@@ -385,12 +411,30 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 			wcscpy_s(sz_Sound, TEXT("3_Monster_Albatross_Rush (%d).wav"));
 			wsprintf(sz_Sound, sz_Sound, iNum);
 			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
-			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Albatross_Wind.wav"), SOUND_MEFFECT, fVolume);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Albatross_Wind.wav"), SOUND_OBJECT, fVolume);
 			m_bIsAttacking = true;
 			m_bDownHovering = false;
 		}
 		break;
 	case Client::CAlbatoss::ATTACK_CLAW:
+		m_fSoundTime += fTimeDelta;
+
+		if (m_fSoundTime > 0.5f)
+		{
+			_uint iNum = rand() % 4 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.3f;
+			wcscpy_s(sz_Sound, TEXT("3_Monster_Albatross_Flapping (%d).wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+
+			iNum = rand() % 5 + 1;
+			fVolume = 0.3f;
+			wcscpy_s(sz_Sound, TEXT("3_Monster_Albatross_Claw (%d).wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MEFFECT, fVolume);
+			m_fSoundTime = 0.f;
+		}
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		Make_ClawEffect(fTimeDelta);
@@ -408,10 +452,24 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		break;
 	case Client::CAlbatoss::HOVERING_ST:
+		if (!m_bFirst)
+		{
+			_uint iNum = rand() % 4 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.3f;
+			wcscpy_s(sz_Sound, TEXT("3_Monster_Albatross_Flapping (%d).wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+			m_fSoundTime = 0.f;
+			m_bFirst = true;
+		}
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+		{
 			m_eState = m_eHoverState;
+			m_bFirst = false;
+		}		
 		break;
 	case Client::CAlbatoss::WEAK_HOVERING_ST:
 		if (!m_bFirst)
@@ -449,10 +507,21 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 			m_dwFlappingTime = GetTickCount();
 			m_eState = ATTACK_FLAPPING;
 			m_bIsAttacking = true;
-			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Albatross_Wind_High.wav"), SOUND_MEFFECT, 0.3f);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Albatross_Wind_High.wav"), SOUND_OBJECT, 0.5f);
 		}
 		break;
 	case Client::CAlbatoss::ATTACK_FLAPPING_ED:
+		if (!m_bFirst)
+		{
+			_uint iNum = rand() % 4 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.3f;
+			wcscpy_s(sz_Sound, TEXT("3_Monster_Albatross_Flapping (%d).wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+			m_fSoundTime = 0.f;
+			m_bFirst = true;
+		}
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
@@ -461,6 +530,7 @@ void CAlbatoss::Change_Animation(_float fTimeDelta)
 			m_bIsAttacking = false;
 			m_bDownHovering = false;
 			m_eAttackMode = RUSH_STATE;
+			m_bFirst = false;
 
 		}
 		break;
@@ -792,8 +862,16 @@ void CAlbatoss::Opening_Motion(_float fTimeDelta)
 			m_vTargetDistance.y = 3.f;
 			m_vTargetDistance.z += 0.01f;
 
+		
 			if (!m_bMakeUIName)
 			{
+				_uint iNum = rand() % 2 + 1;
+				_tchar	sz_Sound[MAX_PATH];
+				_float fVolume = 0.3f;
+				wcscpy_s(sz_Sound, TEXT("3_Monster_Albatross_Rush (%d).wav"));
+				wsprintf(sz_Sound, sz_Sound, iNum);
+				CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+
 				CUIName* pUIName = dynamic_cast<CUIName*>(CUI_Manager::Get_Instance()->Get_NameBox());
 				pUIName->Set_TexType(CUIName::NAME_ALBATROSS);
 				pUIName->Set_Position(_float2(g_iWinSizeX*0.5f, g_iWinSizeY*0.5f + 200.f));
@@ -804,6 +882,19 @@ void CAlbatoss::Opening_Motion(_float fTimeDelta)
 		}
 		else if(m_bFirst && m_dwOpeningTime + 13500 < GetTickCount())
 		{
+			m_fSoundTime += fTimeDelta;
+
+			if (m_fSoundTime > 0.9f)
+			{
+				_uint iNum = rand() % 4 + 1;
+				_tchar	sz_Sound[MAX_PATH];
+				_float fVolume = 0.3f;
+				wcscpy_s(sz_Sound, TEXT("3_Monster_Albatross_Flapping (%d).wav"));
+				wsprintf(sz_Sound, sz_Sound, iNum);
+				CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+				m_fSoundTime = 0.f;
+			}
+
 			m_vTargetDistance.x = 3.f;
 			m_vTargetDistance.y = 3.f;
 			m_vTargetDistance.z = 6.f;
@@ -813,6 +904,21 @@ void CAlbatoss::Opening_Motion(_float fTimeDelta)
 			m_vTargetDistance.x = 1.f;
 			m_vTargetDistance.y = 7.f;
 			m_vTargetDistance.z = 8.f;
+
+			m_fSoundTime += fTimeDelta;
+
+			if (m_fSoundTime > 1.9f)
+			{
+			_uint iNum = rand() % 2 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.3f;
+			wcscpy_s(sz_Sound, TEXT("3_Monster_Albatross_Rush (%d).wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Albatross_Wind.wav"), SOUND_MEFFECT, fVolume);
+			m_fSoundTime = 0.f;
+			}
+
 		}
 		else if (m_bFirst && m_bMessageAutoPass && m_dwOpeningTime + 7000 < GetTickCount())
 		{
@@ -1174,7 +1280,7 @@ void CAlbatoss::Make_ClawEffect(_float fTimeDelta)
 
 	}
 
-	m_fClawTimeEnd = 0.5f;
+	m_fClawTimeEnd = 0.8f;
 	m_fClawTime += fTimeDelta;
 	if (m_fClawTime > m_fClawTimeEnd)
 	{
@@ -1187,13 +1293,6 @@ void CAlbatoss::Make_ClawEffect(_float fTimeDelta)
 		EffectDesc.vColor = XMVectorSet(255, 255, 255, 255);
 		EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.5f);
 		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
-		
-		_uint iNum = rand() % 4 + 1;
-		_tchar	sz_Sound[MAX_PATH];
-		_float fVolume = 0.3f;
-		wcscpy_s(sz_Sound,TEXT("3_Monster_Albatross_Flapping (%d).wav"));
-		wsprintf(sz_Sound, sz_Sound, iNum);
-		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MEFFECT, fVolume);
 		m_fClawTime = 0.f;
 	}
 }
@@ -1308,6 +1407,15 @@ _uint CAlbatoss::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 			}
 
 		}
+
+
+		_uint iNum = rand() % 4 + 1;
+		_tchar	sz_Sound[MAX_PATH];
+		_float fVolume = 0.3f;
+		wcscpy_s(sz_Sound, TEXT("3_Monster_Albatross_Flapping (%d).wav"));
+		wsprintf(sz_Sound, sz_Sound, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_ACTOR, fVolume);
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Albatross_Hit.wav"), SOUND_MONSTER, 0.5f);
 
 		m_bAggro = true;
 		m_bIsAttacking = false;

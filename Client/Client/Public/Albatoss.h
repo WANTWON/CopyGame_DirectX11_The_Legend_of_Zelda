@@ -60,6 +60,7 @@ private:
 	_bool					m_bDownHovering = false;
 	_bool					m_bMakeBullet = false;
 	_bool					m_bMakeUIName = false;
+	_bool					m_bChanged = false;
 
 	DWORD					m_dwOpeningTime = GetTickCount();
 	DWORD					m_dwFlappingTime = GetTickCount();

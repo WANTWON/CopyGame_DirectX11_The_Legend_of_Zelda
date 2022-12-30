@@ -45,22 +45,22 @@ HRESULT CPortal::Initialize(void * pArg)
 		{
 		case MARINHOUSE:
 			IconDesc.iTexureNum = CUIIcon::ICON_HOUSE;
-			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_GAMEPLAY, TEXT("UI_ICON"), &IconDesc)))
 				return E_FAIL;
 			break;
 		case SHOP:
 			IconDesc.iTexureNum = CUIIcon::ICON_SHOP;
-			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_GAMEPLAY, TEXT("UI_ICON"), &IconDesc)))
 				return E_FAIL;
 			break;
 		case CRANE_GAME:
 			IconDesc.iTexureNum = CUIIcon::ICON_HOUSE;
-			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_GAMEPLAY, TEXT("UI_ICON"), &IconDesc)))
 				return E_FAIL;
 			break;
 		case TELEPHONE:
 			IconDesc.iTexureNum = CUIIcon::ICON_TELL;
-			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_GAMEPLAY, TEXT("UI_ICON"), &IconDesc)))
 				return E_FAIL;
 			break;
 		default:
@@ -72,7 +72,7 @@ HRESULT CPortal::Initialize(void * pArg)
 		case LEVEL_TAILCAVE:
 		case LEVEL_TOWER:
 			IconDesc.iTexureNum = CUIIcon::ICON_DGN;
-			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+			if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_GAMEPLAY, TEXT("UI_ICON"), &IconDesc)))
 				return E_FAIL;
 			break;
 		default:

@@ -398,6 +398,7 @@ _uint CPlayer::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 	}
 	
 
+	CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Hit.wav"), SOUND_PEFFECT, 0.3f);
 	if (DamageCauser != nullptr)
 	{
 		_vector vDir = DamageCauser->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION);;
@@ -980,11 +981,13 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		break;
 	case Client::CPlayer::ITEM_GET_LP:
 	case Client::CPlayer::ITEM_GET_ST:
+	case Client::CPlayer::S_ITEM_GET_ST:
 		g_fBGMVolume -= 0.01f;
 		if (g_fBGMVolume <= 0.05f)
 			g_fBGMVolume = 0.05f;
 		break;
 	case Client::CPlayer::ITEM_GET_ED:
+	case Client::CPlayer::S_ITEM_GET_ED:
 		g_fBGMVolume += 0.01f;
 		if (g_fBGMVolume >= 0.2f)
 			g_fBGMVolume = 0.2f;
@@ -1024,11 +1027,17 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	
 		break;
 	case Client::CPlayer::SLASH_HOLD_ST:
-		
-		break;
 	case Client::CPlayer::SHIELD:
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Shield_On.wav"));
+		break;
 	case Client::CPlayer::SHIELD_HIT:
-	
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		iNum = rand() % 4;
+		wcscpy_s(sz_SoundPlayer, TEXT("Guard_Wood_Metal_%d.wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::LAND:
 	case Client::CPlayer::D_LAND:
@@ -1079,24 +1088,16 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		wcscpy_s(sz_SoundEffect, TEXT("LSword_AttackCharging%d.wav"));
 		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
 		break;
-	case Client::CPlayer::DASH_ST:
-		
-		break;
-	
-	case Client::CPlayer::S_ITEM_GET_ST:
-	
-		break;
-	case Client::CPlayer::DASH_ED:
 	case Client::CPlayer::SHIELD_HOLD_ED:
-	
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Shield_Off.wav"));
 		break;
-	case Client::CPlayer::S_ITEM_GET_ED:
+		break;
 	case Client::CPlayer::KEY_OPEN:
 	case Client::CPlayer::STAIR_UP:
-		
 		break;
 	case Client::CPlayer::FALL_FROMTOP:
-		
 		break;
 	case Client::CPlayer::FALL_HOLE:
 	case Client::CPlayer::FALL_ANTLION:
@@ -1108,7 +1109,6 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		break;
 	case Client::CPlayer::STAIR_DOWN:
 	case Client::CPlayer::LADDER_UP_ED:
-		
 		break;
 	case Client::CPlayer::ITEM_CARRY:
 		m_bSoundOnce = true;
@@ -1116,10 +1116,8 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		wcscpy_s(sz_SoundPlayer, TEXT("Link_itemSet.wav"));
 		break;
 	case Client::CPlayer::EV_TELL_ST:
-		
 		break;
 	case Client::CPlayer::EV_TELL_ED:
-	
 		break;
 	case Client::CPlayer::DEAD:
 		m_bSoundOnce = true;
@@ -1129,13 +1127,10 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::WARP_ST:
-		
 		break;
 	case Client::CPlayer::WARP_LP:
-		
 		break;
 	case Client::CPlayer::WARP_ED:
-		
 		break;
 	default:
 		break;
@@ -1680,6 +1675,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		{
 			m_bMakeEffect = false;
 			m_eState = SHIELD_HOLD_LP;
+			m_bSoundOnce = false;
 		}			
 		break;
 	case Client::CPlayer::LAND:
@@ -1761,7 +1757,11 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
 			m_eState = DASH_LP;
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Link_Dash_Start.wav"), SOUND_PLAYER, 0.5f);
+		}
+			
 		break;
 	case Client::CPlayer::ITEM_GET_ST:
 	{
@@ -1786,6 +1786,14 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		break;
 	}
 	case Client::CPlayer::DASH_ED:
+		m_eAnimSpeed = 3.f;
+		m_bIsLoop = false;
+		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
+		{
+			m_eState = IDLE;
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Link_Dash_End.wav"), SOUND_PLAYER, 0.5f);
+		}		
+		break;
 	case Client::CPlayer::SHIELD_HOLD_ED:
 		m_eAnimSpeed = 3.f;
 		m_bIsLoop = false;

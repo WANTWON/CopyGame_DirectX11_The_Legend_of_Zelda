@@ -57,7 +57,7 @@ HRESULT CSquareBlock::Initialize(void * pArg)
 		CUIIcon::ICONDESC IconDesc;
 		IconDesc.iTexureNum = CUIIcon::ICON_WARP;
 		IconDesc.pTarget = this;
-		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_STATIC, TEXT("UI_ICON"), &IconDesc)))
+		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_GAMEPLAY, TEXT("UI_ICON"), &IconDesc)))
 			return E_FAIL;
 	}
 
