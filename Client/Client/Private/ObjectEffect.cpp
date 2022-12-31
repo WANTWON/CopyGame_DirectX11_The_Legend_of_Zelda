@@ -52,7 +52,7 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 		m_fAngle = XMConvertToRadians(float(rand() % 180));
 		break;
 	case ITEM_GET_FLASH:
-		m_eShaderID = SHADER_TWOCOLOR_PRIORITY;
+		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
 		m_vecColor.push_back(XMVectorSet(255.f, 63.f, 63.f, 255.f));
 		m_vecColor.push_back(XMVectorSet(255.f, 127.f, 0.f, 255.f));
 		m_vecColor.push_back(XMVectorSet(0.f, 255.f, 0.f, 255.f));

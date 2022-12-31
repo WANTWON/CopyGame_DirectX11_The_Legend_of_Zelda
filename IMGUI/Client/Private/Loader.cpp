@@ -409,7 +409,7 @@ HRESULT CLoader::Loading_ForGamePlayModel()
 		return E_FAIL;
 
 	/*For.Prototype_Component_Model_TailCaveStatue*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("TailCaveStatue.fbx"),
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("TailStatue.fbx"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/TailStatue/TailStatue.fbx", PivotMatrix))))
 		return E_FAIL;
 

@@ -68,7 +68,7 @@ int CSquareBlock::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
-		m_fAlpha -= 0.05f;
+		m_fAlpha -= 0.02f;
 
 		if (m_fAlpha <= 0)
 		{
@@ -107,8 +107,6 @@ void CSquareBlock::Late_Tick(_float fTimeDelta)
 			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOWDEPTH, this);
 		}
-
-
 		Compute_CamDistance(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		break;
 	}
@@ -424,7 +422,7 @@ void CSquareBlock::Tick_TailStatue(_float fTimeDelta)
 
 		CPlayer::ANIM ePlayerState = pPlayer->Get_AnimState();
 
-		if (CGameInstance::Get_Instance()->Key_Pressing(DIK_A))
+		if (CGameInstance::Get_Instance()->Key_Up(DIK_A))
 		{
 			if (CUI_Manager::Get_Instance()->Get_KeySize() != 0)
 			{

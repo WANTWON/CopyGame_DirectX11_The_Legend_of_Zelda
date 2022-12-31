@@ -110,7 +110,23 @@ void CPawn::Change_Animation(_float fTimeDelta)
 	switch (m_eState)
 	{
 	case Client::CPawn::IDLE:
+		m_fAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		break;
 	case Client::CPawn::WALK:
+		m_fSoundTime += fTimeDelta;
+		if (m_fSoundTime > 0.5f)
+		{
+			_uint iNum = rand() % 2 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.2f;
+			wcscpy_s(sz_Sound, TEXT("3_Monster_Step_%0d.wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MEFFECT, fVolume);
+
+			m_fSoundTime = 0.f;
+		}
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
@@ -333,6 +349,10 @@ _uint CPawn::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 	{
 		if (!m_bDead)
 		{
+
+			_float fVolume = 0.3f;
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Pawn_Damage.wav"), SOUND_MONSTER, fVolume);
+
 			m_bHit = true;
 			Make_GuardEffect(m_pTarget);
 			m_eState = STATE::DAMAGE;
@@ -346,7 +366,17 @@ _uint CPawn::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 		return fHp;
 	}
 	else
+	{
 		m_eState = STATE::DEADFALL;
+
+		_uint iNum = rand() % 2 + 1;
+		_tchar	sz_Sound[MAX_PATH];
+		_float fVolume = 0.3f;
+		wcscpy_s(sz_Sound, TEXT("Pawn_Dead_%0d.wav"));
+		wsprintf(sz_Sound, sz_Sound, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+	}
+		
 
 	return 0;
 }

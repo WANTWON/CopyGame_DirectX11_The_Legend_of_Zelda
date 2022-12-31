@@ -281,7 +281,6 @@ HRESULT CNonAnim::SetUp_ShaderResources()
 HRESULT CNonAnim::SetUp_ShaderID()
 {
 	
-	//m_eShaderID = SHADER_DEFAULT;
 
 	return S_OK;
 }

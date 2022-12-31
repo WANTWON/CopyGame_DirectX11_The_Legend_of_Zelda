@@ -125,7 +125,7 @@ void CCamera_Dynamic::Player_Camera(_float fTimeDelta)
 
 	Safe_Release(pTarget);
 	
-	m_pTransform->Go_PosLerp(fTimeDelta, m_TargetPos, 1.f, XMVectorSet(m_vDistance.x, m_vDistance.y, m_vDistance.z, 0.f));
+	m_pTransform->Go_PosLerp(fTimeDelta, m_TargetPos, 1.f, XMVectorSet(m_vDistance.x, m_vDistance.y + m_fZoom, m_vDistance.z + m_fZoom, 0.f));
 	
 	if (m_dwSettingTime + 2000 < GetTickCount())
 		m_bSetCamLook = true;
@@ -211,7 +211,7 @@ void CCamera_Dynamic::Shaking_Camera(_float fTimeDelta, _float fPower)
 	vecTargetPos = XMVectorSetW(vecTargetPos, 1.f);
 
 	m_pTransform->LookAt(vecTargetPos);
-	m_pTransform->Follow_Target(fTimeDelta, vecTargetPos, XMVectorSet(m_vDistance.x, m_vDistance.y + m_fZoom, m_vDistance.z + m_fZoom, 0.f));
+	m_pTransform->Follow_Target(fTimeDelta, vecTargetPos, XMVectorSet(m_vDistance.x, m_vDistance.y, m_vDistance.z + m_fZoom, 0.f));
 	Safe_Release(pGameInstance);
 }
 

@@ -505,8 +505,7 @@ _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CBaseObj * Dam
 		_float fVolume = 0.3f;
 		wcscpy_s(sz_Sound, TEXT("Guard_Metal_Metal_%d.wav"));
 		wsprintf(sz_Sound, sz_Sound, iNum);
-
-		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Albatross_Hit.wav"), SOUND_MEFFECT, 0.5f);
+		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MEFFECT, 0.5f);
 
 
 		Make_GuardEffect(m_pTarget);
@@ -608,9 +607,16 @@ void CMoblinSword::Sound_By_State(_float fTimeDelta)
 		wcscpy_s(sz_SoundMonster, TEXT("Moriblin_Walk (%d).wav"));
 		wsprintf(sz_SoundMonster, sz_SoundMonster, iNum);
 		break;
+	case Client::CMoblinSword::STAGGER:
+		m_bSoundOnce = true;
+		fVolume = 0.3f;
+		wcscpy_s(sz_SoundMonster, TEXT("3_Monster_Albatross_Hit.wav"));
+		break;
 	default:
 		break;
 	}
+
+	
 
 	if (m_fSoundTime > m_fSoundEndTime || m_bSoundOnce)
 	{

@@ -122,9 +122,9 @@ PS_OUT PS_MAIN_SOFTEFFECT(PS_IN_SOFTEFFECT In)
 	vector	vDepthDesc = g_DepthTexture.Sample(LinearSampler, vUV);
 
 	float	fViewZ = In.vProjPos.w;
-	float	fOldViewZ = vDepthDesc.y*500.f;
+	float	fOldViewZ = vDepthDesc.y*500.5f;
 
-	//Out.vDiffuse.a = Out.vDiffuse.a * (fOldViewZ - fViewZ);
+	Out.vDiffuse.a = Out.vDiffuse.a * (fOldViewZ - fViewZ);
 
 	Out.vDiffuse.a *= g_fAlpha;
 

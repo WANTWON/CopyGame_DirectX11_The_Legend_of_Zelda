@@ -651,7 +651,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Object(const _tchar * pLayerTag)
 				return E_FAIL;
 
 		}
-		else if (!wcscmp(pModeltag, TEXT("TailCaveStatue.fbx")))
+		else if (!wcscmp(pModeltag, TEXT("TailStatue.fbx")))
 		{
 
 			CSquareBlock::BLOCKDESC BlockDesc;

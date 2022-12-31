@@ -1908,6 +1908,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		Make_DefaultEffect(fTimeDelta, m_eState);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
+			m_fTime = 0.f;
 			m_fEffectTime = 0.f;
 			m_eState = WARP_LP;
 		}
@@ -1915,12 +1916,14 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::WARP_LP:
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = true;
+		m_fTime += fTimeDelta;
 		m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop);
 		m_vWarpPos = XMVectorSetY(m_vWarpPos, XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)));
-		if (m_pTransformCom->Go_PosLerp(fTimeDelta, m_vWarpPos, 1.f))
+		if (m_pTransformCom->Go_PosLerp(m_fTime, m_vWarpPos, 0.4f))
 		{
 			m_pNavigationCom->Compute_CurrentIndex_byDistance(Get_TransformState(CTransform::STATE_POSITION));
 			m_eState = WARP_ED;
+			m_fTime = 0.f;
 		}
 		break;
 	case Client::CPlayer::WARP_ED:

@@ -579,6 +579,9 @@ void CDoor::Change_Animation_TailDoor(_float fTimeDelta)
 	switch (m_eState)
 	{
 	case Client::CDoor::CLOSE_TAIL:
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop);
+		break;
 	case Client::CDoor::OPEN_WAIT_TAIL:
 		g_fBGMVolume += 0.01f;
 		if (g_fBGMVolume >= 0.2f)
