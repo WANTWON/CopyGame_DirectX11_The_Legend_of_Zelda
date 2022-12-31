@@ -870,8 +870,12 @@ void CUI_Manager::Set_UI_OpenType(UITYPE eUIType)
 	for (_uint i = 0; i < m_WarpGroup.size(); ++i)
 		dynamic_cast<CUIIcon*>(m_WarpGroup[i])->Set_TexutureNum(CUIIcon::ICON_WARP);
 
-	m_pPickedWarp = m_WarpGroup[0];
-	dynamic_cast<CUIIcon*>(m_pPickedWarp)->Set_TexutureNum(CUIIcon::ICON_WARP);
+	if (m_WarpGroup.size() != 0)
+	{
+		m_pPickedWarp = m_WarpGroup[0];
+		dynamic_cast<CUIIcon*>(m_pPickedWarp)->Set_TexutureNum(CUIIcon::ICON_WARP);
+	}
+	
 }
 
 void CUI_Manager::Set_EquipItem(EQUIP_BT eEquipBt, CObj_UI * pObj)

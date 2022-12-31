@@ -52,7 +52,7 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 		m_fAngle = XMConvertToRadians(float(rand() % 180));
 		break;
 	case ITEM_GET_FLASH:
-		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
+		m_eShaderID = SHADER_TWOCOLOR_PRIORITY;
 		m_vecColor.push_back(XMVectorSet(255.f, 63.f, 63.f, 255.f));
 		m_vecColor.push_back(XMVectorSet(255.f, 127.f, 0.f, 255.f));
 		m_vecColor.push_back(XMVectorSet(0.f, 255.f, 0.f, 255.f));
@@ -949,7 +949,7 @@ void CObjectEffect::Tick_TreasureCross(_float fTimeDelta)
 			EffectDesc.iTextureNum = 1;
 			EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, -1.f, (rand() % 20 - 10) * 0.1f, 0.f);
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
-			
+
 			m_fDeadtime = 0.f;
 		}
 
@@ -997,7 +997,7 @@ void CObjectEffect::Tick_TreasureCross(_float fTimeDelta)
 				}
 		
 
-
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_TreasureBox_Appear.wav"), SOUND_OBJECT, 0.4f);
 				dynamic_cast<CTreasureBox*>(m_EffectDesc.pTarget)->Set_Visible(true);
 				CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 				pPlayer->Set_Stop(false);
@@ -1020,10 +1020,15 @@ void CObjectEffect::Tick_TreasureCross(_float fTimeDelta)
 		m_fZoomValue += 0.1f;
 		if (m_fZoomValue >= 0.f)
 			m_fZoomValue = 0.f;
+			
 	}
 
 	if (m_fAlpha <= 0.f)
+	{
 		m_bDead = true;
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("1-40 Puzzle Solved Jingle.mp3"), SOUND_SYSTEM, 0.5f);
+	}
+		
 }
 
 

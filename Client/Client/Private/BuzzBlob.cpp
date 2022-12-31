@@ -48,11 +48,13 @@ int CBuzzBlob::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 	}
 
-	if (Check_IsinFrustum() == true)
-	{
-		AI_Behaviour(fTimeDelta);
-		Check_Navigation(fTimeDelta);
-	}
+	if (Check_IsinFrustum() == false)
+		return OBJ_NOEVENT;
+
+	
+	AI_Behaviour(fTimeDelta);
+	Check_Navigation(fTimeDelta);
+	
 	
 
 	m_pModelCom->Set_NextAnimIndex(m_eState);
@@ -135,11 +137,23 @@ void CBuzzBlob::Change_Animation(_float fTimeDelta)
 		break;
 	}
 	case Client::CBuzzBlob::IDLE:
+		m_fAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		m_bMakeEffect = false;
+		break;
 	case Client::CBuzzBlob::WALK:
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		m_bMakeEffect = false;
+
+		m_fSoundTime += fTimeDelta;
+		if (m_fSoundTime > 0.5f)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Octarock_Walk01.wav"), SOUND_ACTOR, 0.05f);
+			m_fSoundTime = 0.f;
+		}
 		break;
 	default:
 		break;
@@ -257,7 +271,7 @@ void CBuzzBlob::Follow_Target(_float fTimeDelta)
 	_vector vTargetPos = (m_pTarget)->Get_TransformState(CTransform::STATE_POSITION);
 
 	m_pTransformCom->LookAt(vTargetPos);
-	m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+	m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, 0.f);
 
 	m_bIsAttacking = false;
 }
@@ -312,6 +326,9 @@ _uint CBuzzBlob::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 			m_bHit = true;
 			m_eState = STATE::DAMAGE;
 			m_bMoveSound = true;
+
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("ChuChu_Damage.wav"), SOUND_MEFFECT, 0.5f);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("ChuChu_Vo_Damage.wav"), SOUND_MONSTER, 0.5f);
 		}
 
 		m_bAggro = true;
@@ -321,7 +338,13 @@ _uint CBuzzBlob::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 		return fHp;
 	}
 	else
+	{
 		m_eState = STATE::DEAD;
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("ChuChu_Vo_Dead.wav"), SOUND_MONSTER, 0.5f);
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Explosion.wav"), SOUND_ACTOR, 0.5f);
+
+	}
+		
 
 	return 0;
 }

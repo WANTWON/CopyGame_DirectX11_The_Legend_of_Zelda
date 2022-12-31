@@ -64,15 +64,30 @@ void CFootSwitch::Late_Tick(_float fTimeDelta)
 
 	if (m_pOBBCom->Collision(pTarget->Get_Collider()) || CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pOBBCom) == true)
 	{
+		if (!m_bFirst)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Switch_OnOff.mp3"), SOUND_OBJECT, 0.4f);
+			m_bFirst = true;
+		}
+
 		if (m_eState != PRESSING)
 		{
 			m_bMadeBox = true;
 			m_eState = PRESS;
+
+			
+
 		}
 			
 	}
 	else
 	{
+		if (m_bFirst)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Switch_OnOff.mp3"), SOUND_OBJECT, 0.4f);
+			m_bFirst = false;
+		}
+
 		m_eState = IDLE;
 		m_bMadeBox = false;
 	}

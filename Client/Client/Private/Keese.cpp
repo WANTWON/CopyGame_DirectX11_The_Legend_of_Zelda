@@ -49,7 +49,8 @@ int CKeese::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 	}
 		
-
+	if (Check_IsinFrustum() == false)
+		return OBJ_NOEVENT;
 
 	AI_Behaviour(fTimeDelta);
 	Check_Navigation(fTimeDelta);
@@ -149,6 +150,20 @@ void CKeese::Change_Animation(_float fTimeDelta)
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+
+		m_fSoundTime += fTimeDelta;
+		if (m_fSoundTime > 0.2f)
+		{
+			_uint iNum = rand() % 3;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.4f;
+			wcscpy_s(sz_Sound, TEXT("SR_Keese_Fly%02d.wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MEFFECT, fVolume);
+
+			m_fSoundTime = 0.f;
+		}
+
 		break;
 	default:
 		break;
@@ -295,7 +310,7 @@ void CKeese::AI_Behaviour(_float fTimeDelta)
 		vDir = XMVectorSetY(vDir, 0.f);
 		m_pTransformCom->LookDir(vDir);
 
-		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+		m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom, 0.f);
 		m_eState = STATE::WALK;
 		m_bIsAttacking = true;
 
@@ -323,6 +338,15 @@ _uint CKeese::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCau
 			m_bHit = true;
 			m_eState = STATE::DEAD;
 			m_bMoveSound = true;
+
+			_uint iNum = rand() % 3 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.5f;
+			wcscpy_s(sz_Sound, TEXT("SR_Keese_Vo_Dead%02d.wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Explosion.wav"), SOUND_ACTOR, 0.5f);
+
 		}
 
 		m_bAggro = true;
@@ -336,6 +360,15 @@ _uint CKeese::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCau
 		Make_GetAttacked_Effect(DamageCauser);
 		m_bMakeEffect = false;
 		m_eState = STATE::DEAD;
+
+		_uint iNum = rand() % 3 + 1;
+		_tchar	sz_Sound[MAX_PATH];
+		_float fVolume = 0.5f;
+		wcscpy_s(sz_Sound, TEXT("SR_Keese_Vo_Dead%02d.wav"));
+		wsprintf(sz_Sound, sz_Sound, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Explosion.wav"), SOUND_ACTOR, 0.5f);
+
 	}
 		
 

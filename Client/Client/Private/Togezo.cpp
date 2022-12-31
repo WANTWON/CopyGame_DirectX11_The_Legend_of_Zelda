@@ -51,6 +51,10 @@ int CTogezo::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 	}
 
+	if (Check_IsinFrustum() == false)
+		return OBJ_NOEVENT;
+
+
 	AI_Behaviour(fTimeDelta);
 	Check_Navigation(fTimeDelta);
 
@@ -65,8 +69,10 @@ void CTogezo::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
+	if (Check_IsinFrustum() == false)
+		return;
 
-	if (m_pOBBCom->Collision(m_pTarget->Get_Collider()))
+	if (m_pTarget != nullptr && m_pOBBCom->Collision(m_pTarget->Get_Collider()))
 	{
 		
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pTarget);
@@ -169,11 +175,30 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 	switch (m_eState)
 	{
 	case Client::CTogezo::IDLE:
+		m_bMakeEffect = false;
+		m_fAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		break;
 	case Client::CTogezo::WALK:
 		m_bMakeEffect = false;
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+
+		m_fSoundTime += fTimeDelta;
+		if (m_fSoundTime > 0.5f)
+		{
+			_uint iNum = rand() % 2 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.2f;
+			wcscpy_s(sz_Sound, TEXT("3_Monster_Step_%d.wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_ACTOR, fVolume);
+
+			m_fSoundTime = 0.f;
+		}
+
 		break;
 	case Client::CTogezo::STUN:
 		m_bIsLoop = true;
@@ -193,6 +218,19 @@ void CTogezo::Change_Animation(_float fTimeDelta)
 	case Client::CTogezo::RUN:
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+
+		m_fSoundTime += fTimeDelta;
+		if (m_fSoundTime > 0.2f)
+		{
+			_uint iNum = rand() % 2 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.2f;
+			wcscpy_s(sz_Sound, TEXT("3_Monster_Step_%d.wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_ACTOR, fVolume);
+
+			m_fSoundTime = 0.f;
+		}
 
 		m_fEffectEndTime = 0.1f;
 		m_fEffectTime += fTimeDelta;
@@ -417,6 +455,8 @@ void CTogezo::AI_Behaviour(_float fTimeDelta)
 	{
 		if (m_bIsAttacking)
 		{
+		
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Togezo_Runst.wav"), SOUND_MONSTER, 0.2f);
 			m_eState = STATE::RUN_ST;
 		}
 		if (!m_bIsAttacking && m_dwAttackTime + 1500 < GetTickCount())
@@ -473,6 +513,7 @@ _uint CTogezo::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 				Make_GetAttacked_Effect(DamageCauser);
 				m_bHit = true;
 				m_eState = STATE::DAMAGE;
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("Pawn_Damage.wav"), SOUND_MONSTER, 0.f);
 				m_bMoveSound = true;
 			}
 
@@ -483,12 +524,31 @@ _uint CTogezo::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 			return fHp;
 		}
 		else
+		{
 			m_eState = STATE::DEAD;
+			_uint iNum = rand() % 2 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.3f;
+			wcscpy_s(sz_Sound, TEXT("Pawn_Dead_%d.wav"));
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Explosion.wav"), SOUND_ACTOR, 0.5f);
+
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+		}
+			
 	}
 	else
 	{
 		Make_GuardEffect(m_pTarget);
 		m_eState = DISCOVER;
+
+		_uint iNum = rand() % 4;
+		_tchar	sz_Sound[MAX_PATH];
+		_float fVolume = 0.3f;
+		wcscpy_s(sz_Sound, TEXT("Guard_%d.wav"));
+		wsprintf(sz_Sound, sz_Sound, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+
 	}
 
 	return 0;

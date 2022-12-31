@@ -32,7 +32,7 @@ public:
 	virtual int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-	void Set_Visible(_bool type) { m_eTreasureBoxDesc.bVisible = type; }
+	void Set_Visible(_bool type);
 
 private:
 	void Change_Animation(_float fTimeDelta);

@@ -353,6 +353,8 @@ void CDoor::Tick_LockDoor(_float fTimeDelta)
 				pButton->Set_Visible(false);
 				dynamic_cast<CPlayer*>(pPlayer)->Set_AnimState(CPlayer::KEY_OPEN);
 				m_eState = OPEN_LD;
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Door_Slide.wav"), SOUND_OBJECT, 0.3f);
+
 			}
 		}
 		
@@ -459,12 +461,20 @@ void CDoor::Change_Animation_ClosedDoor(_float fTimeDelta)
 	{
 	case Client::CDoor::CLOSE_CD:
 	case Client::CDoor::CLOSE2_CD:
-		m_bIsLoop = false;
+		if (!m_bFirst)
+		{
+			if(Check_IsinFrustum())
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Door_Slide.wav"), SOUND_OBJECT, 0.3f);
+			m_bFirst = true;
+		}
 
+		m_bIsLoop = false;
 		m_fEffectTime += fTimeDelta;
 
 		if (m_fEffectTime > 0.5f && !m_bMakeEffect)
 		{
+			if (Check_IsinFrustum())
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Door_Close.wav"), SOUND_OBJECT, 0.3f);
 			CEffect::EFFECTDESC EffectDesc;
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 			EffectDesc.eEffectID = CObjectEffect::SMOKE;
@@ -496,17 +506,28 @@ void CDoor::Change_Animation_ClosedDoor(_float fTimeDelta)
 			m_bPlay = false;
 			m_bMakeEffect = false;
 			m_fEffectTime = 0.f;
+			m_bFirst = false;
 		}
 		break;
 	case Client::CDoor::OPEN_CD:
 	case Client::CDoor::OPEN2_CD:
 		if (m_bOpen)
 		{
+			if (!m_bFirst)
+			{
+				if (Check_IsinFrustum())
+					CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Door_Slide.wav"), SOUND_OBJECT, 0.3f);
+				m_bFirst = true;
+			}
+
 			m_bIsLoop = false;
 			if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 			{
 				CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
 				m_eState = OPEN_WAIT_CD;
+				if (Check_IsinFrustum())
+					CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Door_Open.wav"), SOUND_OBJECT, 0.3f);
+				m_bFirst = false;
 			}
 
 		}
@@ -534,6 +555,7 @@ void CDoor::Change_Animation_LockDDoor(_float fTimeDelta)
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Door_Open.wav"), SOUND_OBJECT, 0.3f);
 			CUI_Manager::Get_Instance()->Use_Key();
 			m_bDead = true;		
 		}	
@@ -553,6 +575,7 @@ void CDoor::Change_Animation_BossDoor(_float fTimeDelta)
 			m_bIsLoop = false;
 			if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 			{
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Door_Slide.wav"), SOUND_OBJECT, 0.3f);
 				CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
 				m_eState = OPEN_BOSS;
 			}
@@ -563,6 +586,7 @@ void CDoor::Change_Animation_BossDoor(_float fTimeDelta)
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Door_Open.wav"), SOUND_OBJECT, 0.3f);
 			m_bDead = true;
 		}
 		break;
@@ -664,6 +688,7 @@ _bool CDoor::Check_Open()
 			if (iter->Get_Dead() == false)
 				goto RETURN_CLOSEDOOR;
 		}
+			
 
 		RELEASE_INSTANCE(CGameInstance);
 		return true;

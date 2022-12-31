@@ -59,6 +59,7 @@ private:
 	_bool					m_bOpen = false;
 	_bool					m_bPlay = true;
 	_bool					m_bMakeEffect = false;
+	_bool					m_bFirst = false;
 
 	_float					m_fEffectTime = 0.f;
 

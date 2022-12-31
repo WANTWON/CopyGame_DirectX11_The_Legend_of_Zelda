@@ -34,6 +34,7 @@ private:
 private:
 	CModel*					m_pModelCom = nullptr;
 	_bool					m_bMadeBox = false;
+	_bool					m_bFirst = false;
 
 	STATE m_eState = IDLE;
 	STATE m_ePreState = PRESS;

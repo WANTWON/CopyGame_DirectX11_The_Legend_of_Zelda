@@ -62,11 +62,16 @@ int CBladeTrap::Tick(_float fTimeDelta)
 		{
 			m_dwAttackTime = GetTickCount();
 			m_iMoveCount++;
+			m_bMove = false;
 		}
 			
 
-		if (m_dwAttackTime + 2000 < GetTickCount())
+		if (m_dwAttackTime + 2000 < GetTickCount() )
+		{
 			m_eState = TURN;
+			
+		}
+			
 	}
 
 	
@@ -99,6 +104,14 @@ void CBladeTrap::Late_Tick(_float fTimeDelta)
 	{
 		m_vDir *= -1.f;
 		m_iMoveCount++;
+
+		_uint iNum = rand() % 3 + 1;
+		_tchar	sz_Sound[MAX_PATH];
+		_float fVolume = 0.4f;
+		wcscpy_s(sz_Sound, TEXT("5_Obj_Trap_Collision (%d).wav"));
+		wsprintf(sz_Sound, sz_Sound, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_OBJECT, fVolume);
+
 	}
 }
 
@@ -141,6 +154,11 @@ void CBladeTrap::Change_Animation(_float fTimeDelta)
 	switch (m_eState)
 	{
 	case Client::CBladeTrap::TURN:
+		if (!m_bMove)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Trap_MoveStart.wav"), SOUND_OBJECT, 0.4f);
+			m_bMove = true;
+		}
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta * 2, m_bIsLoop);
 		if (m_pTransformCom->Go_PosDir(fTimeDelta, m_vDir, m_pNavigationCom) == false)
@@ -148,6 +166,13 @@ void CBladeTrap::Change_Animation(_float fTimeDelta)
 			m_eState = IDLE;
 			m_vDir *= -1.f;
 			m_iMoveCount++;
+
+			_uint iNum = rand() % 3 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.4f;
+			wcscpy_s(sz_Sound, TEXT("5_Obj_Trap_Collision (%d).wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_OBJECT, fVolume);
 		}
 		break;
 	case Client::CBladeTrap::IDLE:

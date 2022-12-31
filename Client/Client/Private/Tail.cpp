@@ -2,6 +2,7 @@
 #include "..\Public\Tail.h"
 #include "Player.h"
 #include "MonsterBullet.h"
+#include "MonsterEffect.h"
 
 CTail::CTail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -87,13 +88,16 @@ void CTail::Late_Tick(_float fTimeDelta)
 			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
 		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection);
 
+		if(m_TailDesc.eTailType == TAIL1)
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Guard_0.wav"), SOUND_MEFFECT, 0.5f);
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
 		m_fTurnAngle = (rand() % 2000) * 0.001f + 0.1f;
 		m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
 	}
 
+
 	CBaseObj* pInteractBox = nullptr;
-	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BLOCK, m_pSPHERECom, &pInteractBox))
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_BOX, m_pSPHERECom, &pInteractBox))
 	{
 		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pInteractBox->Get_TransformState(CTransform::STATE_POSITION);
 		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
@@ -105,6 +109,8 @@ void CTail::Late_Tick(_float fTimeDelta)
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
 		m_fTurnAngle = (rand() % 2000) * 0.001f + 0.1f;
 		m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
+		if (m_TailDesc.eTailType == TAIL1)
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Guard_0.wav"), SOUND_MEFFECT, 0.5f);
 	}
 
 
@@ -122,7 +128,8 @@ void CTail::Late_Tick(_float fTimeDelta)
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
 		m_fTurnAngle = (rand() % 2000) * 0.001f + 0.1f;
 		m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
-
+		if (m_TailDesc.eTailType == TAIL1)
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Guard_0.wav"), SOUND_MEFFECT, 0.5f);
 
 		if (ePlayerState == CPlayer::SHIELD_HOLD_LP || ePlayerState == CPlayer::SHIELD)
 		{
@@ -226,6 +233,30 @@ void CTail::Change_Animation(_float fTimeDelta)
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		m_fSoundTime += fTimeDelta;
+		if (m_fSoundTime > 0.25f && m_TailDesc.eTailType == TAIL1)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Octarock_Walk01.wav"), SOUND_ACTOR, 0.02f);
+			m_fSoundTime = 0.f;
+		}
+
+		m_fEffectEndTime = 0.3f;
+		m_fEffectTime += fTimeDelta;
+		if (m_fEffectTime > m_fEffectEndTime && m_TailDesc.eTailType == TAIL3)
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CMonsterEffect::ROLA_SMOKE;
+			EffectDesc.fDeadTime = 0.3f;
+			EffectDesc.vColor = XMVectorSet(214, 201, 187, 255);
+			EffectDesc.vInitScale = _float3(1.f, 1.f, 0.f);
+
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+			m_fEffectTime = 0.f;
+			break;
+		}
+
 		break;
 	default:
 		break;
@@ -320,6 +351,7 @@ _bool CTail::IsDead()
 {
 	if (m_bDead && m_eState == STATE::DEAD)
 	{
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Explosion.wav"), SOUND_ACTOR, 0.5f);
 		return true;
 	}
 		
@@ -394,6 +426,8 @@ void CTail::Behaviour_Head(_float fTimeDelta)
 			{
 				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
 				m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
+				if (m_TailDesc.eTailType == TAIL1)
+					CGameInstance::Get_Instance()->PlaySounds(TEXT("Guard_0.wav"), SOUND_MEFFECT, 0.5f);
 			}
 
 			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTurnAngle);
@@ -417,6 +451,8 @@ void CTail::Behaviour_Tail(_float fTimeDelta)
 	if (m_TailDesc.eTailType != TAIL1)
 	{ 
 		m_eState = m_TailDesc.pParent->Get_AnimState();
+		if(m_eState == DAMAGE)
+			m_bHit = true;
 
 		_vector vPosition;
 		if(m_TailDesc.eTailType == TAIL2)
@@ -426,7 +462,7 @@ void CTail::Behaviour_Tail(_float fTimeDelta)
 		m_pTransformCom->LookAt(vPosition);
 		m_pTransformCom->Fix_Look_byFloor(XMVectorSet(0.f, 1.f, 0.f, 0.f));
 		//m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
-		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, 0.f);
 
 	}
 
@@ -467,6 +503,7 @@ _uint CTail::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 			m_bHit = true;
 			m_eState = STATE::DAMAGE;
 			m_bMoveSound = true;
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Tail_Damage.wav"), SOUND_MONSTER, 0.5f);
 		}
 
 		m_bAggro = true;
@@ -478,6 +515,9 @@ _uint CTail::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 	else
 	{
 		m_eState = STATE::DEAD;
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Tail_Dead.wav"), SOUND_MONSTER, 0.5f);
+		
+
 		m_fAlpha = 0.f;
 	}
 		

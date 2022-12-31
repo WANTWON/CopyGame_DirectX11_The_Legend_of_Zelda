@@ -560,6 +560,9 @@ _uint CMoblinSword::Take_Damage(float fDamage, void * DamageType, CBaseObj * Dam
 		wcscpy_s(sz_Sound, TEXT("Moriblin_Vo_Die%02d.wav"));
 		wsprintf(sz_Sound, sz_Sound, iNum);
 		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Explosion.wav"), SOUND_ACTOR, fVolume);
+
 	}
 
 
@@ -618,7 +621,7 @@ void CMoblinSword::Sound_By_State(_float fTimeDelta)
 
 	
 
-	if (m_fSoundTime > m_fSoundEndTime || m_bSoundOnce)
+	if ((m_fSoundTime > m_fSoundEndTime || m_bSoundOnce) && m_fDistanceToTarget < 10.f)
 	{
 		//pGameInstance->PlaySounds(sz_SoundMonster, SOUND_MONSTER, fVolume);
 		pGameInstance->PlaySounds(sz_SoundMonster, SOUND_MEFFECT, fVolume);

@@ -45,6 +45,7 @@ private:
 	CNavigation*			m_pNavigationCom = nullptr;
 	CBaseObj*				m_pCollisionObj = nullptr;
 	_bool					m_bCheck = false;
+	_bool					m_bFirst = false;
 public:
 	static CCollapseTile* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

@@ -70,7 +70,7 @@ int CSquareBlock::Tick(_float fTimeDelta)
 	{
 		m_fAlpha -= 0.02f;
 
-		if (m_fAlpha <= 0)
+		if (m_fAlpha <= 0.01f)
 		{
 			if (m_BlockDesc.eType != WARP_HOLE)
 				CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_BLOCK, this);
@@ -123,6 +123,9 @@ HRESULT CSquareBlock::Render()
 
 HRESULT CSquareBlock::Render_ShadowDepth()
 {
+	if (m_bDead)
+		return S_OK;
+
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_World4x4_TP(), sizeof(_float4x4))))
@@ -285,7 +288,7 @@ void CSquareBlock::Tick_SquareBlock(_float fTimeDelta)
 			if (ePlayerState != CPlayer::PUSH_WAIT && ePlayerState != CPlayer::PULL_LP && ePlayerState != CPlayer::PUSH_LP)
 			{
 				pPlayer->Set_AnimState(CPlayer::PUSH_WAIT);
-
+				CGameInstance::Get_Instance()->StopSound(SOUND_OBJECT);
 			}
 
 		}
@@ -308,6 +311,12 @@ void CSquareBlock::Tick_SquareBlock(_float fTimeDelta)
 				m_pTransformCom->Go_PosDir(fTimeDelta, vDirection);
 			}
 
+			m_fSoundTime -= fTimeDelta;
+			if (m_fSoundTime <= 0.f)
+			{
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Object_Square_Block.wav"), SOUND_OBJECT, 0.3f);
+				m_fSoundTime = 3.f;
+			}
 		}
 		else if (ePlayerState == CPlayer::PULL_LP)
 		{
@@ -317,7 +326,15 @@ void CSquareBlock::Tick_SquareBlock(_float fTimeDelta)
 			else
 				vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
 			m_pTransformCom->Go_PosDir(fTimeDelta*0.2f, vDirection);
+
+			m_fSoundTime -= fTimeDelta;
+			if (m_fSoundTime <= 0.f)
+			{
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Object_Square_Block.wav"), SOUND_OBJECT, 0.3f);
+				m_fSoundTime = 3.f;
+			}
 		}
+
 
 	}
 

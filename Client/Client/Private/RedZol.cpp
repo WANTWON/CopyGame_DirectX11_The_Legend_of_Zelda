@@ -133,7 +133,12 @@ void CRedZol::Change_Animation(_float fTimeDelta)
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
+		{
 			m_eState = WALK;
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("ChuChu_Vo_JumpAttack.wav"), SOUND_ACTOR, 0.2f);
+
+		}
+			
 		else
 			Follow_Target(fTimeDelta);
 		break;
@@ -314,6 +319,9 @@ _uint CRedZol::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 			m_bHit = true;
 			m_eState = STATE::DAMAGE;
 			m_bMoveSound = true;
+
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("ChuChu_Damage.wav"), SOUND_MEFFECT, 0.5f);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("ChuChu_Vo_Damage.wav"), SOUND_MONSTER, 0.5f);
 		}
 
 		m_bAggro = true;
@@ -327,6 +335,10 @@ _uint CRedZol::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 		m_eState = STATE::DEAD;
 		Make_GetAttacked_Effect(DamageCauser);
 		m_bMakeEffect = false;
+
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("ChuChu_Vo_Dead.wav"), SOUND_MONSTER, 0.5f);
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Explosion.wav"), SOUND_ACTOR, 0.5f);
+
 	}
 		
 

@@ -346,10 +346,21 @@ void CPlayer::Set_AnimState(ANIM eAnim)
 		m_eState = eAnim; 
 }
 
+void CPlayer::Set_RecoverHp()
+{
+	CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_SE_S_HP_GAUGE_UP.wav"), SOUND_SYSTEM, 0.6f);
+
+
+	 m_tInfo.iCurrentHp += 4; 
+
+	if (m_tInfo.iCurrentHp > m_tInfo.iMaxHp) 
+		m_tInfo.iCurrentHp = m_tInfo.iMaxHp; 
+}
+
 void CPlayer::Set_RubyAdd(_int iCoin)
 {
 	 m_tInfo.iCoin += iCoin;
-	 CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Rupee_Count_Up.wav"), SOUND_SYSTEM, 0.4f);
+	 CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Rupee_Count_Up.wav"), SOUND_SYSTEM, 0.6f);
 }
 
 _bool CPlayer::Set_RubyUse(_int iCoin)
@@ -357,7 +368,7 @@ _bool CPlayer::Set_RubyUse(_int iCoin)
 	if (m_tInfo.iCoin < iCoin)
 		return false;
 		
-	CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Rupee_Count_Down.wav"), SOUND_SYSTEM, 0.4f);
+	CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Rupee_Count_Down.wav"), SOUND_SYSTEM, 0.6f);
 	m_tInfo.iCoin -= iCoin;
 	return true;
 }
@@ -1104,7 +1115,7 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		m_bSoundOnce = true;
 		fVolume = 0.5f;
 		iNum = rand() % 4 + 1;
-		wcscpy_s(sz_SoundPlayer, TEXT("Link_Fall(%d).wav"));
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Fall (%d).wav"));
 		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::STAIR_DOWN:
@@ -1962,9 +1973,10 @@ void CPlayer::Check_Navigation(_float fTimeDelta)
 
 	if (m_pNavigationCom->Get_CurrentCelltype() == CCell::DROP)
 	{
-		if (m_eState != FALL_ANTLION && m_eState != JUMP && m_eState != D_JUMP && m_eState != D_FALL && m_eState != LAND && m_eState != D_LAND)
+		if (/*m_eState != FALL_ANTLION &&*/ m_eState != JUMP && m_eState != D_JUMP && m_eState != D_FALL && m_eState != LAND && m_eState != D_LAND)
 		{
-			m_pTransformCom->Go_Straight(fTimeDelta * 10, m_pNavigationCom);
+			if(m_eState != FALL_ANTLION)
+				m_pTransformCom->Go_Straight(fTimeDelta * 10, m_pNavigationCom, 0.f);
 			m_eState = FALL_ANTLION;
 		}
 			

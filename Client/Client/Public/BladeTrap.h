@@ -37,6 +37,7 @@ private:
 	DWORD					m_dwAttackTime = GetTickCount();
 
 	_bool					m_bStart = false;
+	_bool					m_bMove = false;
 	_int					m_iMoveCount = 0;
 
 	_vector					m_vDir = XMVectorSet(1.f, 0.f, 0.f, 0.f);

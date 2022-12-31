@@ -39,6 +39,7 @@ private:
 	DGNKEYDESC				m_eKeyDesc;
 	_bool					m_bGet = false;
 	_bool					m_bMakeEffect = false;
+	_bool					m_bFirst = false;
 	CTexture*				m_pGlowTexture = nullptr;
 
 

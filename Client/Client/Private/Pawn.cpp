@@ -48,6 +48,9 @@ int CPawn::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 	}
 
+	if (Check_IsinFrustum() == false)
+		return OBJ_NOEVENT;
+
 	AI_Behaviour(fTimeDelta);
 	Check_Navigation(fTimeDelta);
 
@@ -62,6 +65,17 @@ void CPawn::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
+	CBaseObj* pCollisionMonster = nullptr;
+	if (CCollision_Manager::Get_Instance()->CollisionwithGroup(CCollision_Manager::COLLISION_MONSTER, m_pOBBCom, &pCollisionMonster))
+	{
+
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - pCollisionMonster->Get_TransformState(CTransform::STATE_POSITION);
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta, vDirection, m_pNavigationCom);
+	}
 	
 }
 
@@ -80,6 +94,12 @@ void CPawn::Check_Navigation(_float fTimeDelta)
 	{
 		if (m_eState == DAMAGE)
 		{
+			_uint iNum = rand() % 2;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.3f;
+			wcscpy_s(sz_Sound, TEXT("Pawn_Dead_%d.wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
 			m_eState = DEADFALL;
 			return;
 		}
@@ -116,12 +136,12 @@ void CPawn::Change_Animation(_float fTimeDelta)
 		break;
 	case Client::CPawn::WALK:
 		m_fSoundTime += fTimeDelta;
-		if (m_fSoundTime > 0.5f)
+		if (m_fSoundTime > 0.2f)
 		{
 			_uint iNum = rand() % 2 + 1;
 			_tchar	sz_Sound[MAX_PATH];
 			_float fVolume = 0.2f;
-			wcscpy_s(sz_Sound, TEXT("3_Monster_Step_%0d.wav"));
+			wcscpy_s(sz_Sound, TEXT("3_Monster_Step_%d.wav"));
 			wsprintf(sz_Sound, sz_Sound, iNum);
 			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MEFFECT, fVolume);
 
@@ -349,9 +369,7 @@ _uint CPawn::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 	{
 		if (!m_bDead)
 		{
-
-			_float fVolume = 0.3f;
-			CGameInstance::Get_Instance()->PlaySounds(TEXT("Pawn_Damage.wav"), SOUND_MONSTER, fVolume);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Pawn_Damage.wav"), SOUND_MONSTER, 0.8f);
 
 			m_bHit = true;
 			Make_GuardEffect(m_pTarget);
@@ -372,7 +390,7 @@ _uint CPawn::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 		_uint iNum = rand() % 2 + 1;
 		_tchar	sz_Sound[MAX_PATH];
 		_float fVolume = 0.3f;
-		wcscpy_s(sz_Sound, TEXT("Pawn_Dead_%0d.wav"));
+		wcscpy_s(sz_Sound, TEXT("Pawn_Dead_%d.wav"));
 		wsprintf(sz_Sound, sz_Sound, iNum);
 		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
 	}

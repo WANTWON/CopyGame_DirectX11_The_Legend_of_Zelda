@@ -38,7 +38,7 @@ HRESULT CTreasureBox::Initialize(void * pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 
 
-	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_INTERACT, this);
+	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BOX, this);
 	return S_OK;
 }
 
@@ -132,6 +132,7 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 		pButton->Set_Position(fPosition);
 		if (pGameInstance->Key_Down(DIK_A))
 		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Unlocking Treasure Box.wav"), SOUND_OBJECT, 0.4f);
 			pButton->Set_Visible(false);
 			if (m_eState == CLOSE_WAIT)
 				m_eState = OPEN;
@@ -201,6 +202,14 @@ HRESULT CTreasureBox::Render()
 	return S_OK;
 }
 
+void CTreasureBox::Set_Visible(_bool type)
+{
+	m_eTreasureBoxDesc.bVisible = type;
+
+	if (type == true)
+		CGameInstance::Get_Instance()->StopSound(SOUND_MEFFECT);
+}
+
 void CTreasureBox::Change_Animation(_float fTimeDelta)
 {
 	switch (m_eState)
@@ -225,6 +234,7 @@ void CTreasureBox::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta, m_bIsLoop))
 		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Unlock Treasure Box Magic Sound Effect.wav"), SOUND_OBJECT, 0.4f);
 			m_eState = OPEN_WAIT;
 			m_bGet = true;
 			m_bOpen = true;
@@ -332,6 +342,9 @@ _bool CTreasureBox::Check_Visible()
 	CInvenItem* pInvenItem = dynamic_cast<CInvenItem*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Compass")));
 	if (pInvenItem != nullptr)
 		pInvenItem->Set_CompassOn(false);
+	
+		pGameInstance->PlaySounds(TEXT("5_Obj_TreasureBox_AppearGlow.wav"), SOUND_ACTOR, 0.4f);
+
 	RELEASE_INSTANCE(CGameInstance);
 	return true;
 
@@ -345,6 +358,7 @@ RETURN_UNVISIBLE:
 
 void CTreasureBox::OpenBox()
 {
+
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
@@ -401,6 +415,7 @@ void CTreasureBox::Make_OpenEffect()
 	if (m_bMakeEffect)
 		return;
 
+	
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	CEffect::EFFECTDESC EffectDesc;
@@ -478,6 +493,7 @@ void CTreasureBox::Make_EntranceEffect()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_TreasureBox_AppearGlow3.wav"), SOUND_MEFFECT, 0.4f);
 	CEffect::EFFECTDESC EffectDesc;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 5.f, 0.f, 0.f);
 	EffectDesc.pTarget = this;

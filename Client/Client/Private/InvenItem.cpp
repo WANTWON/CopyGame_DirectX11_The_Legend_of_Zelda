@@ -84,25 +84,32 @@ void CInvenItem::Late_Tick(_float fTimeDelta)
 
 		if (!m_bCompass)
 		{
+			m_bFirst = false;
 			m_falpha += 0.025f;
 			if (m_falpha >= 1.f)
 			{
 				m_falpha = 1.f;
-
-				
 			}
 				
 		}
 		else
 		{
+			if (!m_bFirst)
+			{
+				m_bFirst = true;
+			}
+			
+
+
 			m_falpha -= 0.025f;
 			if (m_falpha <= 0.f)
 				m_falpha = 0.f;
 
-			m_fEffectEndTime = 1.f;
+			m_fEffectEndTime = 1.5f;
 			m_fEffectTime += fTimeDelta;
 			if (m_fEffectTime > m_fEffectEndTime)
 			{
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("6_UI_Composs_On.wav"), SOUND_SYSTEM, 0.6f);
 				CUIEffect::EFFECTDESC EffectDesc;
 				EffectDesc.eEffectID = CUIEffect::COMPOSS_RING;
 				EffectDesc.vInitPositon = m_fPosition;

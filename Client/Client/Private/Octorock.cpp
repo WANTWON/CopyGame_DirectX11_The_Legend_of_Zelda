@@ -105,6 +105,7 @@ void COctorock::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = true;
 		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
 		m_bMakeEffect = false;
+
 		break;
 	case Client::COctorock::ATTACK_ST:
 		m_fAnimSpeed = 2.f;
@@ -439,6 +440,8 @@ _uint COctorock::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 		wcscpy_s(sz_Sound, TEXT("Octarock_Vo_Damage_Electric0%d.wav"));
 		wsprintf(sz_Sound, sz_Sound, iNum);
 		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
+
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Explosion.wav"), SOUND_ACTOR, fVolume);
 
 		m_eState = STATE::DEAD;
 		m_fAlpha = 0.f;

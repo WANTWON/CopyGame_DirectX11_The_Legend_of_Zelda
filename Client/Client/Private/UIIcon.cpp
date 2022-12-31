@@ -74,7 +74,14 @@ void CUIIcon::Late_Tick(_float fTimeDelta)
 		return;
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+	{
+		if(m_IconDesc.iTexureNum == ICON_PLAYER)
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_TOP, this);
+		else
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+
+	}
+		
 
 }
 

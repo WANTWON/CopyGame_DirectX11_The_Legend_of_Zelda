@@ -52,6 +52,7 @@ private:
 	_bool m_bEmpty = true;
 	_bool m_bShow = true;
 	_bool m_bCompass = false; 
+	_bool m_bFirst = false;
 
 	_float m_falpha = 1.f;
 	_float m_fEffectTime = 0.f;

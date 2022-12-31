@@ -57,7 +57,7 @@ public: /* Getter & Setter */
 	void	Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void	Set_AnimState(ANIM eAnim);
 	void	Set_Carry(_bool type) { m_bCarry = type; }
-	void	Set_RecoverHp() { m_tInfo.iCurrentHp += 4; if (m_tInfo.iCurrentHp > m_tInfo.iMaxHp) m_tInfo.iCurrentHp = m_tInfo.iMaxHp; }
+	void	Set_RecoverHp();
 	void	Set_MaxHp() { m_tInfo.iMaxHp += 4;  m_tInfo.iCurrentHp = m_tInfo.iMaxHp; }
 	void	Set_RubyAdd(_int iCoin = 1);
 	_bool	Set_RubyUse(_int iCoin);

@@ -158,6 +158,16 @@ void CCollapseTile::CollapseTile_Tick(_float fTimeDelta)
 	CBaseObj* pTarget = dynamic_cast<CBaseObj*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 	if (m_pOBBCom != nullptr && m_pOBBCom->Collision(pTarget->Get_Collider()))
 	{
+		if (!m_bFirst)
+		{
+			_uint iNum = rand() % 3 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.4f;
+			wcscpy_s(sz_Sound, TEXT("5_Obj_Tile_Mineral_Break (%d).wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_OBJECT, fVolume);
+			m_bFirst = true;
+		}
 		m_fAlpha -= 0.05f;
 
 		if (m_fAlpha <= 0.f)
