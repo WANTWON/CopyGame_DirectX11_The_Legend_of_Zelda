@@ -235,6 +235,9 @@
     <Filter Include="03.UI\04. Button">
       <UniqueIdentifier>{1301e89d-dc8c-4c2b-bb34-ee43c21d52d0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\06.End">
+      <UniqueIdentifier>{360e5f15-87eb-485d-ab4b-2cea8a71fcec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

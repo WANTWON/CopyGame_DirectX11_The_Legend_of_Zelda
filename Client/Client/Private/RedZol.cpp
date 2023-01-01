@@ -272,7 +272,7 @@ void CRedZol::Follow_Target(_float fTimeDelta)
 
 void CRedZol::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMoveSound || m_eState == DEAD || m_eState == DAMAGE)
+	if (!m_bMove || m_eState == DEAD || m_eState == DAMAGE)
 		return;
 
 	// Check for Target, AggroRadius
@@ -318,7 +318,7 @@ _uint CRedZol::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 		{
 			m_bHit = true;
 			m_eState = STATE::DAMAGE;
-			m_bMoveSound = true;
+			m_bMove = true;
 
 			CGameInstance::Get_Instance()->PlaySounds(TEXT("ChuChu_Damage.wav"), SOUND_MEFFECT, 0.5f);
 			CGameInstance::Get_Instance()->PlaySounds(TEXT("ChuChu_Vo_Damage.wav"), SOUND_MONSTER, 0.5f);

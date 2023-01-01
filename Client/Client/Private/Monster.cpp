@@ -431,12 +431,13 @@ void CMonster::Make_DeadEffect(CBaseObj * Target)
 
 void CMonster::Make_GuardEffect(CBaseObj * Target)
 {
+
 	CEffect::EFFECTDESC EffectDesc;
 	EffectDesc.eEffectType = CEffect::MODEL;
 	EffectDesc.eEffectID = CFightEffect::GUARD_FLASH;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK))*1.5f + XMVectorSet(0.f, Get_Scale().y, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.5f;
-	EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - Target->Get_TransformState(CTransform::STATE_POSITION);
 	EffectDesc.vInitScale = _float3(1.5f, 1.5f, 1.5f);
 	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 

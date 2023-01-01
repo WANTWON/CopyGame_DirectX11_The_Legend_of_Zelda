@@ -31,7 +31,7 @@ private:
 	_float		m_fVelocity = 0.f;
 	_float		m_fMoveSoundTime = 0.f;
 	_bool		m_IsMoved[DIR_END] = { false };
-	_bool		m_bMoveSound = false;
+	_bool		m_bMove = false;
 	DIRINPUT	m_eInputDir = DIR_END;
 	_bool		m_bUp = false; 
 	_bool		m_bFinished = false;

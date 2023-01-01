@@ -388,7 +388,7 @@ void CTail::AI_Behaviour(_float fTimeDelta)
 
 	if (m_TailDesc.eTailType == TAIL1)
 	{
-		if (!m_bMoveSound || m_eState == DEAD || m_eState == PIYO)
+		if (!m_bMove || m_eState == DEAD || m_eState == PIYO)
 			return;
 		Behaviour_Head(fTimeDelta);
 	}
@@ -421,7 +421,7 @@ void CTail::Behaviour_Head(_float fTimeDelta)
 			Follow_Target(fTimeDelta);
 		else
 		{
-			m_bChangeDirection = m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+			m_bChangeDirection = m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, 0.f);
 			if (m_bChangeDirection == false)
 			{
 				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
@@ -451,8 +451,7 @@ void CTail::Behaviour_Tail(_float fTimeDelta)
 	if (m_TailDesc.eTailType != TAIL1)
 	{ 
 		m_eState = m_TailDesc.pParent->Get_AnimState();
-		if(m_eState == DAMAGE)
-			m_bHit = true;
+		m_bHit = m_TailDesc.pParent->Get_Hited();
 
 		_vector vPosition;
 		if(m_TailDesc.eTailType == TAIL2)
@@ -502,7 +501,7 @@ _uint CTail::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 		{
 			m_bHit = true;
 			m_eState = STATE::DAMAGE;
-			m_bMoveSound = true;
+			m_bMove = true;
 			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Tail_Damage.wav"), SOUND_MONSTER, 0.5f);
 		}
 

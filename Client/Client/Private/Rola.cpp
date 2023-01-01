@@ -166,6 +166,11 @@ void CRola::Change_Animation(_float fTimeDelta)
 		}
 		break;		break;
 	case Client::CRola::DEAD:
+		g_fBGMVolume -= 0.005f;
+		if (g_fBGMVolume <= 0.f)
+		{
+			CGameInstance::Get_Instance()->StopSound(SOUND_BGM);
+		}
 		dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
 
 		m_fZoomValue += 0.1f;
@@ -179,11 +184,19 @@ void CRola::Change_Animation(_float fTimeDelta)
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
 			m_fZoomValue = 0.f;
+			g_fBGMVolume = 0.f;
+			CGameInstance::Get_Instance()->PlayBGM(TEXT("1-20 Level 1 - Tail Cave.mp3"), g_fBGMVolume);
 			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
 			m_bDead = true;
 		}
 		break;
 	case Client::CRola::DEAD_ST:
+		g_fBGMVolume -= 0.005f;
+		if (g_fBGMVolume <= 0.f)
+		{
+			CGameInstance::Get_Instance()->StopSound(SOUND_BGM);
+		}
+
 		dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
 		m_fAlpha += 0.01f;
 		m_fZoomValue -= 0.1f;
@@ -249,6 +262,9 @@ void CRola::Change_Animation(_float fTimeDelta)
 			Jumping_Attack(fTimeDelta);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop))
 		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Rola_Jump_End.wav"), SOUND_MEFFECT, 0.5f);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Rola_Boom (1).wav"), SOUND_ACTOR, 0.5f);
+
 			m_eState = JUMP_ED;
 
 
@@ -299,6 +315,8 @@ void CRola::Change_Animation(_float fTimeDelta)
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta* m_fAnimSpeed, m_bIsLoop))
 		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Rola_Jump_Start.wav"), SOUND_MEFFECT, 0.5f);
+
 			m_eState = JUMP_ST;
 		}
 		break;
@@ -421,7 +439,20 @@ void CRola::Follow_Target(_float fTimeDelta)
 
 void CRola::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMoveSound || m_eState == DEAD || m_eState == DEAD_ST || m_bHit || m_bIsAttacking)
+	if (Check_IsinFrustum() == false)
+		return;
+	else if(!m_bSoundPlay)
+	{
+		g_fBGMVolume -= 0.01f;
+		if (g_fBGMVolume <= 0.f)
+		{
+			CGameInstance::Get_Instance()->StopSound(SOUND_BGM);
+			CGameInstance::Get_Instance()->PlayBGM(TEXT("1-22 Mini Boss Battle.mp3"), g_fBGMVolume);
+			m_bSoundPlay = true;
+		}
+	}
+
+	if (!m_bMove || m_eState == DEAD || m_eState == DEAD_ST || m_bHit || m_bIsAttacking)
 		return;
 
 	// Check for Target, AggroRadius
@@ -568,6 +599,8 @@ void CRola::Make_PushEffect()
 	if (m_bMakeEffect)
 		return;
 
+	CGameInstance::Get_Instance()->PlaySounds(TEXT("Guard_0.wav"), SOUND_MEFFECT, 0.5f);
+
 	m_bMakeEffect = true;
 	CMonsterBullet* pRollingBullet = dynamic_cast<CMonsterBullet*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_TAILCAVE, TEXT("Layer_RulaRolling")));
 	pRollingBullet->Set_Rolling(m_eAttackDir);
@@ -640,9 +673,15 @@ _uint CRola::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 			m_bHit = true;
 			m_iDmgCount++;
 			m_eState = STATE::DAMAGE;
-			m_bMoveSound = true;
+			m_bMove = true;
 		}
 
+		_uint iNum = rand() % 3 + 1;
+		_tchar	sz_Sound[MAX_PATH];
+		_float fVolume = 0.5f;
+		wcscpy_s(sz_Sound, TEXT("3_Monster_Rola_Damage (%d).wav"));
+		wsprintf(sz_Sound, sz_Sound, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
 
 		m_bAggro = true;
 		m_bIsAttacking = false;
@@ -652,6 +691,9 @@ _uint CRola::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCaus
 	}
 	else
 	{
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Rola_Dead.wav"), SOUND_MONSTER, 0.5f);
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Explosion.wav"), SOUND_ACTOR, 0.5f);
+
 		m_eState = STATE::DEAD_ST;
 		m_fAlpha = 0.f;
 	}

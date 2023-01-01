@@ -77,7 +77,7 @@ protected:
 	_bool					m_bIsAttacking = false;
 	_bool					m_bHit = false;
 	_bool					m_bRed = false;
-	_bool					m_bMoveSound = true;
+	_bool					m_bMove = true;
 	_bool					m_bMakeEffect = false;
 	
 

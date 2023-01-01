@@ -344,6 +344,8 @@ void CPlayer::Set_AnimState(ANIM eAnim)
 	}
 	else
 		m_eState = eAnim; 
+
+	m_fTime = 0.f;
 }
 
 void CPlayer::Set_RecoverHp()
@@ -1016,13 +1018,13 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	case Client::CPlayer::SHIELD_HOLD_LP:
 		break;
 	case Client::CPlayer::PUSH_LP:
-		break;
-	case Client::CPlayer::PUSH_WAIT:
 		m_bSoundOnce = true;
 		fVolume = 0.5f;
 		iNum = rand() % 4 + 1;
 		wcscpy_s(sz_SoundPlayer, TEXT("Link_Push.wav"));
 		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
+		break;
+	case Client::CPlayer::PUSH_WAIT:
 		break;
 	case Client::CPlayer::JUMP:
 	case Client::CPlayer::D_JUMP:
@@ -1109,6 +1111,10 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	case Client::CPlayer::STAIR_UP:
 		break;
 	case Client::CPlayer::FALL_FROMTOP:
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_FallFromTop.wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::FALL_HOLE:
 	case Client::CPlayer::FALL_ANTLION:
@@ -1138,10 +1144,17 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::WARP_ST:
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Warp_Ready.wav"));
 		break;
 	case Client::CPlayer::WARP_LP:
 		break;
 	case Client::CPlayer::WARP_ED:
+		/*m_bSoundOnce = true;
+		fVolume = 0.5f;
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_FallFromTop.wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);*/
 		break;
 	default:
 		break;
@@ -1917,11 +1930,18 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		Make_DefaultEffect(fTimeDelta, m_eState);
+		m_fTime += fTimeDelta;
+		if (m_fTime > 2.f && !m_bFirst)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Link_Warp_Start Up.wav"), SOUND_PEFFECT, 0.5f);
+			m_bFirst = true;
+		}
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
 			m_fTime = 0.f;
 			m_fEffectTime = 0.f;
 			m_eState = WARP_LP;
+			m_bFirst = false;
 		}
 		break;
 	case Client::CPlayer::WARP_LP:
@@ -1938,10 +1958,19 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		}
 		break;
 	case Client::CPlayer::WARP_ED:
+		m_fTime += fTimeDelta;
+		if (m_fTime > 0.7f && !m_bFirst)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Link_FallFromTop.wav"), SOUND_PEFFECT, 0.5f);
+			m_bFirst = true;
+		}
+
 		m_eAnimSpeed = 2.f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
+			m_fTime = 0.f;
+			m_bFirst = false;
 			m_eState = IDLE;
 		}
 		break;

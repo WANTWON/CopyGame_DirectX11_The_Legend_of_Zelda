@@ -50,6 +50,7 @@ private:
 	_bool m_bJump = false;
 	_bool m_bSpecialAttack = false;
 	_bool m_bBackStep = false;
+	_bool m_bSoundPlay = false;
 	_int  m_iDmgCount = 3;
 
 	_vector m_vAttackPos = { 109.7f, 0.f, 33.75f, 1.f };

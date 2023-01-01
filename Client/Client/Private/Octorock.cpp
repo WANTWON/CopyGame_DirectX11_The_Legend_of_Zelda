@@ -297,7 +297,7 @@ void COctorock::Check_Navigation(_float fTimeDelta)
 
 void COctorock::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMoveSound || m_eState == DEAD)
+	if (!m_bMove || m_eState == DEAD)
 		return;
 
 	// Check for Target, AggroRadius
@@ -423,7 +423,7 @@ _uint COctorock::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 
 			m_bHit = true;
 			m_eState = STATE::DAMAGE;
-			m_bMoveSound = true;
+			m_bMove = true;
 		}
 
 		m_bAggro = true;

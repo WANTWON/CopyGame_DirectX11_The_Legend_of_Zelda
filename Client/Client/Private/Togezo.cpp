@@ -437,7 +437,7 @@ void CTogezo::Follow_Target(_float fTimeDelta)
 
 void CTogezo::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMoveSound || m_eState == DAMAGE  || m_eState == DEADFALL || m_eState == DEAD ||  m_eState == DEADFIRE ||
+	if (!m_bMove || m_eState == DAMAGE  || m_eState == DEADFALL || m_eState == DEAD ||  m_eState == DEADFIRE ||
 		m_eState == DISCOVER || m_eState == REBOUND || m_eState == REBOUND_ED || m_eState == REBOUND_ST || m_eState == RUN||
 		m_eState == RUN_ST || m_eState == RUN_ED || m_eState == STUN || m_eState == STUN_ED )
 		return;
@@ -514,7 +514,7 @@ _uint CTogezo::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCa
 				m_bHit = true;
 				m_eState = STATE::DAMAGE;
 				CGameInstance::Get_Instance()->PlaySounds(TEXT("Pawn_Damage.wav"), SOUND_MONSTER, 0.f);
-				m_bMoveSound = true;
+				m_bMove = true;
 			}
 
 			m_bAggro = true;

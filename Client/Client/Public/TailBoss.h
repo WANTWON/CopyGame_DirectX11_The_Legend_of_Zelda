@@ -40,7 +40,7 @@ private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr) override;
 	virtual HRESULT SetUp_ShaderID() override;
 	virtual _bool IsDead() override;
-
+	virtual void Make_GuardEffect(CBaseObj* Target = nullptr) override;
 private:
 	virtual void AI_Behaviour(_float fTimeDelta) override;
 	void Behaviour_Head(_float fTimeDelta);
@@ -65,7 +65,7 @@ private:
 	_bool m_bStartIntro = false;
 	_bool m_bFinishIntro = false;
 	_bool m_bOpeningMotion = false;
-
+	_bool m_bSoundPlay = false;
 	
 
 public:

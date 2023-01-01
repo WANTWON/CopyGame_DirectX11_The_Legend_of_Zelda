@@ -332,7 +332,7 @@ void CCucco::Check_Navigation(_float fTimeDelta)
 
 void CCucco::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMoveSound && m_eState == LANDING)
+	if (!m_bMove && m_eState == LANDING)
 		return;
 
 	// Check for Target, AggroRadius
@@ -421,7 +421,7 @@ _uint CCucco::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCau
 		{
 			m_bHit = true;
 			m_eState = STATE::LANDING;
-			m_bMoveSound = true;
+			m_bMove = true;
 
 			_uint iNum = 0;
 			_tchar	sz_SoundMonster[MAX_PATH];

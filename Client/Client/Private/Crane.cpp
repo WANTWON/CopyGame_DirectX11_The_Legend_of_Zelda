@@ -86,10 +86,10 @@ int CCrane::Tick(_float fTimeDelta)
 			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Crane_Move.wav"), SOUND_OBJECT, 0.6f);
 			m_fMoveSoundTime = 0.f;
 		}
-		else if (!m_bUp && !m_bMoveSound)
+		else if (!m_bUp && !m_bMove)
 		{
 			CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Crane_Move2.wav"), SOUND_OBJECT, 0.4f);
-			m_bMoveSound = true;
+			m_bMove = true;
 		}
 
 	}
@@ -104,10 +104,10 @@ int CCrane::Tick(_float fTimeDelta)
 			vPosition = vPosition + vDir*m_fVelocity;
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPosition);
 
-			if (!m_bMoveSound)
+			if (!m_bMove)
 			{
 				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Crane_Move.wav"), SOUND_OBJECT, 0.4f);
-				m_bMoveSound = true;
+				m_bMove = true;
 			}
 
 		}
@@ -116,7 +116,7 @@ int CCrane::Tick(_float fTimeDelta)
 			CGameInstance::Get_Instance()->StopSound(SOUND_OBJECT);
 			m_IsMoved[m_eInputDir] = true;
 			m_fVelocity = 0.f;
-			m_bMoveSound = false;
+			m_bMove = false;
 		}
 
 

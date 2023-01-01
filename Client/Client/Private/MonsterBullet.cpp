@@ -166,6 +166,8 @@ void CMonsterBullet::Set_Rolling(_uint Dir)
 {
 	m_fSpeed = Dir % 2 == 0 ? 1.5f : -1.5f;
 	m_fRotSpeed = Dir % 2 == 0 ? 5.f : -5.f;
+
+	CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Object_Square_Block.wav"), SOUND_OBJECT, 0.3f);
 }
 
 HRESULT CMonsterBullet::Ready_Components(void * pArg)

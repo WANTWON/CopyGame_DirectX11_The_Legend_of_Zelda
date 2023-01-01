@@ -287,15 +287,26 @@ void CSquareBlock::Tick_SquareBlock(_float fTimeDelta)
 	
 			if (ePlayerState != CPlayer::PUSH_WAIT && ePlayerState != CPlayer::PULL_LP && ePlayerState != CPlayer::PUSH_LP)
 			{
-				pPlayer->Set_AnimState(CPlayer::PUSH_WAIT);
+				pPlayer->Set_AnimState(CPlayer::PUSH_WAIT);		
+			}
+
+			if (ePlayerState == CPlayer::PUSH_WAIT)
+			{
 				CGameInstance::Get_Instance()->StopSound(SOUND_OBJECT);
+				m_fSoundTime = 0.f;
 			}
 
 		}
 		else
 		{
 			if (ePlayerState == CPlayer::PUSH_WAIT && ePlayerState != CPlayer::IDLE)
+			{
 				pPlayer->Set_AnimState(CPlayer::IDLE);
+				CGameInstance::Get_Instance()->StopSound(SOUND_OBJECT);
+				m_fSoundTime = 0.f;
+
+			}
+				
 		}
 
 

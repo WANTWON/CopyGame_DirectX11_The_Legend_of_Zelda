@@ -296,7 +296,7 @@ void CKeese::Follow_Target(_float fTimeDelta)
 
 void CKeese::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMoveSound || m_eState == DEAD || m_eState == PIYO)
+	if (!m_bMove || m_eState == DEAD || m_eState == PIYO)
 		return;
 
 	// Check for Target, AggroRadius
@@ -337,7 +337,7 @@ _uint CKeese::Take_Damage(float fDamage, void * DamageType, CBaseObj * DamageCau
 		{
 			m_bHit = true;
 			m_eState = STATE::DEAD;
-			m_bMoveSound = true;
+			m_bMove = true;
 
 			_uint iNum = rand() % 3 + 1;
 			_tchar	sz_Sound[MAX_PATH];

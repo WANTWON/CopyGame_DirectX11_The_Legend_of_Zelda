@@ -114,7 +114,9 @@ void CTailBoss::Late_Tick(_float fTimeDelta)
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
 		m_fTurnAngle = (rand() % 2000) * 0.001f + 0.1f;
 		m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("Guard_0.wav"), SOUND_MEFFECT, 0.5f);
 	}
+
 
 }
 
@@ -184,6 +186,12 @@ void CTailBoss::Change_Animation(_float fTimeDelta)
 	case Client::CTailBoss::DEAD:
 		if (m_TailDesc.eTailType == TAIL1)
 		{
+			g_fBGMVolume -= 0.005f;
+			if (g_fBGMVolume <= 0.f)
+			{
+				CGameInstance::Get_Instance()->StopSound(SOUND_BGM);
+			}
+
 			m_fEffectEndTime = 0.3f;
 			m_fEffectTime += fTimeDelta;
 			if (m_fEffectTime > m_fEffectEndTime)
@@ -219,7 +227,7 @@ void CTailBoss::Change_Animation(_float fTimeDelta)
 			}
 
 			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
-			
+
 			m_fZoomValue -= 0.1f;
 			if (m_fZoomValue <= -1.f)
 				m_fZoomValue = -1.f;
@@ -235,9 +243,17 @@ void CTailBoss::Change_Animation(_float fTimeDelta)
 			m_fZoomValue = 0.f;
 			dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
 			m_bDead = true;
+
+			g_fBGMVolume = 0.f;
+			CGameInstance::Get_Instance()->PlayBGM(TEXT("1-20 Level 1 - Tail Cave.mp3"), g_fBGMVolume);
+
 		}
 		break;
 	case Client::CTailBoss::APPEAR:
+		m_fAnimSpeed = 2.f;
+		m_bIsLoop = true;
+		m_pModelCom->Play_Animation(fTimeDelta*m_fAnimSpeed, m_bIsLoop);
+		break;
 	case Client::CTailBoss::WAIT_MOVE:
 		m_fAnimSpeed = 2.f;
 		m_bIsLoop = true;
@@ -265,6 +281,13 @@ void CTailBoss::Change_Animation(_float fTimeDelta)
 			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_MonsterEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 			m_fEffectTime = 0.f;
 			break;
+		}
+
+		m_fSoundTime += fTimeDelta;
+		if (m_fSoundTime > 2.f && m_bOpeningMotion)
+		{
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_TailBoss_Move.wav"), SOUND_ACTOR, 0.05f);
+			m_fSoundTime = 0.f;
 		}
 	default:
 		break;
@@ -328,7 +351,7 @@ HRESULT CTailBoss::Ready_Components(void * pArg)
 	//	return E_FAIL;
 
 	/* For.Com_SHPERE */
-	ColliderDesc.vScale = _float3(1.8f, 1.8f, 1.8f);
+	ColliderDesc.vScale = _float3(2.f, 2.f, 2.f);
 	if (m_TailDesc.eTailType == TAIL5)
 		ColliderDesc.vScale = _float3(0.5f, 1.5f, 0.5f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
@@ -377,12 +400,48 @@ _bool CTailBoss::IsDead()
 	return false;
 }
 
+void CTailBoss::Make_GuardEffect(CBaseObj * Target)
+{
+
+	_vector vDirection =  XMVector3Normalize(Target->Get_TransformState(CTransform::STATE_POSITION) - Get_TransformState(CTransform::STATE_POSITION));
+
+	CEffect::EFFECTDESC EffectDesc;
+	EffectDesc.eEffectType = CEffect::MODEL;
+	EffectDesc.eEffectID = CFightEffect::GUARD_FLASH;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + vDirection*1.5f + XMVectorSet(0.f, Get_Scale().y, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - Target->Get_TransformState(CTransform::STATE_POSITION);
+	EffectDesc.vInitScale = _float3(1.5f, 1.5f, 1.5f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+	EffectDesc.eEffectID = CFightEffect::GUARD_RING;
+	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + vDirection*0.8f + XMVectorSet(0.f, Get_Scale().y*0.5f, 0.f, 0.f);
+	EffectDesc.fDeadTime = 0.5f;
+	EffectDesc.vLook = Get_TransformState(CTransform::STATE_POSITION) - Target->Get_TransformState(CTransform::STATE_POSITION);
+	EffectDesc.vInitScale = _float3(1.0f, 1.0f, 1.0f);
+	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+
+	for (int i = 0; i < 10; ++i)
+	{
+		EffectDesc.eEffectID = CFightEffect::GUARD_DUST;
+		EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + vDirection + XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+		_float iRandNum = (rand() % 10 + 10) * 0.1f;
+		EffectDesc.vInitScale = _float3(iRandNum, iRandNum, iRandNum);
+		EffectDesc.fDeadTime = 0.8f;
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_AttackEffect"), LEVEL_STATIC, TEXT("Layer_MonsterEffect"), &EffectDesc);
+
+	}
+}
+
 
 
 
 void CTailBoss::AI_Behaviour(_float fTimeDelta)
 {
-	if (!m_bMoveSound || m_eState == DAMAGE || m_eState == DEAD || m_eState == FEINT)
+
+
+	if (!m_bMove || m_eState == DAMAGE || m_eState == DEAD || m_eState == FEINT)
 		return;
 
 
@@ -395,6 +454,9 @@ void CTailBoss::AI_Behaviour(_float fTimeDelta)
 
 void CTailBoss::Behaviour_Head(_float fTimeDelta)
 {
+	if (m_eState == FEINT)
+		return;
+
 	Find_Target();
 	if (!m_bStartIntro && m_fDistanceToTarget < 5.f)
 	{
@@ -407,9 +469,38 @@ void CTailBoss::Behaviour_Head(_float fTimeDelta)
 
 	if (!m_bIsAttacking && m_pSPHERECom->Collision(m_pTarget->Get_Collider()) == true)
 	{
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("3_TailBoss_Attack.wav"), SOUND_MONSTER, 0.5f);
 		m_bAggro = true;
-		m_eState = STATE::FEINT;
 		m_bIsAttacking = true;
+
+		CPlayer::ANIM ePlayerState = dynamic_cast<CPlayer*>(m_pTarget)->Get_AnimState();
+
+		_vector vDirection = m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTarget->Get_TransformState(CTransform::STATE_POSITION);
+		if (fabs(XMVectorGetX(vDirection)) > fabs(XMVectorGetZ(vDirection)))
+			vDirection = XMVectorSet(XMVectorGetX(vDirection), 0.f, 0.f, 0.f);
+		else
+			vDirection = XMVectorSet(0.f, 0.f, XMVectorGetZ(vDirection), 0.f);
+		m_pTransformCom->Go_PosDir(fTimeDelta*1.5f, vDirection);
+
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
+		m_fTurnAngle = (rand() % 2000) * 0.001f + 0.1f;
+		m_fTurnAngle = rand() % 2 == 0 ? m_fTurnAngle : -m_fTurnAngle;
+		if (m_TailDesc.eTailType == TAIL1)
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Guard_0.wav"), SOUND_MEFFECT, 0.5f);
+
+		if (ePlayerState == CPlayer::SHIELD_HOLD_LP || ePlayerState == CPlayer::SHIELD)
+		{
+			dynamic_cast<CPlayer*>(m_pTarget)->Set_AnimState(CPlayer::SHIELD_HIT);
+			dynamic_cast<CPlayer*>(m_pTarget)->Make_GuardEffect(this);
+		}
+		else
+		{
+
+			Make_GetAttacked_Effect(m_pTarget);
+			dynamic_cast<CPlayer*>(m_pTarget)->Take_Damage(1.f, nullptr, this);
+		}
+
+
 	}
 	else
 	{
@@ -418,6 +509,7 @@ void CTailBoss::Behaviour_Head(_float fTimeDelta)
 		{
 			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), 180);
 			m_fTurnAngle = rand() % 2 == 0 ? 3.f : -3.f;
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("Guard_0.wav"), SOUND_MEFFECT, 0.5f);
 		}
 
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTurnAngle);
@@ -431,6 +523,7 @@ void CTailBoss::Behaviour_Tail(_float fTimeDelta)
 
 	if (m_TailDesc.eTailType != TAIL1)
 	{
+		m_eState = m_TailDesc.pParent->Get_AnimState();
 		_vector vPosition = m_TailDesc.pParent->Get_TransformState(CTransform::STATE_POSITION) - m_TailDesc.pParent->Get_TransformState(CTransform::STATE_LOOK);
 		m_pTransformCom->LookAt(vPosition);
 		m_pTransformCom->Fix_Look_byFloor(XMVectorSet(0.f, 1.f, 0.f, 0.f));
@@ -474,6 +567,20 @@ void CTailBoss::Opening_Motion(_float fTimeDelta)
 
 void CTailBoss::Opening_MotionHead(_float fTimeDelta)
 {
+	if (Check_IsinFrustum() == false)
+		return;
+	else if (!m_bSoundPlay && m_TailDesc.eTailType == TAIL1)
+	{
+		g_fBGMVolume -= 0.01f;
+		if (g_fBGMVolume <= 0.f)
+		{
+			g_fBGMVolume = 0.f;
+			CGameInstance::Get_Instance()->StopSound(SOUND_BGM);
+
+		}
+	}
+
+
 	Find_Target();
 	if (!m_bStartIntro && !m_bFinishIntro &&  XMVectorGetZ(Get_TransformState(CTransform::STATE_POSITION)) - XMVectorGetZ(m_pTarget->Get_TransformState(CTransform::STATE_POSITION)) < 5.f)
 	{
@@ -498,6 +605,7 @@ void CTailBoss::Opening_MotionHead(_float fTimeDelta)
 		{
 			if (m_fNameBoxTime == 0.f)
 			{
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("3_TailBoss_Appear.wav"), SOUND_MEFFECT, 0.5f);
 				CEffect::EFFECTDESC EffectDesc;
 				EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 				EffectDesc.eEffectID = CMonsterEffect::ROLA_SMOKE;
@@ -543,6 +651,8 @@ void CTailBoss::Opening_MotionHead(_float fTimeDelta)
 			{
 				m_bOpeningMotion = true;
 				m_fZoomValue = 0.f;
+				m_bSoundPlay = true;
+				CGameInstance::Get_Instance()->PlayBGM(TEXT("1-23 Boss Battle.mp3"), g_fBGMVolume);
 			}
 
 		}
@@ -579,8 +689,17 @@ _uint CTailBoss::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 			{
 				m_bHit = true;
 				m_eState = STATE::DAMAGE;
-				m_bMoveSound = true;
+				m_bMove = true;
 			}
+
+			Make_GetAttacked_Effect();
+
+			_uint iNum = rand() % 2 + 1;
+			_tchar	sz_Sound[MAX_PATH];
+			_float fVolume = 0.5f;
+			wcscpy_s(sz_Sound, TEXT("3_TailBoss_Damage%d.wav"));
+			wsprintf(sz_Sound, sz_Sound, iNum);
+			CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MONSTER, fVolume);
 
 			m_bAggro = true;
 			m_bIsAttacking = false;
@@ -592,9 +711,26 @@ _uint CTailBoss::Take_Damage(float fDamage, void * DamageType, CBaseObj * Damage
 		{
 			m_eState = STATE::DEAD;
 			m_fAlpha = 0.f;
+
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_TailBoss_Dead.wav"), SOUND_MONSTER, 0.5f);
+			CGameInstance::Get_Instance()->PlaySounds(TEXT("3_Monster_Explosion.wav"), SOUND_ACTOR, 0.5f);
 		}
 
 		Change_Parent_State(m_eState);
+	}
+	else
+	{
+		m_eState = STATE::FEINT;
+		_uint iNum = rand() % 4 + 1;
+		_tchar	sz_Sound[MAX_PATH];
+		_float fVolume = 0.3f;
+		wcscpy_s(sz_Sound, TEXT("Guard_Metal_Metal_%d.wav"));
+		wsprintf(sz_Sound, sz_Sound, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_Sound, SOUND_MEFFECT, 0.5f);
+
+		Change_Parent_State(m_eState);
+		CBaseObj* pPlayer = dynamic_cast<CBaseObj*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+		Make_GuardEffect(pPlayer);
 	}
 
 	return 0;
