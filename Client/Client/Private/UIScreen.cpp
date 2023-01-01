@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "..\Public\UIScreen.h"
-
+#include "BaseObj.h"
 #include "GameInstance.h"
-
+#include "Player.h"
+#include "Level_GamePlay.h"
 
 CUIScreen::CUIScreen(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CObj_UI(pDevice, pContext)
@@ -36,6 +37,11 @@ HRESULT CUIScreen::Initialize(void * pArg)
 		m_fAlpha = 0.f;
 		m_eShaderID = UI_SCREEN;
 	}
+	else if (m_BackgroundDesc.eVisibleScreen == VISIBLE_EFFECT)
+	{
+		m_fAlpha = 0.f;
+		m_eShaderID = UI_EFFECTSCREEN;
+	}
 
 	return S_OK;
 }
@@ -60,9 +66,6 @@ void CUIScreen::Late_Tick(_float fTimeDelta)
 		__super::Late_Tick(fTimeDelta);
 		
 
-
-		
-
 	if (m_BackgroundDesc.eVisibleScreen == VISIBLE_SCREEN)
 	{
 		if (CUI_Manager::Get_Instance()->Get_NextLevel() == true)
@@ -83,6 +86,29 @@ void CUIScreen::Late_Tick(_float fTimeDelta)
 			if (m_fAlpha <= 0.f)
 				m_fAlpha = 0.f;
 		}
+	}
+
+	if (m_BackgroundDesc.eVisibleScreen == VISIBLE_EFFECT && CGameInstance::Get_Instance()->Get_CurrentLevelIndex() == LEVEL_GAMEPLAY)
+	{
+		CLevel_GamePlay* pLevel = dynamic_cast<CLevel_GamePlay*>(CGameInstance::Get_Instance()->Get_CurrentLevel());
+		if (pLevel->Get_FieldType() == CLevel_GamePlay::FIELD)
+		{
+			m_fAlpha -= 0.01f;
+			if (m_fAlpha <= 0.f)
+				m_fAlpha = 0.f;
+		}
+		else
+		{
+			m_fAlpha += 0.01f;
+			if (m_fAlpha >= 0.7f)
+				m_fAlpha = 0.7f;
+		}
+	}
+	else
+	{
+		m_fAlpha -= 0.01f;
+		if (m_fAlpha <= 0.f)
+			m_fAlpha = 0.f;
 	}
 
 }
@@ -141,6 +167,10 @@ HRESULT CUIScreen::Ready_Components(void * pArg)
 	if (FAILED(__super::Add_Components(TEXT("Com_VIBuffer"), LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Components(TEXT("Com_TextureFog"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Fog"), (CComponent**)&m_pFogtexture)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -159,7 +189,7 @@ HRESULT CUIScreen::SetUp_ShaderResources()
 		return E_FAIL;
 	
 
-	if (m_BackgroundDesc.eVisibleScreen == VISIBLE_SCREEN)
+	if (m_BackgroundDesc.eVisibleScreen == VISIBLE_SCREEN || m_BackgroundDesc.eVisibleScreen == VISIBLE_EFFECT)
 	{
 		if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 			return E_FAIL;
@@ -171,6 +201,21 @@ HRESULT CUIScreen::SetUp_ShaderResources()
 		if (m_BackgroundDesc.eVisibleScreen == VISIBLE_PLAYGAME &&  CUI_Manager::Get_Instance()->Get_UI_OpenType() != CUI_Manager::UI_END)
 		{
 			_uint iIndex = CUI_Manager::Get_Instance()->Get_UI_OpenType();
+
+			if (iIndex = CUI_Manager::UI_MAP)
+			{
+				if (CGameInstance::Get_Instance()->Get_CurrentLevelIndex() == LEVEL_TAILCAVE)
+				{
+					if (CUI_Manager::Get_Instance()->Get_DgnMap() == true)
+						iIndex = DGN_MAP_OPEN;
+					else
+						iIndex = DGN_MAP_MASK;
+				}
+				else if (CGameInstance::Get_Instance()->Get_CurrentLevelIndex() != LEVEL_GAMEPLAY)
+					iIndex = NO_MAP;
+				else
+					iIndex = FIELD_MAP;
+			}
 			if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(iIndex))))
 				return E_FAIL;
 		}
@@ -180,6 +225,24 @@ HRESULT CUIScreen::SetUp_ShaderResources()
 				return E_FAIL;
 		}
 		
+	}
+
+	if (m_pFogtexture != nullptr && m_BackgroundDesc.eVisibleScreen == VISIBLE_EFFECT)
+	{
+		CPlayer* pPlayer = dynamic_cast<CPlayer*> (CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+		_float2 fPlayerPos = pPlayer->Get_ProjPosition();
+		_vector vPlayerPos = XMVectorSet(fPlayerPos.x, fPlayerPos.y, 0.f, 1.f);
+
+		if (FAILED(m_pShaderCom->Set_RawValue("g_PlayerProjPos", &vPlayerPos, sizeof(_float4))))
+			return E_FAIL;
+
+		m_fTexUV = pPlayer->Get_PlayerTexUV();
+		if (FAILED(m_pShaderCom->Set_RawValue("g_TexUV", &m_fTexUV, sizeof(_float2))))
+			return E_FAIL;
+	
+
+		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_FogTexture", m_pFogtexture->Get_SRV())))
+			return E_FAIL;
 	}
 	
 	return S_OK;
@@ -220,4 +283,7 @@ CGameObject * CUIScreen::Clone(void * pArg)
 void CUIScreen::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pFogtexture);
+
 }

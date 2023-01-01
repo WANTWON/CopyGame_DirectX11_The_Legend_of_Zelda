@@ -648,9 +648,22 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		}
 	}
 	else if (pGameInstance->Key_Pressing(DIK_LEFT))
+	{
+		m_fTexUV.x -= 0.001f;
+		if (m_fTexUV.x <= 0.f)
+			m_fTexUV.x = 1.f;
+		
+
 		m_eDir[DIR_X] = -1;
+	}
 	else if (pGameInstance->Key_Pressing(DIK_RIGHT))
+	{
+		m_fTexUV.x += 0.001f;
+		if (m_fTexUV.x >= 1.f)
+			m_fTexUV.x = 0.f;
+
 		m_eDir[DIR_X] = 1;
+	}
 	else
 		m_eDir[DIR_X] = 0;
 
@@ -673,9 +686,21 @@ void CPlayer::Key_Input(_float fTimeDelta)
 		}
 	}
 	if (pGameInstance->Key_Pressing(DIK_DOWN))
+	{
+		m_fTexUV.y += 0.001f;
+		if (m_fTexUV.y >= 1.f)
+			m_fTexUV.y = 0.f;
+
 		m_eDir[DIR_Z] = -1;
+	}
 	else if (pGameInstance->Key_Pressing(DIK_UP))
+	{
+		m_fTexUV.y -= 0.001f;
+		if (m_fTexUV.y <= 0.f)
+			m_fTexUV.y = 1.f;
+
 		m_eDir[DIR_Z] = 1;
+	}
 	else
 		m_eDir[DIR_Z] = 0;
 

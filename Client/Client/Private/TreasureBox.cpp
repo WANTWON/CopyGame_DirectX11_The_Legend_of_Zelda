@@ -8,6 +8,7 @@
 #include "FootSwitch.h"
 #include "InvenItem.h"
 #include "ObjectEffect.h"
+#include "UIIcon.h"
 
 CTreasureBox::CTreasureBox(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -39,6 +40,12 @@ HRESULT CTreasureBox::Initialize(void * pArg)
 
 
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_BOX, this);
+
+	CUIIcon::ICONDESC IconDesc;
+	IconDesc.iTexureNum = CUIIcon::ICON_BOX;
+	IconDesc.pTarget = this;
+	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_TAILCAVE, TEXT("UI_ICON"), &IconDesc)))
+		return E_FAIL;
 	return S_OK;
 }
 

@@ -53,6 +53,7 @@ public: /* Getter & Setter */
 	_uint	Get_PartsItemType();
 	CWeapon::WEAPONDESC Get_WeaponDesc() { return m_WeaponDesc; }
 	_bool	Get_2DMode() { return m_b2D; }
+	_float2 Get_PlayerTexUV() { return m_fTexUV; }
 
 	void	Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void	Set_AnimState(ANIM eAnim);
@@ -168,7 +169,7 @@ private:
 	_bool					m_b2D = false;
 	
 
-
+	_float2		  m_fTexUV = _float2(0.f, 0.f);
 	
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

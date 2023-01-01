@@ -50,12 +50,20 @@ int CUIIcon::Tick(_float fTimeDelta)
 	if (m_IconDesc.pTarget->Get_Dead() || m_IconDesc.pTarget == nullptr )
 		m_bDead = true;
 
-	if (m_IconDesc.pTarget != nullptr)
+	LEVEL iLevel = (LEVEL)CGameInstance::Get_Instance()->Get_CurrentLevelIndex();
+	if (iLevel == LEVEL_GAMEPLAY)
 	{
 		m_eShaderID = UI_ALPHABLEND;
 		m_fPosition.x = 325.f + XMVectorGetX(m_IconDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION))*9.6;
 		m_fPosition.y = 575.f - XMVectorGetZ(m_IconDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION))*5.8f;
-		int a = 0;
+	}
+	else if (iLevel == LEVEL_TAILCAVE)
+	{
+		m_fSize.x = 38.f;
+		m_fSize.y = 38.f;
+		m_eShaderID = UI_ALPHABLEND;
+		m_fPosition.x = 340.f + XMVectorGetX(m_IconDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION))*5.65f;
+		m_fPosition.y = 580.f - XMVectorGetZ(m_IconDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION))*5.3f;
 	}
 
 	if (__super::Tick(fTimeDelta))
@@ -78,7 +86,14 @@ void CUIIcon::Late_Tick(_float fTimeDelta)
 		if(m_IconDesc.iTexureNum == ICON_PLAYER)
 			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_TOP, this);
 		else
-			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+		{
+			if (CGameInstance::Get_Instance()->Get_CurrentLevelIndex() == LEVEL_TAILCAVE && CUI_Manager::Get_Instance()->Get_DgnMap() == true)
+				m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+			else if (CGameInstance::Get_Instance()->Get_CurrentLevelIndex() == LEVEL_GAMEPLAY)
+				m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
+
+		}
+			
 
 	}
 		

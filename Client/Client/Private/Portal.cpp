@@ -84,6 +84,15 @@ HRESULT CPortal::Initialize(void * pArg)
 	Set_Scale(_float3(3.f, 3.f, 3.f));
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_INTERACT, this);
 
+	if (m_PortalDesc.ePortalType == PORTAL_POSITION)
+	{
+		CUIIcon::ICONDESC IconDesc;
+		IconDesc.iTexureNum = CUIIcon::ICON_STAIR;
+		IconDesc.pTarget = this;
+		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_TAILCAVE, TEXT("UI_ICON"), &IconDesc)))
+			return E_FAIL;
+	}
+
 	return S_OK;
 }
 

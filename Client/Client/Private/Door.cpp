@@ -8,6 +8,7 @@
 #include "FootSwitch.h"
 #include "ObjectEffect.h"
 #include "CameraManager.h"
+#include "UIIcon.h"
 
 CDoor::CDoor(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -38,16 +39,33 @@ HRESULT CDoor::Initialize(void * pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vecPostion);
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(m_DoorDesc.fAngle));
 
+	CUIIcon::ICONDESC IconDesc;
 	switch (m_DoorDesc.eType)
 	{
 	case DOOR_CLOSED:
 		m_eState = CLOSE_CD;
+
+		
+		IconDesc.iTexureNum = CUIIcon::ICON_CLOSE_DOOR;
+		IconDesc.pTarget = this;
+		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_TAILCAVE, TEXT("UI_ICON"), &IconDesc)))
+			return E_FAIL;
 		break;
 	case DOOR_KEY:
 		m_eState = CLOSE_LD;
+
+		IconDesc.iTexureNum = CUIIcon::ICON_LOCK_DOOR;
+		IconDesc.pTarget = this;
+		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_TAILCAVE, TEXT("UI_ICON"), &IconDesc)))
+			return E_FAIL;
 		break;
 	case DOOR_BOSS:
 		m_eState = REMOVE_KEY;
+
+		IconDesc.iTexureNum = CUIIcon::ICON_LOCK_BOX;
+		IconDesc.pTarget = this;
+		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_TAILCAVE, TEXT("UI_ICON"), &IconDesc)))
+			return E_FAIL;
 		break;
 	case DOOR_TAIL:
 		m_eState = CLOSE_TAIL;
@@ -414,6 +432,8 @@ void CDoor::Tick_BossDoor(_float fTimeDelta)
 				pButton->Set_Visible(false);
 				dynamic_cast<CPlayer*>(pPlayer)->Set_AnimState(CPlayer::KEY_OPEN);
 				m_eState = REMOVE_KEY;
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_Door Open.wav"), SOUND_OBJECT, 0.5f);
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_TailKeyUse.wav"), SOUND_ACTOR, 0.5f);
 				m_bOpen = true;
 				m_bPlay = true;
 			}

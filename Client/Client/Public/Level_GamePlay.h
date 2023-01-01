@@ -34,7 +34,8 @@ public:
 	HRESULT Ready_Layer_Npc(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Warp(const _tchar* pLayerTag);
 
-
+public:
+	MUSIC Get_FieldType() { return m_eMusic; }
 private:
 	CCollision_Manager* m_pCollision_Manager = nullptr;
 	MUSIC m_eMusic = FIELD;

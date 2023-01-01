@@ -250,6 +250,10 @@ HRESULT CNonAnim::Ready_Components(void* pArg)
 	MultiByteToWideChar(CP_ACP, 0, m_ModelDesc.pModeltag, (int)strlen(m_ModelDesc.pModeltag), szModeltag, MAX_PATH);
 	if (FAILED(__super::Add_Components(TEXT("Com_Model"), iLevel, szModeltag, (CComponent**)&m_pModelCom)))
 		return E_FAIL;
+
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Fog"), (CComponent**)&m_pFogtexture)))
+		return E_FAIL;
 	
 	return S_OK;
 }
@@ -272,6 +276,19 @@ HRESULT CNonAnim::SetUp_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 		return E_FAIL;
+
+
+	_vector vPlayerPos = dynamic_cast<CBaseObj*> (pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")))->Get_TransformState(CTransform::STATE_POSITION);
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_PlayerPosition", &vPlayerPos, sizeof(_float4))))
+		return E_FAIL;
+
+	if (m_pFogtexture != nullptr)
+	{
+		if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_FogTexture", m_pFogtexture->Get_SRV())))
+			return E_FAIL;
+	}
+
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -315,6 +332,8 @@ CGameObject * CNonAnim::Clone(void * pArg)
 void CNonAnim::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pFogtexture);
 
 	Safe_Release(m_pAABBCom);
 	Safe_Release(m_pOBBCom);

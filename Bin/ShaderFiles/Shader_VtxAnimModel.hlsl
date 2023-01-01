@@ -5,7 +5,7 @@ matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D		g_DiffuseTexture;
 texture2D		g_NormalTexture;
 texture2D		g_DissolveTexture;
-
+texture2D		g_SpecularTexture;
 
 float			g_HitRed = 0.2f;
 float			g_fAlpha = 1.f;
@@ -14,8 +14,11 @@ float			g_DissolveSize = 1.5f;
 vector			g_DissolveColor = vector(1.f, 0.7f, 0.f, 1);
 vector			g_vColor = vector(1.f, 1.f, 1.f, 1);
 
+float			g_fMinRange = 5.f;
+float			g_fMaxRange = 10.f;
+float4			g_PlayerPosition;
 
-texture2D		g_SpecularTexture;
+
 
 /* 정점들에게 곱해져야할 행렬. */
 /* 정점들은 메시에게 소속. 이때 곱해져야하는 뼈의 행렬 == 이 메시에 영향을 주는 뼈다. */
@@ -41,6 +44,8 @@ struct VS_OUT
 
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
+
+	float4		vWorldPos : TEXCOORD2;
 };
 
 /* DrawIndexed함수를 호출하면. */
@@ -87,6 +92,8 @@ struct PS_IN
 
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
+
+	float4		vWorldPos : TEXCOORD2;
 };
 
 struct PS_OUT
@@ -117,6 +124,13 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
 	Out.vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
 
+	////float4		vFogColor = vector(186, 218, 255, 0) / 255.f;
+	//float4		vFogColor = vector(66, 116, 214, 0) / 255.f;
+	//float		fDistance = length(g_PlayerPosition - In.vWorldPos);
+	//float		fFogPower = max(fDistance - g_fMinRange, 0.f) / (g_fMaxRange - g_fMinRange);
+
+	//Out.vDiffuse += vFogColor * fFogPower;
+
 	if (Out.vDiffuse.a <= 0.1f)
 		discard;
 
@@ -143,6 +157,14 @@ PS_OUT PS_MAIN_HIT(PS_IN In)
 	Out.vDiffuse.r *= (g_HitRed + 0.2f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
 	Out.vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
+
+	//float4		vFogColor = vector(186, 218, 255, 0) / 255.f;
+	float4		vFogColor = vector(66, 116, 214, 0) / 255.f;
+	float		fDistance = length(g_PlayerPosition - In.vWorldPos);
+	float		fFogPower = max(fDistance - g_fMinRange, 0.f) / (g_fMaxRange - g_fMinRange);
+
+	Out.vDiffuse += vFogColor * fFogPower;
+
 	if (Out.vDiffuse.a <= 0.3f)
 		discard;
 
@@ -184,6 +206,12 @@ PS_OUT PS_DEAD(PS_IN In)
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
 
 
+	//float4		vFogColor = vector(186, 218, 255, 0) / 255.f;
+	float4		vFogColor = vector(66, 116, 214, 0) / 255.f;
+	float		fDistance = length(g_PlayerPosition - In.vWorldPos);
+	float		fFogPower = max(fDistance - g_fMinRange, 0.f) / (g_fMaxRange - g_fMinRange);
+
+	Out.vDiffuse += vFogColor * fFogPower;
 
 	if (Out.vDiffuse.a <= 0.0f)
 		discard;
@@ -222,6 +250,13 @@ PS_OUT PS_CHARGE(PS_IN In)
 	vector GetColor = g_vColor / 255.f;
 
 	Out.vDiffuse.rgb += GetColor.rgb * g_fColorPercent;
+
+	//float4		vFogColor = vector(186, 218, 255, 0) / 255.f;
+	float4		vFogColor = vector(66, 116, 214, 0) / 255.f;
+	float		fDistance = length(g_PlayerPosition - In.vWorldPos);
+	float		fFogPower = max(fDistance - g_fMinRange, 0.f) / (g_fMaxRange - g_fMinRange);
+
+	Out.vDiffuse += vFogColor * fFogPower;
 
 	if (Out.vDiffuse.a <= 0.1f)
 		discard;

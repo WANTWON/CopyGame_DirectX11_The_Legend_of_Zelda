@@ -28,6 +28,9 @@ CLevel_Tower::CLevel_Tower(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Tower::Initialize()
 {
+	CGameInstance::Get_Instance()->Clear_Layer(LEVEL_GAMEPLAY, TEXT("UI_ICON"));
+	CUI_Manager::Get_Instance()->Clear_WarpGroup();
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 

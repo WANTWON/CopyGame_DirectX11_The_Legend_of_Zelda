@@ -6,7 +6,8 @@ BEGIN(Client)
 class CUIScreen final : public CObj_UI
 {
 public:
-	enum VISIBLESCENE { VISIBLE_LOGO, VISIBLE_LOADING, VISIBLE_PLAYGAME, VISIBLE_SCREEN };
+	enum VISIBLESCENE { VISIBLE_LOGO, VISIBLE_LOADING, VISIBLE_PLAYGAME, VISIBLE_EFFECT, VISIBLE_SCREEN };
+	enum TEXNUM { INVEN, FIELD_MAP, NO_MAP, DGN_MAP_MASK, DGN_MAP_OPEN };
 
 	typedef struct backgroundTag
 	{
@@ -37,6 +38,8 @@ private:
 
 	BACKGROUNDESC m_BackgroundDesc;
 	_float		  m_fAlpha = 1.f;
+	_float2		  m_fTexUV = _float2(0.f, 0.f);
+	CTexture*	  m_pFogtexture = nullptr;
 
 public:
 	static CUIScreen* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

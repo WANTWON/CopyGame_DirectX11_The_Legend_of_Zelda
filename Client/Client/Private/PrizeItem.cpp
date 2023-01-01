@@ -508,6 +508,10 @@ void CPrizeItem::Setting_Get_Item()
 		pPlayer->Set_MaxHp();
 		pGameInstance->Clear_Layer(LEVEL_STATIC, TEXT("Layer_Hp"));
 	}
+	else if (m_ItemDesc.eType == MAP)
+	{
+		pUI_Manager->Set_Get_DgnMap(true);
+	}
 
 	RELEASE_INSTANCE(CUI_Manager);
 	RELEASE_INSTANCE(CGameInstance);

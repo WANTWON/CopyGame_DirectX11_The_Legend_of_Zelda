@@ -6,6 +6,7 @@
 #include "ObjectEffect.h"
 #include "MonsterEffect.h"
 #include "FightEffect.h"
+#include "UIIcon.h"
 
 CRola::CRola(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -61,9 +62,17 @@ HRESULT CRola::Initialize(void * pArg)
 		m_vAttackPos = pRollingBullet->Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(-2.f, 0.f, 0.f, 0.f);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vAttackPos);
+
+
+
+	CUIIcon::ICONDESC IconDesc;
+	IconDesc.iTexureNum = CUIIcon::ICON_BOSS;
+	IconDesc.pTarget = this;
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_TAILCAVE, TEXT("UI_ICON"), &IconDesc)))
+		return E_FAIL;
+
+
 	RELEASE_INSTANCE(CGameInstance);
-
-
 
 	return S_OK;
 }

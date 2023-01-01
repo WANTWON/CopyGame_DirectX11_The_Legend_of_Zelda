@@ -117,7 +117,14 @@ void CUI_Manager::Tick_Inventory()
 
 void CUI_Manager::Tick_Map()
 {
+	
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (pGameInstance->Get_CurrentLevelIndex() != LEVEL_GAMEPLAY)
+	{
+		RELEASE_INSTANCE(CGameInstance);
+		return;
+	}
 
 	if (pGameInstance->Key_Up(DIK_RIGHT))
 	{

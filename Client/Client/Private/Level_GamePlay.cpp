@@ -404,7 +404,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _tchar * pLayerTag)
 
 	CameraDesc.iTest = 10;
 
-	CameraDesc.CameraDesc.vEye = _float4(0.f, 10.0f, -8.f, 1.f);
+	CameraDesc.CameraDesc.vEye = _float4(0.f, 10.0f, -6.f, 1.f);
 	CameraDesc.CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 
 	CameraDesc.CameraDesc.fFovy = XMConvertToRadians(60.0f);
@@ -430,10 +430,19 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	//if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_UI"), LEVEL_GAMEPLAY, pLayerTag)))
 		//return E_FAIL;
 
+
 	CUIScreen::BACKGROUNDESC BackgroundDesc;
 	BackgroundDesc.eVisibleScreen = CUIScreen::VISIBLE_PLAYGAME;
 	BackgroundDesc.pTextureTag = TEXT("Prototype_Component_Texture_GamePlayScreen_UI");
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, pLayerTag, 
+		&BackgroundDesc)))
+		return E_FAIL;
+
+
+
+	BackgroundDesc.eVisibleScreen = CUIScreen::VISIBLE_EFFECT;
+	BackgroundDesc.pTextureTag = nullptr;
+	if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, pLayerTag,
 		&BackgroundDesc)))
 		return E_FAIL;
 

@@ -59,6 +59,7 @@ public: /*Getter Setter*/
 	void		Set_NextMessage();
 	void		Set_TellEnd(_bool type) { m_bTellEnd = type; }
 	void		Set_NameTimeZero() { m_fNameTime = 0.f;}
+	void		Set_Get_DgnMap(_bool type) { m_bGetMap = type; }
 
 	void		Get_Key();
 	_uint		Get_KeySize() { return (_uint)m_KeyList.size(); }
@@ -72,6 +73,7 @@ public: /*Getter Setter*/
 	_bool		Get_TellEnd() { return m_bTellEnd; }
 	_bool		Get_NextLevel() { return m_bNextLevel; }
 	_bool		Get_NextLevelFinished() { return m_bFinishedReady; }
+	_bool		Get_DgnMap() { return m_bGetMap; }
 
 	CNpc*		Get_TalkingNpc() { return m_pTalkingNpc; }
 	CObj_UI*	Get_Button() { return m_pInteractButton; }
@@ -143,6 +145,7 @@ private:
 	_int				m_iWarpIndex = 0;
 	_int				m_iMInMaxIndex = 0;
 	CObj_UI*			m_pPickedWarp = nullptr;
+	_bool				m_bGetMap = false;
 public:
 	void Free() override;
 };

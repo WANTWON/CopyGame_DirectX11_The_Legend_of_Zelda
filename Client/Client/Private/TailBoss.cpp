@@ -5,6 +5,7 @@
 #include "UIName.h"
 #include "MonsterEffect.h"
 #include "FightEffect.h"
+#include "UIIcon.h"
 
 CTailBoss::CTailBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMonster(pDevice, pContext)
@@ -42,7 +43,16 @@ HRESULT CTailBoss::Initialize(void * pArg)
 	CCollision_Manager::Get_Instance()->Add_CollisionGroup(CCollision_Manager::COLLISION_MONSTER, this);
 
 	if (m_TailDesc.eTailType == TAIL1)
+	{
 		Set_Scale(_float3(1.3f, 1.3f, 1.3f));
+
+		CUIIcon::ICONDESC IconDesc;
+		IconDesc.iTexureNum = CUIIcon::ICON_BOSS;
+		IconDesc.pTarget = this;
+		if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_UIIcon"), LEVEL_TAILCAVE, TEXT("UI_ICON"), &IconDesc)))
+			return E_FAIL;
+	}
+		
 
 	if (m_TailDesc.eTailType != TAIL1)
 	{

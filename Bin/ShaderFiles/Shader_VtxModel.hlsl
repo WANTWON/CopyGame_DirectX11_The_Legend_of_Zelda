@@ -6,7 +6,11 @@ float			g_fAlpha = 1.f;
 texture2D		g_DiffuseTexture;
 texture2D		g_NormalTexture;
 texture2D		g_SpecularTexture;
+texture2D		g_FogTexture;
 
+float			g_fMinRange = 5.f;
+float			g_fMaxRange = 10.f;
+float4			g_PlayerPosition;
 
 struct VS_IN
 {
@@ -25,6 +29,8 @@ struct VS_OUT
 
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
+
+	float4		vWorldPos : TEXCOORD2;
 };
 
 /* DrawIndexed함수를 호출하면. */
@@ -51,6 +57,9 @@ VS_OUT VS_MAIN(VS_IN In)
 
 	Out.vTangent = normalize(mul(vector(In.vTangent, 0.f), g_WorldMatrix)).xyz;
 	Out.vBinormal = cross(Out.vNormal, Out.vTangent);
+
+	Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+
 	return Out;
 }
 
@@ -64,6 +73,7 @@ struct PS_IN
 
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
+	float4		vWorldPos : TEXCOORD2;
 };
 
 struct PS_OUT
@@ -96,6 +106,14 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
 	
 	Out.vDiffuse.a *= g_fAlpha;
+
+	//float4		vFogColor = vector(186, 218, 255, 0) / 255.f;
+	////float4		vFogColor = vector(66, 116, 214, 0) /255.f;
+	//float		fDistance = length(g_PlayerPosition - In.vWorldPos);
+	//float4		vFogTexture = g_FogTexture.Sample(LinearSampler, In.vTexUV);
+	//float		fFogPower = max(fDistance - g_fMinRange, 0.f) / (g_fMaxRange - g_fMinRange);
+
+	//Out.vDiffuse += vFogColor * fFogPower;
 
 	if (Out.vDiffuse.a <= 0.0f)
 		discard;
@@ -134,27 +152,6 @@ PS_OUT PS_BLOOM(PS_IN In)
 
 
 	float4 vTextureColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-	//float luminance = dot(vTextureColor, float3(0.3, 0.59, 0.11));
-	//float threshold = 0.5;
-	////if (luminance > threshold)
-	////{
-	//	// Sample the texture multiple times at offsets from the current texel
-	//	float2 offsets[9] = {
-	//		float2(-1, -1), float2(0, -1), float2(1, -1),
-	//		float2(-1,  0), float2(0,  0), float2(1,  0),
-	//		float2(-1,  1), float2(0,  1), float2(1,  1)
-	//	};
-	//	float4 sum = 0;
-	//	for (int i = 0; i < 9; i++)
-	//	{
-	//		sum += g_DiffuseTexture.Sample(LinearSampler, In.vTexUV + offsets[i] * 0.004);
-	//	}
-	//	// Average the samples and blend with the original image
-	//	float4 blur = sum / 9;
-	//	// blend the original image with the blurred bright pixels
-	//	float blendFactor = 0.5;
-	//	vTextureColor = lerp(vTextureColor, blur, blendFactor);
-	////}
 
 	vTextureColor.rgb += 0.1f;
 	Out.vDiffuse = vTextureColor;
