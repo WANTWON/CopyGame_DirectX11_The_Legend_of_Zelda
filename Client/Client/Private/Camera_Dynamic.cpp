@@ -228,15 +228,6 @@ void CCamera_Dynamic::Terrain_Camera(_float fTimeDelta)
 
 	_float fMinDistance = 9999;
 
-	
-	if (pGameInstance->Key_Pressing(DIK_F1))
-	{
-		m_vDistance.y -= 0.03f;
-	}
-	if (pGameInstance->Key_Pressing(DIK_F2))
-	{
-		m_vDistance.y += 0.03f;
-	}
 
 
 	for (auto& iter : *pBackgroundList)

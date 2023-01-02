@@ -6,28 +6,21 @@
 
 
 BEGIN(Client)
-class CObjectEffect final : public CEffect
+class CTreasureBoxEffect final : public CEffect
 {
 public:
 	enum TYPE { 
-		/*For Grass */
-		GRASS, LAWN, GRASS_TEX,
-
-		/*For Item Get */
-		ITEM_GET_FLASH, ITEM_GET_GLOW , HORIZONTAL_GLOW, RAINBOW_RING ,
-		GRAD_RING, RAINBOW_HALO, GLITTER , RAY,
-	
-		/*For Smoke*/
-		SMOKE
-
+		/* For TreasureBox*/
+		TREASURE_BEAM, TREASURE_HALO, TREASURE_GLOW, TREASURE_GLITTER,
+		TREASURE_CROSS, TREASURE_FLASH, TRASURE_ENTRANCEBOX,  
 	};
 
 
 
 protected:
-	CObjectEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CObjectEffect(const CObjectEffect& rhs);
-	virtual ~CObjectEffect() = default;
+	CTreasureBoxEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CTreasureBoxEffect(const CTreasureBoxEffect& rhs);
+	virtual ~CTreasureBoxEffect() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -44,21 +37,20 @@ private:
 	virtual HRESULT Ready_Components(void* pArg = nullptr);
 	virtual HRESULT SetUp_ShaderID();
 	virtual void Change_Animation(_float fTimeDelta);
-	virtual void Change_Texture(_float fTimeDelta) override;
-
+	
 private:
-	void Tick_Grass(_float fTimeDelta);
-	void Tick_Smoke(_float fTimeDelta);
-	void Tick_Composs(_float fTimeDelta);
-
 	/* For Get Item*/
-	void Tick_GlowEffect(_float fTimeDelta);
 	void Tick_FlashEffect(_float fTimeDelta);
 	void Tick_HorizontalGlowEffect(_float fTimeDelta);
 	void Tick_RingEffect(_float fTimeDelta);
 	void Tick_HaloEffect(_float fTimeDelta);
 	void Tick_GlitterEffect(_float fTimeDelta);
 	void Tick_Ray(_float fTimeDelta);
+
+	/* Fir TreasureBox */
+	void Tick_GlowEffect(_float fTimeDelta);
+	void Tick_TreausureBox(_float fTimeDelta);
+	void Tick_TreasureCross(_float fTimeDelta);
 
 private:
 	_float	m_fAngle = 0.f;
@@ -74,7 +66,7 @@ private:
 	_float			m_fZoomValue = 0.f;
 
 public:
-	static CObjectEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CTreasureBoxEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);
 	virtual void Free() override;
 };

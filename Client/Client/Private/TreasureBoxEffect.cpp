@@ -1,23 +1,24 @@
 #include "stdafx.h"
-#include "..\Public\ObjectEffect.h"
+#include "..\Public\TreasureBoxEffect.h"
 #include "Weapon.h"
 #include "Player.h"
 #include "GameInstance.h"
 #include "TreasureBox.h"
 #include "FightEffect.h"
 #include "CameraManager.h"
+#include "ObjectEffect.h"
 
-CObjectEffect::CObjectEffect(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CTreasureBoxEffect::CTreasureBoxEffect(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CEffect(pDevice, pContext)
 {
 }
 
-CObjectEffect::CObjectEffect(const CObjectEffect & rhs)
+CTreasureBoxEffect::CTreasureBoxEffect(const CTreasureBoxEffect & rhs)
 	: CEffect(rhs)
 {
 }
 
-HRESULT CObjectEffect::Initialize_Prototype()
+HRESULT CTreasureBoxEffect::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
@@ -25,7 +26,7 @@ HRESULT CObjectEffect::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CObjectEffect::Initialize(void * pArg)
+HRESULT CTreasureBoxEffect::Initialize(void * pArg)
 {
 
 	if (FAILED(__super::Initialize(pArg)))
@@ -39,105 +40,44 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case GRASS:
-	case LAWN:
-		m_pTransformCom->Rotation(XMVectorSet((rand() % 10 + 1)*0.1f, (rand() % 10)*0.1f, (rand() % 10)*0.1f, 0.f), XMConvertToRadians(float(rand() % 180)));
-		m_eShaderID = SHADERM_ONLY_TEXTURE;
-		break;
-	case GRASS_TEX:
-		m_eShaderID = SHADER_TWOCOLOR_NOTALPHASET;
-		m_vColorFront = XMVectorSet(80, 153, 36, 255);
-		m_vColorBack = XMVectorSet(17, 82, 34, 255);
-		m_vDirection = _float3((rand() % 20 - 10) * 0.1f, 1.f, (rand() % 20 - 10)* 0.1f);
-		m_fAngle = XMConvertToRadians(float(rand() % 180));
-		break;
-	case ITEM_GET_FLASH:
-		m_eShaderID = SHADER_TWOCOLOR_PRIORITY;
-		m_vecColor.push_back(XMVectorSet(255.f, 63.f, 63.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(255.f, 127.f, 0.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(0.f, 255.f, 0.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(63.f, 127.f, 255.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(255.f, 127.f, 255.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(255.f, 63.f, 63.f, 255.f));
-		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
-		m_vColorBack = m_vecColor.front();
-		break;
-	case ITEM_GET_GLOW:
-		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
-
-		if (m_EffectDesc.fStartTime != 0.f)
-		{
-			m_vColorBack = XMVectorSet(63, 127, 255, 255.f);
-			m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
-		}
-		else
-		{
-			m_vecColor.push_back(XMVectorSet(255.f, 191.f, 191.f, 255.f));
-			m_vecColor.push_back(XMVectorSet(255.f, 255.f, 127.f, 255.f));
-			m_vecColor.push_back(XMVectorSet(127.f, 255.f, 127.f, 255.f));
-			m_vecColor.push_back(XMVectorSet(191.f, 255.f, 255.f, 255.f));
-			m_vecColor.push_back(XMVectorSet(255.f, 191.f, 255.f, 255.f));
-			m_vecColor.push_back(XMVectorSet(255.f, 191.f, 191.f, 255.f));
-			m_vColorBack = m_vecColor.front();
-			m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
-		}
-		break;
-	case HORIZONTAL_GLOW:
-		m_fAlpha = 0.f;
-		m_vMaxScale = _float3(15.f, 4.f, 0.f);
-		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
-		m_vecColor.push_back(XMVectorSet(255.f, 63.f, 63.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(255.f, 127.f, 0.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(0.f, 255.f, 0.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(63.f, 127.f, 255.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(255.f, 127.f, 255.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(255.f, 63.f, 63.f, 255.f));
-		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
-		m_vColorBack = m_vecColor.front();
-		break;
-	case RAINBOW_RING:
-		m_eShaderID = SHADERM_ONLY_TEXTURE;
-		break;
-	case RAINBOW_HALO:
-		m_fAlpha = 0.f;
-		m_fSpeed = 1.f;
-		m_eShaderID = SHADERM_ONLY_TEXTURE;
-		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
-		m_vColorBack = XMVectorSet(63, 191.f, 228.f, 255.f);
-		break;
-	case GRAD_RING:
-		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
-		m_vecColor.push_back(XMVectorSet(255.f, 63.f, 63.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(255.f, 127.f, 0.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(0.f, 255.f, 0.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(63.f, 127.f, 255.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(255.f, 127.f, 255.f, 255.f));
-		m_vecColor.push_back(XMVectorSet(255.f, 63.f, 63.f, 255.f));
-		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
-		m_vColorBack = m_vecColor.front();
-		break;
-	case GLITTER:
-	{
-		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
-		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
-		_int iRandNum = rand() % 5 + 1;
-		if (iRandNum == 1) m_vColorBack = XMVectorSet(255.f, 63.f, 63.f, 255.f);
-		else if (iRandNum == 2) m_vColorBack = XMVectorSet(255.f, 127.f, 0.f, 255.f);
-		else if (iRandNum == 3)	m_vColorBack = XMVectorSet(0.f, 255.f, 0.f, 255.f);
-		else if (iRandNum == 4)	m_vColorBack = XMVectorSet(63.f, 127.f, 255.f, 255.f);
-		else  m_vColorBack = XMVectorSet(255.f, 63.f, 63.f, 255.f);
-		m_fSpeed = (rand() % 3 + 1)* 0.1f;
-		m_vMaxScale = m_EffectDesc.vInitScale;
-		break;
-	}
-	case RAY:
-		m_eShaderID = SHADER_ONLY_TEXTURE;
-		m_fAlpha = 0.f;
-		break;
-	case SMOKE:
-		m_eShaderID = SHADER_ONECOLOR_NOTALPHASET;
-		m_EffectDesc.iTextureNum = rand() % 3;
+	case TREASURE_BEAM:
+		m_eShaderID = SHADERM_TWOCOLOR_NOTALPHASET;
 		m_vColorFront = m_EffectDesc.vColor;
+		m_vColorBack = m_EffectDesc.vColor;
+		break;
+	case TREASURE_HALO:
+		m_fSpeed = 10.f;
+		m_eShaderID = SHADERM_TWOCOLOR_DEFAULT;
+		m_vColorFront = m_EffectDesc.vColor;
+		m_vColorBack = m_EffectDesc.vColor;
+		m_fAlpha = 0.f;
+		break;
+	case TREASURE_GLOW:
+		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
+		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
+		m_vColorBack = m_EffectDesc.vColor;
+		break;
+	case TREASURE_CROSS:
+		m_vMaxScale = _float3(5.f, 5.f, 5.f);
+		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
+		m_vecColor.push_back(XMVectorSet(198, 133, 0, 255.f));
+		m_vecColor.push_back(XMVectorSet(255.f, 255, 0.f, 255.f));
+		m_vColorFront = XMVectorSet(255, 255, 174, 255.f);
+		m_vColorBack = m_vecColor.front();
+		break;
+	case TREASURE_FLASH:
+	case TRASURE_ENTRANCEBOX:
+		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
+		m_vecColor.push_back(XMVectorSet(192, 72, 0, 255.f));
+		m_vecColor.push_back(XMVectorSet(188, 62, 28, 255.f));
+		m_vColorFront = XMVectorSet(188, 95, 28, 255.f);
+		m_vColorBack = m_vecColor.front();
+		break;
+	case TREASURE_GLITTER:
+		m_fSpeed = 0.5f;
+		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
+		m_vColorFront = XMVectorSet(247, 255, 139, 255.f);
+		m_vColorBack = XMVectorSet(255, 204, 127, 255.f);
 		break;
 	default:
 		break;
@@ -147,7 +87,7 @@ HRESULT CObjectEffect::Initialize(void * pArg)
 	return S_OK;
 }
 
-int CObjectEffect::Tick(_float fTimeDelta)
+int CTreasureBoxEffect::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 	{
@@ -173,35 +113,24 @@ int CObjectEffect::Tick(_float fTimeDelta)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case GRASS:
-	case LAWN:
-	case GRASS_TEX:
-		Tick_Grass(fTimeDelta);
-		break;
-	case ITEM_GET_GLOW:
+	case TREASURE_GLOW:
 		Tick_GlowEffect(fTimeDelta);
 		break;
-	case ITEM_GET_FLASH:
+	case TREASURE_FLASH:
 		Tick_FlashEffect(fTimeDelta);
 		break;
-	case HORIZONTAL_GLOW:
-		Tick_HorizontalGlowEffect(fTimeDelta);
-		break;
-	case RAINBOW_RING:
-	case GRAD_RING:
-		Tick_RingEffect(fTimeDelta);
-		break;
-	case RAINBOW_HALO:
+	case TREASURE_HALO:
 		Tick_HaloEffect(fTimeDelta);
 		break;
-	case GLITTER:
+	case TREASURE_GLITTER:
 		Tick_GlitterEffect(fTimeDelta);
 		break;
-	case RAY:
-		Tick_Ray(fTimeDelta);
+	case TREASURE_BEAM:
+	case TRASURE_ENTRANCEBOX:
+		Tick_TreausureBox(fTimeDelta);
 		break;
-	case SMOKE:
-		Tick_Smoke(fTimeDelta);
+	case TREASURE_CROSS:
+		Tick_TreasureCross(fTimeDelta);
 		break;
 	default:
 		break;
@@ -210,13 +139,13 @@ int CObjectEffect::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CObjectEffect::Late_Tick(_float fTimeDelta)
+void CTreasureBoxEffect::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
 }
 
-HRESULT CObjectEffect::Render()
+HRESULT CTreasureBoxEffect::Render()
 {
 
 	__super::Render();
@@ -225,7 +154,7 @@ HRESULT CObjectEffect::Render()
 	return S_OK;
 }
 
-HRESULT CObjectEffect::Ready_Components(void * pArg)
+HRESULT CTreasureBoxEffect::Ready_Components(void * pArg)
 {
 	LEVEL iLevel = (LEVEL)CGameInstance::Get_Instance()->Get_DestinationLevelIndex();
 
@@ -233,56 +162,26 @@ HRESULT CObjectEffect::Ready_Components(void * pArg)
 
 	switch (m_EffectDesc.eEffectID)
 	{
-	case GRASS:
-		/* For.Com_Model*/
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_GrassLeaf"), (CComponent**)&m_pModelCom)))
-			return E_FAIL;
-		break;
-	case LAWN:
-		/* For.Com_Model*/
-		if (m_EffectDesc.iTextureNum == 0)
-		{
-			if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_LawnLeaf_0"), (CComponent**)&m_pModelCom)))
-				return E_FAIL;
-		}
-		else
-		{
-			if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_LawnLeaf_1"), (CComponent**)&m_pModelCom)))
-				return E_FAIL;
-		}
-		break;
-	case GRASS_TEX:
-		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Grass"), (CComponent**)&m_pTextureCom)))
-			return E_FAIL;
-		break;
-	case ITEM_GET_FLASH:
+	case TREASURE_FLASH:
+	case TREASURE_CROSS:
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Flash"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
-	case ITEM_GET_GLOW:
-	case HORIZONTAL_GLOW:
-	case GLITTER:
+	case TREASURE_GLOW:
+	case TREASURE_GLITTER:
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pTextureCom)))
 			return E_FAIL;
 		break;
-	case RAINBOW_RING:
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RainbowRing"), (CComponent**)&m_pModelCom)))
+	case TREASURE_BEAM:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_TreasureBox_Effect"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
-	case RAINBOW_HALO:
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_RainbowHalo"), (CComponent**)&m_pModelCom)))
+	case TREASURE_HALO:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_TreasureBoxHalo"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
-	case GRAD_RING:
-		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_GradRing"), (CComponent**)&m_pModelCom)))
-			return E_FAIL;
-		break;
-	case RAY:
-		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Ray"), (CComponent**)&m_pTextureCom)))
-			return E_FAIL;
-		break;
-	case SMOKE:
-		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Smoke2"), (CComponent**)&m_pTextureCom)))
+	case TRASURE_ENTRANCEBOX:
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_Treasure_EntranceBox"), (CComponent**)&m_pModelCom)))
 			return E_FAIL;
 		break;
 	default:
@@ -294,113 +193,16 @@ HRESULT CObjectEffect::Ready_Components(void * pArg)
 }
 
 
-HRESULT CObjectEffect::SetUp_ShaderID()
+HRESULT CTreasureBoxEffect::SetUp_ShaderID()
 {
 	return S_OK;
 }
 
-void CObjectEffect::Change_Animation(_float fTimeDelta)
+void CTreasureBoxEffect::Change_Animation(_float fTimeDelta)
 {
 }
 
-void CObjectEffect::Change_Texture(_float fTimeDelta)
-{
-	switch (m_EffectDesc.eEffectID)
-	{
-	case SMOKE:
-		m_EffectDesc.iTextureNum++;
-
-		if (m_EffectDesc.iTextureNum >= m_pTextureCom->Get_TextureSize())
-		{
-			m_bDead = true;
-			m_EffectDesc.iTextureNum--;
-		}
-		break;
-	}
-}
-
-
-void CObjectEffect::Tick_Grass(_float fTimeDelta)
-{
-	m_fDeadtime += fTimeDelta;
-
-	switch (m_EffectDesc.eEffectID)
-	{
-	case GRASS:
-	case LAWN:
-		if (m_fDeadtime > m_EffectDesc.fDeadTime*0.5f)
-			m_fAlpha -= 0.05f;
-
-		m_pTransformCom->Go_PosDir(fTimeDelta*0.5f, m_EffectDesc.vLook);
-		break;
-	case GRASS_TEX:
-	{
-		m_pTransformCom->Go_PosDir(fTimeDelta, XMLoadFloat3(&m_vDirection));
-		SetUp_BillBoard();
-		m_pTransformCom->Rotation(Get_TransformState(CTransform::STATE_LOOK), m_fAngle);
-
-		if (m_fDeadtime > m_EffectDesc.fDeadTime*0.5f)
-			m_fAlpha -= 0.05f;
-		break;
-	}
-	default:
-		break;
-	}
-
-
-
-	if (m_fAlpha <= 0)
-		m_bDead = true;
-
-}
-
-void CObjectEffect::Tick_Smoke(_float fTimeDelta)
-{
-
-	SetUp_BillBoard();
-
-	m_fAlpha -= 0.02f;
-	m_vScale.x -= 0.02f;
-	m_vScale.y -= 0.02f;
-	m_vScale.z -= 0.02f;
-
-	Set_Scale(m_vScale);
-
-	if (m_vScale.x <= 0 && m_fAlpha <= 0)
-		m_bDead = true;
-}
-
-
-void CObjectEffect::Tick_Composs(_float fTimeDelta)
-{
-	SetUp_BillBoard();
-
-	if (m_fDeadtime < m_EffectDesc.fDeadTime)
-	{
-		m_vScale.x += 0.05f;
-		m_vScale.y += 0.05f;
-		//m_vScale.z += 0.05f;
-		m_fAlpha += 0.05f;
-
-		if (m_fAlpha >= 1.f)
-			m_fAlpha = 1.f;
-	}
-	else
-	{
-		m_vScale.x += 0.01f;
-		m_vScale.y += 0.01f;
-		//m_vScale.z += 0.01f;
-		m_fAlpha -= 0.05f;
-
-	}
-	
-	Set_Scale(m_vScale);
-
-	if (m_vScale.x <= 0 || m_fAlpha <= 0)
-		m_bDead = true;
-}
-
-void CObjectEffect::Tick_GlowEffect(_float fTimeDelta)
+void CTreasureBoxEffect::Tick_GlowEffect(_float fTimeDelta)
 {
 	m_fDeadtime += fTimeDelta;
 	m_fColorTime += fTimeDelta;
@@ -440,7 +242,7 @@ void CObjectEffect::Tick_GlowEffect(_float fTimeDelta)
 
 }
 
-void CObjectEffect::Tick_FlashEffect(_float fTimeDelta)
+void CTreasureBoxEffect::Tick_FlashEffect(_float fTimeDelta)
 {
 	m_fDeadtime += fTimeDelta;
 	m_fColorTime += fTimeDelta;
@@ -510,7 +312,7 @@ void CObjectEffect::Tick_FlashEffect(_float fTimeDelta)
 	Set_Scale(m_vScale);
 }
 
-void CObjectEffect::Tick_HorizontalGlowEffect(_float fTimeDelta)
+void CTreasureBoxEffect::Tick_HorizontalGlowEffect(_float fTimeDelta)
 {
 	m_fDeadtime += fTimeDelta;
 	m_fColorTime += fTimeDelta;
@@ -565,7 +367,7 @@ void CObjectEffect::Tick_HorizontalGlowEffect(_float fTimeDelta)
 	Set_Scale(m_vScale);
 }
 
-void CObjectEffect::Tick_RingEffect(_float fTimeDelta)
+void CTreasureBoxEffect::Tick_RingEffect(_float fTimeDelta)
 {
 	SetUp_BillBoard();
 
@@ -623,7 +425,7 @@ void CObjectEffect::Tick_RingEffect(_float fTimeDelta)
 		m_bDead = true;
 }
 
-void CObjectEffect::Tick_HaloEffect(_float fTimeDelta)
+void CTreasureBoxEffect::Tick_HaloEffect(_float fTimeDelta)
 {
 	SetUp_BillBoard();
 
@@ -657,7 +459,7 @@ void CObjectEffect::Tick_HaloEffect(_float fTimeDelta)
 	
 }
 
-void CObjectEffect::Tick_GlitterEffect(_float fTimeDelta)
+void CTreasureBoxEffect::Tick_GlitterEffect(_float fTimeDelta)
 {
 	m_fDeadtime += fTimeDelta;
 
@@ -718,7 +520,7 @@ void CObjectEffect::Tick_GlitterEffect(_float fTimeDelta)
 		m_bDead = true;
 }
 
-void CObjectEffect::Tick_Ray(_float fTimeDelta)
+void CTreasureBoxEffect::Tick_Ray(_float fTimeDelta)
 {
 	if (m_EffectDesc.pTarget != nullptr && m_EffectDesc.pTarget->Get_Dead() == false)
 	{
@@ -761,34 +563,200 @@ void CObjectEffect::Tick_Ray(_float fTimeDelta)
 	
 }
 
-
-CObjectEffect * CObjectEffect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+void CTreasureBoxEffect::Tick_TreausureBox(_float fTimeDelta)
 {
-	CObjectEffect*	pInstance = new CObjectEffect(pDevice, pContext);
+	SetUp_BillBoard();
+
+	if (m_EffectDesc.eEffectID == TREASURE_BEAM)
+	{
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION) + m_EffectDesc.vDistance);
+
+		if (!m_bMax)
+		{
+			m_fAlpha += 0.1f;
+
+			if (m_fAlpha >= 1.f)
+			{
+				m_bMax = true;
+				m_fAlpha = 1.f;
+			}
+		}
+	}
+	else if (m_EffectDesc.eEffectID == TRASURE_ENTRANCEBOX)
+	{
+		m_fDeadtime += fTimeDelta;
+
+		if (!m_bMax)
+		{
+			m_fAlpha += 0.1f;
+
+			if (m_fAlpha >= 1.f)
+			{
+				m_bMax = true;
+				m_fAlpha = 1.f;
+			}
+		}
+
+		if (m_fDeadtime > m_EffectDesc.fDeadTime && m_bMax)
+		{
+			m_fAlpha -= 0.05f;
+
+			if (m_fAlpha <= 0.f)
+				m_bDead = true;
+		}
+
+	}
+
+	Set_Scale(m_vScale);
+}
+
+void CTreasureBoxEffect::Tick_TreasureCross(_float fTimeDelta)
+{
+	CCamera* pCamera = CCameraManager::Get_Instance()->Get_CurrentCamera();
+	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_ZoomValue(m_fZoomValue);
+
+	SetUp_BillBoard();
+	Set_Scale(m_vScale);
+
+	if (!m_bMax)
+	{
+		m_fZoomValue -= 0.1f;
+		if (m_fZoomValue <= -1.f)
+			m_fZoomValue = -1.f;
+
+		m_fDeadtime += fTimeDelta;
+		if (m_fDeadtime < m_EffectDesc.fDeadTime*0.5f)
+		{
+			m_vScale.x += 0.02f;
+			m_vScale.y += 0.02f;
+		}
+		else if (m_fDeadtime < m_EffectDesc.fDeadTime)
+		{
+			m_vScale.x -= 0.02f;
+			m_vScale.y -= 0.02f;
+		}
+		else
+		{
+			CEffect::EFFECTDESC EffectDesc;
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);// +XMVectorSet(0.f, Get_Scale().y - 0.4f, 0.f, 0.f);
+			EffectDesc.pTarget = nullptr;
+			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+			EffectDesc.eEffectID = CTreasureBoxEffect::TREASURE_GLITTER;
+			EffectDesc.vInitScale = _float3(0.4f, 0.4f, 0.0f);
+			EffectDesc.fDeadTime = 1.5f;
+			EffectDesc.iTextureNum = 1;
+			EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, -1.f, (rand() % 20 - 10) * 0.1f, 0.f);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+			m_fDeadtime = 0.f;
+		}
+
+		
+		if (XMVectorGetY(m_EffectDesc.pTarget->Get_TransformState(CTransform::STATE_POSITION)) + 1.f >= XMVectorGetY(Get_TransformState(CTransform::STATE_POSITION)))
+		{
+			m_vScale.x += 0.1f;
+			m_vScale.y += 0.1f;
+
+			if (m_vScale.x >= m_vMaxScale.x)
+			{
+				CEffect::EFFECTDESC EffectDesc;
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+				EffectDesc.pTarget = this;
+				EffectDesc.vDistance = XMVectorSet(0.f, 0.5f, 0.f, 0.f);
+				EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+				EffectDesc.eEffectID = CTreasureBoxEffect::TREASURE_FLASH;
+				EffectDesc.vInitScale = _float3(0.4f, 0.4f, 0.0f);
+				EffectDesc.fDeadTime = 1.0f;
+				EffectDesc.iTextureNum = 3;
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+				EffectDesc.pTarget = this;
+				EffectDesc.vDistance = XMVectorSet(0.f, 0.5f, 0.f, 0.f);
+				EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+				EffectDesc.eEffectID = CTreasureBoxEffect::TREASURE_FLASH;
+				EffectDesc.vInitScale = _float3(0.4f, 0.4f, 0.0f);
+				EffectDesc.fDeadTime = 1.5f;
+				EffectDesc.iTextureNum = 4;
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+
+
+				for (int i = 0; i < 10; ++i)
+				{
+					EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
+					EffectDesc.pTarget = nullptr;
+					EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
+					EffectDesc.eEffectID = CTreasureBoxEffect::TREASURE_GLITTER;
+					EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.5f);
+					EffectDesc.fDeadTime = 1.5f;
+					EffectDesc.iTextureNum = 1;
+					EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, 1.f, (rand() % 20 - 10) * 0.1f, 0.f);
+					CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+				}
+		
+
+				CGameInstance::Get_Instance()->PlaySounds(TEXT("5_Obj_TreasureBox_Appear.wav"), SOUND_OBJECT, 0.4f);
+				dynamic_cast<CTreasureBox*>(m_EffectDesc.pTarget)->Set_Visible(true);
+				CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+				pPlayer->Set_Stop(false);
+				m_bMax = true;
+			}
+				
+
+		}
+		else
+		{
+			m_pTransformCom->Go_PosDir(fTimeDelta*0.4f, m_EffectDesc.vLook);
+		}
+	}
+	else
+	{
+		m_vScale.x -= 0.1f;
+		m_vScale.y -= 0.1f;
+		m_fAlpha -= 0.05f;
+
+		m_fZoomValue += 0.1f;
+		if (m_fZoomValue >= 0.f)
+			m_fZoomValue = 0.f;
+			
+	}
+
+	if (m_fAlpha <= 0.f)
+	{
+		m_bDead = true;
+		CGameInstance::Get_Instance()->PlaySounds(TEXT("1-40 Puzzle Solved Jingle.mp3"), SOUND_SYSTEM, 0.5f);
+	}
+		
+}
+
+
+CTreasureBoxEffect * CTreasureBoxEffect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+{
+	CTreasureBoxEffect*	pInstance = new CTreasureBoxEffect(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		ERR_MSG(TEXT("Failed to Created : CObjectEffect"));
+		ERR_MSG(TEXT("Failed to Created : CTreasureBoxEffect"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CObjectEffect::Clone(void * pArg)
+CGameObject * CTreasureBoxEffect::Clone(void * pArg)
 {
-	CObjectEffect*	pInstance = new CObjectEffect(*this);
+	CTreasureBoxEffect*	pInstance = new CTreasureBoxEffect(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		ERR_MSG(TEXT("Failed to Cloned : CObjectEffect"));
+		ERR_MSG(TEXT("Failed to Cloned : CTreasureBoxEffect"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CObjectEffect::Free()
+void CTreasureBoxEffect::Free()
 {
 	__super::Free();
 }

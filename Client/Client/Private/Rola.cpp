@@ -371,9 +371,9 @@ HRESULT CRola::Ready_Components(void * pArg)
 
 
 	/* For.Com_SHPERE */
-	ColliderDesc.vScale = _float3(1.f, 1.f, 1.f);
+	ColliderDesc.vScale = _float3(2.f, 2.f, 2.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
-	ColliderDesc.vPosition = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.vPosition = _float3(0.f, 0.5f, 0.f);
 	if (FAILED(__super::Add_Components(TEXT("Com_SPHERE"), LEVEL_TAILCAVE, TEXT("Prototype_Component_Collider_SPHERE"), (CComponent**)&m_pSPHERECom, &ColliderDesc)))
 		return E_FAIL;
 

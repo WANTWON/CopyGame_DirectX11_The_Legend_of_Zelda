@@ -86,6 +86,7 @@ public:
 	void Create_Model(const _tchar* pPrototypeTag, const _tchar* pLayerTag, _bool bCreatePrototype = false);
 	void Read_Objects_Name( _tchar* cFolderPath);
 	void Add_TempTag(_tchar* TempTag) { m_TempLayerTags.push_back(TempTag); }
+	void Add_TempTag(char* TempTag) { m_TempCharTags.push_back(TempTag); }
 	
 private:
 	ID3D11Device* m_pDevice = nullptr;
@@ -111,6 +112,7 @@ private:
 	_tchar									m_pFilePath[MAX_PATH] = L"../../../Bin/Resources/Meshes/";
 	vector<string>							m_stLayerTags;
 	vector<const _tchar*>					m_TempLayerTags;
+	vector<char*>							m_TempCharTags;
 	_int									m_iCreatedSelected = 0;
 	_int									m_iSeletecLayerNum = 0;
 	_float									m_fDist = 1.f;

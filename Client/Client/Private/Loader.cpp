@@ -68,6 +68,8 @@
 #include "FightEffect.h"
 #include "MonsterEffect.h"
 #include "UIEffect.h"
+#include "FireEffect.h"
+#include "TreasureBoxEffect.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -469,6 +471,10 @@ HRESULT CLoader::Loading_ForStaticLevel()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/ShaderFiles/Shader_EffectModel.hlsl"), VTXMODEL_DECLARATION::Elements, VTXMODEL_DECLARATION::iNumElements))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Shader_EffectModelFire */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Effect_Fire"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../../../Bin/ShaderFiles/Shader_EffectFire.hlsl"), VTXMODEL_DECLARATION::Elements, VTXMODEL_DECLARATION::iNumElements))))
+		return E_FAIL;
 
 
 	/* For.Prototype_Component_Collider_AABB */
@@ -979,6 +985,16 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	/*For.Prototype_GameObject_EffectTreasureBox*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TreasureBoxEffect"),
+		CTreasureBoxEffect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/*For.Prototype_GameObject_EffectFire*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_FireEffect"),
+		CFireEffect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	/*For.Prototype_GameObject_UIIcon*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UIIcon"),
 		CUIIcon::Create(m_pDevice, m_pContext))))
@@ -1407,6 +1423,7 @@ HRESULT CLoader::Loading_For_Effect()
 
 #pragma endregion SwordEffect
 
+#pragma region FightEffect
 	/*For.Prototype_Component_Model_HitFlash*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_HitFlash"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Hit/HitFlash_2.fbx", PivotMatrix))))
@@ -1420,21 +1437,28 @@ HRESULT CLoader::Loading_For_Effect()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Hit/HitSpark.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	/*For.Prototype_Component_Model_GrassLeaf*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GrassLeaf"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Grass/Grass_0.fbx", PivotMatrix))))
+	/*For.Prototype_Component_Model_GuardFlash*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardFlash"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Guard/GuardFlash.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	/*For.Prototype_Component_Model_LawnLeaf_0*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_LawnLeaf_0"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Grass/Lawn_0.fbx", PivotMatrix))))
+	/*For.Prototype_Component_Model_GuardRing*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardRing"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Guard/GuardRing_0.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	/*For.Prototype_Component_Model_LawnLeaf_1*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_LawnLeaf_1"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Grass/Lawn_1.fbx", PivotMatrix))))
+	/*For.Prototype_Component_Model_GuardRing_2*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardRing_2"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Guard/GuardRing_1.fbx", PivotMatrix))))
 		return E_FAIL;
 
+	/*For.Prototype_Component_Model_GuardDust*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardDust"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Guard/GuardDust.fbx", PivotMatrix))))
+		return E_FAIL;
+#pragma endregion FightEffect
+
+#pragma region ItemEffect
 	/*For.Prototype_Component_Model_RainbowRing*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_RainbowRing"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Ring/RainbowRing.fbx", PivotMatrix))))
@@ -1465,26 +1489,9 @@ HRESULT CLoader::Loading_For_Effect()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/TreasureBox/TreasureBox_1.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	/*For.Prototype_Component_Model_GuardFlash*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardFlash"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Guard/GuardFlash.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	/*For.Prototype_Component_Model_GuardRing*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardRing"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Guard/GuardRing_0.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	/*For.Prototype_Component_Model_GuardRing_2*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardRing_2"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Guard/GuardRing_1.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	/*For.Prototype_Component_Model_GuardDust*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GuardDust"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Guard/GuardDust.fbx", PivotMatrix))))
-		return E_FAIL;
-
+#pragma endregion ItemEffect
+	
+#pragma region MonsterEffect
 	/*For.Prototype_Component_Model_Octorok_Ring*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Octorock_Ring"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Ring/Octorok_Ring.fbx", PivotMatrix))))
@@ -1505,14 +1512,26 @@ HRESULT CLoader::Loading_For_Effect()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Ring/DistRing1.fbx", PivotMatrix))))
 		return E_FAIL;
 
+#pragma endregion MonsterEffect
+
+	/*For.Prototype_Component_Model_GrassLeaf*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_GrassLeaf"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Grass/Grass_0.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_LawnLeaf_0*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_LawnLeaf_0"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Grass/Lawn_0.fbx", PivotMatrix))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Model_LawnLeaf_1*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_LawnLeaf_1"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Grass/Lawn_1.fbx", PivotMatrix))))
+		return E_FAIL;
+
 	/*For.Prototype_Component_Model_Fire*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Fire"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Fire/Fire1.fbx", PivotMatrix))))
-		return E_FAIL;
-
-	/*For.Prototype_Component_Model_FireSide*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_FireSide"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/Effect/Fire/Fire2.fbx", PivotMatrix))))
 		return E_FAIL;
 
 
@@ -1578,16 +1597,28 @@ HRESULT CLoader::Loading_For_Effect()
 
 	/*For.Prototype_Component_Texture_Fog */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Fog"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Fog/cloud_01.png"), 1))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Fog/cloud_00.png"), 1))))
 		return E_FAIL;
 
-	///*For.Prototype_Component_Texture_Distorition */
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Distorition"),
-	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Distorition/distortion_%02d.dds"), 4))))
-	//	return E_FAIL;
+	/*For.Prototype_Component_Texture_FireNoise */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FireNoise"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Meshes/Effect/Fire/fire_00.dds"), 1))))
+		return E_FAIL;
 
+	/*For.Prototype_Component_Texture_FireAlpha */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FireAlphaForme"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Meshes/Effect/Fire/fire_forme_%02d.dds"), 3))))
+		return E_FAIL;
 
-#pragma endregion SwordEffect
+	/*For.Prototype_Component_Texture_FireAlpha */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FireAlphaSmall"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Meshes/Effect/Fire/fire_small_%02d.dds"), 2))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Texture_Distorition */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Distorition"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Distorition/distortion_00.png"), 1))))
+		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;

@@ -238,6 +238,12 @@
     <Filter Include="01.Levels\06.End">
       <UniqueIdentifier>{360e5f15-87eb-485d-ab4b-2cea8a71fcec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\05.Effect\ObjectEffect\Fire">
+      <UniqueIdentifier>{c6c9f056-9303-454d-9af0-a0f2b52c98df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\05.Effect\ObjectEffect\TreasureBox">
+      <UniqueIdentifier>{56041f3a-d0c9-45f0-a4b1-00ca96602460}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -468,6 +474,12 @@
     <ClInclude Include="..\public\UIScreen.h">
       <Filter>03.UI\01. Screen</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\FireEffect.h">
+      <Filter>02.GameObjects\05.Effect\ObjectEffect\Fire</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TreasureBoxEffect.h">
+      <Filter>02.GameObjects\05.Effect\ObjectEffect\TreasureBox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -683,6 +695,12 @@
     <ClCompile Include="..\private\UIScreen.cpp">
       <Filter>03.UI\01. Screen</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\FireEffect.cpp">
+      <Filter>02.GameObjects\05.Effect\ObjectEffect\Fire</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TreasureBoxEffect.cpp">
+      <Filter>02.GameObjects\05.Effect\ObjectEffect\TreasureBox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -714,6 +732,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_EffectModel.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_EffectFire.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

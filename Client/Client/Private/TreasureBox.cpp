@@ -7,6 +7,7 @@
 #include "Monster.h"
 #include "FootSwitch.h"
 #include "InvenItem.h"
+#include "TreasureBoxEffect.h"
 #include "ObjectEffect.h"
 #include "UIIcon.h"
 
@@ -431,41 +432,41 @@ void CTreasureBox::Make_OpenEffect()
 	EffectDesc.pTarget = this;
 
 	EffectDesc.eEffectType = CEffect::MODEL;
-	EffectDesc.eEffectID = CObjectEffect::TREASURE_BEAM;
+	EffectDesc.eEffectID = CTreasureBoxEffect::TREASURE_BEAM;
 	EffectDesc.fDeadTime = 2.f;
 	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.0f);
 	EffectDesc.vDistance = XMVectorSet(0.0f, 0.f, -1.f, 0.f);
 	EffectDesc.vColor = XMVectorSet(247, 255, 139, 255);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBoxEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
 
-	EffectDesc.eEffectID = CObjectEffect::TREASURE_HALO;
+	EffectDesc.eEffectID = CTreasureBoxEffect::TREASURE_HALO;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
 	EffectDesc.fStartTime = 0.f;
 	EffectDesc.fDeadTime = 1.f;
 	EffectDesc.vInitScale = _float3(5.f, 5.f, 5.f);
 	EffectDesc.vColor = XMVectorSet(255, 255, 255, 255);
 	EffectDesc.vDistance = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBoxEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
 
 
 	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
-	EffectDesc.eEffectID = CObjectEffect::TREASURE_GLOW;
+	EffectDesc.eEffectID = CTreasureBoxEffect::TREASURE_GLOW;
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.fStartTime = 0.3f;
 	EffectDesc.vColor = XMVectorSet(247, 255, 139, 255);;
 	EffectDesc.fDeadTime = EffectDesc.fStartTime + 2.5f;
 	EffectDesc.vDistance = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.5f);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBoxEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
 
-	EffectDesc.eEffectID = CObjectEffect::TREASURE_GLOW;
+	EffectDesc.eEffectID = CTreasureBoxEffect::TREASURE_GLOW;
 	EffectDesc.iTextureNum = 0;
 	EffectDesc.fStartTime = 0.2f;
 	EffectDesc.vColor = XMVectorSet(255, 137, 105, 255);;
 	EffectDesc.fDeadTime = EffectDesc.fStartTime + 2.5f;
 	EffectDesc.vDistance = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(1.f, 1.f, 1.0f);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBoxEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
 
 
 	EffectDesc.eEffectID = CObjectEffect::ITEM_GET_FLASH;
@@ -506,12 +507,12 @@ void CTreasureBox::Make_EntranceEffect()
 	EffectDesc.pTarget = this;
 
 	EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
-	EffectDesc.eEffectID = CObjectEffect::TREASURE_CROSS;
+	EffectDesc.eEffectID = CTreasureBoxEffect::TREASURE_CROSS;
 	EffectDesc.iTextureNum = 6;
 	EffectDesc.fDeadTime = 0.5f;
 	EffectDesc.vLook = XMVectorSet(0.f, -1.f, 0.f, 0.f);
 	EffectDesc.vInitScale = _float3(0.5f, 0.5f, 0.5f);
-	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
+	pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_TreasureBoxEffect"), LEVEL_STATIC, TEXT("Layer_TreasureBox"), &EffectDesc);
 	RELEASE_INSTANCE(CGameInstance);
 }
 

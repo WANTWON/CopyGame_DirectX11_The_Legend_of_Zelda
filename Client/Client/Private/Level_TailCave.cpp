@@ -23,7 +23,7 @@
 #include "SquareBlock.h"
 #include "PrizeItem.h"
 #include "CollapseTile.h"
-#include "ObjectEffect.h"
+#include "FireEffect.h"
 
 CLevel_TailCave::CLevel_TailCave(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -119,17 +119,6 @@ void CLevel_TailCave::Late_Tick(_float fTimeDelta)
 
 	CCollision_Manager::Get_Instance()->Update_Collider();
 	CCollision_Manager::Get_Instance()->CollisionwithBullet();
-
-
-	if (CGameInstance::Get_Instance()->Key_Up(DIK_6))
-	{
-		CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
-
-		pUI_Manager->Set_NextLevelIndex(LEVEL_GAMEPLAY);
-		pUI_Manager->Set_NextLevel(true);
-
-		RELEASE_INSTANCE(CUI_Manager);
-	}
 	
 	
 }
@@ -595,7 +584,7 @@ HRESULT CLevel_TailCave::Ready_Layer_Effect(const _tchar * pLayerTag)
 	_ulong dwByte = 0;
 	_uint iNum = 0;
 	CNonAnim::NONANIMDESC  ModelDesc;
-	CObjectEffect::EFFECTDESC EffectDesc;
+	CFireEffect::EFFECTDESC EffectDesc;
 	
 
 	hFile = CreateFile(TEXT("../../../Bin/Data/TailCave_Fire.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
@@ -611,29 +600,38 @@ HRESULT CLevel_TailCave::Ready_Layer_Effect(const _tchar * pLayerTag)
 		EffectDesc.vInitPositon = XMVectorSetW(XMLoadFloat3(&ModelDesc.vPosition), 1.f);
 
 		EffectDesc.eEffectType = CEffect::MODEL;
-		EffectDesc.eEffectID = CObjectEffect::FIRE_FRONT;
+		EffectDesc.eEffectID = CFireEffect::FIRE_SMALL;
 		EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_TAILCAVE, pLayerTag, &EffectDesc)))
+		EffectDesc.iTextureNum = 0;
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FireEffect"), LEVEL_TAILCAVE, pLayerTag, &EffectDesc)))
 			return E_FAIL;
 
-		EffectDesc.eEffectID = CObjectEffect::FIRE_LEFT;
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_TAILCAVE, pLayerTag, &EffectDesc)))
-			return E_FAIL;
-
-		EffectDesc.eEffectID = CObjectEffect::FIRE_RIGHT;
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_TAILCAVE, pLayerTag, &EffectDesc)))
-			return E_FAIL;
-
-		EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
-		EffectDesc.eEffectID = CObjectEffect::FIRE_GLOW;
-		EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
-		EffectDesc.vInitPositon = XMVectorSetY(EffectDesc.vInitPositon, XMVectorGetY(EffectDesc.vInitPositon) - 0.1f);
-		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_TAILCAVE, pLayerTag, &EffectDesc)))
-			return E_FAIL;
 	}
 
 	CloseHandle(hFile);
 
+	hFile = CreateFile(TEXT("../../../Bin/Data/TailCave_FireSmall.dat"), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
+		return E_FAIL;
+
+	/* 타일의 개수 받아오기 */
+	ReadFile(hFile, &(iNum), sizeof(_uint), &dwByte, nullptr);
+
+	for (_uint i = 0; i < iNum; ++i)
+	{
+		ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
+		EffectDesc.vInitPositon = XMVectorSetW(XMLoadFloat3(&ModelDesc.vPosition), 1.f);
+
+		EffectDesc.eEffectType = CEffect::MODEL;
+		EffectDesc.eEffectID = CFireEffect::FIRE_SMALL;
+		EffectDesc.vInitScale = _float3(2.f, 2.f, 2.f);
+		EffectDesc.iTextureNum = 0;
+		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_FireEffect"), LEVEL_TAILCAVE, pLayerTag, &EffectDesc)))
+			return E_FAIL;
+
+	}
+
+	CloseHandle(hFile);
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;

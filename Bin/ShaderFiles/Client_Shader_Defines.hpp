@@ -7,6 +7,13 @@ sampler LinearSampler = sampler_state
 	AddressV = wrap;
 };
 
+sampler FireSampler = sampler_state
+{
+	Filter = MIN_MAG_MIP_LINEAR;
+	AddressU = Clamp;
+	AddressV = Clamp;
+};
+
 sampler PointSampler = sampler_state
 {
 	Filter = MIN_MAG_MIP_POINT;

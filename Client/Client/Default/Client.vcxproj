@@ -171,6 +171,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Bin\ShaderFiles\Client_Shader_Defines.hpp" />
     <ClInclude Include="..\Public\Albatoss.h" />
+    <ClInclude Include="..\Public\FireEffect.h" />
+    <ClInclude Include="..\Public\TreasureBoxEffect.h" />
     <ClInclude Include="..\public\UIScreen.h" />
     <ClInclude Include="..\Public\BaseObj.h" />
     <ClInclude Include="..\Public\BladeTrap.h" />
@@ -247,6 +249,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Albatoss.cpp" />
+    <ClCompile Include="..\Private\FireEffect.cpp" />
+    <ClCompile Include="..\Private\TreasureBoxEffect.cpp" />
     <ClCompile Include="..\private\UIScreen.cpp" />
     <ClCompile Include="..\Private\BaseObj.cpp" />
     <ClCompile Include="..\Private\BladeTrap.cpp" />
@@ -331,6 +335,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_EffectFire.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_EffectModel.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_EffectTexture.hlsl" />
     <FxCompile Include="..\..\..\Bin\ShaderFiles\Shader_UI.hlsl" />

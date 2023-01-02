@@ -135,14 +135,14 @@ HRESULT CLoader::Loading_ForGamePlayLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Bin/Resources/Meshes/NonAnim/Obj/WarpHole/WarpHole.fbx", PivotMatrix))))
 		return E_FAIL;
 
-	///* 모델 로딩 중. */
-	lstrcpy(m_szLoadingText, TEXT("게임 플레이 모델 로딩 중."));
+	//* 모델 로딩 중. */
+	/*lstrcpy(m_szLoadingText, TEXT("게임 플레이 모델 로딩 중."));
 	if (FAILED(Loading_ForGamePlayModel()))
-		return E_FAIL;
+		return E_FAIL;*/
 
-	//lstrcpy(m_szLoadingText, TEXT("던전 모델 로딩 중."));
-	//if (FAILED(Loading_ForDungeonModel()))
-		//return E_FAIL; 
+	lstrcpy(m_szLoadingText, TEXT("던전 모델 로딩 중."));
+	if (FAILED(Loading_ForDungeonModel()))
+		return E_FAIL; 
 
 	/*lstrcpy(m_szLoadingText, TEXT("룸 모델 로딩 중."));
 	if (FAILED(Loading_ForRoomModel()))
@@ -232,7 +232,7 @@ HRESULT CLoader::Loading_ForDungeonModel()
 
 				continue;
 			}
-
+			CImgui_Manager::Get_Instance()->Add_TempTag(FilePath);
 			CImgui_Manager::Get_Instance()->Add_TempTag(pModeltag);
 			CImgui_Manager::Get_Instance()->Add_TempTag(szFilePath);
 
