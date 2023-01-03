@@ -43,6 +43,13 @@ RasterizerState RS_SkyBox
 	FrontCounterClockwise = false;
 };
 
+RasterizerState RS_ShockWave
+{
+	FillMode = solid;
+	CullMode = NONE;
+	FrontCounterClockwise = false;
+};
+
 //BOOL BlendEnable;
 //D3D11_BLEND SrcBlend;
 //D3D11_BLEND DestBlend;

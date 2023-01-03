@@ -70,6 +70,7 @@
 #include "UIEffect.h"
 #include "FireEffect.h"
 #include "TreasureBoxEffect.h"
+#include "SwordTrail.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -198,6 +199,13 @@ HRESULT CLoader::Loading_ForStaticLevel()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Cube"),
 		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	/*For.Prototype_Component_VIBuffer_Swordtrail*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_SwordTrail"),
+		CVIBuffer_SwordTrail::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 
 	lstrcpy(m_szLoadingText, TEXT("네비게이션 생성 중."));
 	/* For.Prototype_Component_Navigation */
@@ -985,6 +993,11 @@ HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
+	/*For.Prototype_GameObject_SwordTrail*/
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_SwordTrail"),
+		CSwordTrail::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	/*For.Prototype_GameObject_EffectTreasureBox*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TreasureBoxEffect"),
 		CTreasureBoxEffect::Create(m_pDevice, m_pContext))))
@@ -1623,6 +1636,11 @@ HRESULT CLoader::Loading_For_Effect()
 	/*For.Prototype_Component_Texture_Distorition */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Distorition"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Distorition/distortion_00.png"), 1))))
+		return E_FAIL;
+
+	/*For.Prototype_Component_Texture_Effect */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SwordTrail"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Slash/slash_%02d.dds"), 3))))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);

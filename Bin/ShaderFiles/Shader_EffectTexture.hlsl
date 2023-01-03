@@ -310,6 +310,25 @@ PS_OUT PS_ONLY_TEXTURE(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_TRAIL(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse.a = Out.vDiffuse.r;
+
+	Out.vDiffuse.rgb = 1.f;
+	Out.vDiffuse.b -= 0.5f;
+
+	Out.vDiffuse.a *= g_fAlpha;
+	if (Out.vDiffuse.a <= 0.0f)
+		discard;
+
+	Out.vDiffuse = vector(1.f, 1.f, 1.f, 1.f);
+
+	return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass OneColor_NotAlphaSet
@@ -444,4 +463,14 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_ONLY_TEXTURE();
 	}
 
+	pass Trail
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_TRAIL();
+	}
 }

@@ -227,7 +227,6 @@ void CPlayerEffect::Change_Texture(_float fTimeDelta)
 }
 
 
-
 void CPlayerEffect::Tick_RollCut(_float fTimeDelta)
 {
 	m_fDeadtime += fTimeDelta;

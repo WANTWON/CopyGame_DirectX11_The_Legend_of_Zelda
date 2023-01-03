@@ -42,6 +42,8 @@ public:
 	virtual void Late_Tick(_float fTimeDelta);
 	virtual HRESULT Render();
 
+	void TarilWeapon_Update(_fmatrix fSocketMatirx);
+
 public:
 	TYPE Get_PartsType() { return m_WeaponDesc.eType; }
 
@@ -55,9 +57,15 @@ private:
 	WEAPONDESC				m_WeaponDesc;
 	_float4x4				m_CombinedWorldMatrix;
 
+	class CGameObject*		m_pTrailWeapon_Effect = nullptr;
+	_float					m_fEffectTurm = 0.f;
+
+	_float3					m_vPointUp;
+	_float3					m_vPointDown;
 
 private:
 	virtual HRESULT Ready_Components(void* pArg) override;
+	HRESULT Ready_Effect();
 	HRESULT SetUp_ShaderResources(); /* 셰이더 전역변수에 값을 전달한다. */
 
 

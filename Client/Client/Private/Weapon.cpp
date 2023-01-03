@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "GameInstance.h"
 #include "PlayerBullet.h"
+#include "SwordTrail.h"
 
 CWeapon::CWeapon(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -27,6 +28,13 @@ HRESULT CWeapon::Initialize(void * pArg)
 	if (FAILED(Ready_Components(pArg)))
 		return E_FAIL;
 
+	if (FAILED(Ready_Effect()))
+		return E_FAIL;
+
+	m_vPointUp = _float3(0.5f, 0.5f, -0.4f);
+	m_vPointDown = _float3(0.5f, 0.5f, -1.f);
+
+
 	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, 3.f);
 	m_pTransformCom->Set_Scale(CTransform::STATE_UP, 3.f);
 	m_pTransformCom->Set_Scale(CTransform::STATE_LOOK, 3.f);
@@ -50,7 +58,15 @@ int CWeapon::Tick(_float fTimeDelta)
 
 
 	XMStoreFloat4x4(&m_CombinedWorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix);
+	
+
+	m_fEffectTurm += fTimeDelta;
+	TarilWeapon_Update(SocketMatrix);
+	m_fEffectTurm = 0.f;
+
+	m_pTrailWeapon_Effect->Tick(fTimeDelta);
 	m_pOBBCom->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
+
 
 	return S_OK;
 }
@@ -62,7 +78,7 @@ void CWeapon::Late_Tick(_float fTimeDelta)
 	if (m_pOBBCom != nullptr)
 		m_pRendererCom->Add_Debug(m_pOBBCom);
 #endif
-	
+	m_pTrailWeapon_Effect->Late_Tick(fTimeDelta);
 	Compute_CamDistance(Get_TransformState(CTransform::STATE_POSITION));
 }
 
@@ -90,6 +106,11 @@ HRESULT CWeapon::Render()
 
 	
 	return S_OK;
+}
+
+void CWeapon::TarilWeapon_Update(_fmatrix fSocketMatirx)
+{
+	((CSwordTrail*)m_pTrailWeapon_Effect)->Update_Trail_Point(m_vPointDown, m_vPointUp, fSocketMatirx);
 }
 
 HRESULT CWeapon::Ready_Components(void* pArg)
@@ -210,6 +231,17 @@ HRESULT CWeapon::Ready_Components(void* pArg)
 	return S_OK;
 }
 
+HRESULT CWeapon::Ready_Effect()
+{
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	m_pTrailWeapon_Effect = (CSwordTrail*)pGameInstance->Clone_GameObject(L"Prototype_GameObject_SwordTrail", nullptr);
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return S_OK;
+}
+
 HRESULT CWeapon::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
@@ -266,6 +298,7 @@ void CWeapon::Free()
 	__super::Free();
 
 	CCollision_Manager::Get_Instance()->Out_CollisionGroup(CCollision_Manager::COLLISION_PBULLET, this);
+	Safe_Release(m_pTrailWeapon_Effect);
 	Safe_Release(m_WeaponDesc.pSocket);
 
 	Safe_Release(m_pAABBCom);

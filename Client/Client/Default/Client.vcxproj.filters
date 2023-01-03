@@ -244,6 +244,9 @@
     <Filter Include="02.GameObjects\05.Effect\ObjectEffect\TreasureBox">
       <UniqueIdentifier>{56041f3a-d0c9-45f0-a4b1-00ca96602460}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\05.Effect\PlayerEffect\SwordTrail">
+      <UniqueIdentifier>{b620b9bc-66da-4170-b95a-9cce00f3b7e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -480,6 +483,9 @@
     <ClInclude Include="..\Public\TreasureBoxEffect.h">
       <Filter>02.GameObjects\05.Effect\ObjectEffect\TreasureBox</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SwordTrail.h">
+      <Filter>02.GameObjects\05.Effect\PlayerEffect\SwordTrail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -700,6 +706,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\TreasureBoxEffect.cpp">
       <Filter>02.GameObjects\05.Effect\ObjectEffect\TreasureBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwordTrail.cpp">
+      <Filter>02.GameObjects\05.Effect\PlayerEffect\SwordTrail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

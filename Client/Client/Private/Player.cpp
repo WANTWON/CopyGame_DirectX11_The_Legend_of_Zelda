@@ -1799,7 +1799,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::SLASH:
 	case Client::CPlayer::S_SLASH:
 	case Client::CPlayer::SLASH_HOLD_ED:
-		Make_SlashEffect();
+		//Make_SlashEffect();
 		m_eAnimSpeed = 2.5f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
