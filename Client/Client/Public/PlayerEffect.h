@@ -15,7 +15,7 @@ public:
 	SLASH, SWISH,
 	
 	/* Charge */
-	CROSS, RIPPLE
+	CROSS, RIPPLE, ARC,
 
 	};
 

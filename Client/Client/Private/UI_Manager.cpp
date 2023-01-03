@@ -24,7 +24,7 @@ CUI_Manager::CUI_Manager()
 void CUI_Manager::Initialize_PlayerState()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 2; ++i)
 	{
 		CPlayerState::STATEDESC StateDesc;
 		StateDesc.m_eType = CPlayerState::KEY;

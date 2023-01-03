@@ -202,7 +202,7 @@ HRESULT CUIScreen::SetUp_ShaderResources()
 		{
 			_uint iIndex = CUI_Manager::Get_Instance()->Get_UI_OpenType();
 
-			if (iIndex = CUI_Manager::UI_MAP)
+			if (iIndex == CUI_Manager::UI_MAP)
 			{
 				if (CGameInstance::Get_Instance()->Get_CurrentLevelIndex() == LEVEL_TAILCAVE)
 				{

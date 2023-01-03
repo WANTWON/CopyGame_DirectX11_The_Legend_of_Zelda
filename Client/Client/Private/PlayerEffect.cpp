@@ -35,6 +35,12 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 
 	switch (m_EffectDesc.eEffectID)
 	{
+	case ARC:
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.vInitPositon);
+		m_pTransformCom->LookDir(m_EffectDesc.vLook);
+		m_eShaderID = SHADERM_SLASH;
+		m_fTexUV = 1.f;
+		m_fAlpha = 1.f;
 	case SWISH:
 		m_eShaderID = SHADERM_ROLLCUT;
 		m_fTexUV = 1.f;
@@ -109,6 +115,7 @@ int CPlayerEffect::Tick(_float fTimeDelta)
 
 	switch (m_EffectDesc.eEffectID)
 	{
+	case ARC:
 	case SLASH:
 		Tick_Slash(fTimeDelta);
 		break;
@@ -172,6 +179,14 @@ HRESULT CPlayerEffect::Ready_Components(void * pArg)
 		break;
 	case RIPPLE:
 		if (FAILED(__super::Add_Components(TEXT("Com_Texture"), LEVEL_STATIC, TEXT("Prototype_Component_Ripple"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+		break;
+	case ARC:
+		/* For.Com_Model*/
+		if (FAILED(__super::Add_Components(TEXT("Com_Model"), LEVEL_STATIC, TEXT("Prototype_Component_Model_SwordArc"), (CComponent**)&m_pModelCom)))
+			return E_FAIL;
+
+		if (FAILED(__super::Add_Components(TEXT("Com_GlowTexture"), LEVEL_STATIC, TEXT("Prototype_Component_Texture_Glow"), (CComponent**)&m_pGlowTexture)))
 			return E_FAIL;
 		break;
 	default:

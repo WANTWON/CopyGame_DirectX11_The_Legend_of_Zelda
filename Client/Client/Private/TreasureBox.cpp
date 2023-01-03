@@ -168,7 +168,7 @@ void CTreasureBox::Late_Tick(_float fTimeDelta)
 			for (auto& iter : *pEffectList)
 			{
 				if (iter != nullptr)
-					dynamic_cast<CObjectEffect*>(iter)->Set_EndMode(true);
+					dynamic_cast<CTreasureBoxEffect*>(iter)->Set_EndMode(true);
 			}
 
 		}

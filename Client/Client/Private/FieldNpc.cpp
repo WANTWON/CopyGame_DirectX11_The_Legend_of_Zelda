@@ -577,7 +577,7 @@ int CFieldNpc::Child_Tick(_float fTimeDelta)
 		if (m_eState == RUN)
 		{
 			Change_Direction();
-			m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom);
+			m_pTransformCom->Go_StraightSliding(fTimeDelta, m_pNavigationCom, 0.f);
 			Make_ChildEffect(fTimeDelta);
 		}
 

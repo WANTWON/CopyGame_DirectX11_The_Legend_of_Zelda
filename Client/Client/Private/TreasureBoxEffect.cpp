@@ -646,7 +646,7 @@ void CTreasureBoxEffect::Tick_TreasureCross(_float fTimeDelta)
 			EffectDesc.fDeadTime = 1.5f;
 			EffectDesc.iTextureNum = 1;
 			EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, -1.f, (rand() % 20 - 10) * 0.1f, 0.f);
-			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+			CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_TreasureBoxEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 			m_fDeadtime = 0.f;
 		}
@@ -668,7 +668,7 @@ void CTreasureBoxEffect::Tick_TreasureCross(_float fTimeDelta)
 				EffectDesc.vInitScale = _float3(0.4f, 0.4f, 0.0f);
 				EffectDesc.fDeadTime = 1.0f;
 				EffectDesc.iTextureNum = 3;
-				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_TreasureBoxEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 				EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION);
 				EffectDesc.pTarget = this;
@@ -678,7 +678,7 @@ void CTreasureBoxEffect::Tick_TreasureCross(_float fTimeDelta)
 				EffectDesc.vInitScale = _float3(0.4f, 0.4f, 0.0f);
 				EffectDesc.fDeadTime = 1.5f;
 				EffectDesc.iTextureNum = 4;
-				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+				CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_TreasureBoxEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 
 
 				for (int i = 0; i < 10; ++i)
@@ -691,7 +691,7 @@ void CTreasureBoxEffect::Tick_TreasureCross(_float fTimeDelta)
 					EffectDesc.fDeadTime = 1.5f;
 					EffectDesc.iTextureNum = 1;
 					EffectDesc.vLook = XMVectorSet((rand() % 20 - 10) * 0.1f, 1.f, (rand() % 20 - 10) * 0.1f, 0.f);
-					CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_ObjectEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
+					CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_TreasureBoxEffect"), LEVEL_STATIC, TEXT("Layer_ObjectEffect"), &EffectDesc);
 				}
 		
 

@@ -967,9 +967,7 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	_float fVolume = 0.5f;
 
 
-	_tchar	sz_SoundEffect[MAX_PATH];
-	_float fEffectVolume = 0.3f;
-
+	
 
 	m_fSoundTime += fTimeDelta;
 
@@ -1040,7 +1038,11 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	case Client::CPlayer::EV_TELL_LP:
 		break;
 	case Client::CPlayer::SLASH_HOLD_LP:
-	case Client::CPlayer::SHIELD_HOLD_LP:
+		m_bSoundOnce = true;
+		fVolume = 0.5f;
+		iNum = rand() % 4 + 1;
+		wcscpy_s(sz_SoundPlayer, TEXT("Link_Charge.wav"));
+		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 		break;
 	case Client::CPlayer::PUSH_LP:
 		m_bSoundOnce = true;
@@ -1067,7 +1069,7 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	case Client::CPlayer::SLASH_HOLD_ST:
 	case Client::CPlayer::SHIELD:
 		m_bSoundOnce = true;
-		fVolume = 0.5f;
+		fVolume = 0.8f;
 		wcscpy_s(sz_SoundPlayer, TEXT("Link_Shield_On.wav"));
 		break;
 	case Client::CPlayer::SHIELD_HIT:
@@ -1108,11 +1110,6 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		iNum = rand() % 3 + 1;
 		wcscpy_s(sz_SoundPlayer, TEXT("Link_Sword_Swing (%d).wav"));
 		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
-
-		fEffectVolume = 0.3f;
-		iNum = rand() % 5 + 1;
-		wcscpy_s(sz_SoundEffect, TEXT("LSword_Swing%d.wav"));
-		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
 		break;
 	case Client::CPlayer::SLASH_HOLD_ED:
 		m_bSoundOnce = true;
@@ -1121,14 +1118,10 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 		wcscpy_s(sz_SoundPlayer, TEXT("Link_Sword_360 (%d).wav"));
 		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);
 
-		fEffectVolume = 0.3f;
-		iNum = rand() % 4 + 1;
-		wcscpy_s(sz_SoundEffect, TEXT("LSword_AttackCharging%d.wav"));
-		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
 		break;
 	case Client::CPlayer::SHIELD_HOLD_ED:
 		m_bSoundOnce = true;
-		fVolume = 0.5f;
+		fVolume = 0.8f;
 		wcscpy_s(sz_SoundPlayer, TEXT("Link_Shield_Off.wav"));
 		break;
 		break;
@@ -1176,10 +1169,6 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	case Client::CPlayer::WARP_LP:
 		break;
 	case Client::CPlayer::WARP_ED:
-		/*m_bSoundOnce = true;
-		fVolume = 0.5f;
-		wcscpy_s(sz_SoundPlayer, TEXT("Link_FallFromTop.wav"));
-		wsprintf(sz_SoundPlayer, sz_SoundPlayer, iNum);*/
 		break;
 	default:
 		break;
@@ -1188,7 +1177,6 @@ void CPlayer::Sound_PlayerVoice_by_State(_float fTimeDelta)
 	if (m_fSoundTime > m_fSoundEndTime || m_bSoundOnce)
 	{
 		pGameInstance->PlaySounds(sz_SoundPlayer, SOUND_PLAYER, fVolume);
-		pGameInstance->PlaySounds(sz_SoundEffect, SOUND_PEFFECT, fEffectVolume);
 		m_fSoundTime = 0.f;
 	}
 	
@@ -1405,6 +1393,10 @@ void CPlayer::Make_SlashEffect()
 
 	m_bMakeEffect = true;
 
+	_tchar	sz_SoundEffect[MAX_PATH];
+	_float fEffectVolume = 0.3f;
+
+	
 	
 	m_BulletLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
 	CEffect::EFFECTDESC EffectDesc;
@@ -1418,7 +1410,7 @@ void CPlayer::Make_SlashEffect()
 	EffectDesc.fDeadTime = 0.5f;
 	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
-
+	
 	EffectDesc.eEffectID = CPlayerEffect::SWISH;
 	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) +XMVectorSet(0.f, 0.5f, 0.f, 0.f);
 	EffectDesc.fDeadTime = 0.5f;
@@ -1426,6 +1418,29 @@ void CPlayer::Make_SlashEffect()
 	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
 	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
+	if (m_eState == SLASH_HOLD_ED)
+	{
+
+		fEffectVolume = 0.3f;
+		_uint iNum = rand() % 4 + 1;
+		wcscpy_s(sz_SoundEffect, TEXT("LSword_AttackCharging%d.wav"));
+		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
+	//	EffectDesc.vLook = m_BulletLook* -1;
+		CGameInstance::Get_Instance()->PlaySounds(sz_SoundEffect, SOUND_PEFFECT, fEffectVolume);
+
+		EffectDesc.vInitScale = _float3(3.5f, 3.5f, 3.5f);
+		EffectDesc.eEffectID = CPlayerEffect::ARC;
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+
+	}
+	else
+	{
+		fEffectVolume = 0.3f;
+		_uint iNum = rand() % 5 + 1;
+		wcscpy_s(sz_SoundEffect, TEXT("LSword_Swing%d.wav"));
+		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_SoundEffect, SOUND_PEFFECT, fEffectVolume);
+	}
 }
 
 void CPlayer::Make_ChargeEffect()
@@ -1440,14 +1455,7 @@ void CPlayer::Make_ChargeEffect()
 	EffectDesc.vInitScale = _float3(5.f, 5.f, 5.f);
 	EffectDesc.fDeadTime = 1.5f;
 	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
-	
-
-	EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVectorSet(0.f, 0.4f, 0.f, 0.f);
-	EffectDesc.fStartTime = 0.5f;
-	EffectDesc.iTextureNum = 0;
-	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
-	EffectDesc.fDeadTime = 1.5f;
-	//CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
+	CGameInstance::Get_Instance()->PlaySounds(TEXT("Link_ChargeEffect.wav"), SOUND_PEFFECT, 0.5f);
 	
 	m_bCharge = true;
 }
@@ -1517,7 +1525,7 @@ void CPlayer::Make_DefaultEffect(_float fTimeDelta, ANIM eState)
 			EffectDesc.eEffectType = CEffect::VIBUFFER_RECT;
 			EffectDesc.eEffectID = CPlayerEffect::CROSS;
 			EffectDesc.vLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
-			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook*1.8f + XMVectorSet(0.f, 0.6f, 0.f, 0.f);
+			EffectDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + EffectDesc.vLook*1.8f + XMVectorSet(0.f, 1.f, 0.f, 0.f);
 			EffectDesc.iTextureNum = 1;
 			EffectDesc.fDeadTime = 1.0f;
 
@@ -1526,6 +1534,7 @@ void CPlayer::Make_DefaultEffect(_float fTimeDelta, ANIM eState)
 			else
 				EffectDesc.vInitScale = _float3(2.f, 2.f, 0.f);
 
+			pGameInstance->PlaySounds(TEXT("Link_ChargeCross.wav"), SOUND_OBJECT, 0.3f);
 			pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 			m_fEffectTime = 0.f;
 		}
@@ -1709,7 +1718,6 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::SLASH_HOLD_ST:
 		m_bIsLoop = false;
 		m_eAnimSpeed = 2.f;
-		Make_DefaultEffect(fTimeDelta, m_eState);
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))
 		{
 			m_eState = SLASH_HOLD_LP;
@@ -1724,6 +1732,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 		{
 			m_bMakeEffect = false;
 			m_eState = SHIELD_HOLD_LP;
+			m_fChargeTime = 1.5f;
 			m_bSoundOnce = false;
 		}			
 		break;
