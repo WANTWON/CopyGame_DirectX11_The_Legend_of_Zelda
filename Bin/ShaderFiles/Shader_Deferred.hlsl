@@ -21,6 +21,8 @@ texture2D		g_ShadeTexture;
 texture2D		g_SpecularTexture;
 texture2D		g_ReflectionTexture;
 texture2D		g_ShadowDepthTexture;
+texture2D		g_BlurTexture;
+
 
 sampler LinearSampler = sampler_state
 {
@@ -85,6 +87,20 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	return Out;
 }
+
+PS_OUT PS_RESULT(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+
+	return Out;
+}
+
+struct PS_OUT_BLEND
+{
+	float4		vColor : SV_TARGET0;
+};
 
 struct PS_OUT_LIGHT
 {
@@ -189,7 +205,7 @@ PS_OUT_LIGHT PS_MAIN_LIGHT_POINT(PS_IN In)
 
 
 
-PS_OUT PS_MAIN_BLEND(PS_IN In)
+PS_OUT_BLEND PS_MAIN_BLEND(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
@@ -277,7 +293,7 @@ DepthStencilState DSS_ZEnable_Disable_ZWrite_Disable
 
 technique11 DefaultTechnique
 {
-	pass DebugTarget
+	pass DebugTarget //0
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -288,7 +304,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
-	pass Light_Directional
+	pass Light_Directional //1
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_LightBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -299,7 +315,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_LIGHT_DIRECTIONAL();
 	}
 
-	pass Light_Point
+	pass Light_Point //2
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_LightBlending, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -310,7 +326,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_LIGHT_POINT();
 	}
 
-	pass Blend
+	pass Blend //3
 	{
 		SetRasterizerState(RS_Default);
 		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -319,6 +335,17 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_BLEND();
+	}
+
+	pass ResultOut //4
+	{
+		SetRasterizerState(RS_Default);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetDepthStencilState(DSS_ZEnable_Disable_ZWrite_Disable, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_RESULT();
 	}
 
 }

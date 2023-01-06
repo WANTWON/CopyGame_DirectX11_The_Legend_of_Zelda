@@ -48,7 +48,7 @@ HRESULT CTarget_Manager::Add_MRT(const _tchar * pMRTTag, const _tchar * pTargetT
 	return S_OK;
 }
 
-HRESULT CTarget_Manager::Begin_MRT(ID3D11DeviceContext* pContext, const _tchar * pMRTTag)
+HRESULT CTarget_Manager::Begin_MRT(ID3D11DeviceContext* pContext, const _tchar * pMRTTag, _bool m_bClear)
 {
 	list<CRenderTarget*>*		pMRTList = Find_MRT(pMRTTag);
 	if (nullptr == pMRTList)
@@ -62,7 +62,8 @@ HRESULT CTarget_Manager::Begin_MRT(ID3D11DeviceContext* pContext, const _tchar *
 
 	for (auto& pRenderTarget : *pMRTList)
 	{
-		pRenderTarget->Clear();
+		if(m_bClear)
+			pRenderTarget->Clear();
 		pRTVs[iNumRenderTargets++] = pRenderTarget->Get_RTV();
 	}
 

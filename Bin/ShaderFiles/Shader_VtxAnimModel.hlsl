@@ -103,6 +103,7 @@ struct PS_OUT
 	float4		vDepth : SV_TARGET2;
 	float4		vSpecular : SV_TARGET3;
 	vector		vLightDepth : SV_TARGET4;
+	float4		vBlur : SV_TARGET5;
 };
 
 /* 이렇게 만들어진 픽셀을 PS_MAIN함수의 인자로 던진다. */
@@ -134,6 +135,8 @@ PS_OUT PS_MAIN(PS_IN In)
 	if (Out.vDiffuse.a <= 0.1f)
 		discard;
 
+
+	Out.vBlur = Out.vDiffuse;
 	return Out;
 }
 
@@ -168,6 +171,7 @@ PS_OUT PS_MAIN_HIT(PS_IN In)
 	if (Out.vDiffuse.a <= 0.3f)
 		discard;
 
+	Out.vBlur = Out.vDiffuse;
 	return Out;
 }
 
@@ -216,6 +220,7 @@ PS_OUT PS_DEAD(PS_IN In)
 	if (Out.vDiffuse.a <= 0.0f)
 		discard;
 
+	Out.vBlur = Out.vDiffuse;
 	return Out;
 }
 
@@ -260,7 +265,7 @@ PS_OUT PS_CHARGE(PS_IN In)
 
 	if (Out.vDiffuse.a <= 0.1f)
 		discard;
-
+	Out.vBlur = Out.vDiffuse;
 	return Out;
 }
 

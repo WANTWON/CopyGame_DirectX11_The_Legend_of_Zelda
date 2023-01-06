@@ -17,7 +17,7 @@ public:
 		_uint iSizeX, _uint iSizeY, DXGI_FORMAT eFormat, const _float4* pColor);
 
 	HRESULT Add_MRT(const _tchar* pMRTTag, const _tchar* pTargetTag);
-	HRESULT Begin_MRT(ID3D11DeviceContext* pContext, const _tchar* pMRTTag);
+	HRESULT Begin_MRT(ID3D11DeviceContext* pContext, const _tchar* pMRTTag, _bool m_bClear = true);
 	HRESULT Begin_ShadowMRT(ID3D11DeviceContext* pContext, const _tchar* pMRTTag);
 
 	HRESULT End_MRT(ID3D11DeviceContext* pContext);
