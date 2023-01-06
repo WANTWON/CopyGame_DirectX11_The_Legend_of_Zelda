@@ -104,6 +104,9 @@ unsigned int APIENTRY Thread_Main(void* pArg)
 	case LEVEL_TOWER:
 		pLoader->Loading_ForTowerLevel();
 		break;
+	case LEVEL_END:
+		pLoader->Loading_ForEndLevel();
+		break;
 	}
 
 	LeaveCriticalSection(&pLoader->Get_CriticalSection());
@@ -989,6 +992,12 @@ HRESULT CLoader::Loading_ForTowerLevel()
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_ForEndLevel()
+{
+	m_isFinished = true;
+	return S_OK;
+}
+
 HRESULT CLoader::Loading_For_ObjectPrototype()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -1321,8 +1330,13 @@ HRESULT CLoader::Loading_For_UITexture()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Message/ShopTalk_%d.dds"), 9))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_EndingScreen"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/EndScreen.dds"), 1))))
+		return E_FAIL;
+
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreen_UI"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/LoadingScreen.dds"), 1))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/LoadingScreen2.dds"), 1))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_TitleScreen"),

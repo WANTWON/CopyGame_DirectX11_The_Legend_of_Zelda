@@ -32,7 +32,7 @@ HRESULT CWeapon::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_vPointUp = _float3(0.5f, 0.5f, -0.4f);
-	m_vPointDown = _float3(0.5f, 0.5f, -1.f);
+	m_vPointDown = _float3(0.5f, 0.5f, -1.5f);
 
 
 	m_pTransformCom->Set_Scale(CTransform::STATE_RIGHT, 3.f);
@@ -56,17 +56,11 @@ int CWeapon::Tick(_float fTimeDelta)
 	SocketMatrix.r[1] = XMVector3Normalize(SocketMatrix.r[1]);
 	SocketMatrix.r[2] = XMVector3Normalize(SocketMatrix.r[2]);
 
-
 	XMStoreFloat4x4(&m_CombinedWorldMatrix, m_pTransformCom->Get_WorldMatrix() * SocketMatrix);
-	
-
-	m_fEffectTurm += fTimeDelta;
 	TarilWeapon_Update(SocketMatrix);
-	m_fEffectTurm = 0.f;
 
 	m_pTrailWeapon_Effect->Tick(fTimeDelta);
 	m_pOBBCom->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
-
 
 	return S_OK;
 }

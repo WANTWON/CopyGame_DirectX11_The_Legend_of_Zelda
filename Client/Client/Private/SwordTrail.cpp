@@ -28,7 +28,6 @@ HRESULT CSwordTrail::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_eShaderID = SHADER_TRAIL;
-	
 	return S_OK;
 }
 
@@ -48,8 +47,21 @@ int CSwordTrail::Tick(_float fTimeDelta)
 
 void CSwordTrail::Late_Tick(_float fTimeDelta)
 {
-	if (nullptr != m_pRendererCom)
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
+
+	if (pPlayer->Get_AnimState() == CPlayer::SLASH_HOLD_ED )
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
+		m_vColorFront = { 102, 255, 255, 255 };
+		m_vColorBack = { 12, 76, 255, 255 };
+	}
+	else if (pPlayer->Get_AnimState() == CPlayer::SLASH)
+	{
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
+		m_vColorFront = { 255, 244, 132, 255 };
+		m_vColorBack = { 248, 100, 0, 255 };
+	}
+
 }
 
 HRESULT CSwordTrail::Render()
@@ -126,7 +138,17 @@ HRESULT CSwordTrail::SetUp_ShaderResources()
 
 	RELEASE_INSTANCE(CGameInstance);
 
-	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(0))))
+	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(2))))
+		return E_FAIL;
+
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorBack", &m_vColorBack, sizeof(_vector))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ColorFront", &m_vColorFront, sizeof(_vector))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;
@@ -139,7 +161,6 @@ void CSwordTrail::Update_Trail_Point(_float3 vPointDown, _float3 vPointUp, _fmat
 
 	XMStoreFloat4x4(&m_WeaponMatrix, vWeaponMatrix);
 
-	m_bUpdateOn = true;
 }
 
 

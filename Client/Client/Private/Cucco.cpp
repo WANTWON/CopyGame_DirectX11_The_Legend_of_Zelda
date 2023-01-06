@@ -534,8 +534,16 @@ HRESULT CCucco::SetUp_ShaderID()
 {
 	 if (m_bHit)
 		m_eShaderID = SHADER_ANIMHIT;
-	else if (m_bAngry)
+	 else if (m_bAngry)
+	 {
 		 m_eShaderID = SHADER_ANIMCHARGE;
+		 _vector m_vColor = { 255, -50, -50, 255 };
+		 _float m_fColorPercent = 1.f;
+		 if (FAILED(m_pShaderCom->Set_RawValue("g_vColor", &m_vColor, sizeof(_float4))))
+			 return E_FAIL;
+		 if (FAILED(m_pShaderCom->Set_RawValue("g_fColorPercent", &m_fColorPercent, sizeof(_float))))
+			 return E_FAIL;
+	}
 		
 	else
 		m_eShaderID = SHADER_ANIMDEFAULT;

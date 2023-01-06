@@ -32,6 +32,7 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.vInitPositon);
 	m_pTransformCom->LookDir(m_EffectDesc.vLook);
 	m_vScale = m_EffectDesc.vInitScale;
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(CGameInstance::Get_Instance()->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
 
 	switch (m_EffectDesc.eEffectID)
 	{
@@ -45,6 +46,16 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 		m_eShaderID = SHADERM_ROLLCUT;
 		m_fTexUV = 1.f;
 		m_fAlpha = 1.f;
+		if (pPlayer->Get_AnimState() == CPlayer::SLASH)
+		{
+			m_vColorFront = XMVectorSet(255, 255, 0, 255.f);
+			m_vColorBack = XMVectorSet(255, 76, 0, 255.f);
+		}
+		else
+		{
+			m_vColorFront = { 102, 255, 255, 255 };
+			m_vColorBack = { 12, 76, 255, 255 };
+		}
 		break;
 	case SLASH:
 		Set_Scale(_float3(3.f, 3.f, 3.f));
@@ -53,10 +64,18 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 		m_eShaderID = SHADERM_SLASH;
 		m_fTexUV = 1.f;
 		m_fAlpha = 1.f;
+		if (pPlayer->Get_AnimState() == CPlayer::SLASH)
+		{
+			m_vColorFront = XMVectorSet(255, 255, 125, 255.f);
+		}
+		else
+		{
+			m_vColorFront = { 102, 255, 255, 255 };
+		}
 		break;
 	case CROSS:
 	{
-		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
+		m_eShaderID = SHADERM_TWOCOLOR_PRIORITY;
 		m_vColorFront = XMVectorSet(228.f, 226.f, 228.f, 255.f);
 		_int iRandNum = rand() % 5 + 1;
 		if (iRandNum == 1) m_vColorBack = XMVectorSet(255.f, 63.f, 63.f, 255.f);
@@ -73,8 +92,8 @@ HRESULT CPlayerEffect::Initialize(void * pArg)
 		m_vMaxScale = m_EffectDesc.vInitScale;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_EffectDesc.vInitPositon);
 		m_eShaderID = SHADER_TWOCOLOR_DEFAULT;
-		m_vColorFront = XMVectorSet(255, 232, 0, 255.f);
-		m_vColorBack = XMVectorSet(255, 76, 0, 255.f);
+		m_vColorFront = XMVectorSet(200, 255, 255, 255.f);
+		m_vColorBack = { 102, 255, 255, 255 };
 		m_fAlpha = 0.f;
 		break;
 	default:

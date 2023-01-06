@@ -486,6 +486,9 @@
     <ClInclude Include="..\Public\SwordTrail.h">
       <Filter>02.GameObjects\05.Effect\PlayerEffect\SwordTrail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_End.h">
+      <Filter>01.Levels\06.End</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -709,6 +712,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\SwordTrail.cpp">
       <Filter>02.GameObjects\05.Effect\PlayerEffect\SwordTrail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_End.cpp">
+      <Filter>01.Levels\06.End</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

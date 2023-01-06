@@ -75,9 +75,8 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDiffuse.a = Out.vDiffuse.r;
 
-
-	Out.vDiffuse.rgb = 1.f;
-	Out.vDiffuse.b -= 0.5f;
+	vector GetColorFront = g_ColorFront / 255.f;
+	Out.vDiffuse.rgb = GetColorFront;
 
 	if (1 - g_TexUV < In.vTexUV.x)
 		discard;
@@ -99,14 +98,14 @@ PS_OUT PS_MAIN_RollCut(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	Out.vDiffuse.a = Out.vDiffuse.r*2.f;
 
-	vector vColor1 = vector(1, 1, 0, 1);
-	vector vColor2 = vector(1, 0.1, 0.1, 1);
+	vector GetColorBack = g_ColorBack / 255.f;
+	vector GetColorFront = g_ColorFront / 255.f;
 
-	Out.vDiffuse.rgb = vColor2.rgb * (1 - Out.vDiffuse.r) + vColor1.rgb *(Out.vDiffuse.r+0.1);
+	Out.vDiffuse.rgb = GetColorBack.rgb * (1 - Out.vDiffuse.r) + GetColorFront.rgb * (Out.vDiffuse.r + 0.1);
 	vector vGlowColor = g_GlowTexture.Sample(LinearSampler, In.vTexUV);
 	vGlowColor.b = vGlowColor.r;
 
-	if (  1 - (1 - g_TexUV) > In.vTexUV.y)
+	if (1 - (1 - g_TexUV) > In.vTexUV.y)
 		discard;
 
 	vGlowColor *= Out.vDiffuse;

@@ -251,12 +251,12 @@ PS_OUT PS_CHARGE(PS_IN In)
 
 	Out.vDiffuse.rgb += GetColor.rgb * g_fColorPercent;
 
-	//float4		vFogColor = vector(186, 218, 255, 0) / 255.f;
-	float4		vFogColor = vector(66, 116, 214, 0) / 255.f;
-	float		fDistance = length(g_PlayerPosition - In.vWorldPos);
-	float		fFogPower = max(fDistance - g_fMinRange, 0.f) / (g_fMaxRange - g_fMinRange);
+	////float4		vFogColor = vector(186, 218, 255, 0) / 255.f;
+	//float4		vFogColor = vector(66, 116, 214, 0) / 255.f;
+	//float		fDistance = length(g_PlayerPosition - In.vWorldPos);
+	//float		fFogPower = max(fDistance - g_fMinRange, 0.f) / (g_fMaxRange - g_fMinRange);
 
-	Out.vDiffuse += vFogColor * fFogPower;
+	//Out.vDiffuse += vFogColor * fFogPower;
 
 	if (Out.vDiffuse.a <= 0.1f)
 		discard;

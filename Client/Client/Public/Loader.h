@@ -39,6 +39,7 @@ public:
 	HRESULT Loading_ForTailCaveLevel();
 	HRESULT Loading_ForRoomLevel();
 	HRESULT Loading_ForTowerLevel();
+	HRESULT Loading_ForEndLevel();
 
 public:
 	HRESULT Loading_For_ObjectPrototype();

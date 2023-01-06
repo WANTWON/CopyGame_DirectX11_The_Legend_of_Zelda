@@ -595,7 +595,7 @@ int CFieldNpc::Child_Tick(_float fTimeDelta)
 			m_eState = RUN;
 			Make_ChildEffect(fTimeDelta);
 			m_pTransformCom->LookAt(vTargetPos);
-			m_pTransformCom->Go_StraightSliding(fTimeDelta*0.5f, m_pNavigationCom);
+			m_pTransformCom->Go_StraightSliding(fTimeDelta*0.5f, m_pNavigationCom, 0.f);
 			
 			int iRandNum = rand() % 2;
 			if (iRandNum == 0)

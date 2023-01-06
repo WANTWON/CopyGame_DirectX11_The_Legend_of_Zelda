@@ -22,13 +22,14 @@ protected:
 	virtual ~CVIBuffer_SwordTrail() = default;
 
 private:
-	_uint		m_iLimitPointCount = 0;
-
+	_int		m_iLimitPointCount = 30;
 	list<_float3>		m_TrailPoint;
+
 	_uint		m_iEndIndex = 0;
 	_uint		m_iCatmullRomCount = 0;
 	_uint		m_iVtxCount = 0;
 	_uint		m_iCatmullRomIndex[4] = { 0 };
+public:
 
 public:
 	virtual HRESULT Initialize_Prototype();

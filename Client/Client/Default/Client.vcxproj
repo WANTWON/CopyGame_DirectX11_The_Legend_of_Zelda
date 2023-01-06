@@ -172,6 +172,7 @@
     <ClInclude Include="..\..\..\Bin\ShaderFiles\Client_Shader_Defines.hpp" />
     <ClInclude Include="..\Public\Albatoss.h" />
     <ClInclude Include="..\Public\FireEffect.h" />
+    <ClInclude Include="..\Public\Level_End.h" />
     <ClInclude Include="..\Public\SwordTrail.h" />
     <ClInclude Include="..\Public\TreasureBoxEffect.h" />
     <ClInclude Include="..\public\UIScreen.h" />
@@ -251,6 +252,7 @@
   <ItemGroup>
     <ClCompile Include="..\Private\Albatoss.cpp" />
     <ClCompile Include="..\Private\FireEffect.cpp" />
+    <ClCompile Include="..\Private\Level_End.cpp" />
     <ClCompile Include="..\Private\SwordTrail.cpp" />
     <ClCompile Include="..\Private\TreasureBoxEffect.cpp" />
     <ClCompile Include="..\private\UIScreen.cpp" />

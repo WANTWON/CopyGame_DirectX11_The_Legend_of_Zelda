@@ -37,13 +37,10 @@ private:
 
 private:
 	CVIBuffer_SwordTrail*		m_pVIBufferCom = nullptr;
-	_float			m_fUpdateTurm = 0.f;
-
+	
 	_float3			m_vPointDown;
 	_float3			m_vPoint_Up;
 	_float4x4		m_WeaponMatrix;
-
-	_bool			m_bUpdateOn = false;
 
 public:
 	static CSwordTrail* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

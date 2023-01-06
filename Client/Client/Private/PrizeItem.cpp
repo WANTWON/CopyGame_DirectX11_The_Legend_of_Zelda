@@ -216,6 +216,16 @@ void CPrizeItem::LateTick_PrizeModeItem(_float fTimeDelta)
 				if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_TOWER, TEXT("Layer_Portal"), &PortalDesc)))
 					return;
 			}
+			else if (m_ItemDesc.eType == CELLO)
+			{
+				CPortal::PORTALDESC PortalDesc;
+				PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
+				pPlayer->Set_2DMode(false);
+				XMStoreFloat3(&PortalDesc.vInitPos, pPlayer->Get_TransformState(CTransform::STATE_POSITION));
+				PortalDesc.eConnectLevel = LEVEL_END;
+				if (FAILED(CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_Portal"), LEVEL_TAILCAVE, TEXT("Layer_Portal"), &PortalDesc)))
+					return;
+			}
 		}
 
 	}

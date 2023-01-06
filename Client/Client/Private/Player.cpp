@@ -76,7 +76,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	//RELEASE_INSTANCE(CGameInstance);
 
 
-	m_vColor = XMVectorSet(255, 230, 0.f, 255);
+	m_vColor = XMVectorSet(0, 105, 255.f, 255);
 	m_eState = WARP_ED;
 
 
@@ -1425,12 +1425,7 @@ void CPlayer::Make_SlashEffect()
 		_uint iNum = rand() % 4 + 1;
 		wcscpy_s(sz_SoundEffect, TEXT("LSword_AttackCharging%d.wav"));
 		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
-	//	EffectDesc.vLook = m_BulletLook* -1;
 		CGameInstance::Get_Instance()->PlaySounds(sz_SoundEffect, SOUND_PEFFECT, fEffectVolume);
-
-		EffectDesc.vInitScale = _float3(3.5f, 3.5f, 3.5f);
-		EffectDesc.eEffectID = CPlayerEffect::ARC;
-		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
 	}
 	else
@@ -1799,7 +1794,7 @@ void CPlayer::Change_Animation(_float fTimeDelta)
 	case Client::CPlayer::SLASH:
 	case Client::CPlayer::S_SLASH:
 	case Client::CPlayer::SLASH_HOLD_ED:
-		//Make_SlashEffect();
+		Make_SlashEffect();
 		m_eAnimSpeed = 2.5f;
 		m_bIsLoop = false;
 		if (m_pModelCom->Play_Animation(fTimeDelta*m_eAnimSpeed, m_bIsLoop))

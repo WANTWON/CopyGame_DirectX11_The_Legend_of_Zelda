@@ -68,7 +68,7 @@ HRESULT CLevel_GamePlay::Initialize()
 
 	if (FAILED(Ready_Layer_Warp(TEXT("Layer_Warp"))))
 		return E_FAIL;
-	
+
 	//if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	//	return E_FAIL;	
 
@@ -81,7 +81,7 @@ HRESULT CLevel_GamePlay::Initialize()
 		CUI_Manager::Get_Instance()->Initialize_PlayerState();
 		g_bUIMadefirst = true;
 	}
-	
+
 	CCameraManager* pCameraManager = CCameraManager::Get_Instance();
 
 	pCameraManager->Ready_Camera(LEVEL::LEVEL_GAMEPLAY);
@@ -89,9 +89,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	dynamic_cast<CCamera_Dynamic*>(pCamera)->Set_CamMode(CCamera_Dynamic::CAM_PLAYER);
 	CUI_Manager::Get_Instance()->Set_NextLevel(false);
 
-	
+
 	g_fBGMVolume = 0.f;
-	
+
 	CGameInstance::Get_Instance()->StopAll();
 	CGameInstance::Get_Instance()->PlayBGM(TEXT("1_0 Field (Normal).mp3"), g_fBGMVolume);
 	return S_OK;
@@ -99,7 +99,7 @@ HRESULT CLevel_GamePlay::Initialize()
 
 void CLevel_GamePlay::Tick(_float fTimeDelta)
 {
-	__super::Tick(fTimeDelta);	
+	__super::Tick(fTimeDelta);
 
 	CUI_Manager::Get_Instance()->Tick_UI(fTimeDelta);
 
@@ -149,7 +149,7 @@ void CLevel_GamePlay::Setting_Light()
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pGameInstance->Get_Object(LEVEL_STATIC, TEXT("Layer_Player")));
-	
+
 	_float fPositionZ = XMVectorGetZ(pPlayer->Get_TransformState(CTransform::STATE_POSITION));
 	LIGHTDESC			LightDesc = *pGameInstance->Get_LightDesc(0);
 
@@ -164,33 +164,92 @@ void CLevel_GamePlay::Setting_Light()
 				pGameInstance->PlayBGM(TEXT("1-10 Mysterious Forest.mp3"), g_fBGMVolume);
 				CUI_Manager::Get_Instance()->Set_NextLevel(false);
 				m_eMusic = MYSTERY;
+
+				if (!m_bMakeLight)
+				{
+					/* For.Point */
+					LIGHTDESC PointLightDesc;
+					ZeroMemory(&PointLightDesc, sizeof(LIGHTDESC));
+					PointLightDesc.eType = LIGHTDESC::TYPE_POINT;
+					XMStoreFloat4(&PointLightDesc.vPosition, pPlayer->Get_TransformState(CTransform::STATE_POSITION));
+					PointLightDesc.vPosition.y += 3.f;
+					PointLightDesc.fRange = 5.f;
+					PointLightDesc.vDiffuse = _float4(0.f, 0.f, 0.f, 1.f);
+					PointLightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
+					PointLightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+
+					if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, PointLightDesc)))
+						return;
+
+					m_bMakeLight = true;
+				}
 			}
 
-			
+
 		}
 
 
-		if (LightDesc.vDiffuse.x > 0.5f)
+		LightDesc.vDiffuse.x -= 0.005f;
+		LightDesc.vDiffuse.y -= 0.005f;
+
+		if (LightDesc.vDiffuse.x <= 0.3f)
 		{
-			LightDesc.vDiffuse.x -= 0.005f;
-			LightDesc.vDiffuse.y -= 0.005f;
-			LightDesc.vSpecular.x -= 0.005f;
-			LightDesc.vSpecular.y -= 0.005f;
-
-			if (LightDesc.vSpecular.x <= 0.4f)
-			{
-				LightDesc.vSpecular.x = 0.4f;
-				LightDesc.vSpecular.y = 0.4f;
-
-			}
-				
-			pGameInstance->Set_LightDesc(0, &LightDesc);
+			LightDesc.vDiffuse.x = 0.3f;
+			LightDesc.vDiffuse.y = 0.3f;
 		}
-		
+
+		LightDesc.vSpecular.x -= 0.005f;
+		LightDesc.vSpecular.y -= 0.005f;
+		if (LightDesc.vSpecular.x <= 0.3f)
+		{
+			LightDesc.vSpecular.x = 0.3f;
+			LightDesc.vSpecular.y = 0.3f;
+		}
+
+		LightDesc.vDiffuse.z -= 0.005f;
+		if (LightDesc.vDiffuse.z <= 0.5f)
+			LightDesc.vDiffuse.z = 0.5f;
+
+		pGameInstance->Set_LightDesc(0, &LightDesc);
+
+
+		if (m_bMakeLight)
+		{
+			LIGHTDESC PointLightDesc = *pGameInstance->Get_LightDesc(1);
+			XMStoreFloat4(&PointLightDesc.vPosition, pPlayer->Get_TransformState(CTransform::STATE_POSITION));
+			PointLightDesc.vPosition.y += 3.f;
+			PointLightDesc.vDiffuse.x += 0.05f;
+			PointLightDesc.vDiffuse.y += 0.05f;
+			PointLightDesc.vDiffuse.z += 0.05f;
+
+			if (PointLightDesc.vDiffuse.x >= 1.f)
+			{
+				PointLightDesc.vDiffuse.x = 1.f;
+				PointLightDesc.vDiffuse.y = 1.f;
+				PointLightDesc.vDiffuse.z = 1.f;
+			}
+			pGameInstance->Set_LightDesc(1, &PointLightDesc);
+		}
 
 	}
 	else
 	{
+
+		if (m_bMakeLight)
+		{
+			LIGHTDESC PointLightDesc = *pGameInstance->Get_LightDesc(1);
+			PointLightDesc.vDiffuse.x -= 0.005f;
+			PointLightDesc.vDiffuse.y -= 0.005f;
+			PointLightDesc.vDiffuse.z -= 0.005f;
+			pGameInstance->Set_LightDesc(1, &PointLightDesc);
+
+			if (PointLightDesc.vDiffuse.x <= 0.f)
+			{
+				pGameInstance->Clear_Light(1);
+				m_bMakeLight = false;
+			}
+		}
+
 
 		if (m_eMusic == MYSTERY)
 		{
@@ -203,27 +262,37 @@ void CLevel_GamePlay::Setting_Light()
 				m_eMusic = FIELD;
 			}
 
-			
+
 		}
 
-		if (LightDesc.vDiffuse.x < 1.f)
+
+		LightDesc.vDiffuse.x += 0.005f;
+		LightDesc.vDiffuse.y += 0.005f;
+		if (LightDesc.vDiffuse.x >= 1.f)
 		{
-			LightDesc.vDiffuse.x += 0.005f;
-			LightDesc.vDiffuse.y += 0.005f;
-			//LightDesc.vDiffuse.z -= 0.005f;
-			LightDesc.vSpecular.x += 0.005f;
-			LightDesc.vSpecular.y += 0.005f;
-
-			if (LightDesc.vSpecular.x >= 0.7f)
-			{
-				LightDesc.vSpecular.x = 0.7f;
-				LightDesc.vSpecular.y = 0.7f;
-
-			}
-			//if (LightDesc.vDiffuse.z <= 0.8f)
-			//	LightDesc.vDiffuse.z = 0.8f;
-			pGameInstance->Set_LightDesc(0, &LightDesc);
+			LightDesc.vDiffuse.x = 1.f;
+			LightDesc.vDiffuse.y = 1.f;
 		}
+
+		LightDesc.vSpecular.x += 0.005f;
+		LightDesc.vSpecular.y += 0.005f;
+
+		if (LightDesc.vSpecular.x >= 0.7f)
+		{
+			LightDesc.vSpecular.x = 0.7f;
+			LightDesc.vSpecular.y = 0.7f;
+
+		}
+
+
+		LightDesc.vDiffuse.z += 0.005f;
+		if (LightDesc.vDiffuse.z >= 0.8f)
+		{
+			LightDesc.vDiffuse.z = 0.8f;
+		}
+
+
+		pGameInstance->Set_LightDesc(0, &LightDesc);
 	}
 
 
@@ -249,7 +318,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	LightDesc.vDirection = _float4(-0.3f, -1.f, -0.3f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 0.8f, 1.f);
 	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
-	LightDesc.vSpecular = _float4(0.7f, 0.7f, 0.7f, 1.f);	
+	LightDesc.vSpecular = _float4(0.7f, 0.7f, 0.7f, 1.f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
@@ -257,23 +326,12 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 
 	_float4		vLightEye, vLightAt;
 
-	XMStoreFloat4(&vLightEye, XMVectorSet(40,100.f,73,1.f));
+	XMStoreFloat4(&vLightEye, XMVectorSet(40, 100.f, 73, 1.f));
 	XMStoreFloat4(&vLightAt, XMVectorSet(39, 0, 71, 1.f));
 
 	pGameInstance->Set_ShadowLightView(vLightEye, vLightAt);
 
-	///* For.Point */
-	//ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 
-	//LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	//LightDesc.vPosition = _float4(16.3f, 2.f, 18.8f, 1.f);
-	//LightDesc.fRange = 5.f;	
-	//LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
-	//LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	//LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
-
-	//if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
-	//	return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -333,7 +391,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _tchar * pLayerTag)
 
 	Safe_Release(pGameInstance);
 
-	
+
 	return S_OK;
 }
 
@@ -350,7 +408,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Terrain"), LEVEL_GAMEPLAY, TEXT("Layer_Terrain"), &eLevel)))
 		return E_FAIL;
 
-	
+
 
 	HANDLE hFile = 0;
 	_ulong dwByte = 0;
@@ -387,10 +445,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_Effect(const _tchar * pLayerTag)
 	{
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Effect"), LEVEL_GAMEPLAY, pLayerTag, nullptr)))
 			return E_FAIL;
-	}	
+	}
 
 	Safe_Release(pGameInstance);
-	
+
 	return S_OK;
 }
 
@@ -434,7 +492,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	CUIScreen::BACKGROUNDESC BackgroundDesc;
 	BackgroundDesc.eVisibleScreen = CUIScreen::VISIBLE_PLAYGAME;
 	BackgroundDesc.pTextureTag = TEXT("Prototype_Component_Texture_GamePlayScreen_UI");
-	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, pLayerTag, 
+	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_BackGround_UI"), LEVEL_STATIC, pLayerTag,
 		&BackgroundDesc)))
 		return E_FAIL;
 
@@ -475,7 +533,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 
 	if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CUIButton"), LEVEL_STATIC, pLayerTag, &ButtonDesc)))
 		return E_FAIL;
-	
+
 
 	ButtonDesc.eButtonType = CUIButton::BTN_INTERACT;
 	ButtonDesc.eState = CUIButton::BTN_A;
@@ -488,13 +546,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	for (_int i = 0; i < 3; ++i)
 	{
 		for (_int j = 0; j < 4; ++j)
-		{			
+		{
 
 			CInvenTile::INVENDESC InvenDesc;
 			InvenDesc.eTileType = CInvenTile::INVEN_TILE;
 			InvenDesc.eState = CInvenTile::STATE_DEFAULT;
 			InvenDesc.eEquipKey = CInvenTile::EQUIP_NONE;
-			InvenDesc.vPosition = _float2(_float(780 + j*110), _float(260 + i*120));
+			InvenDesc.vPosition = _float2(_float(780 + j * 110), _float(260 + i * 120));
 
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_InvenTile_UI"), LEVEL_STATIC, TEXT("Layer_Ineventile"), &InvenDesc)))
 				return E_FAIL;
@@ -519,8 +577,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	{
 		CInvenItem::ITEMDESC ItemDesc;
 		ItemDesc.eItemType = CInvenItem::ITEM_EQUIP;
-		ItemDesc.m_iTextureNum = (CInvenItem::EQUIP_TEXLIST)(i+1);
-		ItemDesc.vPosition = _float2(165.f, 245.f + 70*i);
+		ItemDesc.m_iTextureNum = (CInvenItem::EQUIP_TEXLIST)(i + 1);
+		ItemDesc.vPosition = _float2(165.f, 245.f + 70 * i);
 
 		if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_CInvenItem"), LEVEL_STATIC, TEXT("Layer_EquipItem"), &ItemDesc)))
 			return E_FAIL;
@@ -552,8 +610,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const _tchar * pLayerTag)
 	for (int i = 0; i < 4; ++i)
 	{
 		_float2 vPosition = _float2(0.f, 0.f);
-		
-		vPosition.x = (i == 1 || i == 2) ?  400 + 95.f : 400 + 40.f;
+
+		vPosition.x = (i == 1 || i == 2) ? 400 + 95.f : 400 + 40.f;
 
 		vPosition.y = 230.f + i * 70.f;
 
@@ -618,7 +676,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _tchar * pLayerTag)
 
 	}
 
-	
+
 
 
 	CloseHandle(hFile);
@@ -729,7 +787,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Portal(const _tchar * pLayerTag)
 
 
 	ReadFile(hFile, &(ModelDesc), sizeof(CNonAnim::NONANIMDESC), &dwByte, nullptr);
-	
+
 	CPortal::PORTALDESC PortalDesc;
 	PortalDesc.ePortalType = CPortal::PORTAL_LEVEL;
 	PortalDesc.vInitPos = ModelDesc.vPosition;
@@ -821,7 +879,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Npc(const _tchar * pLayerTag)
 				return E_FAIL;
 
 		}
-		 if (!wcscmp(pModeltag, TEXT("MadamMeowMeow.fbx")))
+		if (!wcscmp(pModeltag, TEXT("MadamMeowMeow.fbx")))
 		{
 			CNpc::NPCDESC NpcDesc;
 			NpcDesc.vInitPos = ModelDesc.vPosition;
@@ -851,7 +909,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Npc(const _tchar * pLayerTag)
 		else if (!wcscmp(pModeltag, TEXT("Cucco.fbx")))
 		{
 			if (FAILED(pGameInstance->Add_GameObject(TEXT("Prototype_GameObject_Cucco"), LEVEL_GAMEPLAY, TEXT("Layer_Cucco"), &ModelDesc.vPosition)))
-				return E_FAIL;	
+				return E_FAIL;
 
 		}
 		else if (!wcscmp(pModeltag, TEXT("Butterfly.fbx")))

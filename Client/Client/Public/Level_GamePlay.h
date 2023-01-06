@@ -39,6 +39,7 @@ public:
 private:
 	CCollision_Manager* m_pCollision_Manager = nullptr;
 	MUSIC m_eMusic = FIELD;
+	_bool m_bMakeLight = false;
 
 public:
 	static CLevel_GamePlay* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
