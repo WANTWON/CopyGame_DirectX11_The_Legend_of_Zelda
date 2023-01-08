@@ -54,12 +54,16 @@ int CUIScreen::Tick(_float fTimeDelta)
 
 void CUIScreen::Late_Tick(_float fTimeDelta)
 {
+	if (CGameInstance::Get_Instance()->Get_CurrentLevelIndex() == LEVEL_LOADING && m_BackgroundDesc.eVisibleScreen != VISIBLE_LOADING)
+		return;
+
+
 	if (CGameInstance::Get_Instance()->Get_CurrentLevelIndex() == LEVEL_LOADING
 		|| CGameInstance::Get_Instance()->Get_CurrentLevelIndex() == LEVEL_LOGO)
 	{
 		if (m_BackgroundDesc.eVisibleScreen != VISIBLE_LOGO)
 			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
-		else
+		else 
 			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_BACK, this);
 	}
 	else
@@ -132,8 +136,7 @@ HRESULT CUIScreen::Render()
 
 	m_pVIBufferCom->Render();
 
-	return S_OK;
-	
+
 	return S_OK;
 }
 

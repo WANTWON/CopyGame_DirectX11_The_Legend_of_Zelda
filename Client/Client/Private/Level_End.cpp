@@ -20,7 +20,7 @@ HRESULT CLevel_End::Initialize()
 		return E_FAIL;
 
 	CGameInstance::Get_Instance()->StopAll();
-	CGameInstance::Get_Instance()->PlayBGM(TEXT("0_Title (No Intro Version).mp3"), g_fBGMVolume);
+	CGameInstance::Get_Instance()->PlayBGM(TEXT("03 NameInput.mp3"), g_fBGMVolume);
 	CUI_Manager::Get_Instance()->Set_NextLevel(false);
 	return S_OK;
 }
@@ -49,7 +49,8 @@ HRESULT CLevel_End::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	Safe_AddRef(pGameInstance);
 
 	pGameInstance->Clear_Layer(LEVEL_STATIC, TEXT("Layer_UI"));
-
+	pGameInstance->Clear_Layer(LEVEL_STATIC, TEXT("Layer_InvenItem"));
+	
 	CUIScreen::BACKGROUNDESC BackgroundDesc;
 
 	BackgroundDesc.eVisibleScreen = CUIScreen::VISIBLE_LOGO;

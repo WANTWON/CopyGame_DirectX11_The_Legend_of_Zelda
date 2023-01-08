@@ -38,6 +38,7 @@ public:
 	void Set_TileState(TILE_STATE eState) {m_InvenDesc.eState = eState;}
 	void Set_TextureNum(_uint iNum);
 	_uint Get_TextureNum();
+	class CInvenItem* Get_Item() { return m_pItem; }
 
 private:
 	virtual HRESULT Ready_Components(void * pArg = nullptr) override;
