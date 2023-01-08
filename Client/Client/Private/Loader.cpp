@@ -1336,7 +1336,7 @@ HRESULT CLoader::Loading_For_UITexture()
 
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreen_UI"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/LoadingScreen2.dds"), 1))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/UI/Screen/LoadingScreen.dds"), 1))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_TitleScreen"),
@@ -1570,6 +1570,12 @@ HRESULT CLoader::Loading_For_Effect()
 	/*For.Prototype_Component_Ripple */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Ripple"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/Ripple/ripple_%02d.dds"), 4))))
+		return E_FAIL;
+
+
+	/*For.Prototype_Component_Texture_WandSmoke */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_WandSmoke"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Bin/Resources/Textures/Effect/WandSmoke/smoke_array_pattern_02_Slice_%d_.png"), 32))))
 		return E_FAIL;
 
 	/*For.Prototype_Component_Texture_Blast */

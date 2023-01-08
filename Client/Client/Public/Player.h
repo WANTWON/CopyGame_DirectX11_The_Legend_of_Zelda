@@ -54,6 +54,8 @@ public: /* Getter & Setter */
 	CWeapon::WEAPONDESC Get_WeaponDesc() { return m_WeaponDesc; }
 	_bool	Get_2DMode() { return m_b2D; }
 	_float2 Get_PlayerTexUV() { return m_fTexUV; }
+	MESH_NAME Get_RightHandItem() { return m_eRightHand; }
+
 
 	void	Set_Info(OBJINFO Info) { m_tInfo = Info; }
 	void	Set_AnimState(ANIM eAnim);
@@ -75,7 +77,7 @@ public:
 	HRESULT Ready_Parts(CPrizeItem::TYPE eType, PARTS PartsIndex);
 	HRESULT Ready_Parts_Bullet(CWeapon::TYPE eType, PARTS PartsIndex);
 	void	Set_PlayerState_Defaut();
-
+	void	Set_PlayerHandItem();
 	
 public:
 	void Make_GuardEffect(CBaseObj* pTarget = nullptr);

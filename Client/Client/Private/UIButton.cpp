@@ -97,7 +97,7 @@ void CUIButton::Late_Tick(_float fTimeDelta)
 		else if (m_ButtonDesc.eButtonType == BTN_INVEN && CUI_Manager::Get_Instance()->Get_UI_OpenType() == CUI_Manager::UI_INVEN)
 			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_TOP, this);
 		else
-			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_TOP, this);
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI_FRONT, this);
 		
 	}
 		

@@ -52,14 +52,41 @@ void CSwordTrail::Late_Tick(_float fTimeDelta)
 	if (pPlayer->Get_AnimState() == CPlayer::SLASH_HOLD_ED )
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
-		m_vColorFront = { 102, 255, 255, 255 };
-		m_vColorBack = { 12, 76, 255, 255 };
+
+		if (pPlayer->Get_RightHandItem() == CPlayer::MESH_SWORD)
+		{
+			m_vColorFront = { 102, 255, 255, 255 };
+			m_vColorBack = { 12, 76, 255, 255 };
+			m_EffectDesc.iTextureNum = 2;
+
+		}	
+		else if (pPlayer->Get_RightHandItem() == CPlayer::MESH_ROD)
+		{
+			m_vColorFront = { 143, 105, 255, 255 };
+			m_vColorBack = { 143, 105, 255, 255 };
+			m_EffectDesc.iTextureNum = 1;
+
+		}
+
 	}
 	else if (pPlayer->Get_AnimState() == CPlayer::SLASH)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
-		m_vColorFront = { 255, 244, 132, 255 };
-		m_vColorBack = { 248, 100, 0, 255 };
+
+		if (pPlayer->Get_RightHandItem() == CPlayer::MESH_SWORD)
+		{
+			m_vColorFront = { 255, 244, 132, 255 };
+			m_vColorBack = { 248, 100, 0, 255 };
+			m_EffectDesc.iTextureNum = 2;
+
+		}
+		else if (pPlayer->Get_RightHandItem() == CPlayer::MESH_ROD)
+		{
+			m_vColorFront = { 143, 105, 255, 255 };
+			m_vColorBack = { 143, 105, 255, 255 };
+			m_EffectDesc.iTextureNum = 1;
+
+		}
 	}
 
 }
@@ -138,7 +165,7 @@ HRESULT CSwordTrail::SetUp_ShaderResources()
 
 	RELEASE_INSTANCE(CGameInstance);
 
-	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(2))))
+	if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_DiffuseTexture", m_pTextureCom->Get_SRV(m_EffectDesc.iTextureNum))))
 		return E_FAIL;
 
 

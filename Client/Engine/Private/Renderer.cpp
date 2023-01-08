@@ -274,8 +274,7 @@ HRESULT CRenderer::Render_GameObjects()
 		return E_FAIL;
 
 #ifdef _DEBUG	
-	if (FAILED(Render_Debug()))
-		return E_FAIL;
+	Render_Debug();
 #endif // _DEBUG
 
 	if (FAILED(Render_UI()))

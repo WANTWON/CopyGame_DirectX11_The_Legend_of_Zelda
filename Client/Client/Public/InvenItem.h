@@ -42,7 +42,7 @@ public:
 	void Set_TextureNum(_uint iNum) { m_ItemDesc.m_iTextureNum = iNum; }
 	void Set_bShow(_bool type) { m_bShow = type; }
 	_uint Get_TextureNum() { return m_ItemDesc.m_iTextureNum; }
-
+	ITEMDESC Get_ItemDesc() { return m_ItemDesc; }
 private:
 	virtual HRESULT Ready_Components(void * pArg = nullptr) override;
 	virtual HRESULT SetUp_ShaderResources()override;  /* 셰이더 전역변수에 값을 전달한다. */

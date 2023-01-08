@@ -13,7 +13,7 @@ BEGIN(Client)
 class CPlayerBullet final : public CBaseObj
 {
 public:
-	enum BULLETTYPE { BOW, BOOMERANG, BULLET_END};
+	enum BULLETTYPE { BOW,WAND, BOOMERANG, BULLET_END};
 
 	typedef struct Bullettag
 	{
@@ -48,6 +48,7 @@ private:
 private:
 	void Moving_SwordBullet(_float fTimeDelta);
 	void Moving_BowBullet(_float fTimeDelta);
+	void Moving_WandBullet(_float fTimeDelta);
 
 protected: /* For.Components */
 	CModel*					m_pModelCom = nullptr;
@@ -58,6 +59,10 @@ protected: /* For.Components */
 	_float					m_fDeadtime = 0.f;
 	_float					m_fAnimSpeed = 1.f;
 	_float					m_fTexUV = 0.f;
+	_uint					m_iTextureNum = 0;
+
+	_vector m_vColorFront;
+	_vector	m_vColorBack;
 
 	BULLETDESC				m_BulletDesc;
 	_float4x4				m_CombinedWorldMatrix;

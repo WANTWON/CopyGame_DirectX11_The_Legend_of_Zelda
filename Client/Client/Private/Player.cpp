@@ -13,6 +13,8 @@
 #include "FightEffect.h"
 #include "UIIcon.h"
 #include "MonsterEffect.h"
+#include "InvenItem.h"
+#include "InvenTile.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CBaseObj(pDevice, pContext)
@@ -180,6 +182,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 
 
 	Sound_PlayerVoice_by_State(fTimeDelta);
+	Set_PlayerHandItem();
 
 	for (auto& pParts : m_Parts)
 	{
@@ -547,6 +550,37 @@ HRESULT CPlayer::Ready_Parts_Bullet(CWeapon::TYPE eType, PARTS PartsIndex)
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
+}
+
+void CPlayer::Set_PlayerHandItem()
+{
+	CUI_Manager* pUI_Manager = GET_INSTANCE(CUI_Manager);
+
+	CObj_UI* pInvenTileX = pUI_Manager->Get_EquipItem(CUI_Manager::EQUIP_X);
+	CObj_UI* pInvenTileY = pUI_Manager->Get_EquipItem(CUI_Manager::EQUIP_Y);
+
+	if (pInvenTileX == nullptr && pInvenTileY == nullptr)
+	{
+		m_eRightHand = MESH_SWORD;
+		RELEASE_INSTANCE(CUI_Manager);
+		return;
+	}
+
+	_uint ItemX = 0;
+	_uint ItemY = 0;
+	if (pInvenTileX != nullptr)
+		ItemX = dynamic_cast<CInvenTile*>(pInvenTileX)->Get_TextureNum();
+	if (pInvenTileY != nullptr)
+		ItemY = dynamic_cast<CInvenTile*>(pInvenTileY)->Get_TextureNum();
+	if (ItemX == CInvenItem::ITEM_WAND || ItemY == CInvenItem::ITEM_WAND)
+	{
+		m_eRightHand = MESH_ROD;
+	}
+	else
+		m_eRightHand = MESH_SWORD;
+
+
+	RELEASE_INSTANCE(CUI_Manager);
 }
 
 void CPlayer::Set_PlayerState_Defaut()
@@ -1395,8 +1429,36 @@ void CPlayer::Make_SlashEffect()
 
 	_tchar	sz_SoundEffect[MAX_PATH];
 	_float fEffectVolume = 0.3f;
+	if (m_eState == SLASH_HOLD_ED)
+	{
+		fEffectVolume = 0.3f;
+		_uint iNum = rand() % 4 + 1;
+		wcscpy_s(sz_SoundEffect, TEXT("LSword_AttackCharging%d.wav"));
+		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_SoundEffect, SOUND_PEFFECT, fEffectVolume);
+	}
+	else
+	{
+		fEffectVolume = 0.3f;
+		_uint iNum = rand() % 5 + 1;
+		wcscpy_s(sz_SoundEffect, TEXT("LSword_Swing%d.wav"));
+		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
+		CGameInstance::Get_Instance()->PlaySounds(sz_SoundEffect, SOUND_PEFFECT, fEffectVolume);
+	}
 
-	
+
+	if (m_eRightHand == MESH_ROD)
+	{
+		CPlayerBullet::BULLETDESC BulletDesc;
+		BulletDesc.eBulletType = CPlayerBullet::WAND;
+		BulletDesc.fDeadTime = 2.f;
+		BulletDesc.vInitPositon = Get_TransformState(CTransform::STATE_POSITION) + XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK)) + XMVectorSet(0.f,1.f,0.f,0.f);
+		BulletDesc.vLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
+
+		CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerBullet"), LEVEL_STATIC, TEXT("Layer_PlayerBullet"), &BulletDesc);
+		return;
+	}
+
 	
 	m_BulletLook = XMVector3Normalize(Get_TransformState(CTransform::STATE_LOOK));
 	CEffect::EFFECTDESC EffectDesc;
@@ -1418,24 +1480,6 @@ void CPlayer::Make_SlashEffect()
 	EffectDesc.vInitScale = _float3(3.f, 3.f, 3.f);
 	CGameInstance::Get_Instance()->Add_GameObject(TEXT("Prototype_GameObject_PlayerEffect"), LEVEL_STATIC, TEXT("Layer_PlayerEffect"), &EffectDesc);
 
-	if (m_eState == SLASH_HOLD_ED)
-	{
-
-		fEffectVolume = 0.3f;
-		_uint iNum = rand() % 4 + 1;
-		wcscpy_s(sz_SoundEffect, TEXT("LSword_AttackCharging%d.wav"));
-		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
-		CGameInstance::Get_Instance()->PlaySounds(sz_SoundEffect, SOUND_PEFFECT, fEffectVolume);
-
-	}
-	else
-	{
-		fEffectVolume = 0.3f;
-		_uint iNum = rand() % 5 + 1;
-		wcscpy_s(sz_SoundEffect, TEXT("LSword_Swing%d.wav"));
-		wsprintf(sz_SoundEffect, sz_SoundEffect, iNum);
-		CGameInstance::Get_Instance()->PlaySounds(sz_SoundEffect, SOUND_PEFFECT, fEffectVolume);
-	}
 }
 
 void CPlayer::Make_ChargeEffect()
