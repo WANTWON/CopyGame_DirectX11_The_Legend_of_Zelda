@@ -171,7 +171,6 @@ void CDgnKey::Late_Tick(_float fTimeDelta)
 		if (pPlayer->Get_AnimState() == CPlayer::ITEM_GET_ED || pPlayer->Get_AnimState() == CPlayer::S_ITEM_GET_ED)
 		{
 			pUI_Manager->Open_Message(false);
-			pUI_Manager->Get_Key();
 			m_bDead = true;
 
 			list<CGameObject*>* pEffectList = CGameInstance::Get_Instance()->Get_ObjectList(LEVEL_STATIC, TEXT("Layer_ObjectEffect"));
