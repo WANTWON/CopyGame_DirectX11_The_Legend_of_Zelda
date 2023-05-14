@@ -136,9 +136,9 @@ NPC는 공통적으로 플레이어와 충돌하면 대화가 가능해집니다
 
 ### Defferd Shader
 
-<img src="https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/d967daff-dc7a-4149-96e8-ac4b980f9a75" width="50%"/> 
+<img src="https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/d967daff-dc7a-4149-96e8-ac4b980f9a75" width="70%"/> 
 
-<img src="https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/51e42c56-a7a6-4991-a3a4-f5f56ecb033d" width="50%"/>
+<img src="https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/51e42c56-a7a6-4991-a3a4-f5f56ecb033d" width="70%"/>
 
 <img src="https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/d9dc134f-14ea-44d0-82dc-676029305efc" width="20%"/> <img src="https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/1904c677-2ffe-4486-ad9b-530aee9a9d00" width="40%"/>
 
