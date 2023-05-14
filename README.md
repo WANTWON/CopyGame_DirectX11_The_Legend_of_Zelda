@@ -35,8 +35,7 @@
 
 ## 1. 플레이어
 
-![제목 없는 동영상 - Clipchamp로 제작](https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/9db2511e-9e2c-4016-99b9-7db049cd74ba)
-![제목 없는 동영상 - Clipchamp로 제작 (1)](https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/f7dee7df-b657-4181-b674-f2c22cd030e3)
+<img src="https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/9db2511e-9e2c-4016-99b9-7db049cd74ba" width="40%"/> <img src="https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/f7dee7df-b657-4181-b674-f2c22cd030e3" width="40%"/>
 
 플레이어는 8방향 움직임,  대쉬, 점프, 이중점프, 약공격, 밀기, 당기기, 일반 공격 등 여러 애니메이션이 존재합니다.
 
@@ -83,8 +82,7 @@ NPC는 공통적으로 플레이어와 충돌하면 대화가 가능해집니다
 
 ### 룰라
 
-![제목 없는 동영상 - Clipchamp로 제작 (16)](https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/a99cee70-7e51-4a3f-996c-b36d58828816)
-![제목 없는 동영상 - Clipchamp로 제작 (17)](https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/e61bb0e7-96a4-44f3-91d9-ae2ef0a9ad52)
+<img src="https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/a99cee70-7e51-4a3f-996c-b36d58828816" width="40%"/> <img src="https://github.com/WANTWON/CopyGame_DirectX11_The_Legend_of_Zelda/assets/106663427/e61bb0e7-96a4-44f3-91d9-ae2ef0a9ad52" width="40%"/>
 
 포물선 공식을 이용해 점프를 구현했습니다. 점프하며 플레이어를 향해 움직입니다. 이때 4번의 데미지를 입을 때마다 벽으로 이동하여 뿔 롤러를 굴립니다.
 
