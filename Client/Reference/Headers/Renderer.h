@@ -46,12 +46,19 @@ private:
 
 	class CVIBuffer_Rect*					m_pVIBuffer = nullptr;
 	class CShader*							m_pShader = nullptr;
+	class CTexture*							m_pNoiseTexture = nullptr;
 	_float4x4								m_WorldMatrix, m_ViewMatrix, m_ProjMatrix;
 
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_NonAlphaBlend();
 	HRESULT Render_ShadowDepth();
+
+	HRESULT Render_BlurDownSample();
+	HRESULT Render_BlurHorizontal();
+	HRESULT Render_BlurVertical();
+	HRESULT Render_BlurUpSample();
+	HRESULT Render_Grow();
 
 	HRESULT Render_Lights();
 	HRESULT Render_Blend();
